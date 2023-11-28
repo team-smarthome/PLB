@@ -1,0 +1,13 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.bg-scan-passport {
+  background-color: #3d5889;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}

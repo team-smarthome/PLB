@@ -1,0 +1,16 @@
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 10%;
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  color: #fff;
+}
+
+.header-title {
+  font-size: 2.5em;
+  font-family: "Roboto", Arial, sans-serif;
+}
