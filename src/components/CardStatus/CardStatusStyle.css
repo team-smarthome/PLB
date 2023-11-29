@@ -27,6 +27,11 @@
     flex-direction: column;
     border-radius: 18px;
   }
+
+  .webcam {
+    width: 260px;
+    height: 155px;
+  }
   
   .card-title {
     font-size: 30px;

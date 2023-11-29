@@ -1,0 +1,18 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.payment-container {
+  background-color: #3d5889;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.payment-body{
+    display: flex;
+  align-items: center;
+}

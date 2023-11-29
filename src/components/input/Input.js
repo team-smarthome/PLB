@@ -3,7 +3,6 @@ import "./InputStyle.css";
 import Checklist from "../../assets/images/group.svg";
 
 const Input = () => {
-
   const initialFormData = {
     passport_number: "X123J123",
     full_name: "JOHN ANTHONY GINTING ",
@@ -55,123 +54,66 @@ const Input = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <div className="wrapper-form">
-          <label htmlFor="passport_number">Passport Number</label>
-          <input
-            type="text"
-            name="passport_number"
-            id="passport_number"
-            value={formdata.passport_number}
-            onChange={handleInputChange}
-          />
+            <label htmlFor="passport_number">Passport Number</label>
+            <input
+              type="text"
+              name="passport_number"
+              id="passport_number"
+              value={formdata.passport_number}
+              onChange={handleInputChange}
+            />
           </div>
           <div className="checkbox-container">
-          <div className="checkbox-value">
-
-          </div>
+            <div className="checkbox-value"></div>
           </div>
         </div>
 
         <div className="form-group">
           <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="full_name">Full Name</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="text"
-            name="full_name"
-            id="full_name"
-            value={formdata.full_name}
-            onChange={handleInputChange}
-          />
-          </div>
-          <div className="checkbox-container">
-          <div className="checkbox-value">
-
-          </div>
-          </div>
-       
-        </div>
-
-
-        {/* <div className="form-group">
-          <label htmlFor="full_name">Full Name</label>
-          <input
-            type="text"
-            name="full_name"
-            id="full_name"
-            value={formdata.full_name}
-            onChange={handleInputChange}
-          />
-        </div> */}
-
-<div className="form-group">
-          <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="date_of_birth">Date of Birth</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="date"
-            name="date_of_birth"
-            id="date_of_birth"
-            value={formdata.date_of_birth}
-            onChange={handleInputChange}
-          />
-          </div>
-          <div className="checkbox-container">
-          <div className="checkbox-value">
-
-          </div>
-          </div>
-          {/* <img 
-            src={Checklist}
-          /> */}
-        </div>
-
-        {/* <div className="form-group">
-          <label htmlFor="date_of_birth">Date of Birth</label>
-          <input
-            type="date"
-            name="date_of_birth"
-            id="date_of_birth"
-            value={formdata.date_of_birth}
-            onChange={handleInputChange}
-          />
-        </div> */}
-
-
-<div className="form-group">
-          <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="gender">Gender</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="text"
-            name="gender"
-            id="gender"
-            value={formdata.gender}
-            onChange={handleInputChange}
-          />
-          </div>
-          <div className="checkbox-container">
-          <div className="checkbox-value">
-
-          </div>
-          </div>
-          {/* <img 
-            src={Checklist}
-          /> */}
-        </div>
-
-        {/* <div className="form-group">
-          <label htmlFor="gender">Gender</label>
-          <div className="select-container">
+            <div className="wrapper-input">
+              <label htmlFor="full_name">Full Name</label>
+            </div>
             <input
+              type="text"
+              name="full_name"
+              id="full_name"
+              value={formdata.full_name}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="checkbox-container">
+            <div className="checkbox-value"></div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="date_of_birth">Date of Birth</label>
+            </div>
+            <input
+              type="date"
+              name="date_of_birth"
+              id="date_of_birth"
+              value={formdata.date_of_birth}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="checkbox-container">
+            <div className="checkbox-value"></div>
+          </div>
+          {/* <img 
+            src={Checklist}
+          /> */}
+        </div>
+
+        <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="gender">Gender</label>
+            </div>
+            <input
+              // style={{marginLeft: "52px", marginRight: "4px"}}
               type="text"
               name="gender"
               id="gender"
@@ -179,118 +121,81 @@ const Input = () => {
               onChange={handleInputChange}
             />
           </div>
-        </div> */}
+          <div className="checkbox-container">
+            <div className="checkbox-value"></div>
+          </div>
+          {/* <img 
+            src={Checklist}
+          /> */}
+        </div>
         <div className="form-group">
           <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="nationality">Nationality</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="text"
-            name="nationality"
-            id="nationality"
-            value={formdata.nationality}
-            onChange={handleInputChange}
-          />
+            <div className="wrapper-input">
+              <label htmlFor="nationality">Nationality</label>
+            </div>
+            <input
+              type="text"
+              name="nationality"
+              id="nationality"
+              value={formdata.nationality}
+              onChange={handleInputChange}
+            />
           </div>
           <div className="checkbox-container">
-          <div className="checkbox-value">
-
-          </div>
+            <div className="checkbox-value"></div>
           </div>
           {/* <img 
             src={Checklist}
           /> */}
         </div>
 
-        {/* <div className="form-group">
-          <label htmlFor="nationality">Nationality</label>
-          <input
-            type="text"
-            name="nationality"
-            id="nationality"
-            value={formdata.nationality}
-            onChange={handleInputChange}
-          />
-        </div> */}
         <div className="form-group">
           <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="expiry_date">Expiry Date</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="date"
-            name="expiry_date"
-            id="expiry_date"
-            value={formdata.expiry_date}
-            onChange={handleInputChange}
-          />
+            <div className="wrapper-input">
+              <label htmlFor="expiry_date">Expiry Date</label>
+            </div>
+            <input
+              type="date"
+              name="expiry_date"
+              id="expiry_date"
+              value={formdata.expiry_date}
+              onChange={handleInputChange}
+            />
           </div>
           <div className="checkbox-container">
-          {/* <div className="checkbox-value">
+            {/* <div className="checkbox-value">
 
           </div> */}
           </div>
-           <img 
-            src={Checklist}
-          />
+          <img src={Checklist} />
         </div>
-        {/* <div className="form-group">
-          <label htmlFor="expiry_date">Expiry Date</label>
-          <input
-            type="date"
-            name="expiry_date"
-            id="expiry_date"
-            value={formdata.expiry_date}
-            onChange={handleInputChange}
-          />
-        </div> */}
-          <div className="form-group">
-          <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="paspor_type">Paspor Type</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="text"
-            name="paspor_type"
-            id="paspor_type"
-            value={formdata.paspor_type}
-            onChange={handleInputChange}
-          />
-          </div>
-          <div className="checkbox-container">
-          {/* <div className="checkbox-value">
-          </div> */}
-          </div>
-          <img 
-            src={Checklist}
-          />
-        </div>
-        {/* <div className="form-group">
-          <label htmlFor="paspor_type">Paspor Type</label>
-          <input
-            type="text"
-            name="paspor_type"
-            id="paspor_type"
-            value={formdata.paspor_type}
-            onChange={handleInputChange}
-          />
-        </div> */}
-
-
 
         
         <div className="form-group">
           <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="paspor_type">Paspor Type</label>
+            </div>
+            <input
+              // style={{marginLeft: "52px", marginRight: "4px"}}
+              type="text"
+              name="paspor_type"
+              id="paspor_type"
+              value={formdata.paspor_type}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="checkbox-container">
+            {/* <div className="checkbox-value">
+          </div> */}
+          </div>
+          <img src={Checklist} />
+        </div>
 
-          <div className="wrapper-input">
-          <label htmlFor="photo">Photo</label>
+        <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="photo">Photo</label>
             </div>
           </div>
           <div className="photo">
@@ -303,22 +208,19 @@ const Input = () => {
           </div>
         </div>
 
-        
-
         <div className="form-group">
           <div className="wrapper-form">
-          <div className="wrapper-input">
-          <label htmlFor="email">Email</label>
-
-          </div>
-          <input
-          // style={{marginLeft: "52px", marginRight: "4px"}}
-            type="text"
-            name="email"
-            id="email"
-            value={formdata.email}
-            onChange={handleInputChange}
-          />
+            <div className="wrapper-input">
+              <label htmlFor="email">Email</label>
+            </div>
+            <input
+              // style={{marginLeft: "52px", marginRight: "4px"}}
+              type="text"
+              name="email"
+              id="email"
+              value={formdata.email}
+              onChange={handleInputChange}
+            />
           </div>
           {/* <div className="checkbox-container"> */}
           {/* <div className="checkbox-value">
@@ -328,17 +230,6 @@ const Input = () => {
             src={Checklist}
           /> */}
         </div>
-
-        {/* <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            name="email"
-            id="email"
-            value={formdata.email}
-            onChange={handleInputChange}
-          />
-        </div> */}
       </form>
     </div>
   );
