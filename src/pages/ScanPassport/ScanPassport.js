@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import "./ScanPassportStyle.css";
+import Hero from "../../components/hero/Hero";
 
 const ScanPassport = () => {
   return (
@@ -12,6 +13,7 @@ const ScanPassport = () => {
         <div className="body-scan-passport"></div>
         <div className="footer-scan-passport"></div>
       </div> */}
+      <Hero />
       <Footer
         titleBack="Back"
         titleStep="Next Step"

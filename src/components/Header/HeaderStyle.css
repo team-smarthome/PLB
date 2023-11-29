@@ -1,5 +1,5 @@
 .header-container {
-  position: fixed;
+  /* position: fixed; */
   top: 0;
   left: 10%;
   width: 100%;
@@ -8,6 +8,8 @@
   align-items: left;
   justify-content: left;
   color: #fff;
+  padding-left: 160px;
+  /* background-color: aqua; */
 }
 
 .header-title {

@@ -1,0 +1,47 @@
+/* CardStatus.css */
+
+.card-status {
+  display: flex;
+  /* background-color: green; */
+  margin-left: -20px;
+}
+
+.card-container {
+    width: 645px;
+    height: 285px;
+    background-color: #FBAF17;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 40px;
+    border-radius: 18px;
+  }
+  
+  .inner-card {
+    width: 630px;
+    height: 265px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 18px;
+  }
+  
+  .card-title {
+    font-size: 30px;
+    text-align: center;
+    color: #3D5889;
+    margin-top: -10px;
+  }
+  
+  .card-image {
+    /* margin-bottom: 20px; */
+    width: 260px;
+    height: 155px;
+    /* object-fit: cover; */
+  }
+  
+  /* h1 {
+    color: #3D5889;
+  } */
