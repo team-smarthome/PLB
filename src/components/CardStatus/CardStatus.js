@@ -10,7 +10,7 @@ import Gambar4 from "../../assets/images/image-4.svg";
 import Gambar6 from "../../assets/images/image-6.svg";
 import Gambar7 from "../../assets/images/image-7.svg";
 import "./CardStatusStyle.css";
-import WebcamComponent from "../WebcamComponent/WebcamComponent";
+
 
 const CardStatus = () => {
   const [status, setStatus] = useState("iddle");
@@ -29,7 +29,7 @@ const CardStatus = () => {
     if (path === "scanpassport") {
       setStatus("success");
     } else if (path === "takephoto") {
-      setStatus("takePhotoSucces");
+      setStatus("lookCamera");
     } else if (path === "inputemail") {
       setStatus("inputEmail");
     }
