@@ -29,30 +29,31 @@
     cursor: pointer;
     text-align: center;
     margin-left: -20px;
-    
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .list-content {
     background-color: #A3A9A5;
     height: 15px;
     width: 520px;
-    font-size: 25px;
+    font-size: 20px;
     font-weight: bold;
     padding: 1rem;
     color: #fff;
     border-radius: 10px;
     cursor: pointer;
-    
+    display: flex;
+    align-items: center;
   }
   
   .selected {
     background-color: #FBAF17 !important;
   }
 
-  .isActived .list-content {
-    background-color: #86D1A4 !important;
-  }
-
+  .isActived .list-content,
   .isActived .number-badge {
-    background-color: #86D1A4 !important;
+      background-color: #86D1A4 !important;
   }
+  
