@@ -9,7 +9,9 @@ const Hero = () => {
     <div className="hero">
       <div className="container-hero">
         <div className="list"><List /></div>
-        <div className="card"><CardStatus /></div>
+        <div className="card">
+          <CardStatus />
+        </div>
       </div>
       <div className="form">
         <Input />

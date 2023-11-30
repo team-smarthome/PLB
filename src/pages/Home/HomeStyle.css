@@ -40,10 +40,6 @@ html {
   .text-information {
     font-size: 2em;
   }
-   .bg-apply-information {
-    width: 100%; /* Set the width to 100% for tablets */
-    height: auto; /* Set the height to auto for tablets */
-  }
 }
 
 
@@ -125,4 +121,18 @@ html {
   color: #fff;
   font-size: 2em;
   font-family: "Roboto", Arial, sans-serif;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 979px) {
+  .bg-apply-information  {
+    height: 70px;
+  }
+  .bg-apply {
+    height : 30%;
+    margin-bottom: -46px;
+  }
+  .bg-information {
+    height: 30%;
+  }
+
 }

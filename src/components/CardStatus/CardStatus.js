@@ -27,7 +27,7 @@ const CardStatus = () => {
   useEffect(() => {
     const path = location.pathname.split("/").pop();
     if (path === "scanpassport") {
-      setStatus("success");
+      setStatus("errorBulan");
     } else if (path === "takephoto") {
       setStatus("lookCamera");
     } else if (path === "inputemail") {

@@ -2,19 +2,15 @@
 
 .list-container {
     margin-top: -15px;
-    /* margin-bottom: ; */
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    /* background-color: red; */
   }
   
   .list-item {
-    /* margin-top: ; */
     display: flex;
     gap: 30px;
-    /* margin-right: 200px; */
   }
   
   .number-badge {
@@ -57,3 +53,10 @@
       background-color: #86D1A4 !important;
   }
   
+
+  @media screen and (max-width: 768px) {
+    .list-container {
+      margin-top: 10px;
+      margin-left: 40px;
+    }
+  }

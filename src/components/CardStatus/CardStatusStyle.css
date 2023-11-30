@@ -87,9 +87,86 @@
   margin-top: 5px;
 }
 
-@media only screen and (max-width: 768px) {
+/* @media only screen and (max-width: 768px){ */
   .card-container {
-    /* width: 500px;
-    height: 100px; */
+    height: 225px;
+    margin-top: 20px;
+    /* background-color: red; */
+    margin-left: 80px;
   }
+  .inner-card {
+    height: 205px;
+  }
+  .card-image {
+    height: 130px;
+    margin-bottom: 20px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .webcam {
+    width: 260px;
+    height: 130px;
+  }
+
+  .input-email input {
+     height: 15px;
+    /* gap: 10px; */
+    width: 280px;
+    margin-bottom: 10px;
+  }
+
+  .ok-button {
+    margin-bottom: 20px;
+  }
+
+  p {
+    margin-top: -15px;
+  }
+  
+/* } */
+
+@media only screen and (max-width: 768px){
+  .card-container {
+    height: 200px;
+    margin-top: 10px;
+    /* background-color: red; */
+    margin-left: 80px;
+  }
+  .inner-card {
+    height: 185px;
+  }
+  .card-image {
+    height: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .webcam {
+    width: 260px;
+    height: 130px;
+  }
+
+  .input-email input {
+     height: 10px;
+    /* gap: 10px; */
+    width: 280px;
+    margin-bottom: 10px;
+  }
+
+  .ok-button {
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-top: -15px;
+  }
+  
 }

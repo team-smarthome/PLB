@@ -16,3 +16,13 @@ html {
     display: flex;
   align-items: center;
 }
+
+@media screen and (max-width: 768px) {
+  .payment-body {
+    margin-top: 10px;
+    height: 85vh;
+    display: inline-block;  
+  /* align-items: center; */
+}
+
+}

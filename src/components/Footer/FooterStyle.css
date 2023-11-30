@@ -58,3 +58,13 @@
   font-size: 2em;
   font-family: "Roboto", Arial, sans-serif;
 }
+
+@media only screen and (max-width: 768px) {
+  .footer {
+    padding-left: 32px;
+    /* padding-right: 20px; */
+    /* background-color: aqua; */
+    width: 665px;
+    margin-left: 20px;
+  }
+}

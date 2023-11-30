@@ -8,10 +8,10 @@ const Payment = () => {
         <div className="payment-container">
             <Header title="Payment"/>
             <div className="payment-body">
-            {/* <CardPayment /> */}
+            <CardPayment />
             {/* <CardPayment isConfirm/> */}
             {/* <CardPayment isPrinted/> */}
-            <CardPayment isSuccess/>    
+            {/* <CardPayment isSuccess/>     */}
             <Input />
             </div>
         </div>

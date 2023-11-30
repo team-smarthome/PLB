@@ -12,3 +12,10 @@
     flex-direction: nowrap;
     height: 455px;
 }
+
+@media screen and (max-width: 768px) {
+    .hero {
+        display: inline-block;
+        height: 2px;
+    }
+}
