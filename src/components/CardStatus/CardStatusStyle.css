@@ -18,7 +18,7 @@
   
   .inner-card {
     width: 630px;
-    height: 265px;
+    height: 260px;
     background-color: #fff;
     display: flex;
     justify-content: center;
@@ -87,12 +87,11 @@
   margin-top: 5px;
 }
 
-/* @media only screen and (max-width: 768px){ */
+/* @media only screen and (max-width: 768px){
   .card-container {
     height: 225px;
     margin-top: 20px;
-    /* background-color: red; */
-    margin-left: 80px;
+    margin-left: 40px;
   }
   .inner-card {
     height: 205px;
@@ -115,11 +114,11 @@
   .input-email input {
      height: 15px;
     /* gap: 10px; */
-    width: 280px;
+    /* width: 280px;
     margin-bottom: 10px;
-  }
+  } */
 
-  .ok-button {
+  /* .ok-button {
     margin-bottom: 20px;
   }
 
@@ -127,14 +126,15 @@
     margin-top: -15px;
   }
   
-/* } */
+} */
+
 
 @media only screen and (max-width: 768px){
   .card-container {
     height: 200px;
     margin-top: 10px;
     /* background-color: red; */
-    margin-left: 80px;
+    margin-left: 78px;
   }
   .inner-card {
     height: 185px;
@@ -169,4 +169,61 @@
     margin-top: -15px;
   }
   
+}
+
+@media only screen  and (min-width: 769px) and (max-width: 1024px) {
+
+  .card-status {
+    display: flex;
+    width: 30%;
+    align-items: center;
+    margin-left: -36px;
+    /* background-color: red; */
+  }
+  .card-container {
+    margin-top: -20px;
+    width: 58.5%;
+    margin-left: 10.2em;
+    height: 300px;
+
+  }
+
+  .inner-card {
+    width: 96%;
+    height: 90%;
+  }
+
+  .input-email input {
+    width: 340%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .input-email input::placeholder {
+    font-size: 100%;
+  }
+
+  .email {
+    margin: 8px;
+    width: 100%;
+  }
+
+  .ok-button {
+    width: 10%;
+    margin-top: 15px;
+    font-size: 20.5px;
+    font-weight: bold;
+  }
+
+  .card-title {
+    font-size: 25px;
+    width: 100%;
+    
+  }
+
+  .input-email input {
+    width: 28vh;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
 }

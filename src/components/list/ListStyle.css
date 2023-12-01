@@ -60,3 +60,30 @@
       margin-left: 40px;
     }
   }
+
+  @media only screen and (min-width: 769px) and (max-width: 1024px) {
+    .list-container {
+      margin-right: 28px;
+      display: flex;
+      align-items: center;
+      height: 200px;
+      /* background-color: red; */
+      padding-top: 30px;
+      gap: 20px;
+    }
+    .number-badge {
+      /* margin: 0%; */
+      transform: scale(1.1);
+      margin-left: -38.5px;
+      
+      /* padding: 0%; */
+    }
+    .list-content {
+      transform: scale(1.1);
+    }
+    .list-item {
+      display: flex;
+      gap: 60px;
+      align-items: center;
+    }
+  }

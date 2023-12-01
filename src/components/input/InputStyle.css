@@ -84,6 +84,8 @@ label {
     padding-top: 10px;
   }
 
+
+  /* inspect element chrome */
   /* @media screen and (max-width: 768px) {
     .container-form {
       margin-left: 60px;
@@ -120,6 +122,7 @@ label {
     }
   } */
 
+ /* mobile simulator */   
   @media screen and (max-width: 768px) {
     .container-form {
       margin-left: 60px;
@@ -154,4 +157,42 @@ label {
 
     .checkbox-value {
     }
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1024px) {
+    .container-form {
+      display: flex;
+      /* align-items: flex-start; */
+      /* padding-top: 10vh; */
+      margin-top: 0.5vh;
+      justify-content: center;
+      /* background-color: red; */
+      height: 42vh;
+      width: 53vh;
+      margin-left: 7.9em;
+    }
+    
+    .form-group {
+      /* background-color: red; */
+      height: 63.75px;
+      display: flex;
+      align-items: center;
+      /* flex-direction: row; */
+    }
+
+    .form-group input {
+      width: 400px;
+      height: 15px;
+    }
+
+    .photo-box {
+      /* background-color: red; */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 70px;
+      /* padding-left: 30px; */
+    }
+    
+
   }

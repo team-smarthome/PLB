@@ -68,3 +68,19 @@
     margin-left: 20px;
   }
 }
+
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+  .footer {
+
+  }
+  .container-footer {
+    /* background-color: red; */
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+  }
+  .box-footer {
+    /* background-color: aqua;   */
+    width: 72%;
+  }
+}

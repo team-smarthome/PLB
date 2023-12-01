@@ -243,3 +243,52 @@
       }
 
     }
+
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+    .card-status1 {
+      /* background-color: red; */
+      height: 40%;
+      width: 71%;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      margin: 0;
+      padding: 0%
+    }
+    .card-container1 {
+      height: 100%;
+      width: 100%;
+      padding: 0%;
+      margin: 0%;
+    }
+    .inner-card1 {
+      height : 93%;
+      width: 93%;
+    }
+
+    .form-group-payment1 {
+      font-size: 20px;
+      margin-top: 30px;
+    }
+
+    .form-group-payment1:nth-child(1){
+      margin-top: 30px;
+      /* margin-top: 3rem; */
+      /* background-color: red; */
+      gap: 10px;
+      font-size: 20px;
+    }
+
+    .form-group-payment1:nth-child(1){
+      /* margin-top: 1rem; */
+      margin-top: 30px;
+      font-size: 20px;
+      /* background-color: aqua; */
+    }
+    .form-group-payment1:nth-child(3){
+      /* margin-bottom: 4rem;   */
+      margin-top: 30px;
+      font-size: 20px;
+      /* background-color: #FBAF17; */
+    }
+}

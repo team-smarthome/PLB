@@ -23,6 +23,28 @@ html {
     height: 85vh;
     display: inline-block;  
   /* align-items: center; */
+  }
 }
+
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+  .payment-body {
+    padding-top: 20px;
+    /* background-color: aqua; */
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .payment-input {
+    /* background-color: red; */
+    margin-bottom: 18%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 10%;
+
+  }
 
 }

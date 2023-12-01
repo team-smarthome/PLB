@@ -28,3 +28,13 @@
     /* background-color: red; */
   }
 }
+
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+  .header-container {
+    /* background-color: red; */
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
