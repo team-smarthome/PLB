@@ -29,7 +29,7 @@ const CardStatus = () => {
     if (path === "scanpassport") {
       setStatus("iddle");
     } else if (path === "takephoto") {
-      setStatus("lookCamera");
+      setStatus("takePhotoSucces");
     } else if (path === "inputemail") {
       setStatus("inputEmail");
     }
@@ -89,10 +89,6 @@ const CardStatus = () => {
     default:
       imageSource = Gambar1;
   }
-
-  const handleCapture = (imageSrc) => {
-    setCapturedImage(imageSrc);
-  };
 
   return (
     <div className="card-status">

@@ -123,7 +123,7 @@ label {
   } */
 
  /* mobile simulator */   
-  @media screen and (max-width: 768px) {
+  /* @media screen and (max-width: 768px) {
     .container-form {
       margin-left: 60px;
       display: flex;
@@ -157,7 +157,7 @@ label {
 
     .checkbox-value {
     }
-  }
+  } */
 
   @media only screen and (min-width: 769px) and (max-width: 1024px) {
     .container-form {
@@ -174,7 +174,7 @@ label {
     
     .form-group {
       /* background-color: red; */
-      height: 63.75px;
+      height: 4.675vh;
       display: flex;
       align-items: center;
       /* flex-direction: row; */
@@ -185,14 +185,75 @@ label {
       height: 15px;
     }
 
+    .form-group label {
+      font-size: 1.18vh;
+    }
+
     .photo-box {
-      /* background-color: red; */
       display: flex;
       align-items: center;
       justify-content: center;
       height: 70px;
-      /* padding-left: 30px; */
     }
     
+
+  }
+
+  @media only screen and (max-width: 768px) {
+    .container-form {
+      margin-top: 3.8%;
+      display: flex;
+      width: 70%;
+      margin: 0;
+      margin-top: 3.8%;
+      margin-left: 11vh;
+      height: 33vh;
+      justify-content: center;
+    }
+
+    .form-group {
+      margin-top: 0%;
+      height: 3.65vh;
+      width: 53vh;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .form-group label {
+      font-size: 1.2vh;
+      margin-left: 2.8vh;
+    }
+
+    .form-group input {
+      width: 25vh;
+      height: 0.4vh;
+    }
+
+    .photo-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+    }
+
+    .wrapper-form {
+      margin-top: 0%;
+    }
+
+
+    .photo-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 4vh;
+      width: 4vh;
+      margin-bottom: 25%;
+      margin-left: -20%;
+    }
+
+    .photo-box img {
+      height: 2vh;
+    }
 
   }

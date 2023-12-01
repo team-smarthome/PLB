@@ -59,20 +59,8 @@
   font-family: "Roboto", Arial, sans-serif;
 }
 
-@media only screen and (max-width: 768px) {
-  .footer {
-    padding-left: 32px;
-    /* padding-right: 20px; */
-    /* background-color: aqua; */
-    width: 665px;
-    margin-left: 20px;
-  }
-}
 
 @media only screen and (min-width: 769px) and (max-width: 1024px) {
-  .footer {
-
-  }
   .container-footer {
     /* background-color: red; */
     display: flex;
@@ -83,4 +71,25 @@
     /* background-color: aqua;   */
     width: 72%;
   }
+}
+
+@media only screen and (max-width: 768px) {
+  .container-footer {
+    /* background-color: red; */
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+  }
+  .box-footer {
+    /* background-color: aqua;   */
+    width: 72%; 
+  }
+  .text-back,
+  .text-step {
+    font-size: 1.5em;
+  }
+.bg-back,
+.bg-step {
+  height: 3.8vh;
+}
 }

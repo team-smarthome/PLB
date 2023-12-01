@@ -17,7 +17,40 @@
       margin-left: 40px;
       border-radius: 18px;
     }
+
     
+    .card-container1 img {
+      margin-top: 10vh;
+      margin-bottom: -13vh;
+    }
+    .isPrint-container1 img {
+      /* background-color: red; */
+      margin-top: 1vh;
+    }
+
+    .isfailed-payment {
+      /* background-color: red; */
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .isfailed-payment2 {
+      /* margin-top: 10vh; */
+      /* margin-bottom: 1vh; */
+      color: #3D5889;
+    }
+
+    .isfailed-payment img {
+      margin-bottom: 12vh;
+    }
+
+    .issusccess-container1 img {
+      margin-top: 10vh;
+      height: 20vh;
+      width: 20vh;
+    }
+
     .inner-card1 {
       width: 630px;
       height: 455px;
@@ -30,10 +63,25 @@
     }
     
     .card-title1 {
-      font-size: 40px;
+      font-size: 7vh;
+      height: 2vh;
       text-align: center;
       color: #3D5889;
-      margin-top: -10px;
+      margin-top: -15vh;
+    }
+
+    .issusccess-register1 {
+      margin-top: 15vh;
+      /* background-color: red; */
+      display: flex;
+      flex-direction: row ;
+      gap: 2vh;
+    }
+
+
+    .issusccess-container1 h4{ 
+      color: red;
+      /* margin-top: 0.6vh; */
     }
     
     .card-image1 {
@@ -43,31 +91,35 @@
       /* object-fit: cover; */
     }
     .card-image-success1, .card-image-print1{
-      width: 150px;
-      height: 150px;
+      width: 30vh;
+      height: 20vh;
+      /* background-color: red; */
     }
     
     .card-image-issuccess1 {
         width: 260px;
       height: 150px;  
-      margin-bottom: 1.5rem;
     }
     .isPrint-container1{
+      margin-bottom: -2vh;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
     .issusccess-container1{
+      height: 50vh;
+      width: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
+      /* background-color: aqua; */
     
     }
     .issusccess-container1 button{
-      width: 254px;
-      height: 100px;
+      width: 25vh;
+      height: 10vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -91,6 +143,7 @@
       flex-direction: column;
     }
     .print-container1 h2{
+      margin-top: 20vh;
       color: #3D5889;
       font-size: 19px;
       text-align: center;
@@ -102,15 +155,20 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      margin: 1rem 0;
+      /* margin: 1rem 0; */
+      margin-top: 5vh;
+      /* margin-bottom: 10vh; */
     }
     .form-group-payment1:nth-child(1){
-      margin-top: 3rem;
+      margin-top: 12vh;
+      /* background-color: red; */
     }
     .form-group-payment1:nth-child(3){
-      margin-bottom: 5rem;
+      margin-top: 5vh;
+      margin-bottom: 15vh;
     }
     .form-group-payment-submit1{
+      margin-bottom: -12vh;
       display: flex;
       justify-content: center;
     }
@@ -126,125 +184,17 @@
       color: #fff;
     }
 
-    @media only screen and (max-width: 768px){
-      .card-status1 {
-        display: flex;
-        justify-content: center;
-      }
-      .card-container1 {
-        margin-top: 5px;
-        margin-bottom: 25px;
-        height: 350px;
-      }
-      .inner-card1 {
-        height: 320px;
-        width: 610px;
-      }
-      .card-title1 {
-        font-size: 30px;
-        margin-top: 2px;
-      }
-
-      .card-image1 {
-        width: 220px;
-        height: 250px;
-      } 
-      
-      .form-group-payment1 label {
-        padding-top: 18px;
-      }
-      .form-group-payment1{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        margin: 1rem 0;
-      }
-      .form-group-payment1:nth-child(1){
-        margin-top: 3rem;
-      }
-      .form-group-payment1:nth-child(3){
-        margin-bottom: 5rem;
-      }
-      .form-group-payment-submit1{
-        display: flex;
-        justify-content: center;
-      }
-    
-      .form-group-payment-submit1 button{
-        width: 250px;
-        height: 50px;
-        border-radius: 18px;
-        border: none;
-        background-color: #3D5889;
-        font-size: 20px;
-        font-weight: bold;
-        color: #fff;
-      }
-      .form-group-payment1{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        margin: 1rem 0;
-      }
-      .form-group-payment1:nth-child(1){
-        margin-top: 1rem;
-      }
-      .form-group-payment1:nth-child(3){
-        margin-bottom: 2rem;  
-      }
-      .form-group-payment-submit1{
-        display: flex;
-        justify-content: center;
-      }
-    
-      .form-group-payment-submit1 button{
-        width: 250px;
-        height: 50px;
-        border-radius: 18px;
-        border: none;
-        font-size: 32px;
-        font-weight: bold;
-        color: #fff;
-      }
-
-      .print-container1{
-        height: 0px;
-        
-        margin-top: 120px;
-        /* margin-top: 200px; */
-      }
-
-      .issusccess-container1 button{
-        width: 130px;
-        height: 40px;
-      }
-
-      .issusccess-container1 button h2{
-        font-size: 25px;
-      }
-
-      .issusccess-container1 button span{
-        padding-top: 0.8px;
-      }
-      
-      .issusccess-container1 img {
-        margin-left: 30px;
-      }
-
-      .isPrint-container1 img {
-        padding-top: 20px;
-        padding-bottom: 50px;
-        margin-top: -30px;
-        height: 80px;
-      }
-
-      .print-container1 h2 {
-        margin-top  : -100px;
-      }
-
-    }
 
 @media only screen and (min-width: 769px) and (max-width: 1024px) {
+
+  .issusccess-container1 {
+    margin-bottom: -10vh;
+    margin-top: 5vh;
+    height: 20vh;
+    width: 30vh;
+    /* background-color: #3DBB6F; */
+  }
+
     .card-status1 {
       /* background-color: red; */
       height: 40%;
@@ -281,14 +231,262 @@
 
     .form-group-payment1:nth-child(1){
       /* margin-top: 1rem; */
-      margin-top: 30px;
+      margin-top: 5vh;
       font-size: 20px;
       /* background-color: aqua; */
     }
     .form-group-payment1:nth-child(3){
       /* margin-bottom: 4rem;   */
-      margin-top: 30px;
+      margin-top: 2vh;
       font-size: 20px;
       /* background-color: #FBAF17; */
     }
+
+    .card-title1 {
+      /* margin-top: 0.1vh; */
+      /* background-color: red; */
+      font-size: 3.5vh;
+      height: 2vh;
+      width: 50vh;
+    }
+
+    .card-container-image {
+      /* background-color: red; */
+      margin-bottom: -2vh;
+      margin-top: -5vh;
+    }
+
+    .form-group-payment-submit1 {
+      margin-top: -10vh;
+    }
+
+    .print-container1 {
+      /* background-color: aqua; */
+      margin-top: -15vh;
+    }
+
+    .print-container1 img {
+      /* margin-top: 5vh; */
+      height: 15vh;
+    }
+
+    .print-container1 h2 {
+      /* margin-top: 2vh; */
+      /* background-color: aqua; */
+    }
+
+    .isPrint-container1 {
+      /* background-color: red; */
+      margin-top: 1vh;
+      /* margin-bottom: -10vh; */
+    }
+
+    .isPrint-container1 img {
+      /* margin-top: -1vh; */
+      padding-bottom: 7vh;
+      height: 10vh;
+    }
+    .issusccess-container1 button{
+      height: 3vh;
+      width: 12vh;
+    }
+    .issusccess-container1 img {
+      /* margin-bottom: 1vh; */
+      margin-top: -1vh;
+      /* background-color: red; */
+      height: 10vh;
+      width: 20vh;
+    }
+
+    .isfailed-payment {
+      margin-top: 3vh;
+    }
+
+    .isfailed-payment img {
+      /* background-color: aqua; */
+      margin-top: 3vh;
+      padding-bottom: 1vh;
+      /* margin-bottom: 1vh; */
+    }
+}
+
+@media only screen and (max-width: 768px) {
+  .card-status1 {
+    /* background-color: red; */
+    height: 32%;
+    width: 71%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0%
+  }
+  .card-container1 {
+    height: 100%;
+    width: 100%;
+    padding: 0%;
+    margin: 0%;
+  }
+  .inner-card1 {
+    height : 93%;
+    width: 93%;
+  }
+
+  .inner-card1 img {
+    height: 15vh;
+  }
+
+  .form-group-payment1 {
+    font-size: 15px;
+    margin-top: 3vh;
+  }
+
+  .form-group-payment1:nth-child(1){
+    margin-top: 3vh;
+    /* margin-top: 3rem; */
+    /* background-color: red; */
+    gap: 10px;
+    font-size: 15px;
+  }
+
+  .form-group-payment1:nth-child(1){
+    /* margin-top: 1rem; */
+    margin-top: 3vh;
+    font-size: 15px;
+    /* background-color: aqua; */
+  }
+  .form-group-payment1:nth-child(3){
+    margin-bottom: 1rem;
+    margin-top: 3vh;
+    font-size: 15px;
+    /* background-color: #FBAF17; */
+  }
+
+  .form-group-payment-submit1 button{
+    margin-bottom: 8vh;
+    width: 12vh;
+    height: 5vh;
+    border-radius: 18px;
+    border: none;
+    background-color: #3D5889;
+    font-size: 2.1vh;
+    font-weight: bold;
+    color: #fff;
+  }
+  .issusccess-container1 button{
+    /* background-color: red; */
+    width: 12vh;
+    height: 5vh;
+  }
+
+  .card-title1 {
+    margin-top: -3.5vh;
+    font-size: 2vh;
+    height: 2vh;
+    width: 25vh;
+  }
+
+
+
+  .isPrint-container1 {
+    /* background-color: aqua; */
+    margin-bottom: -6.5vh;
+    height: 30vh;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+  }
+  .isPrint-container1 img {
+    /* margin-top: -1vh; */
+    height: 7vh;
+  }
+  .print-container1{
+    margin-bottom: 20vh;
+  }
+
+  .issusccess-register1 {
+    margin-top: 15vh;
+    /* background-color: red; */
+    display: flex;
+    flex-direction: row ;
+  }
+
+  .issusccess-container1 img {
+    margin-top: -5vh;
+    height: 7vh;
+    width: 7vh;
+    /* background-color: red; */
+  }
+
+  .issusccess-container2 {
+    background-color: red;
+  }
+
+  .issusccess-container1{
+    margin-top: 7vh;
+    height: 15vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    /* background-color: aqua; */
+  }
+
+
+  .issusccess-container1 h4{ 
+    color: red;
+    margin-top: 0.6vh;
+  }
+
+  .issusccess-container1 h3{
+    margin-top: -1vh;
+    /* color: #3DBB6F; */
+    /* background-color: red; */
+  }
+
+  .issusccess-register1 {
+    /* background-color: red; */
+    gap: 2vh;
+  }
+  .isPrint-container1{
+    /* margin-top: 10vh; */
+
+    /* background-color: red; */
+    /* margin-bottom: 2.5vh; */
+  }
+  .card-container-image {
+    margin-bottom: 8vh;
+    margin-top: -5vh;
+  }
+ .card-container-image {
+  margin-bottom: 10vh;
+  margin-top: -5vh;
+ }
+
+ .print-container1 h2{
+  margin-top: 15vh;
+  font-size: 1.5vh;
+  text-align: center;
+ }
+
+ .isfailed-payment {
+  
+  /* background-color: red; */
+  height: 15vh;
+  
+ }
+
+ .isfailed-payment2 {
+  /* background-color: red; */
+  margin-top: 2vh ;
+  font-size: 1vh;
+  margin-bottom: -8vh;
+ }
+
+  .isfailed-payment img {
+    margin-bottom: 3vh;
+    height: 10vh;
+  }
+
+
+
 }
