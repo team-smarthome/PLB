@@ -3,51 +3,66 @@ import "./InputStyle.css";
 import Checklist from "../../assets/images/group.svg";
 import axios from "axios";
 
-const Input = () => {
+const Input = ({ sharedData, setSharedData }) => {
   const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
   const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
   const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
     useState(true);
   const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
     useState(true);
-  const [status, setStatus] = useState("iddle");
+  const [status, setStatus] = useState("checkData");
 
   const initialFormData = {
-    passport_number: "X123J123",
-    full_name: "JOHN ANTHONY GINTING ",
-    date_of_birth: "1990-09-09",
-    gender: "MALE",
-    nationality: "USA -UNITED STATES OF AMERICA",
-    expiry_date: "2030-09-09",
-    paspor_type: "P- ORDINARY PASPORT",
+    passport_number: "",
+    full_name: "",
+    date_of_birth: "",
+    gender: "",
+    nationality: "",
+    expiry_date: "",
+    paspor_type: "",
     photo: "",
     email: "",
   };
   const [formdata, setFormData] = useState(initialFormData);
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/data?passport_number=${formdata.passport_number}`
-      );
-      const data = response.data;
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `http://localhost:8080/api/data?passport_number=${formdata.passport_number}`
+  //     );
+  //     const data = response.data;
 
-      setFormData((prevData) => ({
-        ...prevData,
-        expiry_date: data.expiry_date || "",
-        paspor_type: data.paspor_type || "",
-      }));
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       expiry_date: data.expiry_date || "",
+  //       paspor_type: data.paspor_type || "",
+  //     }));
 
-      setIsCheckedExpiryDate(!!data.expiry_date);
-      setIsCheckedPasporType(!!data.paspor_type);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  //     setIsCheckedExpiryDate(!!data.expiry_date);
+  //     setIsCheckedPasporType(!!data.paspor_type);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
 
   useEffect(() => {
-    fetchData();
-  }, [formdata]);
+    // Update form data when sharedData changes
+    if (sharedData.passportData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        passport_number: sharedData.passportData.passport_number || "",
+        full_name: sharedData.passportData.full_name || "",
+        date_of_birth: sharedData.passportData.date_of_birth || "",
+        gender: sharedData.passportData.gender || "",
+        nationality: sharedData.passportData.nationality || "",
+        expiry_date: sharedData.passportData.expiry_date || "",
+        paspor_type: sharedData.passportData.paspor_type || "",
+      }));
+      setIsCheckedExpiryDate(!!sharedData.passportData.expiry_date);
+      setIsCheckedPasporType(!!sharedData.passportData.paspor_type);
+    }
+  }, [sharedData]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -71,9 +86,16 @@ const Input = () => {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8080/api/data", formdata);
-      fetchData();
-      setFormData(initialFormData);
+      // Update sharedData with the new form data
+      setSharedData({
+        ...sharedData,
+        passportData: formdata,
+      });
+
+      // Simulate API call
+      // await axios.post("http://localhost:8080/api/data", formdata);
+      // fetchData();
+      // setFormData(initialFormData);
     } catch (error) {
       console.error("Gagal mengirim formulir ke backend:", error);
     }
@@ -202,7 +224,7 @@ const Input = () => {
                   id="expiry_date"
                   value={formdata.expiry_date}
                   onChange={handleInputChange}
-                  disabled={!isCheckedExpiryDate}
+                  disabled={isCheckedExpiryDate}
                   className="disabled-input"
                 />
               </div>
@@ -240,7 +262,7 @@ const Input = () => {
                   id="paspor_type"
                   value={formdata.paspor_type}
                   onChange={handleInputChange}
-                  disabled={!isCheckedPasporType}
+                  disabled={isCheckedPasporType}
                   className="disabled-input"
                 />
               </div>

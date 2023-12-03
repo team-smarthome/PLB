@@ -2,6 +2,7 @@
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
+import axios from "axios";
 
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -11,11 +12,55 @@ import Gambar6 from "../../assets/images/image-6.svg";
 import Gambar7 from "../../assets/images/image-7.svg";
 import "./CardStatusStyle.css";
 
-
-const CardStatus = () => {
+const CardStatus = ({ sendDataToInput }) => {
   const [status, setStatus] = useState("iddle");
   const [capturedImage, setCapturedImage] = useState(null); // State untuk menyimpan gambar yang diambil
   const location = useLocation();
+
+  const initialFormData = {
+    passport_number: "X123J123",
+  };
+  const [formdata, setFormData] = useState(initialFormData);
+
+  const handleImageClick = async () => {
+    try {
+      // Simulate API call
+      const response = await axios.get(
+        `http://localhost:8080/api/data?passport_number=${formdata.passport_number}`
+      );
+      const data = response.data;
+      console.log(data);
+  
+      // Pemeriksaan status dari response API
+      switch (data.status) {
+        case "success":
+          setStatus("success");
+          // Setelah 5 detik, ubah status menjadi "checkData"
+          setTimeout(() => {
+            setStatus("checkData");
+          }, 5000);
+          break;
+        case "errorchecksum":
+          setStatus("errorchecksum");
+          break;
+        case "errorVoa":
+          setStatus("errorVoa");
+          break;
+        case "errorBulan":
+          setStatus("errorBulan");
+          break;
+        default:
+          // Jika status tidak sesuai dengan yang diharapkan
+          console.warn("Unknown status from API response:", data.status);
+      }
+  
+      // Call the function passed from the parent component
+      sendDataToInput(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
 
   const webcamRef = useRef(null);
 
@@ -79,7 +124,40 @@ const CardStatus = () => {
       headerText1 = "Take Photo Succes";
       break;
     case "inputEmail":
-      headerText1 = "Please Input Your Email Address";
+      headerText1 = "Please Input Your Email Address";  const handleImageClick = async () => {
+        try {
+          // Simulate API call
+          const response = await axios.get(
+            `http://localhost:8080/api/data?passport_number=${formdata.passport_number}`
+          );
+          const data = response.data;
+          console.log(data);
+    
+          // Pemeriksaan status dari response API
+          switch (data.status) {
+            case "success":
+              setStatus("success");
+              break;
+            case "errorchecksum":
+              setStatus("errorchecksum");
+              break;
+            case "errorVoa":
+              setStatus("errorVoa");
+              break;
+            case "errorBulan":
+              setStatus("errorBulan");
+              break;
+            default:
+              // Jika status tidak sesuai dengan yang diharapkan
+              console.warn("Unknown status from API response:", data.status);
+          }
+    
+          // Call the function passed from the parent component
+          sendDataToInput(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
       headerText2 = "VOA will be send to email";
       break;
     case "emailSucces":
@@ -151,11 +229,24 @@ const CardStatus = () => {
                             <br />
                             {headerText2}
                           </h1>
-                          <img
-                            src={imageSource}
-                            alt=""
-                            className="card-image"
-                          />
+                          {status === "iddle" ? (
+                            <>
+                              <img
+                                src={imageSource}
+                                alt=""
+                                onClick={handleImageClick}
+                                className="card-image"
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <img
+                                src={imageSource}
+                                alt=""
+                                className="card-image"
+                              />
+                            </>
+                          )}
                         </>
                       )}
                     </>
