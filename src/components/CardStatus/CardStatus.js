@@ -26,7 +26,7 @@ const CardStatus = ({ sendDataToInput }) => {
     try {
       // Simulate API call
       const response = await axios.get(
-        `http://localhost:8080/api/data?passport_number=${formdata.passport_number}`
+        `http://10.30.221.55:8080/api/data?passport_number=${formdata.passport_number}`
       );
       const data = response.data;
       console.log(data);
@@ -124,40 +124,7 @@ const CardStatus = ({ sendDataToInput }) => {
       headerText1 = "Take Photo Succes";
       break;
     case "inputEmail":
-      headerText1 = "Please Input Your Email Address";  const handleImageClick = async () => {
-        try {
-          // Simulate API call
-          const response = await axios.get(
-            `http://localhost:8080/api/data?passport_number=${formdata.passport_number}`
-          );
-          const data = response.data;
-          console.log(data);
-    
-          // Pemeriksaan status dari response API
-          switch (data.status) {
-            case "success":
-              setStatus("success");
-              break;
-            case "errorchecksum":
-              setStatus("errorchecksum");
-              break;
-            case "errorVoa":
-              setStatus("errorVoa");
-              break;
-            case "errorBulan":
-              setStatus("errorBulan");
-              break;
-            default:
-              // Jika status tidak sesuai dengan yang diharapkan
-              console.warn("Unknown status from API response:", data.status);
-          }
-    
-          // Call the function passed from the parent component
-          sendDataToInput(data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
+      headerText1 = "Please Input Your Email Address";
       headerText2 = "VOA will be send to email";
       break;
     case "emailSucces":
