@@ -7,7 +7,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const btnOnClick_Apply = () => {
-    navigate("/scanpassport");
+    navigate("/apply");
   };
 
   const btnOnClick_Informasi = () => {

@@ -1,14 +1,14 @@
 import React from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import "./ScanPassportStyle.css";
-import Hero from "../../components/hero/Hero";
+import BodyContent from "../../components/BodyContent/BodyContent";
+import "./ApplyStyle.css";
 
-const ScanPassport = () => {
+const Apply = () => {
   return (
-    <div className="bg-scan-passport">
+    <div className="background-apply-voa">
       <Header title="Apply VOA" />
-      <Hero />
+      <BodyContent />
       <Footer
         titleBack="Back"
         titleStep="Next Step"
@@ -19,4 +19,4 @@ const ScanPassport = () => {
   );
 };
 
-export default ScanPassport;
+export default Apply;

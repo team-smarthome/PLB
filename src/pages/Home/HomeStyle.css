@@ -32,17 +32,6 @@ html {
   font-family: "Roboto", Arial, sans-serif;
 }
 
-@media only screen and (max-width: 1024px) {
-  .title1,
-  .title2,
-  .text-apply,
-  /* .bg-apply, */
-  .text-information {
-    font-size: 2em;
-  }
-}
-
-
 .content-home {
   display: flex;
   flex-direction: column;
@@ -66,8 +55,7 @@ html {
 
 .bg-apply-information {
   background-image: url("../../assets/images/bg_rectangle.png");
-  height: 100px;
-  background-size: 2px 1px;
+  background-size: cover;
   background-position: center;
   display: flex;
   align-items: stretch;
@@ -78,7 +66,7 @@ html {
   margin: 3%;
   border-radius: 15px;
   background-color: rgba(0, 0, 0, 0.5);
-  width: 120%;
+  width: 150%;
 }
 
 .grid-box-apply-information {
@@ -96,17 +84,13 @@ html {
 }
 
 .bg-apply {
-  margin-top: 97px;
   background-color: #fbaf17;
-  height: 40%;
   border-radius: 15px;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
 }
 
 .bg-information {
-  margin-top: 97px;
   background-color: #3d5889;
-  height: 40%;
   border-radius: 15px;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
 }
@@ -123,16 +107,20 @@ html {
   font-family: "Roboto", Arial, sans-serif;
 }
 
-@media only screen and (min-width: 768px) and (max-width: 979px) {
-  .bg-apply-information  {
-    height: 70px;
+@media screen and (min-width: 1024px) {
+  .title1,
+  .title2 {
+    font-size: 2.5em;
   }
-  .bg-apply {
-    height : 30%;
-    margin-bottom: -46px;
-  }
-  .bg-information {
-    height: 30%;
+}
+
+@media screen and (min-width: 768px) {
+  .title1,
+  .title2 {
+    font-size: 2.2em;
   }
 
+  .text-information {
+    font-size: 1.5em;
+  }
 }

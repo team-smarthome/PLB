@@ -1,6 +1,6 @@
 import React from "react";
 import "./PaymentStyle.css";
-import Input from "../../components/input/Input";
+import Input from "../../components/Input/Input";
 import Header from "../../components/Header/Header";
 import CardPayment from "../../components/CardPayment/CardPayment";
 

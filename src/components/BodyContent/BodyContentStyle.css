@@ -1,0 +1,14 @@
+.body-content {
+  display: flex;
+  height: 80vh;
+}
+
+.left-panel {
+  flex: 1;
+  padding: 20px;
+}
+
+.right-panel {
+  flex: 1;
+  padding: 20px;
+}
