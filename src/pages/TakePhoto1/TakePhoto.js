@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/Header/Header";
-import Content from "../../components/Content/Content";
+// import Hero from "../../components/Hero/Hero";
 import Footer from "../../components/Footer/Footer";
 import "./TakePhotoStyle.css";
 
@@ -8,7 +8,7 @@ const TakePhoto = () => {
   return (
     <div className="bg-take-photo">
       <Header title="Apply VOA" />
-      <Content />
+      {/* <Hero /> */}
       <Footer
         titleBack="Back"
         titleStep="Next Step"

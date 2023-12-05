@@ -1,8 +1,10 @@
 // CardStatus.js
-import React, { useRef, useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
-import axios from "axios";
+import { useFaceDetection } from "react-use-face-detection";
+import FaceDetection from "@mediapipe/face_detection";
+import { Camera } from "@mediapipe/camera_utils";
 
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -12,68 +14,47 @@ import Gambar6 from "../../assets/images/image-6.svg";
 import Gambar7 from "../../assets/images/image-7.svg";
 import "./CardStatusStyle.css";
 
-const CardStatus = ({ sendDataToInput }) => {
-  const [status, setStatus] = useState("takephoto");
+const CardStatus = () => {
+  const [status, setStatus] = useState("iddle");
   const [capturedImage, setCapturedImage] = useState(null); // State untuk menyimpan gambar yang diambil
   const location = useLocation();
 
-  const initialFormData = {
-    passport_number: "X123J123",
-  };
-  const [formdata, setFormData] = useState(initialFormData);
+  const { webcamRef, boundingBox, isLoading, detected, facesDetected } =
+    useFaceDetection({
+      faceDetectionOptions: {
+        model: "short",
+      },
+      faceDetection: new FaceDetection.FaceDetection({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`,
+      }),
+      camera: ({ mediaSrc, onFrame }) =>
+        new Camera(mediaSrc, {
+          onFrame,
+        }),
+    });
 
-  const handleImageClick = async () => {
-    try {
-      // Simulate API call
-      const response = await axios.get(
-        `http://10.30.221.55:8080/api/data?passport_number=${formdata.passport_number}`
-      );
-      const data = response.data;
-      console.log(data);
-
-      // Pemeriksaan status dari response API
-      switch (data.status) {
-        case "success":
-          setStatus("success");
-          // Setelah 5 detik, ubah status menjadi "checkData"
-          setTimeout(() => {
-            setStatus("checkData");
-          }, 5000);
-          break;
-        case "errorchecksum":
-          setStatus("errorchecksum");
-          break;
-        case "errorVoa":
-          setStatus("errorVoa");
-          break;
-        case "errorBulan":
-          setStatus("errorBulan");
-          break;
-        default:
-          // Jika status tidak sesuai dengan yang diharapkan
-          console.warn("Unknown status from API response:", data.status);
-      }
-
-      // Call the function passed from the parent component
-      sendDataToInput(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  const webcamRef = useRef(null);
+  // const webcamRef = useRef(null);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setCapturedImage(imageSrc);
+    setStatus("takePhotoSucces");
   }, [webcamRef]);
+
+  const retake = useCallback(() => {
+    // const imageSrc = webcamRef.current.getScreenshot();
+    // setCapturedImage(imageSrc);
+
+    setStatus("lookCamera");
+  }, []);
 
   useEffect(() => {
     const path = location.pathname.split("/").pop();
     if (path === "scanpassport") {
       setStatus("iddle");
     } else if (path === "takephoto") {
-      setStatus("takePhotoSucces");
+      setStatus("lookCamera");
     } else if (path === "inputemail") {
       setStatus("inputEmail");
     }
@@ -135,9 +116,9 @@ const CardStatus = ({ sendDataToInput }) => {
   }
 
   return (
-    <div className="card-status">
-      <div className="card-container">
-        <div className="inner-card">
+    <div className="card-status" style={{ height: "auto" }}>
+      <div className="card-container" style={{ height: "auto" }}>
+        <div className="inner-card" style={{ height: "auto" }}>
           {status === "inputEmail" ? (
             <>
               <h1 className="card-title">{headerText1}</h1>
@@ -168,12 +149,34 @@ const CardStatus = ({ sendDataToInput }) => {
                   {status === "lookCamera" ? (
                     <>
                       <h1 className="card-title">{headerText1}</h1>
-                      <Webcam
-                        className="webcam"
-                        audio={false}
-                        ref={webcamRef}
-                        screenshotFormat="image/jpeg"
-                      />
+                      <div style={{ position: "relative" }}>
+                        {boundingBox.map((box, index) => (
+                          <div
+                            key={`${index + 1}`}
+                            style={{
+                              border: "2px solid red",
+                              position: "absolute",
+                              top: `${box.yCenter * 70}%`,
+                              left: `${box.xCenter * 100}%`,
+                              width: `${box.width * 100}%`,
+                              height: `${box.height * 110}%`,
+                              zIndex: 1,
+                            }}
+                          />
+                        ))}
+                        <Webcam
+                          className="webcam"
+                          audio={false}
+                          ref={webcamRef}
+                          mirrored={false}
+                          screenshotFormat="image/jpeg"
+                        />
+                      </div>
+                      <div style={{ paddingTop: "2%" }}>
+                        <p>{`Loading: ${isLoading}`}</p>
+                        <p>{`Face Detected: ${detected}`}</p>
+                        <p>{`Number of faces detected: ${facesDetected}`}</p>
+                      </div>
                       <button onClick={capture}>Capture photo</button>
                     </>
                   ) : (
@@ -187,6 +190,7 @@ const CardStatus = ({ sendDataToInput }) => {
                               className="card-image"
                             />
                           )}
+                          <button onClick={retake}>retake photo</button>
                         </>
                       ) : (
                         <>
@@ -195,24 +199,11 @@ const CardStatus = ({ sendDataToInput }) => {
                             <br />
                             {headerText2}
                           </h1>
-                          {status === "iddle" ? (
-                            <>
-                              <img
-                                src={imageSource}
-                                alt=""
-                                onClick={handleImageClick}
-                                className="card-image"
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <img
-                                src={imageSource}
-                                alt=""
-                                className="card-image"
-                              />
-                            </>
-                          )}
+                          <img
+                            src={imageSource}
+                            alt=""
+                            className="card-image"
+                          />
                         </>
                       )}
                     </>

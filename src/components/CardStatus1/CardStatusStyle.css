@@ -1,0 +1,172 @@
+/* CardStatus.css */
+
+.card-status {
+  display: flex;
+  margin-left: -20px;
+}
+
+.card-container {
+    width: 645px;
+    height: 285px;
+    background-color: #FBAF17;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 40px;
+    border-radius: 18px;
+  }
+  
+  .inner-card {
+    width: 630px;
+    height: 265px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 18px;
+  }
+
+  .webcam {
+    width: 260px;
+    height: 155px;
+  }
+  
+  .card-title {
+    font-size: 30px;
+    text-align: center;
+    color: #3D5889;
+    margin-top: -10px;
+  }
+
+  p {
+    text-align: center;
+    justify-content: justify;
+    margin-top: -10px;
+    color: #3D5889;
+  }
+  
+  .card-image {
+    /* margin-bottom: 20px; */
+    width: 260px;
+    height: 155px;
+    /* object-fit: cover; */
+  }
+
+  .input-email input {
+    background-color: white !important;
+    border-radius: 10px;
+    height: 30px;
+    /* margin-bottom: 20px; */
+    margin-top: 5px;
+  
+  }
+
+  .input-email {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .input-email input::placeholder {
+    color: #ACACAC;
+    font-size: large;
+    /* margin-left: 100px; */
+  }
+
+
+.ok-button {
+  background-color: #3D5889;
+  border: 1px solid #3D5889;
+  border-radius: 18px;
+  font-size: 16px;
+  color: white;
+  width: 80px;
+  height: 45px;
+  margin-top: 5px;
+}
+
+/* @media only screen and (max-width: 768px){ */
+  .card-container {
+    height: 225px;
+    margin-top: 20px;
+    /* background-color: red; */
+    margin-left: 80px;
+  }
+  .inner-card {
+    height: 205px;
+  }
+  .card-image {
+    height: 130px;
+    margin-bottom: 20px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .webcam {
+    width: 260px;
+    height: 130px;
+  }
+
+  .input-email input {
+     height: 15px;
+    /* gap: 10px; */
+    width: 280px;
+    margin-bottom: 10px;
+  }
+
+  .ok-button {
+    margin-bottom: 20px;
+  }
+
+  p {
+    margin-top: -15px;
+  }
+  
+/* } */
+
+@media only screen and (max-width: 768px){
+  .card-container {
+    height: 200px;
+    margin-top: 10px;
+    /* background-color: red; */
+    margin-left: 80px;
+  }
+  .inner-card {
+    height: 185px;
+  }
+  .card-image {
+    height: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .webcam {
+    width: 260px;
+    height: 130px;
+  }
+
+  .input-email input {
+     height: 10px;
+    /* gap: 10px; */
+    width: 280px;
+    margin-bottom: 10px;
+  }
+
+  .ok-button {
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-top: -15px;
+  }
+  
+}
