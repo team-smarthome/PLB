@@ -13,7 +13,7 @@ import Gambar7 from "../../assets/images/image-7.svg";
 import "./CardStatusStyle.css";
 
 const CardStatus = ({ sendDataToInput }) => {
-  const [status, setStatus] = useState("takephoto");
+  const [status, setStatus] = useState("iddle");
   const [capturedImage, setCapturedImage] = useState(null); // State untuk menyimpan gambar yang diambil
   const location = useLocation();
 
