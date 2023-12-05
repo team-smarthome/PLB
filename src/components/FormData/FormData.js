@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 
-const FormData = ({
-  sharedData,
-  setSharedData,
-  passportImage,
-  setPassportImage,
-}) => {
+const FormData = ({ sharedData, setSharedData }) => {
   const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
   const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
   const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
@@ -30,46 +25,21 @@ const FormData = ({
   const [formdata, setFormData] = useState(initialFormData);
 
   useEffect(() => {
-    if (sharedData.passportData && passportImage) {
-      let fullName =
-        sharedData.passportData.foreName +
-        " " +
-        sharedData.passportData.surName;
-      // Split the date string into day, month, and year
-      const [day, month, year] = sharedData.passportData.birthDate
-        .split("-")
-        .map(Number);
-      const [day1, month1, year1] = sharedData.passportData.expiryDate
-        .split("-")
-        .map(Number);
-
-      // Create a new Date object with the year adjusted for 4-digit year (you may need to adjust the logic based on the date range)
-      const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
-      const dateObject = new Date(adjustedYear, month - 1, day); // Month is 0-indexed in Date object
-      // const adjustedYear1 = year < 50 ? 2000 + year1 : 1900 + year1;
-      const dateObject1 = new Date(year1, month1 - 1, day1);
-
-      // Format the date into YYYY-MM-DD
-      const formattedDate = dateObject.toISOString().split("T")[0]; // Extracts YYYY-MM-DD
-      const expiryDate = dateObject1.toISOString().split("T")[0]; // Extracts YYYY-MM-DD
-      // let visibleImage = passportImage.visibleImage;
-      // const imagePassport = atob(visibleImage);
-      // console.log(imagePassport);
+    if (sharedData.passportData) {
       setFormData((prevData) => ({
         ...prevData,
-        passport_number: sharedData.passportData.docNumber || "",
-        full_name: fullName || "",
-        date_of_birth: formattedDate || "",
-        gender: sharedData.passportData.sex || "",
+        passport_number: sharedData.passportData.passport_number || "",
+        full_name: sharedData.passportData.full_name || "",
+        date_of_birth: sharedData.passportData.date_of_birth || "",
+        gender: sharedData.passportData.gender || "",
         nationality: sharedData.passportData.nationality || "",
-        expiry_date: expiryDate || "",
-        paspor_type: sharedData.passportData.docType || "",
+        expiry_date: sharedData.passportData.expiry_date || "",
+        paspor_type: sharedData.passportData.paspor_type || "",
       }));
       setIsCheckedExpiryDate(!!sharedData.passportData.expiry_date);
       setIsCheckedPasporType(!!sharedData.passportData.paspor_type);
     }
-    // console.log(formdata);
-  }, [sharedData, passportImage]);
+  }, [sharedData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
