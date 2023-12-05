@@ -1,3 +1,10 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 .card-list-container {
   margin-top: -15px;
   list-style: none;
@@ -13,8 +20,8 @@
 
 .number-badge {
   background-color: #a3a9a5;
-  width: 10%;
-  font-size: 2em;
+  width: 5%;
+  /* font-size: 2em; */
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
   padding: 1rem;
@@ -31,7 +38,7 @@
 .list-content {
   background-color: #a3a9a5;
   width: 100%;
-  font-size: 2em;
+  /* font-size: 2em; */
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
   padding: 1rem;

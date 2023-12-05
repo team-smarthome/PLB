@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Input from "../Input/Input";
+import FormData from "../FormData/FormData";
 import CardList from "../CardList/CardList";
 import CardStatus from "../CardStatus/CardStatus";
 import "./BodyContentStyle.css";
@@ -17,11 +17,15 @@ const BodyContent = () => {
   return (
     <div className="body-content">
       <div className="left-panel">
-        <CardList />
-        <CardStatus sendDataToInput={handleDataFromCardStatus} />
+        <div className="left-panel-top">
+          <CardList />
+        </div>
+        <div className="left-panel-bottom">
+          <CardStatus sendDataToInput={handleDataFromCardStatus} />
+        </div>
       </div>
       <div className="right-panel">
-        <Input sharedData={sharedData} setSharedData={setSharedData} />
+        <FormData sharedData={sharedData} setSharedData={setSharedData} />
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ const CardStatus = ({ sendDataToInput }) => {
       );
       const data = response.data;
       console.log(data);
-  
+
       // Pemeriksaan status dari response API
       switch (data.status) {
         case "success":
@@ -53,14 +53,13 @@ const CardStatus = ({ sendDataToInput }) => {
           // Jika status tidak sesuai dengan yang diharapkan
           console.warn("Unknown status from API response:", data.status);
       }
-  
+
       // Call the function passed from the parent component
       sendDataToInput(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  
 
   const webcamRef = useRef(null);
 
