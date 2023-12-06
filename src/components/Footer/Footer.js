@@ -1,19 +1,28 @@
 import React from "react";
 import "./FooterStyle.css";
 
-const Footer = ({ titleBack, titleStep, isEnableBack, isEnableStep }) => {
-  const btnOnClick_Back = () => {};
-
-  const btnOnClick_Step = () => {};
-
+const Footer = ({
+  titleBack,
+  titleStep,
+  isEnableBack,
+  isEnableStep,
+  btnOnClick_Back,
+  btnOnClick_Step,
+}) => {
   return (
     <footer className="footer">
       <div className="container-footer">
         <div className="box-footer">
-          <div className="bg-back" onClick={btnOnClick_Back}>
+          <div
+            className={`bg-back ${!isEnableBack ? "disabled" : ""}`}
+            onClick={isEnableBack ? btnOnClick_Back : null}
+          >
             <h2 className="text-back">{titleBack}</h2>
           </div>
-          <div className="bg-step" onClick={btnOnClick_Step}>
+          <div
+            className={`bg-step ${!isEnableStep ? "disabled" : ""}`}
+            onClick={isEnableStep ? btnOnClick_Step : null}
+          >
             <h2 className="text-step">{titleStep}</h2>
           </div>
         </div>

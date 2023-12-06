@@ -1,0 +1,26 @@
+const dataPaspor = {
+  surName: "ELEKTRONIK",
+  foreName: "UJI CETAK PASPOR",
+  secondName: "CETAK PASPOR",
+  nationality: "MYS",
+  sex: "Male",
+  birthDate: "08-11-90",
+  docNumber: "R0000001",
+  docType: "PASSPORT",
+  data: "P<IDNELEKTRONIK<<UJI<CETAK<PASPOR<<<<<<<<<<<\rR0000001<2IDN9011089M27100403674060811000738\r",
+  dateOfBirthMrz: "901108",
+  docId: "PASSPORT",
+  expiredDocumentFlag: "false",
+  expiryDate: "04-10-2027",
+  expiryDateMrz: "271004",
+  optionalData1: "36740608110007",
+  optionalData2: "",
+  mrzOnRearSide: "false",
+  issuingState: "MYS",
+  line1: "P<IDNELEKTRONIK<<UJI<CETAK<PASPOR<<<<<<<<<<<",
+  line2: "R0000001<2IDN9011089M27100403674060811000738",
+  line3: "",
+  msgType: "passportData",
+};
+
+export default dataPaspor;

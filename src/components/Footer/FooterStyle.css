@@ -53,3 +53,8 @@
   font-size: 2em;
   font-family: "Roboto", Arial, sans-serif;
 }
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

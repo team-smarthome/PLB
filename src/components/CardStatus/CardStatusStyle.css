@@ -36,7 +36,7 @@ html {
 
 .webcam {
   width: 260px;
-  height: 155px;
+  /* height: 155px; */
 }
 
 .card-title {
@@ -44,6 +44,7 @@ html {
   text-align: center;
   color: #3d5889;
   margin-top: -10px;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 p {
@@ -51,6 +52,7 @@ p {
   justify-content: justify;
   margin-top: -10px;
   color: #3d5889;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 .card-image {
@@ -66,6 +68,7 @@ p {
   height: 30px;
   /* margin-bottom: 20px; */
   margin-top: 5px;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 .input-email {
@@ -73,11 +76,13 @@ p {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 .input-email input::placeholder {
   color: #acacac;
   font-size: large;
+  font-family: "Roboto", Arial, sans-serif;
   /* margin-left: 100px; */
 }
 
@@ -87,7 +92,37 @@ p {
   border-radius: 18px;
   font-size: 16px;
   color: white;
-  width: 80px;
-  height: 45px;
-  margin-top: 5px;
+  width: 40%;
+  height: 40px;
+  margin-top: 20px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.webcam-container {
+  position: relative;
+  background-color: black;
+}
+
+.bounding-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 100%;
+  border: 2px solid red;
+  box-sizing: border-box;
+  animation: blink 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }

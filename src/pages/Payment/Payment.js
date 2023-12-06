@@ -1,6 +1,6 @@
 import React from "react";
 import "./PaymentStyle.css";
-import Input from "../../components/Input/Input";
+// import Input from "../../components/Input/Input";
 import Header from "../../components/Header/Header";
 import CardPayment from "../../components/CardPayment/CardPayment";
 
@@ -19,9 +19,9 @@ const Payment = () => {
       <div className="payment-body">
         <CardPayment {...cardPaymentProps} />
 
-        <div className="payment-input">
+        {/* <div className="payment-input">
           <Input />
-        </div>
+        </div> */}
       </div>
     </div>
   );

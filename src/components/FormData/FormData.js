@@ -5,11 +5,10 @@ import "./FormDataStyle.css";
 const FormData = ({ sharedData, setSharedData }) => {
   const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
   const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
-  const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
-    useState(true);
-  const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
-    useState(true);
-  const [status, setStatus] = useState("");
+  // const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
+  //   useState(true);
+  // const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
+  //   useState(true);
 
   const initialFormData = {
     passport_number: "",
@@ -28,16 +27,16 @@ const FormData = ({ sharedData, setSharedData }) => {
     if (sharedData.passportData) {
       setFormData((prevData) => ({
         ...prevData,
-        passport_number: sharedData.passportData.passport_number || "",
-        full_name: sharedData.passportData.full_name || "",
-        date_of_birth: sharedData.passportData.date_of_birth || "",
-        gender: sharedData.passportData.gender || "",
+        passport_number: sharedData.passportData.docNumber || "",
+        full_name: sharedData.passportData.fullName || "",
+        date_of_birth: sharedData.passportData.formattedBirthDate || "",
+        gender: sharedData.passportData.sex || "",
         nationality: sharedData.passportData.nationality || "",
-        expiry_date: sharedData.passportData.expiry_date || "",
-        paspor_type: sharedData.passportData.paspor_type || "",
+        expiry_date: sharedData.passportData.formattedExpiryDate || "",
+        paspor_type: sharedData.passportData.docType || "",
       }));
-      setIsCheckedExpiryDate(!!sharedData.passportData.expiry_date);
-      setIsCheckedPasporType(!!sharedData.passportData.paspor_type);
+      setIsCheckedExpiryDate(!!sharedData.passportData.formattedExpiryDate);
+      setIsCheckedPasporType(!!sharedData.passportData.docType);
     }
   }, [sharedData]);
 
@@ -49,15 +48,15 @@ const FormData = ({ sharedData, setSharedData }) => {
     });
   };
 
-  const handleImageClick = (type) => {
-    if (type === "expiry_date") {
-      setIsCheckedExpiryDate(!isCheckedExpiryDate);
-      setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
-    } else if (type === "paspor_type") {
-      setIsCheckedPasporType(!isCheckedPasporType);
-      setIsCommentDisabledPasporType(!isCommentDisabledPasporType);
-    }
-  };
+  // const handleImageClick = (type) => {
+  //   if (type === "expiry_date") {
+  //     setIsCheckedExpiryDate(!isCheckedExpiryDate);
+  //     setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
+  //   } else if (type === "paspor_type") {
+  //     setIsCheckedPasporType(!isCheckedPasporType);
+  //     setIsCommentDisabledPasporType(!isCommentDisabledPasporType);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,7 +130,7 @@ const FormData = ({ sharedData, setSharedData }) => {
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
-              //   disabled
+              disabled
               className="disabled-input"
             />
 

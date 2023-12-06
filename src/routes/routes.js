@@ -14,8 +14,8 @@ const Routes = () => {
       <Route path="/apply" element={<Apply />} />
       {/* <Route path="/scanpassport" element={<ScanPassport />} />
       <Route path="/takephoto" element={<TakePhoto />} />
-      <Route path="/inputemail" element={<InputEmail />} />
-      <Route path="/payment" element={<Payment />} /> */}
+      <Route path="/inputemail" element={<InputEmail />} /> */}
+      {/* <Route path="/payment" element={<Payment />} /> */}
     </ReactRoutes>
   );
 };
