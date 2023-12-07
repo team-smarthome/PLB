@@ -17,6 +17,7 @@ const BodyContent = ({
   setCardPaymentProps,
   shareDataPaymentProps,
   setShareDataPaymentProps,
+  dataNumberPermohonan,
 }) => {
   const [sharedData, setSharedData] = useState({
     passportData: null,
@@ -95,6 +96,7 @@ const BodyContent = ({
             {...cardPaymentProps}
             sendDataUpdatePayment={handleDataFormPaymentStatus}
             dataUser={sharedData}
+            dataNumberPermohonan={dataNumberPermohonan}
           />
         )}
       </div>

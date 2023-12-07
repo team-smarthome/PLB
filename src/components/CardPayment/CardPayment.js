@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PrintIcon from "../../assets/images/image-9.svg";
 import InsertCard from "../../assets/images/image-8.svg";
 import Success from "../../assets/images/image-2.svg";
@@ -12,7 +13,10 @@ const CardPayment = ({
   isSuccess,
   sendDataUpdatePayment,
   dataUser,
+  dataNumberPermohonan,
 }) => {
+  const navigate = useNavigate();
+
   const [cardNumber, setCardNumber] = useState("");
   const [cardNumberWarning, setCardNumberWarning] = useState(false);
 
@@ -24,11 +28,12 @@ const CardPayment = ({
 
   const [seconds, setSeconds] = useState(5);
   const [dataPasporUser, setDataPasporUser] = useState(null);
+  const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
 
-  const [number, setNumber] = useState("234732641340112311");
-  const [receipt, setReceipt] = useState("234732641340112311");
+  const [number, setNumber] = useState("");
+  const [receipt, setReceipt] = useState("");
 
-  // console.log("dataUser: ", dataUser);
+  // console.log("dataPermohonanUser: ", dataPermohonanUser);
   console.table({
     isConfirm,
     isFailed,
@@ -40,6 +45,7 @@ const CardPayment = ({
   });
 
   useEffect(() => {
+    // ini jika semua false
     const timer = setTimeout(() => {
       if (!isConfirm && !isFailed && !isPrinted && !isSuccess) {
         sendDataUpdatePayment({
@@ -53,6 +59,7 @@ const CardPayment = ({
         });
 
         setDataPasporUser(dataUser);
+        setDataPermohonanUser(dataNumberPermohonan);
       }
     }, 3000);
 
@@ -60,6 +67,7 @@ const CardPayment = ({
   }, [
     cardNumber,
     cvv,
+    dataNumberPermohonan,
     dataUser,
     expiry,
     isConfirm,
@@ -70,8 +78,13 @@ const CardPayment = ({
   ]);
 
   useEffect(() => {
+    // ini jika isPrinted true
     if (isPrinted && !isConfirm && !isFailed && !isSuccess) {
       console.log("cahyooo");
+
+      setNumber(dataPermohonanUser?.registerNumber ?? "");
+      setReceipt("000000000011");
+
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
           isConfirm: false,
@@ -89,6 +102,7 @@ const CardPayment = ({
   }, [
     cardNumber,
     cvv,
+    dataPermohonanUser,
     expiry,
     isConfirm,
     isFailed,
@@ -98,12 +112,21 @@ const CardPayment = ({
   ]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds((prevSeconds) => (prevSeconds > 0 ? prevSeconds - 1 : 0));
-    }, 1000);
+    // ini jika isSuccess true
+    if (!isPrinted && !isConfirm && !isFailed && isSuccess) {
+      const timer = setInterval(() => {
+        setSeconds((prevSeconds) => (prevSeconds > 0 ? prevSeconds - 1 : 0));
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+      return () => clearInterval(timer);
+    }
+  }, [isConfirm, isFailed, isPrinted, isSuccess]);
+
+  useEffect(() => {
+    if (seconds === 0) {
+      navigate("/");
+    }
+  }, [navigate, seconds]);
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");

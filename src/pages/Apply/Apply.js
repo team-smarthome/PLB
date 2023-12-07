@@ -205,6 +205,7 @@ const Apply = () => {
         setCardPaymentProps={setCardPaymentProps}
         shareDataPaymentProps={shareDataPaymentProps}
         setShareDataPaymentProps={setShareDataPaymentProps}
+        dataNumberPermohonan={dataPermohonan}
       />
       <Footer
         titleBack="Back"
