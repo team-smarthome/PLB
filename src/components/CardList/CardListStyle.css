@@ -21,7 +21,7 @@ html {
 .number-badge {
   background-color: #a3a9a5;
   width: 5%;
-  /* font-size: 2em; */
+  font-size: 20px;
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
   padding: 1rem;
@@ -38,7 +38,7 @@ html {
 .list-content {
   background-color: #a3a9a5;
   width: 100%;
-  /* font-size: 2em; */
+  font-size: 20px;
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
   padding: 1rem;

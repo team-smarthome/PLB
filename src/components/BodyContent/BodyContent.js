@@ -13,6 +13,10 @@ const BodyContent = ({
   setTitleHeader,
   dataPrimaryPassport,
   updateSharedData,
+  cardPaymentProps,
+  setCardPaymentProps,
+  shareDataPaymentProps,
+  setShareDataPaymentProps,
 }) => {
   const [sharedData, setSharedData] = useState({
     passportData: null,
@@ -38,21 +42,38 @@ const BodyContent = ({
     setCardStatus(statusCardBox);
   };
 
+  const handleDataFormPaymentStatus = ({
+    isConfirm,
+    isFailed,
+    isPrinted,
+    isSuccess,
+    cardNumber,
+    expiry,
+    cvv,
+  }) => {
+    setCardPaymentProps({
+      ...cardPaymentProps,
+      isConfirm,
+      isFailed,
+      isPrinted,
+      isSuccess,
+    });
+
+    setShareDataPaymentProps({
+      ...shareDataPaymentProps,
+      cardNumber,
+      expiry,
+      cvv,
+    });
+  };
+
   useEffect(() => {
-    console.log("sharedData: ", sharedData);
     updateSharedData(sharedData);
   }, [sharedData]);
 
   useEffect(() => {
     setSharedData({ passportData: dataPrimaryPassport });
   }, [dataPrimaryPassport]);
-
-  const cardPaymentProps = {
-    isConfirm: false,
-    isPrinted: false,
-    isSuccess: false,
-    isFailed: true,
-  };
 
   return (
     <div className="body-content">
@@ -70,7 +91,11 @@ const BodyContent = ({
             </div>
           </>
         ) : (
-          <CardPayment {...cardPaymentProps} />
+          <CardPayment
+            {...cardPaymentProps}
+            sendDataUpdatePayment={handleDataFormPaymentStatus}
+            dataUser={sharedData}
+          />
         )}
       </div>
       <div className="right-panel">

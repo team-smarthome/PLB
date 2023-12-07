@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import Select from "react-select";
 import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
+import dataNegara from "../../utils/dataNegara";
 
 const FormData = ({ sharedData, setSharedData }) => {
   const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
   const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
+  const [optionNegara, setOptionNegara] = useState([]);
   // const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
   //   useState(true);
   // const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
@@ -24,14 +27,28 @@ const FormData = ({ sharedData, setSharedData }) => {
   const [formdata, setFormData] = useState(initialFormData);
 
   useEffect(() => {
+    const dataNationality = dataNegara.data.map((negara) => ({
+      value: negara.id_negara,
+      label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
+    }));
+
+    setOptionNegara(dataNationality);
+
     if (sharedData.passportData) {
+      const filteredNationality = dataNationality.filter(
+        (negara) => negara.value === sharedData.passportData.nationality
+      );
+
+      console.log(filteredNationality[0]);
+
       setFormData((prevData) => ({
         ...prevData,
         passport_number: sharedData.passportData.docNumber || "",
         full_name: sharedData.passportData.fullName || "",
         date_of_birth: sharedData.passportData.formattedBirthDate || "",
         gender: sharedData.passportData.sex || "",
-        nationality: sharedData.passportData.nationality || "",
+        nationality:
+          filteredNationality.length > 0 ? filteredNationality[0] : "",
         expiry_date: sharedData.passportData.formattedExpiryDate || "",
         paspor_type: sharedData.passportData.docType || "",
       }));
@@ -67,6 +84,15 @@ const FormData = ({ sharedData, setSharedData }) => {
   //     setIsCommentDisabledPasporType(!isCommentDisabledPasporType);
   //   }
   // };
+
+  const handleSelectChange = (selectedOption, fieldName) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [fieldName]: selectedOption,
+    }));
+
+    console.log(formdata);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -188,14 +214,41 @@ const FormData = ({ sharedData, setSharedData }) => {
             <div className="wrapper-input">
               <label htmlFor="nationality">Nationality</label>
             </div>
-            <input
-              type="text"
-              name="nationality"
+            <Select
               id="nationality"
-              value={formdata.nationality}
-              onChange={handleInputChange}
-              disabled
-              className="disabled-input"
+              name="nationality"
+              value={{
+                value: formdata.nationality.value,
+                label: formdata.nationality.label,
+              }}
+              onChange={(selectedOption) =>
+                handleSelectChange(selectedOption, "nationality")
+              }
+              isDisabled
+              options={optionNegara}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
             />
 
             {/* <div className="checkbox-container">

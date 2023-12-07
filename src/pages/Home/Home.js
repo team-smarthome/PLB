@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+// import { apiPGToken } from "../../services/api";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 
@@ -13,6 +14,34 @@ const Home = () => {
   const btnOnClick_Informasi = () => {
     console.log("INFORMASI");
   };
+
+  const getCurrentTimestamp = () => {
+    const currentTimestamp = new Date().toISOString();
+    return currentTimestamp;
+  };
+
+  // useEffect(() => {
+  //   const requestData = {
+  //     grantType: "client_credentials",
+  //   };
+
+  //   const headers = {
+  //     "Content-Type": "application/json",
+  //     "X-CLIENT-KEY": "724157150340021088",
+  //     // "X-SIGNATURE": generateSignature(),
+  //     "X-TIMESTAMP": getCurrentTimestamp(),
+  //   };
+
+  //   console.log(headers);
+
+  //   // apiPGToken(headers, requestData)
+  //   //   .then((res) => {
+  //   //     console.log(res);
+  //   //   })
+  //   //   .catch((err) => {
+  //   //     console.log(err);
+  //   //   });
+  // }, []);
 
   return (
     <div className="bg-home">

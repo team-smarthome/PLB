@@ -5,15 +5,97 @@ import Success from "../../assets/images/image-2.svg";
 import Failed from "../../assets/images/image-3.svg";
 import "./CardPaymentStyle.css";
 
-const CardPayment = ({ isConfirm, isFailed, isPrinted, isSuccess }) => {
+const CardPayment = ({
+  isConfirm,
+  isFailed,
+  isPrinted,
+  isSuccess,
+  sendDataUpdatePayment,
+  dataUser,
+}) => {
   const [cardNumber, setCardNumber] = useState("");
+  const [cardNumberWarning, setCardNumberWarning] = useState(false);
+
   const [expiry, setExpiry] = useState("");
+  const [expiryWarning, setExpiryWarning] = useState(false);
+
   const [cvv, setCvv] = useState("");
+  const [cvvWarning, setCvvWarning] = useState(false);
 
   const [seconds, setSeconds] = useState(5);
+  const [dataPasporUser, setDataPasporUser] = useState(null);
 
   const [number, setNumber] = useState("234732641340112311");
   const [receipt, setReceipt] = useState("234732641340112311");
+
+  // console.log("dataUser: ", dataUser);
+  console.table({
+    isConfirm,
+    isFailed,
+    isPrinted,
+    isSuccess,
+    cardNumber,
+    expiry,
+    cvv,
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isConfirm && !isFailed && !isPrinted && !isSuccess) {
+        sendDataUpdatePayment({
+          isConfirm: true,
+          isFailed: false,
+          isPrinted: false,
+          isSuccess: false,
+          cardNumber: cardNumber,
+          expiry: expiry,
+          cvv: cvv,
+        });
+
+        setDataPasporUser(dataUser);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [
+    cardNumber,
+    cvv,
+    dataUser,
+    expiry,
+    isConfirm,
+    isFailed,
+    isPrinted,
+    isSuccess,
+    sendDataUpdatePayment,
+  ]);
+
+  useEffect(() => {
+    if (isPrinted && !isConfirm && !isFailed && !isSuccess) {
+      console.log("cahyooo");
+      const timerPrintOut = setTimeout(() => {
+        sendDataUpdatePayment({
+          isConfirm: false,
+          isFailed: false,
+          isPrinted: false,
+          isSuccess: true,
+          cardNumber: cardNumber,
+          expiry: expiry,
+          cvv: cvv,
+        });
+      }, 3000);
+
+      return () => clearTimeout(timerPrintOut);
+    }
+  }, [
+    cardNumber,
+    cvv,
+    expiry,
+    isConfirm,
+    isFailed,
+    isPrinted,
+    isSuccess,
+    sendDataUpdatePayment,
+  ]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -26,11 +108,17 @@ const CardPayment = ({ isConfirm, isFailed, isPrinted, isSuccess }) => {
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
     if (input.length <= 4) {
-      setExpiry(
-        input
+      setExpiry((prevExpiry) => {
+        const formattedInput = input
           .replace(/(\d{2})(\d{0,2})/, "$1/$2")
-          .replace(/(\/\d{2})\d+?$/, "$1")
-      );
+          .replace(/(\/\d{2})\d+?$/, "$1");
+
+        if (/^\d{0,2}\/?\d{0,2}$/.test(formattedInput)) {
+          return formattedInput;
+        } else {
+          return prevExpiry;
+        }
+      });
     }
   };
 
@@ -48,9 +136,54 @@ const CardPayment = ({ isConfirm, isFailed, isPrinted, isSuccess }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(
-      `Payment confirmed for card ending in ${cardNumber} with expiry ${expiry} and CVV ${cvv}`
-    );
+
+    if (cardNumber === "") {
+      setCardNumberWarning(true);
+    } else if (expiry === "") {
+      setExpiryWarning(true);
+    } else if (cvv === "") {
+      setCvvWarning(true);
+    } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
+      setCardNumberWarning(false);
+      setExpiryWarning(false);
+      setCvvWarning(false);
+
+      const card_data = {
+        cc_no: cardNumber,
+        cc_exp: expiry,
+        cvv: cvv,
+      };
+
+      const bill_data = {
+        billing_id: "",
+        amount: "",
+        currency: "",
+      };
+
+      const user_data = {
+        pass_no: dataPasporUser.passportData.docNumber,
+        pass_name: dataPasporUser.passportData.fullName,
+        country: dataPasporUser.passportData.nationality,
+      };
+
+      const dataParam = {
+        card_data: { ...card_data },
+        bill_data: { ...bill_data },
+        user_data: { ...user_data },
+      };
+
+      console.log("dataParam: ", dataParam);
+
+      sendDataUpdatePayment({
+        isConfirm: false,
+        isFailed: false,
+        isPrinted: true,
+        isSuccess: false,
+        cardNumber: cardNumber,
+        expiry: expiry,
+        cvv: cvv,
+      });
+    }
   };
 
   return (
@@ -80,30 +213,37 @@ const CardPayment = ({ isConfirm, isFailed, isPrinted, isSuccess }) => {
                 <label>Card Number</label>
                 <input
                   type="text"
-                  className="card-number-input" // Add the class name here
+                  className="card-number-input"
                   value={cardNumber}
                   onChange={handleCardNumberChange}
                 />
               </div>
+              {cardNumberWarning && (
+                <div className="warning">Please enter your card number!</div>
+              )}
               <div className="form-group-payment-cc">
                 <label>Expired</label>
                 <input
                   type="text"
-                  className="expiry-input" // Add the class name here
+                  className="expiry-input"
                   value={expiry}
                   onChange={handleExpiryChange}
                 />
               </div>
+              {expiryWarning && (
+                <div className="warning">Please enter expired!</div>
+              )}
               <div className="form-group-payment-cc">
                 <label>CVV</label>
                 <input
                   type="text"
                   maxLength="3"
-                  className="cvv-input" // Add the class name here
+                  className="cvv-input"
                   value={cvv}
                   onChange={(e) => setCvv(e.target.value)}
                 />
               </div>
+              {cvvWarning && <div className="warning">Please enter cvv!</div>}
               <div className="form-group-payment-submit-cc">
                 <button type="submit">Confirm</button>
               </div>

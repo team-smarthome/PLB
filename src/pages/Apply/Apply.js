@@ -22,6 +22,18 @@ const Apply = () => {
   const [titleFooter, setTitleFooter] = useState("Next Step");
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
+  const [cardPaymentProps, setCardPaymentProps] = useState({
+    isConfirm: false,
+    isPrinted: false,
+    isSuccess: false,
+    isFailed: false,
+  });
+
+  const [shareDataPaymentProps, setShareDataPaymentProps] = useState({
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+  });
 
   useEffect(() => {
     let fullName = dataPaspor.foreName + " " + dataPaspor.surName;
@@ -189,6 +201,10 @@ const Apply = () => {
         setTitleFooter={setTitleFooter}
         dataPrimaryPassport={dataPrimaryPassport}
         updateSharedData={updateSharedData}
+        cardPaymentProps={cardPaymentProps}
+        setCardPaymentProps={setCardPaymentProps}
+        shareDataPaymentProps={shareDataPaymentProps}
+        setShareDataPaymentProps={setShareDataPaymentProps}
       />
       <Footer
         titleBack="Back"

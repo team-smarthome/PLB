@@ -131,6 +131,7 @@ p {
 .warning {
   color: red;
   margin-top: 5px;
+  margin-bottom: 10px;
   font-family: "Roboto", Arial, sans-serif;
 }
 
