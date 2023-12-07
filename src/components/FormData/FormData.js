@@ -255,14 +255,45 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             <div className="wrapper-input">
               <label htmlFor="gender">Gender</label>
             </div>
-            <input
-              type="text"
-              name="gender"
+            <Select
               id="gender"
-              value={formdata.gender}
-              onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? !isCheckedGender : true}
-              className="disabled-input"
+              name="gender"
+              value={{
+                value: formdata.gender,
+                label: formdata.gender,
+
+              }}
+              onChange={(selectedOption) =>
+                handleSelectChange(selectedOption, "gender")
+              }
+              isDisabled={cardStatus === "checkData" ? !isCheckedGender : true}
+              options={[
+                { value: "M", label: "Male" },
+                { value: "F", label: "Female" },
+              ]}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
             />
             {cardStatus === "checkData" ? (
               <>
@@ -299,7 +330,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "nationality")
               }
-              disabled={cardStatus === "checkData" ? !isCheckedNationality : true}
+              isDisabled={cardStatus === "checkData" ? !isCheckedNationality : true}
+              
               options={optionNegara}
               className="basic-single"
               classNamePrefix="select"
