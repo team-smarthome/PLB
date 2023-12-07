@@ -4,14 +4,44 @@ import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
 
-const FormData = ({ sharedData, setSharedData }) => {
+const FormData = ({ sharedData, setSharedData, cardStatus }) => {
+  // passportNumber
+  const [isCheckedPassportNumber, setIsCheckedPassportNumber] = useState(false);
+  // fullName
+  const [isCheckedFullName, setIsCheckedFullName] = useState(false);
+  // dateOfBirth
+  const [isCheckedDateOfBirth, setIsCheckedDateOfBirth] = useState(false);
+  // gender
+  const [isCheckedGender, setIsCheckedGender] = useState(false);
+  //nationality
+  const [isCheckedNationality, setIsCheckedNationality] = useState(false);
+  // expiryDate
   const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
+  // pasporType
   const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
+
   const [optionNegara, setOptionNegara] = useState([]);
-  // const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
-  //   useState(true);
-  // const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
-  //   useState(true);
+
+  // passportNumber
+  const [isCommentDisabledPassportNumber, setIsCommentDisabledPassportNumber] =
+    useState(true);
+  // fullName
+  const [isCommentDisabledFullName, setIsCommentDisabledFullName] =
+    useState(true);
+  // dateOfBirth
+  const [isCommentDisabledDateOfBirth, setIsCommentDisabledDateOfBirth] =
+    useState(true);
+  // gender
+  const [isCommentDisabledGender, setIsCommentDisabledGender] = useState(true);
+  // nationality
+  const [isCommentDisabledNationality, setIsCommentDisabledNationality] =
+    useState(true);
+  // expiryDate
+  const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
+    useState(true);
+  // pasporType
+  const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
+    useState(true);
 
   const initialFormData = {
     passport_number: "",
@@ -75,15 +105,30 @@ const FormData = ({ sharedData, setSharedData }) => {
     });
   };
 
-  // const handleImageClick = (type) => {
-  //   if (type === "expiry_date") {
-  //     setIsCheckedExpiryDate(!isCheckedExpiryDate);
-  //     setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
-  //   } else if (type === "paspor_type") {
-  //     setIsCheckedPasporType(!isCheckedPasporType);
-  //     setIsCommentDisabledPasporType(!isCommentDisabledPasporType);
-  //   }
-  // };
+  const handleImageClick = (type) => {
+    if (type === "expiry_date") {
+      setIsCheckedExpiryDate(!isCheckedExpiryDate);
+      setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
+    } else if (type === "paspor_type") {
+      setIsCheckedPasporType(!isCheckedPasporType);
+      setIsCommentDisabledPasporType(!isCommentDisabledPasporType);
+    } else if (type === "nationality") {
+      setIsCheckedNationality(!isCheckedNationality);
+      setIsCommentDisabledNationality(!isCommentDisabledNationality);
+    } else if (type === "passport_number") {
+      setIsCheckedPassportNumber(!isCheckedPassportNumber);
+      setIsCommentDisabledPassportNumber(!isCommentDisabledPassportNumber);
+    } else if (type === "full_name") {
+      setIsCheckedFullName(!isCheckedFullName);
+      setIsCommentDisabledFullName(!isCommentDisabledFullName);
+    } else if (type === "date_of_birth") {
+      setIsCheckedDateOfBirth(!isCheckedDateOfBirth);
+      setIsCommentDisabledDateOfBirth(!isCommentDisabledDateOfBirth);
+    } else if (type === "gender") {
+      setIsCheckedGender(!isCheckedGender);
+      setIsCommentDisabledGender(!isCommentDisabledGender);
+    }
+  };
 
   const handleSelectChange = (selectedOption, fieldName) => {
     setFormData((prevData) => ({
@@ -112,19 +157,27 @@ const FormData = ({ sharedData, setSharedData }) => {
               id="passport_number"
               value={formdata.passport_number}
               onChange={handleInputChange}
-              disabled
+              disabled={!isCheckedPassportNumber}
               className="disabled-input"
             />
 
-            {/* <div className="checkbox-container">
-              <div className="checkbox-value"></div>
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              className={`checklist-img ${isCheckedPasporType ? "dimmed" : ""}`}
-              onClick={() => handleImageClick("paspor_type")}
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledPassportNumber && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${
+                    !isCheckedPassportNumber ? "dimmed" : ""
+                  }`}
+                  onClick={() => handleImageClick("passport_number")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -139,19 +192,27 @@ const FormData = ({ sharedData, setSharedData }) => {
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
-              disabled
+              disabled={!isCheckedFullName}
               className="disabled-input"
             />
 
-            {/* <div className="checkbox-container">
-              <div className="checkbox-value"></div>
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              className={`checklist-img ${isCheckedPasporType ? "dimmed" : ""}`}
-              onClick={() => handleImageClick("paspor_type")}
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledFullName && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${
+                    !isCheckedFullName ? "dimmed" : ""
+                  }`}
+                  onClick={() => handleImageClick("full_name")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -166,19 +227,26 @@ const FormData = ({ sharedData, setSharedData }) => {
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
-              disabled
+              disabled={!isCheckedDateOfBirth}
               className="disabled-input"
             />
-
-            {/* <div className="checkbox-container">
-              <div className="checkbox-value"></div>
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              className={`checklist-img ${isCheckedPasporType ? "dimmed" : ""}`}
-              onClick={() => handleImageClick("paspor_type")}
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledDateOfBirth && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${
+                    !isCheckedDateOfBirth ? "dimmed" : ""
+                  }`}
+                  onClick={() => handleImageClick("date_of_birth")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -187,25 +255,98 @@ const FormData = ({ sharedData, setSharedData }) => {
             <div className="wrapper-input">
               <label htmlFor="gender">Gender</label>
             </div>
-            <input
-              type="text"
-              name="gender"
+            <Select
               id="gender"
+              name="gender"
               value={formdata.gender}
-              onChange={handleInputChange}
-              disabled
-              className="disabled-input"
+              onChange={(selectedOption) =>
+                handleSelectChange(selectedOption, "gender")
+              }
+              isDisabled={!isCheckedGender}
+              options={[
+                { value: "M", label: "Male" },
+                { value: "F", label: "Female" },
+              ]}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
             />
-
-            {/* <div className="checkbox-container">
-              <div className="checkbox-value"></div>
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              className={`checklist-img ${isCheckedPasporType ? "dimmed" : ""}`}
-              onClick={() => handleImageClick("paspor_type")}
+            {/* <Select
+              id="gender"
+              name="gender"
+              value={{
+                value: formdata.gender.value,
+                label: formdata.gender.label,
+              }}
+              onChange={(selectedOption) =>
+                handleSelectChange(selectedOption, "gender")
+              }
+              isDisabled={!isCheckedGender}
+              options={[
+                { value: "M", label: "Male" },
+                { value: "F", label: "Female" },
+              ]}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
             /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledGender && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${
+                    !isCheckedGender ? "dimmed" : ""
+                  }`}
+                  onClick={() => handleImageClick("gender")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -224,7 +365,7 @@ const FormData = ({ sharedData, setSharedData }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "nationality")
               }
-              isDisabled
+              isDisabled={!isCheckedNationality}
               options={optionNegara}
               className="basic-single"
               classNamePrefix="select"
@@ -250,16 +391,23 @@ const FormData = ({ sharedData, setSharedData }) => {
                 }),
               }}
             />
-
-            {/* <div className="checkbox-container">
-              <div className="checkbox-value"></div>
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              className={`checklist-img ${isCheckedPasporType ? "dimmed" : ""}`}
-              onClick={() => handleImageClick("paspor_type")}
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledNationality && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${
+                    !isCheckedNationality ? "dimmed" : ""
+                  }`}
+                  onClick={() => handleImageClick("nationality")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -277,21 +425,24 @@ const FormData = ({ sharedData, setSharedData }) => {
               disabled={isCheckedExpiryDate}
               className="disabled-input"
             />
-
-            {/* <div className="checkbox-container">
-              {isCommentDisabledExpiryDate && (
-                <div className="checkbox-value"></div>
-              )}
-            </div>
-            <img
-              src={Checklist}
-              style={{
-                cursor: "pointer",
-                opacity: isCheckedExpiryDate ? 0.5 : 1,
-              }}
-              onClick={() => handleImageClick("expiry_date")}
-              alt="Checklist Icon"
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledExpiryDate && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  style={{
+                    cursor: "pointer",
+                    opacity: isCheckedExpiryDate ? 0.5 : 1,
+                  }}
+                  onClick={() => handleImageClick("expiry_date")}
+                  alt="Checklist Icon"
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -309,21 +460,24 @@ const FormData = ({ sharedData, setSharedData }) => {
               disabled={isCheckedPasporType}
               className="disabled-input"
             />
-
-            {/* <div className="checkbox-container">
-              {isCommentDisabledPasporType && (
-                <div className="checkbox-value"></div>
-              )}
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              style={{
-                cursor: "pointer",
-                opacity: isCheckedPasporType ? 0.5 : 1,
-              }}
-              onClick={() => handleImageClick("paspor_type")}
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledPasporType && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  style={{
+                    cursor: "pointer",
+                    opacity: isCheckedPasporType ? 0.5 : 1,
+                  }}
+                  onClick={() => handleImageClick("paspor_type")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -355,21 +509,24 @@ const FormData = ({ sharedData, setSharedData }) => {
               disabled
               onChange={handleInputChange}
             />
-
-            {/* <div className="checkbox-container">
-              {isCommentDisabledPasporType && (
-                <div className="checkbox-value"></div>
-              )}
-            </div>
-            <img
-              src={Checklist}
-              alt="Checklist Icon"
-              style={{
-                cursor: "pointer",
-                opacity: isCheckedPasporType ? 0.5 : 1,
-              }}
-              onClick={() => handleImageClick("paspor_type")}
-            /> */}
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledPasporType && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  style={{
+                    cursor: "pointer",
+                    opacity: isCheckedPasporType ? 0.5 : 1,
+                  }}
+                  onClick={() => handleImageClick("paspor_type")}
+                />
+              </>
+            ) : null}
           </div>
         </div>
       </form>

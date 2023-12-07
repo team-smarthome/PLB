@@ -4,6 +4,7 @@ const dataPaspor = {
   secondName: "CETAK PASPOR",
   nationality: "MYS",
   sex: "Male",
+  gender: "M",
   birthDate: "08-11-90",
   docNumber: "R0000001",
   docType: "PASSPORT",

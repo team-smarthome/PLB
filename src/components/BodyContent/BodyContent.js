@@ -101,7 +101,7 @@ const BodyContent = ({
         )}
       </div>
       <div className="right-panel">
-        <FormData sharedData={sharedData} setSharedData={setSharedData} />
+        <FormData cardStatus={cardStatus} sharedData={sharedData} setSharedData={setSharedData} />
       </div>
     </div>
   );
