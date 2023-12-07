@@ -38,6 +38,16 @@ const FormData = ({ sharedData, setSharedData }) => {
       setIsCheckedExpiryDate(!!sharedData.passportData.formattedExpiryDate);
       setIsCheckedPasporType(!!sharedData.passportData.docType);
     }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      photo: sharedData.photoFace || "",
+    }));
+
+    setFormData((prevData) => ({
+      ...prevData,
+      email: sharedData.email || "",
+    }));
   }, [sharedData]);
 
   const handleInputChange = (e) => {
@@ -271,10 +281,9 @@ const FormData = ({ sharedData, setSharedData }) => {
             </div>
             <div className="photo">
               <div className="photo-box">
-                {/* <img
-                  src={formdata.photo}
-                  alt={formdata.full_name || "Applicant"}
-                /> */}
+                {formdata.photo !== null || formdata.photo !== "" ? (
+                  <img src={formdata.photo} alt="" />
+                ) : null}
               </div>
             </div>
           </div>
@@ -290,6 +299,7 @@ const FormData = ({ sharedData, setSharedData }) => {
               name="email"
               id="email"
               value={formdata.email}
+              disabled
               onChange={handleInputChange}
             />
 

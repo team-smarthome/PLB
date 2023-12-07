@@ -16,6 +16,32 @@ export async function apiValidationPassport(header, body) {
   }
 }
 
-// export async function apiSimpanPermohonan(header, body){
+export async function apiSimpanPermohonan(header, body) {
+  const apiUrl = `${url_dev}api/visa/application`;
 
-// }
+  const headers = header;
+
+  const requestBody = body;
+
+  try {
+    const response = await axios.post(apiUrl, requestBody, { headers });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function apiUpdatePayment(header, body) {
+  const apiUrl = `${url_dev}api/bri/update-payment`;
+
+  const headers = header;
+
+  const requestBody = body;
+
+  try {
+    const response = await axios.post(apiUrl, requestBody, { headers });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

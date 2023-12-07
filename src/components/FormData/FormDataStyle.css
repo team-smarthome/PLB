@@ -79,18 +79,27 @@ input {
   background-color: rgba(217, 217, 217, 0.75);
   border-radius: 12px;
   width: 100px;
-  height: 100px;
+  height: 140px;
+  margin-top: 6px;
 }
 
 .photo-box {
-  margin-right: 10px;
+  margin-right: 0px;
 }
 
-img {
-  max-width: 100%;
+.photo-box img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+} */
 
 /* .photo-box {
   margin-top: 10px;

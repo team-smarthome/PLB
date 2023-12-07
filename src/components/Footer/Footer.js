@@ -8,24 +8,27 @@ const Footer = ({
   isEnableStep,
   btnOnClick_Back,
   btnOnClick_Step,
+  isDisabled,
 }) => {
   return (
     <footer className="footer">
       <div className="container-footer">
-        <div className="box-footer">
-          <div
-            className={`bg-back ${!isEnableBack ? "disabled" : ""}`}
-            onClick={isEnableBack ? btnOnClick_Back : null}
-          >
-            <h2 className="text-back">{titleBack}</h2>
+        {isDisabled ? null : (
+          <div className="box-footer">
+            <div
+              className={`bg-back ${!isEnableBack ? "disabled" : ""}`}
+              onClick={isEnableBack ? btnOnClick_Back : null}
+            >
+              <h2 className="text-back">{titleBack}</h2>
+            </div>
+            <div
+              className={`bg-step ${!isEnableStep ? "disabled" : ""}`}
+              onClick={isEnableStep ? btnOnClick_Step : null}
+            >
+              <h2 className="text-step">{titleStep}</h2>
+            </div>
           </div>
-          <div
-            className={`bg-step ${!isEnableStep ? "disabled" : ""}`}
-            onClick={isEnableStep ? btnOnClick_Step : null}
-          >
-            <h2 className="text-step">{titleStep}</h2>
-          </div>
-        </div>
+        )}
       </div>
     </footer>
   );
