@@ -255,81 +255,15 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             <div className="wrapper-input">
               <label htmlFor="gender">Gender</label>
             </div>
-            <Select
-              id="gender"
+            <input
+              type="text"
               name="gender"
+              id="gender"
               value={formdata.gender}
-              onChange={(selectedOption) =>
-                handleSelectChange(selectedOption, "gender")
-              }
+              onChange={handleInputChange}
               disabled={cardStatus === "checkData" ? !isCheckedGender : true}
-              options={[
-                { value: "M", label: "Male" },
-                { value: "F", label: "Female" },
-              ]}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                }),
-              }}
+              className="disabled-input"
             />
-            {/* <Select
-              id="gender"
-              name="gender"
-              value={{
-                value: formdata.gender.value,
-                label: formdata.gender.label,
-              }}
-              onChange={(selectedOption) =>
-                handleSelectChange(selectedOption, "gender")
-              }
-              isDisabled={!isCheckedGender}
-              options={[
-                { value: "M", label: "Male" },
-                { value: "F", label: "Female" },
-              ]}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                }),
-              }}
-            /> */}
             {cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
@@ -359,7 +293,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="nationality"
               name="nationality"
               value={{
-                value: formdata.nationality.value,
+                value: formdata.nationality.valueOf,
                 label: formdata.nationality.label,
               }}
               onChange={(selectedOption) =>
@@ -422,7 +356,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="expiry_date"
               value={formdata.expiry_date}
               onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? !isCheckedExpiryDate : true}
+              disabled={cardStatus === "checkData" ? isCheckedExpiryDate : true}
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
@@ -457,7 +391,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="paspor_type"
               value={formdata.paspor_type}
               onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? !isCheckedPasporType : true}
+              disabled={cardStatus === "checkData" ? isCheckedPasporType : true}
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
@@ -509,24 +443,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               disabled
               onChange={handleInputChange}
             />
-            {cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledPasporType && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  style={{
-                    cursor: "pointer",
-                    opacity: isCheckedPasporType ? 0.5 : 1,
-                  }}
-                  onClick={() => handleImageClick("paspor_type")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
       </form>
