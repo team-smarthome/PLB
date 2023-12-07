@@ -13,7 +13,7 @@ const Apply = () => {
   const [validationPerformed, setValidationPerformed] = useState(false);
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(false);
-  const [tabStatus, setTabStatus] = useState(0);
+  const [tabStatus, setTabStatus] = useState(1);
   const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [dataPhotoPassport, setDataPhotoPassport] = useState(null);
@@ -127,10 +127,10 @@ const Apply = () => {
     if (isEnableStep) {
       if (cardStatus === "checkData") {
         setCardStatus("lookCamera");
-        setTabStatus(1);
+        setTabStatus(2);
       } else if (cardStatus === "takePhotoSucces") {
         setCardStatus("inputEmail");
-        setTabStatus(2);
+        setTabStatus(3);
       } else if (titleFooter === "Payment") {
         console.log("sharedData: ", sharedData);
         doSaveRequestVoaUser(sharedData);

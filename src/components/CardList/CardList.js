@@ -8,13 +8,13 @@ const CardList = ({ status }) => {
     <ul className="card-list-container">
       {listData.map((list, index) => (
         <li
-          className={`card-list-item ${index < status ? "isActived" : ""}`}
+          className={`card-list-item ${index + 1 < status ? "isActived" : ""}`}
           key={index}
         >
-          <div className={`number-badge ${status === index ? "selected" : ""}`}>
-            {index}
+          <div className={`number-badge ${status === index + 1 ? "selected" : ""}`}>
+            {index + 1}
           </div>
-          <div className={`list-content ${status === index ? "selected" : ""}`}>
+          <div className={`list-content ${status === index + 1 ? "selected" : ""}`}>
             {list}
           </div>
         </li>
