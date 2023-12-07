@@ -157,7 +157,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="passport_number"
               value={formdata.passport_number}
               onChange={handleInputChange}
-              disabled={!isCheckedPassportNumber}
+              disabled={cardStatus === "checkData" ? !isCheckedPassportNumber : true}
               className="disabled-input"
             />
 
@@ -192,7 +192,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
-              disabled={!isCheckedFullName}
+              disabled={cardStatus === "checkData" ? !isCheckedFullName : true}
               className="disabled-input"
             />
 
@@ -227,7 +227,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
-              disabled={!isCheckedDateOfBirth}
+              disabled={cardStatus === "checkData" ? !isCheckedDateOfBirth : true}
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
@@ -262,7 +262,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "gender")
               }
-              isDisabled={!isCheckedGender}
+              disabled={cardStatus === "checkData" ? !isCheckedGender : true}
               options={[
                 { value: "M", label: "Male" },
                 { value: "F", label: "Female" },
@@ -365,7 +365,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "nationality")
               }
-              isDisabled={!isCheckedNationality}
+              disabled={cardStatus === "checkData" ? !isCheckedNationality : true}
               options={optionNegara}
               className="basic-single"
               classNamePrefix="select"
@@ -422,7 +422,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="expiry_date"
               value={formdata.expiry_date}
               onChange={handleInputChange}
-              disabled={isCheckedExpiryDate}
+              disabled={cardStatus === "checkData" ? !isCheckedExpiryDate : true}
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
@@ -457,7 +457,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="paspor_type"
               value={formdata.paspor_type}
               onChange={handleInputChange}
-              disabled={isCheckedPasporType}
+              disabled={cardStatus === "checkData" ? !isCheckedPasporType : true}
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
