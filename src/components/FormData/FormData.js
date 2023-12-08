@@ -157,7 +157,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="passport_number"
               value={formdata.passport_number}
               onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? !isCheckedPassportNumber : true}
+              disabled={
+                cardStatus === "checkData" ? !isCheckedPassportNumber : true
+              }
               className="disabled-input"
             />
 
@@ -227,7 +229,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? !isCheckedDateOfBirth : true}
+              disabled={
+                cardStatus === "checkData" ? !isCheckedDateOfBirth : true
+              }
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
@@ -261,7 +265,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={{
                 value: formdata.gender,
                 label: formdata.gender,
-
               }}
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "gender")
@@ -330,8 +333,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "nationality")
               }
-              isDisabled={cardStatus === "checkData" ? !isCheckedNationality : true}
-              
+              isDisabled={
+                cardStatus === "checkData" ? !isCheckedNationality : true
+              }
               options={optionNegara}
               className="basic-single"
               classNamePrefix="select"
@@ -454,7 +458,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <div className="photo">
               <div className="photo-box">
-                {formdata.photo !== null || formdata.photo !== "" ? (
+                {formdata.photo !== null && formdata.photo !== "" ? (
                   <img src={formdata.photo} alt="" />
                 ) : null}
               </div>
