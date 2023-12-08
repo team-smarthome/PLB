@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -9,8 +9,12 @@ import { apiValidationPassport, apiSimpanPermohonan } from "../../services/api";
 import "./ApplyStyle.css";
 
 const Apply = () => {
+  const socketRef = useRef(null);
   const navigate = useNavigate();
+  const [isConnected, setIsConnected] = useState(false);
+  const [passportImage, setPassportImage] = useState({});
   const [validationPerformed, setValidationPerformed] = useState(false);
+  const [receivedData, setReceivedData] = useState(null);
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(false);
   const [tabStatus, setTabStatus] = useState(1);
@@ -35,35 +39,148 @@ const Apply = () => {
     cvv: "",
   });
 
-  useEffect(() => {
-    let fullName = dataPaspor.foreName + " " + dataPaspor.surName;
-    const [day, month, year] = dataPaspor.birthDate.split("-").map(Number);
-    const [day1, month1, year1] = dataPaspor.expiryDate.split("-").map(Number);
+  const [receiveTempData, setRecievedTempData] = useState([]);
 
-    const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+  const connectWebSocket = () => {
+    const ipAddress = "192.168.1.38";
 
-    const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-      .toISOString()
-      .split("T")[0];
-    const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-      .toISOString()
-      .split("T")[0];
+    if (ipAddress) {
+      const socketURL = `ws://${ipAddress}:5588`;
+      socketRef.current = new WebSocket(socketURL);
 
-    dataPaspor.fullName = fullName;
-    dataPaspor.formattedBirthDate = formattedDate;
-    dataPaspor.formattedExpiryDate = expiryDate;
-
-    setDataPrimaryPassport(dataPaspor);
-    setDataPhotoPassport(dataPhotoPaspor);
-
-    if (!validationPerformed) {
-      doCheckValidationPassport(dataPaspor, dataPhotoPaspor);
-
-      setValidationPerformed(true);
+      socketRef.current.onopen = () => {
+        console.log("WebSocket connection opened");
+        setIsConnected(true);
+      };
     }
-  }, [validationPerformed]);
+
+    socketRef.current.onmessage = (event) => {
+      const dataJson = JSON.parse(event.data);
+      console.log("dataJson: ", dataJson);
+      setCardStatus("iddle");
+      // if (dataJson.msgType === "passportData") {
+      //   let fullName = dataJson.foreName + " " + dataJson.surName;
+      //   const [day, month, year] = dataJson.birthDate.split("-").map(Number);
+      //   const [day1, month1, year1] = dataJson.expiryDate
+      //     .split("-")
+      //     .map(Number);
+
+      //   const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+
+      //   const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+      //     .toISOString()
+      //     .split("T")[0];
+      //   const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+      //     .toISOString()
+      //     .split("T")[0];
+
+      //   dataJson.fullName = fullName;
+      //   dataJson.formattedBirthDate = formattedDate;
+      //   dataJson.formattedExpiryDate = expiryDate;
+      //   setDataPrimaryPassport(dataJson);
+      // }
+
+      // if (dataJson.msgType === "visibleImage") {
+      //   setDataPhotoPassport(dataJson);
+      // }
+      switch (dataJson.msgType) {
+        case "passportData":
+          let fullName = dataJson.foreName + " " + dataJson.surName;
+          const [day, month, year] = dataJson.birthDate.split("-").map(Number);
+          const [day1, month1, year1] = dataJson.expiryDate
+            .split("-")
+            .map(Number);
+
+          const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+
+          const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+            .toISOString()
+            .split("T")[0];
+          const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+            .toISOString()
+            .split("T")[0];
+
+          dataJson.fullName = fullName;
+          dataJson.formattedBirthDate = formattedDate;
+          dataJson.formattedExpiryDate = expiryDate;
+          setDataPrimaryPassport(dataJson);
+          setRecievedTempData((previous) => [...previous, dataJson]);
+          // console.log("setSharedData: ", sharedData);
+
+          break;
+        case "visibleImage":
+          setDataPhotoPassport(dataJson);
+          setRecievedTempData((previous) => [...previous, dataJson]);
+          break;
+        default:
+          break;
+      }
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("WebSocket connection closed");
+      setIsConnected(false);
+    };
+  };
+
+  const closeWebSocket = () => {
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+
+    return () => {
+      closeWebSocket();
+    };
+  }, []);
+
+  useEffect(() => {
+    // console.log("recieveTempData: ", receiveTempData);
+    if (receiveTempData.length === 2) {
+      const passportUser = receiveTempData.filter(
+        (obj) => obj.msgType === "passportData"
+      );
+      const passportImage = receiveTempData.filter(
+        (obj) => obj.msgType === "visibleImage"
+      );
+      // console.log(passportUser, passportImage);
+      doCheckValidationPassport(passportUser[0], passportImage[0]);
+    }
+  }, [receiveTempData]);
+
+  // useEffect(() => {
+  //   let fullName = dataPaspor.foreName + " " + dataPaspor.surName;
+  //   const [day, month, year] = dataPaspor.birthDate.split("-").map(Number);
+  //   const [day1, month1, year1] = dataPaspor.expiryDate.split("-").map(Number);
+
+  //   const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+
+  //   const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+  //     .toISOString()
+  //     .split("T")[0];
+  //   const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+  //     .toISOString()
+  //     .split("T")[0];
+
+  //   dataPaspor.fullName = fullName;
+  //   dataPaspor.formattedBirthDate = formattedDate;
+  //   dataPaspor.formattedExpiryDate = expiryDate;
+
+  //   setDataPrimaryPassport(dataPaspor);
+  //   setDataPhotoPassport(dataPhotoPaspor);
+
+  //   if (!validationPerformed) {
+  //     doCheckValidationPassport(dataPaspor, dataPhotoPaspor);
+
+  //     setValidationPerformed(true);
+  //   }
+  // }, [validationPerformed]);
 
   const doCheckValidationPassport = async (dataPaspor, dataPhotoPaspor) => {
+    console.log("docheckvalid", dataPaspor);
     const header = {
       "Content-Type": "application/json",
       token: "f74d6060186dfa9a312dbf6940a8f58471ad8d9c98f226748f4b350004b72838",
@@ -157,7 +274,7 @@ const Apply = () => {
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
       photoFace: sharedData.photoFace,
       email: sharedData.email,
-      postalCode: "14130",
+      // postalCode: "14130",
       paymentMethod: "KIOSK",
     };
 

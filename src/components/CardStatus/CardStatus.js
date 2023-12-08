@@ -18,7 +18,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const capture = () => {
     const imageSrc = webcamRef.current.getScreenshot();
     setCapturedImage(imageSrc);
-    // console.log("Captured image source:", imageSrc);
 
     sendDataToInput({
       statusCardBox: "takePhotoSucces",
@@ -216,6 +215,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         return ["Please Input Your Email Address", "VOA will be sent to email"];
       case "emailSucces":
         return ["Email Successfully Saved"];
+      case "photoNotMatch":
+        return ["Face Paspor and", "photo not Match"];
       default:
         return [];
     }
