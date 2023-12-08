@@ -21,6 +21,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
 
   const [optionNegara, setOptionNegara] = useState([]);
+  const [optionGender, setOptionGender] = useState([]);
 
   // passportNumber
   const [isCommentDisabledPassportNumber, setIsCommentDisabledPassportNumber] =
@@ -64,24 +65,40 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
     setOptionNegara(dataNationality);
 
+    const dataGender = [
+      { value: "Male", label: "MALE" },
+      { value: "Female", label: "FEMALE" },
+    ];
+
+    setOptionGender(dataGender);
+
     if (sharedData.passportData) {
       const filteredNationality = dataNationality.filter(
         (negara) => negara.value === sharedData.passportData.nationality
       );
+
+    // gender
+    if (sharedData.passportData) {
+      const filteredGender = dataGender.filter(
+        (gender) => gender.value === sharedData.passportData.gender
+      );
+
+      setFormData((prevData) => ({
+        ...prevData,
+        gender: filteredGender.length > 0 ? filteredGender[0] : "",
+      }));
+    }
 
       setFormData((prevData) => ({
         ...prevData,
         passport_number: sharedData.passportData.docNumber || "",
         full_name: sharedData.passportData.fullName || "",
         date_of_birth: sharedData.passportData.formattedBirthDate || "",
-        gender: sharedData.passportData.sex || "",
         nationality:
           filteredNationality.length > 0 ? filteredNationality[0] : "",
         expiry_date: sharedData.passportData.formattedExpiryDate || "",
         paspor_type: sharedData.passportData.docType || "",
       }));
-      // setIsCheckedExpiryDate(!!sharedData.passportData.formattedExpiryDate);
-      // setIsCheckedPasporType(!!sharedData.passportData.docType);
     }
 
     setFormData((prevData) => ({
@@ -140,9 +157,18 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
 
   const handleSelectChange = (selectedOption, fieldName) => {
+    console.log(selectedOption);
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: selectedOption,
+    }));
+
+    setSharedData((prevData) => ({
+      ...prevData,
+      passportData: {
+        ...prevData.passportData,
+        [fieldName]: selectedOption.value,
+      },
     }));
 
     console.log(formdata);
@@ -264,68 +290,62 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         </div>
 
         <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="gender">Gender</label>
-            </div>
-            <Select
-              id="gender"
-              name="sex"
-              value={{
-                value: formdata.sex,
-                label: formdata.gender === "Male" ? "Male" : "Female",
-              }}
-              onChange={(selectedOption) =>
-                handleSelectChange(selectedOption, "gender")
-              }
-              isDisabled={cardStatus === "checkData" ? !isCheckedGender : true}
-              options={[
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-              ]}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                }),
-              }}
-            />
-            {cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledGender && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedGender ? "dimmed" : ""
-                  }`}
-                  onClick={() => handleImageClick("gender")}
-                />
-              </>
-            ) : null}
-          </div>
+      <div className="wrapper-form">
+        <div className="wrapper-input">
+          <label htmlFor="gender">Gender</label>
         </div>
+        <Select
+          id="gender"
+          name="gender"
+          value={formdata.gender}
+          onChange={(selectedOption) =>
+            handleSelectChange(selectedOption, "gender")
+          }
+          isDisabled={cardStatus === "checkData" ? !isCheckedGender : true}
+          options={optionGender}
+          className="basic-single"
+          classNamePrefix="select"
+          styles={{
+            container: (provided) => ({
+              ...provided,
+              flex: 1,
+              width: "100%",
+              borderRadius: "10px",
+              backgroundColor: "rgba(217, 217, 217, 0.75)",
+              fontFamily: "Roboto, Arial, sans-serif",
+            }),
+            valueContainer: (provided) => ({
+              ...provided,
+              flex: 1,
+              width: "100%",
+            }),
+            control: (provided) => ({
+              ...provided,
+              flex: 1,
+              width: "100%",
+              backgroundColor: "rgba(217, 217, 217, 0.75)",
+            }),
+          }}
+        />
+        {cardStatus === "checkData" ? (
+          <>
+            <div className="checkbox-container">
+              {isCommentDisabledGender && (
+                <div className="checkbox-value"></div>
+              )}
+            </div>
+            <img
+              src={Checklist}
+              alt="Checklist Icon"
+              className={`checklist-img ${
+                !isCheckedGender ? "dimmed" : ""
+              }`}
+              onClick={() => handleImageClick("gender")}
+            />
+          </>
+        ) : null}
+      </div>
+    </div>
 
         <div className="form-group">
           <div className="wrapper-form">
@@ -334,7 +354,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <Select
               id="nationality"
-              name="filteredNationality"
+              name="nationality"
               value={{
                 value: formdata.nationality.valueOf,
                 label: formdata.nationality.label,
