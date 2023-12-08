@@ -69,8 +69,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         (negara) => negara.value === sharedData.passportData.nationality
       );
 
-      console.log(filteredNationality[0]);
-
       setFormData((prevData) => ({
         ...prevData,
         passport_number: sharedData.passportData.docNumber || "",
@@ -99,10 +97,21 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(name, value);
     setFormData({
       ...formdata,
       [name]: value,
     });
+
+    setSharedData((prevData) => ({
+      ...prevData,
+      passportData: {
+        ...prevData.passportData,
+        [name]: value,
+      },
+    }));
+    console.log(sharedData);
+    console.log(formdata);
   };
 
   const handleImageClick = (type) => {
@@ -153,7 +162,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="text"
-              name="passport_number"
+              name="docNumber"
               id="passport_number"
               value={formdata.passport_number}
               onChange={handleInputChange}
@@ -190,7 +199,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="text"
-              name="full_name"
+              name="foreName"
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
@@ -225,7 +234,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="date"
-              name="date_of_birth"
+              name="birthDate"
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
@@ -261,7 +270,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <Select
               id="gender"
-              name="gender"
+              name="sex"
               value={{
                 value: formdata.gender,
                 label: formdata.gender,
@@ -388,7 +397,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="date"
-              name="expiry_date"
+              name="expiryDate"
               id="expiry_date"
               value={formdata.expiry_date}
               onChange={handleInputChange}
@@ -423,7 +432,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="text"
-              name="paspor_type"
+              name="docType"
               id="paspor_type"
               value={formdata.paspor_type}
               onChange={handleInputChange}
