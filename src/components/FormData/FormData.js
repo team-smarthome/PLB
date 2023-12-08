@@ -80,8 +80,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         expiry_date: sharedData.passportData.formattedExpiryDate || "",
         paspor_type: sharedData.passportData.docType || "",
       }));
-      setIsCheckedExpiryDate(!!sharedData.passportData.formattedExpiryDate);
-      setIsCheckedPasporType(!!sharedData.passportData.docType);
+      // setIsCheckedExpiryDate(!!sharedData.passportData.formattedExpiryDate);
+      // setIsCheckedPasporType(!!sharedData.passportData.docType);
     }
 
     setFormData((prevData) => ({
@@ -199,7 +199,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="text"
-              name="foreName"
+              name="fullName"
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
@@ -234,7 +234,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="date"
-              name="birthDate"
+              name="formattedBirthDate"
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
@@ -272,16 +272,16 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="gender"
               name="sex"
               value={{
-                value: formdata.gender,
-                label: formdata.gender,
+                value: formdata.sex,
+                label: formdata.gender === "Male" ? "Male" : "Female",
               }}
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "gender")
               }
               isDisabled={cardStatus === "checkData" ? !isCheckedGender : true}
               options={[
-                { value: "M", label: "Male" },
-                { value: "F", label: "Female" },
+                { value: "Male", label: "Male" },
+                { value: "Female", label: "Female" },
               ]}
               className="basic-single"
               classNamePrefix="select"
@@ -334,7 +334,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <Select
               id="nationality"
-              name="nationality"
+              name="filteredNationality"
               value={{
                 value: formdata.nationality.valueOf,
                 label: formdata.nationality.label,
@@ -397,11 +397,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="date"
-              name="expiryDate"
+              name="formattedExpiryDate"
               id="expiry_date"
               value={formdata.expiry_date}
               onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? isCheckedExpiryDate : true}
+              disabled={cardStatus === "checkData" ? !isCheckedExpiryDate : true}
               className="disabled-input"
             />
             {cardStatus === "checkData" ? (
@@ -415,7 +415,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                   src={Checklist}
                   style={{
                     cursor: "pointer",
-                    opacity: isCheckedExpiryDate ? 0.5 : 1,
+                    opacity: !isCheckedExpiryDate ? 0.5 : 1,
                   }}
                   onClick={() => handleImageClick("expiry_date")}
                   alt="Checklist Icon"
@@ -425,7 +425,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           </div>
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
               <label htmlFor="paspor_type">Paspor Type</label>
@@ -458,8 +458,43 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               </>
             ) : null}
           </div>
-        </div>
+        </div> */}
+     <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="paspor_type">Paspor Type</label>
+            </div>
+            <input
+              type="text"
+              name="docType"
+              id="paspor_type"
+              value={formdata.paspor_type}
+              onChange={handleInputChange}
+              disabled={
+                cardStatus === "checkData" ? !isCheckedPasporType: true
+              }
+              className="disabled-input"
+            />
 
+            {cardStatus === "checkData" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledPasporType&& (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${
+                    !isCheckedPasporType ? "dimmed" : ""
+                  }`}
+                  onClick={() => handleImageClick("paspor_type")}
+                />
+              </>
+            ) : null}
+          </div>
+        </div>
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
