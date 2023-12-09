@@ -48,7 +48,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     passport_number: "",
     full_name: "",
     date_of_birth: "",
-    gender: "",
+    sex: "",
     nationality: "",
     expiry_date: "",
     paspor_type: "",
@@ -80,12 +80,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
       // gender
       if (sharedData.passportData) {
         const filteredGender = dataGender.filter(
-          (gender) => gender.value === sharedData.passportData.gender
+          (sex) => sex.value === sharedData.passportData.sex
         );
 
         setFormData((prevData) => ({
           ...prevData,
-          gender: filteredGender.length > 0 ? filteredGender[0] : "",
+          sex: filteredGender.length > 0 ? filteredGender[0] : "",
         }));
       }
 
@@ -296,10 +296,13 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <Select
               id="gender"
-              name="gender"
-              value={formdata.gender}
+              name="sex"
+              value={{
+                value: formdata.sex.valueOf,
+                label: formdata.sex.label,
+              }}
               onChange={(selectedOption) =>
-                handleSelectChange(selectedOption, "gender")
+                handleSelectChange(selectedOption, "sex")
               }
               isDisabled={cardStatus === "checkData" ? !isCheckedGender : true}
               options={optionGender}

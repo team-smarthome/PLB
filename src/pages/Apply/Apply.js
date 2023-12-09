@@ -42,10 +42,10 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
 
   const connectWebSocket = () => {
-    const ipAddress = "192.168.1.38";
+    const ipAddress = "192.168.4.31";
 
     if (ipAddress) {
-      const socketURL = `ws://${ipAddress}:5588`;
+      const socketURL = `ws://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
 
       socketRef.current.onopen = () => {
@@ -274,7 +274,7 @@ const Apply = () => {
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
       photoFace: sharedData.photoFace,
       email: sharedData.email,
-      // postalCode: "14130",
+      postalCode: "14130",
       paymentMethod: "KIOSK",
     };
 
