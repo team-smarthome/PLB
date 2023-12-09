@@ -94,7 +94,7 @@ const Apply = () => {
       break;
     default:
       setCardStatus("errorchecksum");
-      setDataPrimaryPassport(null);
+      // setDataPrimaryPassport(null);
       setTimeout(() => {
         setCardStatus("iddle");
       }, 2000);
@@ -291,10 +291,7 @@ const Apply = () => {
         } else if (messageError === "Passport is already had staypermit active.") {
           setCardStatus("errorIntal");
           setRecievedTempData([]);
-        } else {
-          setReceivedData(null);
-          setRecievedTempData([]);
-        }
+        } 
       }
     } catch (err) {
       console.log("tahap error");
@@ -325,6 +322,7 @@ const Apply = () => {
   };
 
   const doSaveRequestVoaUser = async (sharedData) => {
+    console.log(sharedData)
     const header = {
       "Content-Type": "application/json",
       token: "f74d6060186dfa9a312dbf6940a8f58471ad8d9c98f226748f4b350004b72838",
