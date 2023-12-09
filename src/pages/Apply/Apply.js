@@ -95,9 +95,7 @@ const Apply = () => {
     default:
       setCardStatus("errorchecksum");
       // setDataPrimaryPassport(null);
-      setTimeout(() => {
-        setCardStatus("iddle");
-      }, 2000);
+      
       break;
   }
 };
@@ -279,7 +277,6 @@ const Apply = () => {
         if (messageError === "Passport is not from voa country.") {
           setCardStatus("errorVoa");
           setRecievedTempData([]);
-          setDataPrimaryPassport(null);
         } else if (
           messageError === "Passport is not active for at least 6 months."
         ) {
