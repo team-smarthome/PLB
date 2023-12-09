@@ -94,102 +94,11 @@ const Apply = () => {
       break;
     default:
       setCardStatus("errorchecksum");
-      // setDataPrimaryPassport(null);
+      // setDataPrimaryPassport(null)
       
       break;
   }
 };
-
-
-
-    // socketRef.current.onmessage = (event) => {
-    //   const dataJson = JSON.parse(event.data);
-    //   console.log("dataJson: ", dataJson);
-    //   setCardStatus("iddle");
-    
-    //   switch (dataJson.msgType) {
-    //     case "passportData":
-    //       let fullName = dataJson.foreName + " " + dataJson.surName;
-    //       const [day, month, year] = dataJson.birthDate.split("-").map(Number);
-    //       const [day1, month1, year1] = dataJson.expiryDate.split("-").map(Number);
-    
-    //       const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
-    
-    //       const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-    //         .toISOString()
-    //         .split("T")[0];
-    //       const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-    //         .toISOString()
-    //         .split("T")[0];
-    
-    //       dataJson.fullName = fullName;
-    //       dataJson.formattedBirthDate = formattedDate;
-    //       dataJson.formattedExpiryDate = expiryDate;
-    
-    //       // Pemeriksaan docNumber
-    //       if (dataJson.docNumber && dataJson.docNumber !== "" && !dataJson.docNumber.includes('*')) {
-    //         setDataPrimaryPassport(dataJson);
-    //         setRecievedTempData((previous) => [...previous, dataJson]);
-    //       } else {
-    //         // Jika docNumber tidak memenuhi kondisi, set dataPrimaryPassport menjadi null
-    //         setDataPrimaryPassport(null);
-    //       }
-    
-    //       break;
-    //     case "visibleImage":
-    //       setDataPhotoPassport(dataJson);
-    //       setRecievedTempData((previous) => [...previous, dataJson]);
-    //       break;
-    //     default:
-    //       setCardStatus("errorchecksum");
-    //       setTimeout(() => {
-    //         setCardStatus("iddle");
-    //       }, 2000);
-    //       break;
-    //   }
-    // };
-    
-
-    // socketRef.current.onmessage = (event) => {
-    //   const dataJson = JSON.parse(event.data);
-    //   console.log("dataJson: ", dataJson);
-    //   setCardStatus("iddle");
-    //   switch (dataJson.msgType) {
-    //     case "passportData":
-    //       let fullName = dataJson.foreName + " " + dataJson.surName;
-    //       const [day, month, year] = dataJson.birthDate.split("-").map(Number);
-    //       const [day1, month1, year1] = dataJson.expiryDate
-    //         .split("-")
-    //         .map(Number);
-
-    //       const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
-
-    //       const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-    //         .toISOString()
-    //         .split("T")[0];
-    //       const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-    //         .toISOString()
-    //         .split("T")[0];
-
-    //       dataJson.fullName = fullName;
-    //       dataJson.formattedBirthDate = formattedDate;
-    //       dataJson.formattedExpiryDate = expiryDate;
-    //       setDataPrimaryPassport(dataJson);
-    //       setRecievedTempData((previous) => [...previous, dataJson]);
-    //       // console.log("setSharedData: ", sharedData);
-    //       break;
-    //     case "visibleImage":
-    //       setDataPhotoPassport(dataJson);
-    //       setRecievedTempData((previous) => [...previous, dataJson]);
-    //       break;
-    //     default:
-    //       setCardStatus("errorchecksum")
-    //       setTimeout(() => {
-    //         setCardStatus("iddle");
-    //       }, 2000);
-    //       break;
-    //   }
-    // };
 
     socketRef.current.onclose = () => {
       console.log("WebSocket connection closed");
