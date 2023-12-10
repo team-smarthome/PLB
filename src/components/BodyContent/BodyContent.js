@@ -19,6 +19,7 @@ const BodyContent = ({
   setShareDataPaymentProps,
   dataNumberPermohonan,
 }) => {
+  console.log("dataPrimaryPassport: ", dataPrimaryPassport)
   const [sharedData, setSharedData] = useState({
     passportData: null,
     photoFace: null,
@@ -73,6 +74,7 @@ const BodyContent = ({
   }, [sharedData]);
 
   useEffect(() => {
+    console.log("dataPrimaryPassport2: ", dataPrimaryPassport)
     setSharedData({ passportData: dataPrimaryPassport });
   }, [dataPrimaryPassport]);
 

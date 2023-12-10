@@ -81,9 +81,11 @@ const CardPayment = ({
     // ini jika isPrinted true
     if (isPrinted && !isConfirm && !isFailed && !isSuccess) {
       console.log("cahyooo");
+      console.log("dataPermohonanUser: ", dataPermohonanUser);
 
-      setNumber(dataPermohonanUser?.registerNumber ?? "");
+      setNumber(dataPermohonanUser?.application.registerNumber ?? "");
       setReceipt("000000000011");
+      
 
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -124,7 +126,7 @@ const CardPayment = ({
 
   useEffect(() => {
     if (seconds === 0) {
-      navigate("/");
+      // navigate("/");
     }
   }, [navigate, seconds]);
 

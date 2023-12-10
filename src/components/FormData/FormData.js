@@ -56,60 +56,71 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     email: "",
   };
   const [formdata, setFormData] = useState(initialFormData);
+  
 
   useEffect(() => {
-    const dataNationality = dataNegara.data.map((negara) => ({
-      value: negara.id_negara,
-      label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
-    }));
+    console.log("test shared data", sharedData.passportData);
 
-    setOptionNegara(dataNationality);
-
-    const dataGender = [
-      { value: "Male", label: "MALE" },
-      { value: "Female", label: "FEMALE" },
-    ];
-
-    setOptionGender(dataGender);
-
-    if (sharedData.passportData) {
-      const filteredNationality = dataNationality.filter(
-        (negara) => negara.value === sharedData.passportData.nationality
-      );
-
-      // gender
+    if (sharedData.passportData === null) {
+      console.log("test shared data null");
+      setFormData(initialFormData);
+    } else {
+      const dataNationality = dataNegara.data.map((negara) => ({
+        value: negara.id_negara,
+        label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
+      }));
+  
+      setOptionNegara(dataNationality);
+  
+      const dataGender = [
+        { value: "Male", label: "MALE" },
+        { value: "Female", label: "FEMALE" },
+      ];
+  
+      
+      setOptionGender(dataGender);
+  
       if (sharedData.passportData) {
-        const filteredGender = dataGender.filter(
-          (sex) => sex.value === sharedData.passportData.sex
+        const filteredNationality = dataNationality.filter(
+          (negara) => negara.value === sharedData.passportData.nationality
         );
-
+  
+        // gender
+        if (sharedData.passportData) {
+          const filteredGender = dataGender.filter(
+            (sex) => sex.value === sharedData.passportData.sex
+          );
+  
+          setFormData((prevData) => ({
+            ...prevData,
+            sex: filteredGender.length > 0 ? filteredGender[0] : "",
+          }));
+        }
+  
         setFormData((prevData) => ({
           ...prevData,
-          sex: filteredGender.length > 0 ? filteredGender[0] : "",
+          passport_number: sharedData.passportData.docNumber || "",
+          full_name: sharedData.passportData.fullName || "",
+          date_of_birth: sharedData.passportData.formattedBirthDate || "",
+          nationality:
+            filteredNationality.length > 0 ? filteredNationality[0] : "",
+          expiry_date: sharedData.passportData.formattedExpiryDate || "",
+          paspor_type: sharedData.passportData.docType || "",
         }));
       }
-
+  
       setFormData((prevData) => ({
         ...prevData,
-        passport_number: sharedData.passportData.docNumber || "",
-        full_name: sharedData.passportData.fullName || "",
-        date_of_birth: sharedData.passportData.formattedBirthDate || "",
-        nationality:
-          filteredNationality.length > 0 ? filteredNationality[0] : "",
-        expiry_date: sharedData.passportData.formattedExpiryDate || "",
-        paspor_type: sharedData.passportData.docType || "",
+        photo: sharedData.photoFace || "",
+      }));
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        email: sharedData.email || "",
       }));
     }
 
-    setFormData((prevData) => ({
-      ...prevData,
-      photo: sharedData.photoFace || "",
-    }));
 
-    setFormData((prevData) => ({
-      ...prevData,
-      email: sharedData.email || "",
-    }));
   }, [sharedData]);
 
   const handleInputChange = (e) => {

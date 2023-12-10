@@ -55,50 +55,54 @@ const Apply = () => {
     }
 
     socketRef.current.onmessage = (event) => {
-  const dataJson = JSON.parse(event.data);
-  console.log("dataJson: ", dataJson);
-  setCardStatus("iddle");
+      const dataJson = JSON.parse(event.data);
+      // console.log("dataJson: ", dataJson);
+      // setCardStatus("iddle");
 
-  switch (dataJson.msgType) {
-    case "passportData":
-      let fullName = dataJson.foreName + " " + dataJson.surName;
-      const [day, month, year] = dataJson.birthDate.split("-").map(Number);
-      const [day1, month1, year1] = dataJson.expiryDate.split("-").map(Number);
+      switch (dataJson.msgType) {
+        case "passportData":
+          let fullName = dataJson.foreName + " " + dataJson.surName;
+          const [day, month, year] = dataJson.birthDate.split("-").map(Number);
+          const [day1, month1, year1] = dataJson.expiryDate
+            .split("-")
+            .map(Number);
 
-      const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+          const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
 
-      const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-        .toISOString()
-        .split("T")[0];
-      const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-        .toISOString()
-        .split("T")[0];
+          const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+            .toISOString()
+            .split("T")[0];
+          const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+            .toISOString()
+            .split("T")[0];
 
-      dataJson.fullName = fullName;
-      dataJson.formattedBirthDate = formattedDate;
-      dataJson.formattedExpiryDate = expiryDate;
+          dataJson.fullName = fullName;
+          dataJson.formattedBirthDate = formattedDate;
+          dataJson.formattedExpiryDate = expiryDate;
 
-      // Pemeriksaan docNumber
-      if (dataJson.docNumber && dataJson.docNumber !== "" && !dataJson.docNumber.includes('*')) {
-        setDataPrimaryPassport(dataJson);
-        setRecievedTempData((previous) => [...previous, dataJson]);
-      } else {
-        // Jika docNumber tidak memenuhi kondisi, set dataPrimaryPassport menjadi null
-        setDataPrimaryPassport(null);
+          // Pemeriksaan docNumber
+          if (
+            dataJson.docNumber &&
+            dataJson.docNumber !== "" &&
+            !dataJson.docNumber.includes("*")
+          ) {
+            // setDataPrimaryPassport(dataJson);
+            setRecievedTempData((previous) => [...previous, dataJson]);
+          } else {
+            // Jika docNumber tidak memenuhi kondisi, set dataPrimaryPassport menjadi null
+            setDataPrimaryPassport(null);
+          }
+
+          break;
+        case "visibleImage":
+          // setDataPhotoPassport(dataJson);
+          setRecievedTempData((previous) => [...previous, dataJson]);
+          break;
+        default:
+          // setCardStatus("errorchecksum");
+          break;
       }
-
-      break;
-    case "visibleImage":
-      setDataPhotoPassport(dataJson);
-      setRecievedTempData((previous) => [...previous, dataJson]);
-      break;
-    default:
-      setCardStatus("errorchecksum");
-      // setDataPrimaryPassport(null)
-      
-      break;
-  }
-};
+    };
 
     socketRef.current.onclose = () => {
       console.log("WebSocket connection closed");
@@ -121,30 +125,66 @@ const Apply = () => {
   }, []);
 
   useEffect(() => {
-    console.log("tahap nol")
+    console.log("tahap nol");
+    setDataPrimaryPassport(null);
     console.log("receiveTempData: ", receiveTempData);
-    if (receiveTempData.length === 2) {
-      const passportUser = receiveTempData.find(
+    if (receiveTempData.length > 0) {
+      const passportUser = receiveTempData.filter(
         (obj) => obj.msgType === "passportData"
       );
-      const passportImage = receiveTempData.find( 
+      const passportImage = receiveTempData.filter(
         (obj) => obj.msgType === "visibleImage"
       );
-        console.log("kuy", passportUser)
-      if (passportUser && passportImage ) {
-        console.log("tahap satu")
-        console.log("receiveTempData: ", receiveTempData);
-        if (passportUser.docNumber !== "" && !passportUser.docNumber.includes('*')) {
-          console.log("tahap dua")
-        doCheckValidationPassport(passportUser, passportImage);
+      console.log("passportUser", passportUser);
+      console.log("passportImage", passportImage);
+      if (passportUser.length > 0 && passportImage.length > 0) {
+        console.log("tahap satu");
+        // console.log("receiveTempData: ", receiveTempData);
+        const tempPassportUser = passportUser[0];
+        const tempPassportImage = passportImage[0];
+        if (
+          tempPassportUser.docNumber !== "" &&
+          !tempPassportUser.docNumber.includes("*") &&
+          tempPassportImage.visibleImage !== ""
+        ) {
+          console.log("tahap dua");
+          setDataPrimaryPassport(tempPassportUser);
+          setDataPhotoPassport(tempPassportImage);
+          doCheckValidationPassport(tempPassportUser, tempPassportImage);
+        } else {
+          setCardStatus("errorchecksum");
+          setTimeout(() => {
+            setCardStatus("iddle");
+          }, 2000);
         }
+      } else if (
+        (passportUser.length === 0 && passportImage.length > 0) ||
+        (passportUser.length > 0 && passportImage.length === 0)
+      ) {
+        console.log("tahap testing");
+        setCardStatus("waiting");
+
+        // setTimeout(() => {
+        //   console.log("gagal error 1")
+        //   setCardStatus("errorchecksum");
+        //   setTimeout(() => {
+        //     console.log("balik ke awal")
+        //     setCardStatus("iddle");
+        //     setDataPrimaryPassport(null);
+        //     setRecievedTempData([]);
+        //   }, 2000);
+        // }, 15000);
+      } else {
+        console.log("ttesting waiting");
+        setCardStatus("waiting");
+        // setRecievedTempData([]);
+        setDataPrimaryPassport(null);
       }
-    } else if (receiveTempData.length > 2) {
-      setRecievedTempData([]);
-      setDataPrimaryPassport(null);
+    } else {
+      console.log("testing else akhir");
+      // setCardStatus("iddle");
     }
   }, [receiveTempData]);
-  
 
   const doCheckValidationPassport = async (dataPaspor, dataPhotoPaspor) => {
     console.log("docheckvalid", dataPaspor);
@@ -181,23 +221,32 @@ const Apply = () => {
           setIsEnableBack(false);
         }, 5000);
       } else {
-        const messageError = data.message;    
+        const messageError = data.message;
         console.log("tahap gagal");
         if (messageError === "Passport is not from voa country.") {
           setCardStatus("errorVoa");
-          setRecievedTempData([]);
+          console.log("hapus")
+          setTimeout(() => {
+            setCardStatus("iddle");
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
+          }, 3000);
         } else if (
           messageError === "Passport is not active for at least 6 months."
         ) {
           setCardStatus("errorBulan");
           setRecievedTempData([]);
+          setDataPrimaryPassport(null);
         } else if (messageError === "Passport is from danger country.") {
           setCardStatus("errorDanger");
           setRecievedTempData([]);
-        } else if (messageError === "Passport is already had staypermit active.") {
+          setDataPrimaryPassport(null);
+        } else if (
+          messageError === "Passport is already had staypermit active."
+        ) {
           setCardStatus("errorIntal");
           setRecievedTempData([]);
-        } 
+        }
       }
     } catch (err) {
       console.log("tahap error");
@@ -228,7 +277,7 @@ const Apply = () => {
   };
 
   const doSaveRequestVoaUser = async (sharedData) => {
-    console.log(sharedData)
+    console.log(sharedData);
     const header = {
       "Content-Type": "application/json",
       token: "f74d6060186dfa9a312dbf6940a8f58471ad8d9c98f226748f4b350004b72838",
