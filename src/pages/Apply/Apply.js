@@ -42,7 +42,7 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
 
   const connectWebSocket = () => {
-    const ipAddress = "192.168.4.31";
+    const ipAddress = "192.168.1.81";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -163,17 +163,6 @@ const Apply = () => {
       ) {
         console.log("tahap testing");
         setCardStatus("waiting");
-
-        // setTimeout(() => {
-        //   console.log("gagal error 1")
-        //   setCardStatus("errorchecksum");
-        //   setTimeout(() => {
-        //     console.log("balik ke awal")
-        //     setCardStatus("iddle");
-        //     setDataPrimaryPassport(null);
-        //     setRecievedTempData([]);
-        //   }, 2000);
-        // }, 15000);
       } else {
         console.log("ttesting waiting");
         setCardStatus("waiting");
@@ -225,7 +214,7 @@ const Apply = () => {
         console.log("tahap gagal");
         if (messageError === "Passport is not from voa country.") {
           setCardStatus("errorVoa");
-          console.log("hapus")
+          console.log("hapus");
           setTimeout(() => {
             setCardStatus("iddle");
             setRecievedTempData([]);
@@ -235,17 +224,27 @@ const Apply = () => {
           messageError === "Passport is not active for at least 6 months."
         ) {
           setCardStatus("errorBulan");
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
+          setTimeout(() => {
+            setCardStatus("iddle");
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
+          }, 3000);
         } else if (messageError === "Passport is from danger country.") {
           setCardStatus("errorDanger");
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
+          setTimeout(() => {
+            setCardStatus("iddle");
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
+          }, 3000);
         } else if (
           messageError === "Passport is already had staypermit active."
         ) {
           setCardStatus("errorIntal");
-          setRecievedTempData([]);
+          setTimeout(() => {
+            setCardStatus("iddle");
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
+          }, 3000);
         }
       }
     } catch (err) {

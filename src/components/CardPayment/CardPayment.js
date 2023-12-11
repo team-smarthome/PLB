@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PrintIcon from "../../assets/images/image-9.svg";
 import InsertCard from "../../assets/images/image-8.svg";
 import Success from "../../assets/images/image-2.svg";
 import Failed from "../../assets/images/image-3.svg";
 import "./CardPaymentStyle.css";
+import Printer from "../Printer/Printer";
+import { useReactToPrint } from "react-to-print";
 
 const CardPayment = ({
   isConfirm,
@@ -16,7 +18,7 @@ const CardPayment = ({
   dataNumberPermohonan,
 }) => {
   const navigate = useNavigate();
-
+  const printRef = useRef()
   const [cardNumber, setCardNumber] = useState("");
   const [cardNumberWarning, setCardNumberWarning] = useState(false);
 
@@ -26,12 +28,14 @@ const CardPayment = ({
   const [cvv, setCvv] = useState("");
   const [cvvWarning, setCvvWarning] = useState(false);
 
-  const [seconds, setSeconds] = useState(5);
+  const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
   const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
 
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
+
+
 
   // console.log("dataPermohonanUser: ", dataPermohonanUser);
   console.table({
@@ -126,9 +130,16 @@ const CardPayment = ({
 
   useEffect(() => {
     if (seconds === 0) {
-      // navigate("/");
+      navigate("/");
     }
   }, [navigate, seconds]);
+
+  useEffect(()=>{
+    if (isPrinted === true){
+      setDataPermohonanUser(dataNumberPermohonan);
+      handlePrint()
+    }
+  }, [isPrinted])
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
@@ -147,6 +158,10 @@ const CardPayment = ({
     }
   };
 
+  const handlePrint = useReactToPrint({
+    
+    content: () => printRef.current,
+  });
   const handleCardNumberChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
     if (input.length <= 16) {
@@ -300,7 +315,7 @@ const CardPayment = ({
               </div>
               <h4>Please capture this page when receipt not printed out</h4>
 
-              <button>
+              <button onClick={handlePrint}>
                 <h2>OK</h2>
                 <span>({seconds})</span>
               </button>
@@ -322,6 +337,8 @@ const CardPayment = ({
           )}
         </div>
       </div>
+      
+      <Printer dataNumberPermohonanProps={number} printRefProps={printRef}/>
     </div>
   );
 };
