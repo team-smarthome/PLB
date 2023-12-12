@@ -37,4 +37,11 @@
     padding-left: 1vh;
     /* color: yellow; */
   }
+
+  .h2-dua {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }

@@ -2,7 +2,11 @@ import React, { useRef, useState } from "react";
 import "./PrinterStyle.css";
 import QRCode from "qrcode.react";
 
-const Printer = ({ dataNumberPermohonanProps, printRefProps }) => {
+const Printer = ({
+  dataNumberPermohonanPropsVisa,
+  dataNumberPermohonanPropsReceipt,
+  printRefProps,
+}) => {
   const tanggal = new Date();
 
   const day = String(tanggal.getDate()).padStart(2, "0");
@@ -15,7 +19,7 @@ const Printer = ({ dataNumberPermohonanProps, printRefProps }) => {
 
   const formattedTime = `${hour}:${minute}:${second}`;
   const formattedDate = `${day}/${month}/${year}`;
-  const combinedValue = `Nomor E-VOA: AB9930006, Registration No: ${dataNumberPermohonanProps}`;
+  const combinedValue = `Nomor E-VOA: ${dataNumberPermohonanPropsVisa}, Registration No: ${dataNumberPermohonanPropsReceipt}`;
 
   return (
     <div className="container-print" ref={printRefProps}>
@@ -26,25 +30,27 @@ const Printer = ({ dataNumberPermohonanProps, printRefProps }) => {
 
       <div className="wrappper-container">
         <div className="h2-nol">
-
-        <h2>Visa Number</h2>
+          <h2>Visa Number</h2>
         </div>
         <div className="h2-satu">
-          <h2>AB9930006</h2>
+          <h2>{dataNumberPermohonanPropsVisa}</h2>
         </div>
       </div>
       <div className="wrappper-container">
         <div className="qrcode">
           <QRCode value={combinedValue} />
         </div>
-    </div>
+      </div>
       <div className="wrappper-container">
         <div className="h2-dua">
-          <h2>Registration No: </h2>
+          <div className="header-h2">
+            <h2>Registration No: </h2>
+          </div>
+          <div className="header-h2">
+            <h2>{dataNumberPermohonanPropsReceipt}</h2>
+          </div>
         </div>
-        <h2>{dataNumberPermohonanProps}</h2>
       </div>
-   
     </div>
   );
 };

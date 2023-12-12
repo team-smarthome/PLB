@@ -7,6 +7,7 @@ import Failed from "../../assets/images/image-3.svg";
 import "./CardPaymentStyle.css";
 import Printer from "../Printer/Printer";
 import { useReactToPrint } from "react-to-print";
+import userEvent from "@testing-library/user-event";
 
 const CardPayment = ({
   isConfirm,
@@ -35,7 +36,11 @@ const CardPayment = ({
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
 
-
+  
+  const handlePrint = useReactToPrint({
+    
+    content: () => printRef.current,
+  }); 
 
   // console.log("dataPermohonanUser: ", dataPermohonanUser);
   console.table({
@@ -87,9 +92,10 @@ const CardPayment = ({
       console.log("cahyooo");
       console.log("dataPermohonanUser: ", dataPermohonanUser);
 
-      setNumber(dataPermohonanUser?.application.registerNumber ?? "");
-      setReceipt("000000000011");
+      setNumber(dataPermohonanUser?.visa_number ?? "");
+      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       
+      handlePrint();
 
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -115,6 +121,7 @@ const CardPayment = ({
     isPrinted,
     isSuccess,
     sendDataUpdatePayment,
+    handlePrint,
   ]);
 
   useEffect(() => {
@@ -134,12 +141,13 @@ const CardPayment = ({
     }
   }, [navigate, seconds]);
 
-  useEffect(()=>{
-    if (isPrinted === true){
-      setDataPermohonanUser(dataNumberPermohonan);
-      handlePrint()
-    }
-  }, [isPrinted])
+
+  // handlePrint dijalankna ketika isPrinted true
+  useEffect(() => {
+  if(isPrinted === true){
+    handlePrint()
+  }
+}, [isPrinted])
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
@@ -158,10 +166,6 @@ const CardPayment = ({
     }
   };
 
-  const handlePrint = useReactToPrint({
-    
-    content: () => printRef.current,
-  });
   const handleCardNumberChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
     if (input.length <= 16) {
@@ -315,7 +319,7 @@ const CardPayment = ({
               </div>
               <h4>Please capture this page when receipt not printed out</h4>
 
-              <button onClick={handlePrint}>
+              <button>
                 <h2>OK</h2>
                 <span>({seconds})</span>
               </button>
@@ -338,7 +342,7 @@ const CardPayment = ({
         </div>
       </div>
       
-      <Printer dataNumberPermohonanProps={number} printRefProps={printRef}/>
+      <Printer dataNumberPermohonanPropsVisa={number} dataNumberPermohonanPropsReceipt={receipt} printRefProps={printRef}/>
     </div>
   );
 };
