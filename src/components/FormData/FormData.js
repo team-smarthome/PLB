@@ -57,7 +57,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
   const [formdata, setFormData] = useState(initialFormData);
   
-
   useEffect(() => {
     console.log("test shared data", sharedData.passportData);
 
@@ -461,40 +460,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           </div>
         </div>
 
-        {/* <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="paspor_type">Paspor Type</label>
-            </div>
-            <input
-              type="text"
-              name="docType"
-              id="paspor_type"
-              value={formdata.paspor_type}
-              onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? isCheckedPasporType : true}
-              className="disabled-input"
-            />
-            {cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledPasporType && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  style={{
-                    cursor: "pointer",
-                    opacity: isCheckedPasporType ? 0.5 : 1,
-                  }}
-                  onClick={() => handleImageClick("paspor_type")}
-                />
-              </>
-            ) : null}
-          </div>
-        </div> */}
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">

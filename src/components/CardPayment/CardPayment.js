@@ -8,18 +8,28 @@ import "./CardPaymentStyle.css";
 import Printer from "../Printer/Printer";
 import { useReactToPrint } from "react-to-print";
 import userEvent from "@testing-library/user-event";
+import Credit from "../../assets/images/credit.png";
+import Cash from "../../assets/images/cash.png";
 
 const CardPayment = ({
-  isConfirm,
+  onStatusChange,
+  isCreditCard,
+  isPaymentCredit,
+  isPaymentCash,
   isFailed,
   isPrinted,
   isSuccess,
+  cardNumberPetugas,
   sendDataUpdatePayment,
   dataUser,
   dataNumberPermohonan,
+  statusPaymentCredit,
 }) => {
   const navigate = useNavigate();
-  const printRef = useRef()
+  const printRef = useRef();
+
+  const [paymentMethod, setPaymentMethod] = useState("");
+
   const [cardNumber, setCardNumber] = useState("");
   const [cardNumberWarning, setCardNumberWarning] = useState(false);
 
@@ -36,18 +46,18 @@ const CardPayment = ({
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
 
-  
   const handlePrint = useReactToPrint({
-    
     content: () => printRef.current,
-  }); 
+  });
 
-  // console.log("dataPermohonanUser: ", dataPermohonanUser);
   console.table({
-    isConfirm,
+    isCreditCard,
+    isPaymentCredit,
+    isPaymentCash,
     isFailed,
     isPrinted,
     isSuccess,
+    paymentMethod,
     cardNumber,
     expiry,
     cvv,
@@ -56,12 +66,22 @@ const CardPayment = ({
   useEffect(() => {
     // ini jika semua false
     const timer = setTimeout(() => {
-      if (!isConfirm && !isFailed && !isPrinted && !isSuccess) {
+      if (
+        !isFailed &&
+        !isPrinted &&
+        !isSuccess &&
+        !isPaymentCredit &&
+        !isPaymentCash &&
+        isCreditCard
+      ) {
         sendDataUpdatePayment({
-          isConfirm: true,
+          isCreditCard: false,
           isFailed: false,
           isPrinted: false,
           isSuccess: false,
+          isPaymentCredit: true,
+          isPaymentCash: false,
+          paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
           cvv: cvv,
@@ -74,35 +94,39 @@ const CardPayment = ({
 
     return () => clearTimeout(timer);
   }, [
+    paymentMethod,
     cardNumber,
     cvv,
     dataNumberPermohonan,
     dataUser,
     expiry,
-    isConfirm,
     isFailed,
     isPrinted,
     isSuccess,
+    isCreditCard,
     sendDataUpdatePayment,
   ]);
 
   useEffect(() => {
     // ini jika isPrinted true
-    if (isPrinted && !isConfirm && !isFailed && !isSuccess) {
-      console.log("cahyooo");
+    if (
+      isPrinted &&
+      !isFailed &&
+      !isSuccess &&
+      !isPaymentCredit &&
+      !isPaymentCash &&
+      !isCreditCard
+    ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
-
-      setNumber(dataPermohonanUser?.visa_number ?? "");
-      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
-      
       handlePrint();
-
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
-          isConfirm: false,
+          isCreditCard: false,
           isFailed: false,
           isPrinted: false,
           isSuccess: true,
+          isPaymentCredit: false,
+          paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
           cvv: cvv,
@@ -112,42 +136,50 @@ const CardPayment = ({
       return () => clearTimeout(timerPrintOut);
     }
   }, [
+    paymentMethod,
     cardNumber,
     cvv,
     dataPermohonanUser,
     expiry,
-    isConfirm,
     isFailed,
     isPrinted,
     isSuccess,
+    isCreditCard,
+    isPaymentCredit,
     sendDataUpdatePayment,
     handlePrint,
   ]);
 
   useEffect(() => {
     // ini jika isSuccess true
-    if (!isPrinted && !isConfirm && !isFailed && isSuccess) {
+    if (
+      !isPrinted &&
+      !isFailed &&
+      isSuccess &&
+      !isPaymentCredit &&
+      !isPaymentCash &&
+      !isCreditCard
+    ) {
       const timer = setInterval(() => {
         setSeconds((prevSeconds) => (prevSeconds > 0 ? prevSeconds - 1 : 0));
       }, 1000);
 
       return () => clearInterval(timer);
     }
-  }, [isConfirm, isFailed, isPrinted, isSuccess]);
+  }, [
+    isFailed,
+    isPrinted,
+    isSuccess,
+    isPaymentCredit,
+    isPaymentCash,
+    isCreditCard,
+  ]);
 
   useEffect(() => {
     if (seconds === 0) {
-      navigate("/");
+      navigate("/home");
     }
   }, [navigate, seconds]);
-
-
-  // handlePrint dijalankna ketika isPrinted true
-  useEffect(() => {
-  if(isPrinted === true){
-    handlePrint()
-  }
-}, [isPrinted])
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
@@ -178,6 +210,43 @@ const CardPayment = ({
     }
   };
 
+  const handlePaymentCredit = () => {
+    setPaymentMethod("KIOSK");
+    console.log("berhasil");
+    sendDataUpdatePayment({
+      isFailed: false,
+      isPrinted: false,
+      isSuccess: false,
+      isCreditCard: true,
+      isPaymentCredit: false,
+      paymentMethod: paymentMethod,
+      cardNumber: cardNumber,
+      expiry: expiry,
+      cvv: cvv,
+    });
+  };
+
+  const handlePaymentCash = () => {
+    setPaymentMethod("KICASH");
+    console.log("berhasil");
+    sendDataUpdatePayment({
+      isFailed: false,
+      isPrinted: false,
+      isSuccess: false,
+      isCreditCard: false,
+      isPaymentCredit: false,
+      isPaymentCash: true,
+      paymentMethod: paymentMethod,
+      cardNumber: cardNumber,
+      expiry: expiry,
+      cvv: cvv,
+    });
+  };
+
+  const handleBackHome = () => {
+    navigate("/home");
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -191,7 +260,6 @@ const CardPayment = ({
       setCardNumberWarning(false);
       setExpiryWarning(false);
       setCvvWarning(false);
-
       const card_data = {
         cc_no: cardNumber,
         cc_exp: expiry,
@@ -227,6 +295,8 @@ const CardPayment = ({
         expiry: expiry,
         cvv: cvv,
       });
+      const newStatusPaymentCreditCard = !statusPaymentCredit;
+      onStatusChange(newStatusPaymentCreditCard);
     }
   };
 
@@ -235,9 +305,7 @@ const CardPayment = ({
       <div className="card-container">
         <div className="inner-card">
           <h1 className="card-title">
-            {isConfirm ? (
-              "Confirmation Payment"
-            ) : isPrinted ? (
+            {isPrinted ? (
               "Payment Success"
             ) : isSuccess ? (
               <>
@@ -247,52 +315,17 @@ const CardPayment = ({
               </>
             ) : isFailed ? (
               "Payment Failed"
-            ) : (
+            ) : isCreditCard ? (
               "Please input your credit card"
+            ) : isPaymentCredit ? (
+              "Confirmation Payment -CC"
+            ) : isPaymentCash ? (
+              "Confirmation Payment - Cash"
+            ) : (
+              "Chose payment method"
             )}
           </h1>
-          {isConfirm ? (
-            <form className="card-payment-form" onSubmit={handleSubmit}>
-              <div className="form-group-payment-cc">
-                <label>Card Number</label>
-                <input
-                  type="text"
-                  className="card-number-input"
-                  value={cardNumber}
-                  onChange={handleCardNumberChange}
-                />
-              </div>
-              {cardNumberWarning && (
-                <div className="warning">Please enter your card number!</div>
-              )}
-              <div className="form-group-payment-cc">
-                <label>Expired</label>
-                <input
-                  type="text"
-                  className="expiry-input"
-                  value={expiry}
-                  onChange={handleExpiryChange}
-                />
-              </div>
-              {expiryWarning && (
-                <div className="warning">Please enter expired!</div>
-              )}
-              <div className="form-group-payment-cc">
-                <label>CVV</label>
-                <input
-                  type="text"
-                  maxLength="3"
-                  className="cvv-input"
-                  value={cvv}
-                  onChange={(e) => setCvv(e.target.value)}
-                />
-              </div>
-              {cvvWarning && <div className="warning">Please enter cvv!</div>}
-              <div className="form-group-payment-submit-cc">
-                <button type="submit">Confirm</button>
-              </div>
-            </form>
-          ) : isPrinted ? (
+          {isPrinted ? (
             <div className="isPrint-container1">
               <img src={Success} alt="" className="card-image-success1" />
               <div className="print-container1">
@@ -319,8 +352,8 @@ const CardPayment = ({
               </div>
               <h4>Please capture this page when receipt not printed out</h4>
 
-              <button>
-                <h2>OK</h2>
+              <button onClick={handlePrint}>
+                <h2 onClick={handleBackHome}>OK</h2>
                 <span>({seconds})</span>
               </button>
             </div>
@@ -334,15 +367,138 @@ const CardPayment = ({
                 <button type="submit">Confirm</button>
               </div>
             </div>
-          ) : (
+          ) : isCreditCard ? (
             <div className="card-container-image">
               <img src={InsertCard} alt="" className="card-image1" />
+            </div>
+          ) : isPaymentCredit ? (
+            <form className="payment-credit-cardCC" onSubmit={handleSubmit}>
+              <div>
+                <div className="credit-card-payment1">
+                  <div className="amount">
+                    <p>Amunt</p>
+                    <p>Transaction Fee</p>
+                    <p>Total Amount</p>
+                  </div>
+                  <div className="amount-price">
+                    <div className="amount-box1">
+                      <input type="text" value="Rp. 500.000" />
+                    </div>
+                    <div className="amount-box2">
+                      <input type="text" value="Rp. 19.500" />
+                    </div>
+                    <div className="amount-box3">
+                      <input type="text" value="Rp. 519.500" />
+                    </div>
+                  </div>
+                </div>
+                <div className="credit-card-payment2">
+                  <div className="credit-card-payment3">
+                    <p>Card Number</p>
+                    <p>Expired</p>
+                    <p>CVV</p>
+                  </div>
+                  <div className="credit-card-payment4">
+                    <div className="credit-card-value1">
+                      <input
+                        type="text"
+                        // value="12312 123123 1231321"
+                        value={cardNumber}
+                        onChange={handleCardNumberChange}
+                      />
+                    </div>
+                    <div className="credit-card-value2">
+                      <input
+                        type="text"
+                        // value="12/25"
+                        value={expiry}
+                        onChange={handleExpiryChange}
+                      />
+                    </div>
+                    <div className="credit-card-value3">
+                      <input
+                        type="text"
+                        // value="asddsa"
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="confirm-payment-credit">
+                  <div className="confirm-payment-credit2">
+                    <div className="form-group-payment-submit2">
+                      <button type="submit">Confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          ) : isPaymentCash ? (
+            <form className="payment-credit-cardCC">
+              <div>
+                <div className="credit-card-payment1">
+                  <div className="amount">
+                    <p>Amunt</p>
+                    <p>Transaction Fee</p>
+                    <p>Total Amount</p>
+                  </div>
+                  <div className="amount-price">
+                    <div className="amount-box1">
+                      <input type="text" value="Rp. 500.000" />
+                    </div>
+                    <div className="amount-box2">
+                      <input type="text" value="Rp. 19.500" />
+                    </div>
+                    <div className="amount-box3">
+                      <input type="text" value="Rp. 519.500" />
+                    </div>
+                  </div>
+                </div>
+                <div className="credit-card-payment2">
+                  <div className="credit-card-payment3">
+                    <p>Card Number</p>
+                  </div>
+                  <div className="credit-card-payment4">
+                    <div className="credit-card-value1">
+                      <input type="text" value={cardNumberPetugas} />
+                    </div>
+                    {cardNumberWarning && (
+                      <div className="warning">
+                        Please enter your card number!
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="confirm-payment-credit">
+                  <div className="confirm-payment-credit2">
+                    <div className="form-group-payment-submit3">
+                      <button type="submit">Confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          ) : (
+            <div className="payment-method">
+              <div className="payment-credit" onClick={handlePaymentCredit}>
+                <img src={Credit} alt="" />
+                <p>Credit Card</p>
+              </div>
+              <div className="payment-cash" onClick={handlePaymentCash}>
+                <img src={Cash} alt="" />
+                <p>Cash</p>
+              </div>
             </div>
           )}
         </div>
       </div>
-      
-      <Printer dataNumberPermohonanPropsVisa={number} dataNumberPermohonanPropsReceipt={receipt} printRefProps={printRef}/>
+
+      <Printer
+        dataNumberPermohonanPropsVisa={number}
+        dataNumberPermohonanPropsReceipt={receipt}
+        printRefProps={printRef}
+      />
     </div>
   );
 };

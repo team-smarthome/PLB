@@ -6,6 +6,7 @@ import CardPayment from "../CardPayment/CardPayment";
 import "./BodyContentStyle.css";
 
 const BodyContent = ({
+  cardNumberPetugas,
   tabStatus,
   cardStatus,
   setCardStatus,
@@ -19,7 +20,6 @@ const BodyContent = ({
   setShareDataPaymentProps,
   dataNumberPermohonan,
 }) => {
-  console.log("dataPrimaryPassport: ", dataPrimaryPassport)
   const [sharedData, setSharedData] = useState({
     passportData: null,
     photoFace: null,
@@ -49,6 +49,7 @@ const BodyContent = ({
     isFailed,
     isPrinted,
     isSuccess,
+    paymentMethod,
     cardNumber,
     expiry,
     cvv,
@@ -63,6 +64,7 @@ const BodyContent = ({
 
     setShareDataPaymentProps({
       ...shareDataPaymentProps,
+      paymentMethod,
       cardNumber,
       expiry,
       cvv,
@@ -74,7 +76,6 @@ const BodyContent = ({
   }, [sharedData]);
 
   useEffect(() => {
-    console.log("dataPrimaryPassport2: ", dataPrimaryPassport)
     setSharedData({ passportData: dataPrimaryPassport });
   }, [dataPrimaryPassport]);
 
@@ -99,6 +100,7 @@ const BodyContent = ({
             sendDataUpdatePayment={handleDataFormPaymentStatus}
             dataUser={sharedData}
             dataNumberPermohonan={dataNumberPermohonan}
+            cardNumberPetugas={cardNumberPetugas}
           />
         )}
       </div>
