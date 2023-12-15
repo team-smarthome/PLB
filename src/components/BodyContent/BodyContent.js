@@ -14,6 +14,7 @@ const BodyContent = ({
   setTitleHeader,
   dataPrimaryPassport,
   updateSharedData,
+  onStatusChange,
   cardPaymentProps,
   setCardPaymentProps,
   shareDataPaymentProps,
@@ -45,7 +46,10 @@ const BodyContent = ({
   };
 
   const handleDataFormPaymentStatus = ({
-    isConfirm,
+    isCreditCard,
+    isPaymentCredit,
+    isPaymentCash,
+    isWaiting,
     isFailed,
     isPrinted,
     isSuccess,
@@ -56,7 +60,10 @@ const BodyContent = ({
   }) => {
     setCardPaymentProps({
       ...cardPaymentProps,
-      isConfirm,
+      isCreditCard,
+      isPaymentCredit,
+      isPaymentCash,
+      isWaiting,
       isFailed,
       isPrinted,
       isSuccess,
@@ -100,6 +107,7 @@ const BodyContent = ({
             sendDataUpdatePayment={handleDataFormPaymentStatus}
             dataUser={sharedData}
             dataNumberPermohonan={dataNumberPermohonan}
+            onStatusChange={onStatusChange}
             cardNumberPetugas={cardNumberPetugas}
           />
         )}

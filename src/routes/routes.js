@@ -23,7 +23,7 @@ const Routes = () => {
     <ReactRoutes>
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
-      <Route path="/apply" element={<Apply />} />
+      <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
     </ReactRoutes>
   );
 };

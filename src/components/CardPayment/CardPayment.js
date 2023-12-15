@@ -7,7 +7,6 @@ import Failed from "../../assets/images/image-3.svg";
 import "./CardPaymentStyle.css";
 import Printer from "../Printer/Printer";
 import { useReactToPrint } from "react-to-print";
-import userEvent from "@testing-library/user-event";
 import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 
@@ -18,6 +17,7 @@ const CardPayment = ({
   isPaymentCash,
   isFailed,
   isPrinted,
+  isWaiting,
   isSuccess,
   cardNumberPetugas,
   sendDataUpdatePayment,
@@ -29,7 +29,6 @@ const CardPayment = ({
   const printRef = useRef();
 
   const [paymentMethod, setPaymentMethod] = useState("");
-
   const [cardNumber, setCardNumber] = useState("");
   const [cardNumberWarning, setCardNumberWarning] = useState(false);
 
@@ -54,6 +53,7 @@ const CardPayment = ({
     isCreditCard,
     isPaymentCredit,
     isPaymentCash,
+    isWaiting,
     isFailed,
     isPrinted,
     isSuccess,
@@ -68,6 +68,7 @@ const CardPayment = ({
     const timer = setTimeout(() => {
       if (
         !isFailed &&
+        !isWaiting &&
         !isPrinted &&
         !isSuccess &&
         !isPaymentCredit &&
@@ -76,6 +77,7 @@ const CardPayment = ({
       ) {
         sendDataUpdatePayment({
           isCreditCard: false,
+          isWaiting: false,
           isFailed: false,
           isPrinted: false,
           isSuccess: false,
@@ -100,6 +102,7 @@ const CardPayment = ({
     dataNumberPermohonan,
     dataUser,
     expiry,
+    isWaiting,
     isFailed,
     isPrinted,
     isSuccess,
@@ -107,12 +110,15 @@ const CardPayment = ({
     sendDataUpdatePayment,
   ]);
 
+  
+
   useEffect(() => {
     // ini jika isPrinted true
     if (
       isPrinted &&
       !isFailed &&
       !isSuccess &&
+      !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
       !isCreditCard
@@ -122,6 +128,7 @@ const CardPayment = ({
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
           isCreditCard: false,
+          isWaiting: false,
           isFailed: false,
           isPrinted: false,
           isSuccess: true,
@@ -141,6 +148,7 @@ const CardPayment = ({
     cvv,
     dataPermohonanUser,
     expiry,
+    isWaiting,
     isFailed,
     isPrinted,
     isSuccess,
@@ -156,6 +164,7 @@ const CardPayment = ({
       !isPrinted &&
       !isFailed &&
       isSuccess &&
+      !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
       !isCreditCard
@@ -169,6 +178,7 @@ const CardPayment = ({
   }, [
     isFailed,
     isPrinted,
+    isWaiting,
     isSuccess,
     isPaymentCredit,
     isPaymentCash,
@@ -214,6 +224,7 @@ const CardPayment = ({
     setPaymentMethod("KIOSK");
     console.log("berhasil");
     sendDataUpdatePayment({
+      isWaiting: false,
       isFailed: false,
       isPrinted: false,
       isSuccess: false,
@@ -228,8 +239,13 @@ const CardPayment = ({
 
   const handlePaymentCash = () => {
     setPaymentMethod("KICASH");
+    setExpiry("12/25");
+    setCvv("123");
+       setDataPasporUser(dataUser);
     console.log("berhasil");
+    setCardNumber(cardNumberPetugas)
     sendDataUpdatePayment({
+      isWaiting: false,
       isFailed: false,
       isPrinted: false,
       isSuccess: false,
@@ -285,12 +301,13 @@ const CardPayment = ({
       };
 
       console.log("dataParam: ", dataParam);
-
       sendDataUpdatePayment({
+        isWaiting: false,
         isConfirm: false,
         isFailed: false,
-        isPrinted: true,
+        isPrinted: false,
         isSuccess: false,
+        paymentMethod: paymentMethod,
         cardNumber: cardNumber,
         expiry: expiry,
         cvv: cvv,
@@ -299,6 +316,66 @@ const CardPayment = ({
       onStatusChange(newStatusPaymentCreditCard);
     }
   };
+
+  
+  const handleSubmitCash = (e) => {
+    console.log("dataPasporUser1: ", dataPasporUser);
+    e.preventDefault();
+    console.log("dataPasporUser2: ", dataPasporUser);
+    setCardNumber(cardNumberPetugas)
+    if (cardNumber === "") {
+      setCardNumberWarning(true);
+    } else if (expiry === "") {
+      setExpiryWarning(true);
+    } else if (cvv === "") {
+      setCvvWarning(true);
+    } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
+      setCardNumberWarning(false);
+      setExpiryWarning(false);
+      setCvvWarning(false);
+      const card_data = {
+        cc_no: cardNumber,
+        cc_exp: expiry,
+        cvv: cvv,
+      };
+
+      const bill_data = {
+        billing_id: "",
+        amount: "",
+        currency: "",
+      };
+
+      const user_data = {
+        pass_no: dataPasporUser.passportData.docNumber,
+        pass_name: dataPasporUser.passportData.fullName,
+        country: dataPasporUser.passportData.nationality,
+      };
+
+      console.log("dataPasporUser: ", dataPasporUser);
+
+      const dataParam = {
+        card_data: { ...card_data },
+        bill_data: { ...bill_data },
+        user_data: { ...user_data },
+      };
+
+      console.log("dataParam: ", dataParam);
+      sendDataUpdatePayment({
+        isWaiting: false,
+        isConfirm: false,
+        isFailed: false,
+        isPrinted: false,
+        isSuccess: false,
+        paymentMethod: paymentMethod,
+        cardNumber: cardNumber,
+        expiry: expiry,
+        cvv: cvv,
+      });
+      const newStatusPaymentCreditCard = !statusPaymentCredit;
+      onStatusChange(newStatusPaymentCreditCard);
+    }
+  };
+
 
   return (
     <div className="card-status">
@@ -321,7 +398,8 @@ const CardPayment = ({
               "Confirmation Payment -CC"
             ) : isPaymentCash ? (
               "Confirmation Payment - Cash"
-            ) : (
+            ) : isWaiting ? ("")
+             : (
               "Chose payment method"
             )}
           </h1>
@@ -435,7 +513,7 @@ const CardPayment = ({
               </div>
             </form>
           ) : isPaymentCash ? (
-            <form className="payment-credit-cardCC">
+            <form className="payment-credit-cardCC" onSubmit={handleSubmitCash}>
               <div>
                 <div className="credit-card-payment1">
                   <div className="amount">
@@ -479,7 +557,13 @@ const CardPayment = ({
                 </div>
               </div>
             </form>
-          ) : (
+          ) : isWaiting ? (
+            <div style={{color: "#3d5889"}}>
+              <h1>Please wait...</h1>
+            </div>
+
+          )
+          : (
             <div className="payment-method">
               <div className="payment-credit" onClick={handlePaymentCredit}>
                 <img src={Credit} alt="" />

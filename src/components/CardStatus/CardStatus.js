@@ -183,6 +183,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
       case "errorDanger":
       case "errorIntal":
       case "inputEmail":
+      case "photoNotMatch":
         return Gambar3;
       case "lookCamera":
         return Gambar6;

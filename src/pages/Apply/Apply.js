@@ -4,7 +4,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
-import { apiValidationPassport, apiSimpanPermohonan } from "../../services/api";
+import { apiPaymentGateway } from "../../services/api";
 import "./ApplyStyle.css";
 
 const Apply = () => {
@@ -32,6 +32,7 @@ const Apply = () => {
     isPaymentCash: false,
     isPrinted: false,
     isSuccess: false,
+    isWaiting: false,
     isFailed: false,
   });
 
@@ -45,7 +46,7 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
 
   const connectWebSocket = () => {
-    const ipAddress = "192.168.4.31";
+    const ipAddress = "192.168.1.81";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -256,6 +257,7 @@ const Apply = () => {
     setStatusPaymentCredit(newstatusPaymentCredit);
   };
 
+
   useEffect(() => {
     if (receiveTempData.length > 2) {
       setRecievedTempData([]);
@@ -269,8 +271,9 @@ const Apply = () => {
   }, [statusPaymentCredit]);
 
 
-  const doSaveRequestVoaPayment = async (sharedData) => {
 
+  const doSaveRequestVoaPayment = async (sharedData) => {
+    console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
     const key = localStorage.getItem("key");
 
@@ -279,14 +282,15 @@ const Apply = () => {
       Authorization: `Bearer ${bearerToken}`,
       'Content-Type': 'application/json'
     };
-    
+    //chek apakah payment Method ada atau tidak
+    console.log("sharedDataPaymentProps", shareDataPaymentProps)
     const bodyParam = {
       passportNumber: sharedData.passportData.docNumber,
       expiredDate: sharedData.passportData.formattedExpiryDate,
       fullName: sharedData.passportData.fullName,
       dateOfBirth: sharedData.passportData.formattedBirthDate,
       nationalityCode: sharedData.passportData.nationality,
-      sex: sharedData.passportData.sex === "MALE" ? "M" : "F",
+      sex: sharedData.passportData.sex === "Ma" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
       photoFace: sharedData.photoFace,
@@ -301,10 +305,20 @@ const Apply = () => {
     setIsEnableStep(false);
 
     try {
-      const res = await apiValidationPassport(header, bodyParam);
+      setCardPaymentProps({
+        isCreditCard: false,
+        isPaymentCredit: false,
+        isPaymentCash: false,
+        isWaiting: true,
+        isPrinted: false,
+        isSuccess: false,
+        isFailed: false,
+      });
+      const res = await apiPaymentGateway(header, bodyParam);
       const data = res.data;
       if (data.data.is_valid === true && data.code === 200) {
         setCardPaymentProps({
+          isWaiting: false,
           isCreditCard: false,
           isPaymentCredit: false,
           isPaymentCash: false,
@@ -314,9 +328,10 @@ const Apply = () => {
         });
         setDataPermohonan(data.data);
         setDisabled(true);
-      } else {
+      } else if (data.status === "Failed" || data.code === 500 || data.status === "failed") {
         const messageError = data.message;
         setCardPaymentProps({
+          isWaiting: false,
           isCreditCard: false,
           isPaymentCredit: false,
           isPaymentCash: false,
@@ -331,6 +346,7 @@ const Apply = () => {
             setTitleFooter("Next Step");
             setTabStatus(1);
             setCardPaymentProps({
+              isWaiting: false,
               isCreditCard: false,
               isPaymentCredit: false,
               isPaymentCash: false,
@@ -353,6 +369,7 @@ const Apply = () => {
             setTitleFooter("Next Step");
             setTabStatus(1);
             setCardPaymentProps({
+              isWaiting: false,
               isCreditCard: false,
               isPaymentCredit: false,
               isPaymentCash: false,
@@ -372,6 +389,7 @@ const Apply = () => {
             setTitleFooter("Next Step");
             setTabStatus(1);
             setCardPaymentProps({
+              isWaiting: false,
               isCreditCard: false,
               isPaymentCredit: false,
               isPaymentCash: false,
@@ -394,6 +412,46 @@ const Apply = () => {
             setTitleFooter("Next Step");
             setTabStatus(1);
             setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: false,
+              isSuccess: false,
+              isFailed: false,
+            });
+            setTimeout(() => {
+              setStatusPaymentCredit(false);
+              setCardStatus("iddle");
+              setRecievedTempData([]);
+              setDataPrimaryPassport(null);
+            }, 3000);
+          } else if (messageError === "Failed when request payment pg") {
+            setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: false,
+              isSuccess: false,
+              isFailed: true,
+            });
+            setTimeout(() => {
+              setDisabled(false);
+              setTitleFooter("Next Step");
+              setTabStatus(1);
+              setStatusPaymentCredit(false);
+              setCardStatus("iddle");
+              setRecievedTempData([]);
+              setDataPrimaryPassport(null);
+            }, 3000);
+          } else if (messageError === "Failed when request payment pg") {
+            setDisabled(false);
+            setCardStatus("photoNotMatch");
+            setTitleFooter("Next Step");
+            setTabStatus(1);
+            setCardPaymentProps({
+              isWaiting: false,
               isCreditCard: false,
               isPaymentCredit: false,
               isPaymentCash: false,
@@ -408,7 +466,7 @@ const Apply = () => {
               setDataPrimaryPassport(null);
             }, 3000);
           }
-        }, 2000);
+        }, 5000);
       }
     } catch (err) {
       console.log("tahap error");
