@@ -46,7 +46,7 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
 
   const connectWebSocket = () => {
-    const ipAddress = "192.168.1.81";
+    const ipAddress = "192.168.100.107";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -290,7 +290,7 @@ const Apply = () => {
       fullName: sharedData.passportData.fullName,
       dateOfBirth: sharedData.passportData.formattedBirthDate,
       nationalityCode: sharedData.passportData.nationality,
-      sex: sharedData.passportData.sex === "Ma" ? "M" : "F",
+      sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
       photoFace: sharedData.photoFace,
@@ -316,7 +316,9 @@ const Apply = () => {
       });
       const res = await apiPaymentGateway(header, bodyParam);
       const data = res.data;
-      if (data.data.is_valid === true && data.code === 200) {
+      console.log("data", data);
+      setDataPermohonan(data.data);
+      if (data.code === 200) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -326,8 +328,22 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
         });
-        setDataPermohonan(data.data);
         setDisabled(true);
+        setTimeout(() => {
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: true,
+            isFailed: false,
+          });
+          setStatusPaymentCredit(false);
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+        }, 3000);
+  
       } else if (data.status === "Failed" || data.code === 500 || data.status === "failed") {
         const messageError = data.message;
         setCardPaymentProps({
@@ -359,7 +375,7 @@ const Apply = () => {
               setCardStatus("iddle");
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
-            
+              setIsEnableBack(true);
             }, 3000);
           } else if (
             messageError === "Passport is not active for at least 6 months."
@@ -382,6 +398,7 @@ const Apply = () => {
               setCardStatus("iddle");
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
+              setIsEnableBack(true);
             }, 3000);
           } else if (messageError === "Passport is from danger country.") {
             setDisabled(false);
@@ -402,7 +419,7 @@ const Apply = () => {
               setCardStatus("iddle");
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
-             
+              setIsEnableBack(true);
             }, 3000);
           } else if (
             messageError === "Passport is already had staypermit active."
@@ -425,6 +442,7 @@ const Apply = () => {
               setCardStatus("iddle");
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
+              setIsEnableBack(true);
             }, 3000);
           } else if (messageError === "Failed when request payment pg") {
             setCardPaymentProps({
@@ -444,6 +462,7 @@ const Apply = () => {
               setCardStatus("iddle");
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
+              setIsEnableBack(true);
             }, 3000);
           } else if (messageError === "Failed when request payment pg") {
             setDisabled(false);
@@ -464,6 +483,7 @@ const Apply = () => {
               setCardStatus("iddle");
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
+              setIsEnableBack(true);
             }, 3000);
           }
         }, 5000);

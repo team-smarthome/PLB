@@ -114,6 +114,8 @@ const CardPayment = ({
 
   useEffect(() => {
     // ini jika isPrinted true
+    setDataPasporUser(dataUser);
+        setDataPermohonanUser(dataNumberPermohonan);
     if (
       isPrinted &&
       !isFailed &&
@@ -124,6 +126,8 @@ const CardPayment = ({
       !isCreditCard
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
+      setNumber(dataPermohonanUser?.visa_number ?? "");
+      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -375,6 +379,7 @@ const CardPayment = ({
       onStatusChange(newStatusPaymentCreditCard);
     }
   };
+
 
 
   return (
