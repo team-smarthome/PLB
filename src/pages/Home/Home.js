@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";

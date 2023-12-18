@@ -9,6 +9,9 @@ import Printer from "../Printer/Printer";
 import { useReactToPrint } from "react-to-print";
 import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
+import io from "socket.io-client";
+
+const socket = io("localhost:4499");
 
 const CardPayment = ({
   onStatusChange,
@@ -66,6 +69,41 @@ const CardPayment = ({
   });
 
   useEffect(() => {
+    socket.on("connected", (message) => {
+      console.log("connected client to server");
+    });
+    socket.on("getCredentials", (data) => {
+      console.log(`client getCredentials: ${JSON.stringify(data)}`);
+      if (data) {
+        const inputCC = data.ccnum.replace(/\D/g, "");
+        if (inputCC.length <= 16) {
+          setCardNumber(
+            inputCC
+              .match(/.{1,4}/g)
+              ?.join(" ")
+              .substring(0, 19)
+          );
+        }
+        const inputExp = data.expdate;
+        const year = inputExp.substring(0, 2);
+        const month = inputExp.substring(2, 4);
+        const formatedDate = month + year;
+        setExpiry((prevExpiry) => {
+          const formattedInput = formatedDate
+            .replace(/(\d{2})(\d{0,2})/, "$1/$2")
+            .replace(/(\/\d{2})\d+?$/, "$1");
+
+          if (/^\d{0,2}\/?\d{0,2}$/.test(formattedInput)) {
+            return formattedInput;
+          } else {
+            return prevExpiry;
+          }
+        });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     // ini jika semua false
     const timer = setTimeout(() => {
       if (
@@ -112,12 +150,10 @@ const CardPayment = ({
     sendDataUpdatePayment,
   ]);
 
-  
-
   useEffect(() => {
     // ini jika isPrinted true
     setDataPasporUser(dataUser);
-        setDataPermohonanUser(dataNumberPermohonan);
+    setDataPermohonanUser(dataNumberPermohonan);
     if (
       isPrinted &&
       !isFailed &&
@@ -247,9 +283,9 @@ const CardPayment = ({
     setPaymentMethod("KICASH");
     setExpiry("12/25");
     setCvv("123");
-       setDataPasporUser(dataUser);
+    setDataPasporUser(dataUser);
     console.log("berhasil");
-    setCardNumber(cardNumberPetugas)
+    setCardNumber(cardNumberPetugas);
     sendDataUpdatePayment({
       isWaiting: false,
       isFailed: false,
@@ -329,12 +365,11 @@ const CardPayment = ({
     }
   };
 
-  
   const handleSubmitCash = (e) => {
     console.log("dataPasporUser1: ", dataPasporUser);
     e.preventDefault();
     console.log("dataPasporUser2: ", dataPasporUser);
-    setCardNumber(cardNumberPetugas)
+    setCardNumber(cardNumberPetugas);
     if (cardNumber === "") {
       setCardNumberWarning(true);
     } else if (expiry === "") {
@@ -388,8 +423,6 @@ const CardPayment = ({
     }
   };
 
-
-
   return (
     <div className="card-status">
       <div className="card-container">
@@ -411,8 +444,9 @@ const CardPayment = ({
               "Confirmation Payment -CC"
             ) : isPaymentCash ? (
               "Confirmation Payment - Cash"
-            ) : isWaiting ? ("")
-             : (
+            ) : isWaiting ? (
+              ""
+            ) : (
               "Chose payment method"
             )}
           </h1>
@@ -571,12 +605,10 @@ const CardPayment = ({
               </div>
             </form>
           ) : isWaiting ? (
-            <div style={{color: "#3d5889"}}>
+            <div style={{ color: "#3d5889" }}>
               <h1>Please wait...</h1>
             </div>
-
-          )
-          : (
+          ) : (
             <div className="payment-method">
               <div className="payment-credit" onClick={handlePaymentCredit}>
                 <img src={Credit} alt="" />
