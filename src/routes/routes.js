@@ -5,9 +5,32 @@ import Login from "../pages/Login/Login";
 import Home from "../pages/Home/Home";
 
 const isAuthenticated = () => {
+  const jwtToken = localStorage.getItem('JwtToken');
 
-  return localStorage.getItem('JwtToken') !== null;
+  if (!jwtToken) {
+    // Token is not present, consider the user as not authenticated
+    return false;
+  }
+
+  const decodedToken = JSON.parse(atob(jwtToken.split('.')[1]));
+  const expirationTime = decodedToken.exp * 1000;
+  const now = Date.now();
+  const isExpired = now > expirationTime;
+  const date = new Date(expirationTime);
+  console.log(date.toString());
+
+  if (isExpired) {
+    // Clear localStorage if token is expired
+    localStorage.removeItem('user');
+    localStorage.removeItem('JwtToken');
+    localStorage.removeItem('cardNumberPetugas');
+    localStorage.removeItem('key');
+    localStorage.removeItem('token');
+  }
+
+  return !isExpired;
 };
+
 
 const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? (

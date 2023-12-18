@@ -38,7 +38,7 @@ const Printer = ({
       </div>
       <div className="wrappper-container">
         <div className="qrcode">
-          <QRCode value={combinedValue} />
+          <QRCode className="qrcode-image" value={combinedValue} />
         </div>
       </div>
       <div className="wrappper-container">

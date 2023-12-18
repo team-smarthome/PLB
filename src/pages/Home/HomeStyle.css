@@ -48,7 +48,7 @@ html {
   background-image: url("../../assets/images/background.png");
   background-size: cover;
   background-position: center;
-  height: 100vh;
+  height: 125vh;
   overflow: hidden;
   position: relative;
 }

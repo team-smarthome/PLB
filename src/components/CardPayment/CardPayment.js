@@ -12,6 +12,7 @@ import Cash from "../../assets/images/cash.png";
 
 const CardPayment = ({
   onStatusChange,
+  onStatusConfirm,
   isCreditCard,
   isPaymentCredit,
   isPaymentCash,
@@ -22,6 +23,7 @@ const CardPayment = ({
   cardNumberPetugas,
   sendDataUpdatePayment,
   dataUser,
+  confirm,
   dataNumberPermohonan,
   statusPaymentCredit,
 }) => {
@@ -126,8 +128,8 @@ const CardPayment = ({
       !isCreditCard
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
-      setNumber(dataPermohonanUser?.visa_number ?? "");
-      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
+      setNumber(dataPermohonanUser?.visa_number ?? "123213");
+      setReceipt(dataPermohonanUser?.visa_receipt ?? "12321312313");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -266,6 +268,12 @@ const CardPayment = ({
   const handleBackHome = () => {
     navigate("/home");
   };
+
+  const handleConfirm = () => {
+    const newStatusConfirm = !confirm;
+    onStatusConfirm(newStatusConfirm);
+  }
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -435,8 +443,8 @@ const CardPayment = ({
               </div>
               <h4>Please capture this page when receipt not printed out</h4>
 
-              <button onClick={handlePrint}>
-                <h2 onClick={handleBackHome}>OK</h2>
+              <button onClick={handleBackHome}>
+                <h2>OK</h2>
                 <span>({seconds})</span>
               </button>
             </div>
@@ -447,7 +455,7 @@ const CardPayment = ({
               </div>
               <img src={Failed} alt="" className="card-image-issuccess1" />
               <div className="form-group-payment-submit1">
-                <button type="submit">Confirm</button>
+                <button type="submit" onClick={handleConfirm}>Confirm</button>
               </div>
             </div>
           ) : isCreditCard ? (

@@ -26,6 +26,8 @@ const Apply = () => {
   const [titleFooter, setTitleFooter] = useState("Next Step");
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
     isPaymentCredit: false,
@@ -46,7 +48,7 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
 
   const connectWebSocket = () => {
-    const ipAddress = "192.168.100.107";
+    const ipAddress = "192.168.1.81";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -257,6 +259,10 @@ const Apply = () => {
     setStatusPaymentCredit(newstatusPaymentCredit);
   };
 
+  const updateStatusConfirm = (newStatusConfirm) => {
+    setConfirm(newStatusConfirm);
+  }
+
 
   useEffect(() => {
     if (receiveTempData.length > 2) {
@@ -269,6 +275,8 @@ const Apply = () => {
       doSaveRequestVoaPayment(sharedData);
     }
   }, [statusPaymentCredit]);
+
+
 
 
 
@@ -296,8 +304,8 @@ const Apply = () => {
       photoFace: sharedData.photoFace,
       email: sharedData.email,
       paymentMethod: shareDataPaymentProps.paymentMethod,
-      cc_no: shareDataPaymentProps.cardNumber,
-      cc_exp: shareDataPaymentProps.expiry,
+      cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ''),
+      cc_exp: shareDataPaymentProps.expiry.replace('/', ''),
       cvv: shareDataPaymentProps.cvv,
       token: token,
       key: key,
@@ -345,6 +353,7 @@ const Apply = () => {
         }, 3000);
   
       } else if (data.status === "Failed" || data.code === 500 || data.status === "failed") {
+        setStatusPaymentCredit(false);
         const messageError = data.message;
         setCardPaymentProps({
           isWaiting: false,
@@ -376,7 +385,7 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
-            }, 3000);
+            }, 5000);
           } else if (
             messageError === "Passport is not active for at least 6 months."
           ) {
@@ -399,7 +408,7 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
-            }, 3000);
+            }, 5000);
           } else if (messageError === "Passport is from danger country.") {
             setDisabled(false);
             setCardStatus("errorDanger");
@@ -420,7 +429,7 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
-            }, 3000);
+            }, 5000);
           } else if (
             messageError === "Passport is already had staypermit active."
           ) {
@@ -443,17 +452,8 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
-            }, 3000);
+            }, 5000);
           } else if (messageError === "Failed when request payment pg") {
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: true,
-            });
             setTimeout(() => {
               setDisabled(false);
               setTitleFooter("Next Step");
@@ -463,28 +463,16 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
-            }, 3000);
-          } else if (messageError === "Failed when request payment pg") {
-            setDisabled(false);
-            setCardStatus("photoNotMatch");
-            setTitleFooter("Next Step");
-            setTabStatus(1);
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-            });
-            setTimeout(() => {
-              setStatusPaymentCredit(false);
-              setCardStatus("iddle");
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-            }, 3000);
+              setCardPaymentProps({
+                isWaiting: false,
+                isCreditCard: false,
+                isPaymentCredit: false,
+                isPaymentCash: false,
+                isPrinted: false,
+                isSuccess: false,
+                isFailed: false,
+              });
+            }, 5000);
           }
         }, 5000);
       }
@@ -494,6 +482,17 @@ const Apply = () => {
       throw err;
     }
   };
+
+  useEffect(() => {
+    if (confirm) {
+      setTabStatus(1);
+      setStatusPaymentCredit(false);
+      setCardStatus("iddle");
+      setRecievedTempData([]);
+      setDataPrimaryPassport(null);
+      setIsEnableBack(true);
+    }
+  }, [confirm]);
 
   const updateSharedData = (newSharedData) => {
     setSharedData(newSharedData);
@@ -511,7 +510,9 @@ const Apply = () => {
         cardNumberPetugas={cardNumberPetugas}
         dataPrimaryPassport={dataPrimaryPassport}
         statusPaymentCredit={statusPaymentCredit}
+        confirm={confirm}
         onStatusChange={updateStatusPaymentCredit}
+        onStatusConfirm={updateStatusConfirm}
         updateSharedData={updateSharedData}
         cardPaymentProps={cardPaymentProps}
         setCardPaymentProps={setCardPaymentProps}

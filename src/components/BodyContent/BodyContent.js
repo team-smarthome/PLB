@@ -15,6 +15,7 @@ const BodyContent = ({
   dataPrimaryPassport,
   updateSharedData,
   onStatusChange,
+  onStatusConfirm,
   cardPaymentProps,
   setCardPaymentProps,
   shareDataPaymentProps,
@@ -108,6 +109,7 @@ const BodyContent = ({
             dataUser={sharedData}
             dataNumberPermohonan={dataNumberPermohonan}
             onStatusChange={onStatusChange}
+            onStatusConfirm={onStatusConfirm}
             cardNumberPetugas={cardNumberPetugas}
           />
         )}

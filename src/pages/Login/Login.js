@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import "./LoginStyle.css";
-import "boxicons";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
+import { Spinner } from "flowbite-react";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,33 +15,44 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  
-const isAuthenticated = () => {
-  return localStorage.getItem('JwtToken') !== null;
-};
+  const [loading, isLoading] = useState(false);
 
+  const isAuthenticated = () => {
+    return localStorage.getItem("JwtToken") !== null;
+  };
 
   if (isAuthenticated()) {
-    return <Navigate to="/home" replace />;
-  }
+    return <Navigate to="/home" replace />;
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      isLoading(true);
       console.log("username", username);
       console.log("password", password);
-      const response = await axios.post("http://10.20.68.82/molina-lte/api/Login.php", {
-        username,
-        password,
-      });
-  
+      const response = await axios.post(
+        "http://10.20.68.82/molina-lte/api/Login.php",
+        {
+          username,
+          password,
+        }
+      );
+
       if (response.data.status === "success") {
-        localStorage.setItem('JwtToken', response.data.JwtToken.token);
-        localStorage.setItem('cardNumberPetugas', response.data.profile.card.number);
+        isLoading(false);
+        localStorage.setItem("JwtToken", response.data.JwtToken.token);
+        localStorage.setItem(
+          "cardNumberPetugas",
+          response.data.profile.card.number
+        );
         localStorage.setItem("key", response.data.profile.api.key);
         localStorage.setItem("token", response.data.profile.api.token);
-        localStorage.setItem("user", JSON.stringify(response.data.profile.user_data));
-  
+        localStorage.setItem(
+          "user",
+          JSON.stringify(response.data.profile.user_data)
+        );
+
         Toast.fire({
           icon: "success",
           title: "Berhasil Masuk",
@@ -51,6 +62,7 @@ const isAuthenticated = () => {
         alert("Username atau password salah!");
       }
     } catch (error) {
+      isLoading(false);
       console.error("Error during login:", error);
       Toast.fire({
         icon: "error",
@@ -58,52 +70,51 @@ const isAuthenticated = () => {
       });
     }
   };
-  
+
   return (
     <>
-      <div id="particles-js">
+      <div className={loading ? "form-loading-login" : "form-login-container"}>
+        <div className="loader-login-spin">
+        {loading && <span className="loader-loading-login"></span>}
+        </div>
+     
         <img
           src={icon_kemenkumham}
           alt="icon_kemenkumham"
-          className="icon-image"
+          className="icon-imagess"
         />
-      </div>
-      <div className="animated bounceInDown">
-        <div className="container">
-          <span className="error animated tada" id="msg"></span>
-          <form name="form1" className="box" onSubmit={handleLogin}>
-            <h1>Login</h1>
+        <form className="form-login" onSubmit={handleLogin}>
+          <h3> Login</h3>
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter email or phone"
+            onChange={(e) => setUsername(e.target.value)}
+          />
+
+          <label htmlFor="password">Password</label>
+          <div className="pass">
             <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              autoComplete="off"
-              onChange={(e) => setUsername(e.target.value)}
+              type={showPassword ? "text" : "password"}
+              className="pass"
+              name="password"
+              placeholder="Enter password"
+              id="password"
+              onChange={(e) => setPassword(e.target.value)}
             />
-            <div className="passoword-togel">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                id="pwd"
-                autoComplete="off"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={tooglePasswordVisibility}
-                className="password-toggle-icon"
-              >
-                <box-icon
-                  type="solid"
-                  name={showPassword ? "hide" : "show"}
-                  className="box-icon"
-                />
-              </button>
-            </div>
-            <input type="submit" value="Sign in" className="btn1" />
-          </form>
-        </div>
+            <i
+              id="show-hide"
+              className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"}`}
+              onClick={tooglePasswordVisibility}
+            ></i>
+          </div>
+          <button className="login-button" type="submit">
+            Log In
+          </button>
+          {/* <hr /> */}
+        </form>
       </div>
     </>
   );
