@@ -7,6 +7,7 @@ const TLV = require("node-tlv");
 const devices = new Devices();
 const http = require("http");
 const socketIo = require("socket.io");
+const hex2ascii = require("hex2ascii");
 
 const server = http.createServer();
 const io = socketIo(server, {
@@ -21,7 +22,7 @@ function splitAFL(dataHex) {
   const chunks = dataHex.match(/.{1,8}/g) || [];
   return chunks;
 }
-let data = null;
+let data = {};
 
 devices.on("device-activated", (event) => {
   const currentDevices = event.devices;
@@ -71,6 +72,7 @@ devices.on("device-activated", (event) => {
     let expdate = null;
     let isPDOL = false;
     let isGPO = null;
+    let cardtype = null;
 
     application.on("application-selected", (event) => {
       console.log(`Application Selected ${event.application}`);
@@ -106,6 +108,9 @@ devices.on("device-activated", (event) => {
         );
         res = response.data;
         tlv = TLV.parse(res);
+        let temp = tlv.find("50");
+        cardtype = hex2ascii("0x" + temp.value);
+        data.cardtype = cardtype;
         pdol = tlv.find("9f38");
         if (pdol) {
           console.log("PDOL found");
@@ -139,9 +144,10 @@ devices.on("device-activated", (event) => {
         if (cc) {
           ccnum = cc.value.slice(0, 16);
           expdate = cc.value.slice(17, 21);
-          console.log("ccnum: ", ccnum, "expdate: ", expdate);
           isPDOL = true;
-          data = { ccnum: ccnum, expdate: expdate };
+          data.ccnum = ccnum;
+          data.expdate = expdate;
+          console.table(data);
           sendServertoClient(data);
         } else if (tlv.tag === "77") {
           console.log("response 77");
@@ -209,8 +215,9 @@ devices.on("device-activated", (event) => {
             tlv = TLV.parse(res);
             ccnum = tlv.find("5a").value;
             expdate = tlv.find("5f24").value;
-            console.table({ ccnum, expdate });
-            data = { ccnum: ccnum, expdate: expdate };
+            console.table(data);
+            data.ccnum = ccnum;
+            data.expdate = expdate;
             sendServertoClient(data);
           } else if (isGPO === 80) {
             res = response.data;
@@ -218,8 +225,9 @@ devices.on("device-activated", (event) => {
             let cc = tlv.find("57");
             ccnum = cc.value.slice(0, 16);
             expdate = cc.value.slice(17, 21);
-            console.log("ccnum: ", ccnum, "expdate: ", expdate);
-            data = { ccnum: ccnum, expdate: expdate };
+            console.table(data);
+            data.ccnum = ccnum;
+            data.expdate = expdate;
             sendServertoClient(data);
           }
         }
