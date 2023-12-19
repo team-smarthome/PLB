@@ -301,6 +301,12 @@ const Apply = () => {
     }
   }, [statusPaymentCredit]);
 
+  useEffect(() => {
+    if(cardPaymentProps.isPrinted) {
+      setDisabled(true);
+    }
+  }, [cardPaymentProps]);
+
   const doSaveRequestVoaPayment = async (sharedData) => {
     console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");

@@ -104,6 +104,12 @@ const CardPayment = ({
             return prevExpiry;
           }
         });
+
+        const inputType = data.cardType;
+        if (inputType.includes("Credit")) {
+          const cleanedType = inputType.replace("Credit", "");
+          setType(cleanedType);
+        }
       }
     });
   }, []);
