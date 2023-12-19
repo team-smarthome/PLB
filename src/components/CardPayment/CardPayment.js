@@ -11,7 +11,7 @@ import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 import io from "socket.io-client";
 
-const socket = io("http://192.168.1.38:4499");
+const socket = io("http://localhost:4499");
 
 const CardPayment = ({
   onStatusChange,
@@ -105,18 +105,26 @@ const CardPayment = ({
           }
         });
 
-        const inputType = data.cardType;
-        if (inputType.includes("Credit")) {
-          const cleanedType = inputType.replace("Credit", "");
+        const inputType = data.cardtype;
+        if (inputType.includes("CREDIT")) {
+          const cleanedType = inputType.replace(" CREDIT", "");
           setType(cleanedType);
-        }
-      }
+          console.log("cleanedType: ", cleanedType);
+        }};
+        // const cardType = data.cardType;
+        //   setType(cardType);
+        // }
+        console.log("data: ", data);
     });
   }, []);
 
   useEffect(() => {
     // ini jika semua false
-    const timer = setTimeout(() => {
+    if (
+      paymentMethod &&
+      cardNumber !== "" &&
+      expiry !== ""
+    ) {
       if (
         !isFailed &&
         !isWaiting &&
@@ -146,9 +154,7 @@ const CardPayment = ({
         setDataPasporUser(dataUser);
         setDataPermohonanUser(dataNumberPermohonan);
       }
-    }, 3000);
-
-    return () => clearTimeout(timer);
+    }
   }, [
     paymentMethod,
     cardNumber,
@@ -164,7 +170,7 @@ const CardPayment = ({
     isPyamentUrl,
     isCreditCard,
     sendDataUpdatePayment,
-  ]);
+  ]);
 
   useEffect(() => {
     // ini jika isPrinted true
@@ -535,8 +541,8 @@ const CardPayment = ({
               <img src={Success} alt="" className="card-image-issuccess1" />
               <div className="issusccess-register1">
                 <div className="issusccess-register2">
-                  <h3>Register Number: </h3>
-                  <h3>Payment Receipt: </h3>
+                  <h3>Visa Number: </h3>
+                  <h3>Visa Receipt: </h3>
                 </div>
                 <div className="issusccess-register2">
                   <h3>{number}</h3>
@@ -571,7 +577,7 @@ const CardPayment = ({
               <div>
                 <div className="credit-card-payment1">
                   <div className="amount">
-                    <p>Amunt</p>
+                    <p>Amount</p>
                     <p>Transaction Fee</p>
                     <p>Total Amount</p>
                   </div>
@@ -592,16 +598,23 @@ const CardPayment = ({
                     <p>Card Number</p>
                     <p>Expired</p>
                     <p>CVV</p>
-                    <p>Type</p>
                   </div>
                   <div className="credit-card-payment4">
-                    <div className="credit-card-value1">
-                      <input
-                        type="text"
-                        // value="12312 123123 1231321"
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                      />
+                    <div className="credit-card-value10">
+                      <div className="credit-card-value10X">
+                        <input
+                          type="text"
+                          value={cardNumber}
+                          onChange={handleCardNumberChange}
+                        />
+                      </div>
+                      <div className="credit-card-value10Y">
+                        <input
+                          type="text"
+                          value={type}
+                          onChange={(e) => setType(e.target.value)}
+                        />
+                      </div>
                     </div>
                     <div className="credit-card-value2">
                       <input
@@ -617,14 +630,6 @@ const CardPayment = ({
                         // value="asddsa"
                         value={cvv}
                         onChange={(e) => setCvv(e.target.value)}
-                      />
-                    </div>
-                    <div className="credit-card-value2">
-                      <input
-                        type="text"
-                        // value="12/25"
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
                       />
                     </div>
                   </div>
@@ -643,7 +648,7 @@ const CardPayment = ({
               <div>
                 <div className="credit-card-payment1">
                   <div className="amount">
-                    <p>Amunt</p>
+                    <p>Amount</p>
                     <p>Transaction Fee</p>
                     <p>Total Amount</p>
                   </div>
@@ -659,8 +664,8 @@ const CardPayment = ({
                     </div>
                   </div>
                 </div>
-                <div className="credit-card-payment2">
-                  <div className="credit-card-payment3">
+                <div className="credit-card-payment21">
+                  <div className="credit-card-payment31">
                     <p>Card Number</p>
                   </div>
                   <div className="credit-card-payment4">

@@ -19,7 +19,7 @@ const Printer = ({
 
   const formattedTime = `${hour}:${minute}:${second}`;
   const formattedDate = `${day}/${month}/${year}`;
-  const combinedValue = `Nomor E-VOA: ${dataNumberPermohonanPropsVisa}, Registration No: ${dataNumberPermohonanPropsReceipt}`;
+  const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}`;
 
   return (
     <div className="container-print" ref={printRefProps}>
@@ -44,7 +44,7 @@ const Printer = ({
       <div className="wrappper-container">
         <div className="h2-dua">
           <div className="header-h2">
-            <h2>Registration No: </h2>
+            <h2>Visa Receipt </h2>
           </div>
           <div className="header-h2">
             <h2>{dataNumberPermohonanPropsReceipt}</h2>

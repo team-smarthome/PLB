@@ -6,6 +6,7 @@ import BodyContent from "../../components/BodyContent/BodyContent";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
 import "./ApplyStyle.css";
+import { is } from "@babel/types";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -48,9 +49,9 @@ const Apply = () => {
   });
 
   const [receiveTempData, setRecievedTempData] = useState([]);
-
+  let isCloseTimeoutSet = false;
   const connectWebSocket = () => {
-    const ipAddress = "192.168.100.107";
+    const ipAddress = "192.168.1.81";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -58,6 +59,13 @@ const Apply = () => {
 
       socketRef.current.onopen = () => {
         console.log("WebSocket connection opened");
+        isCloseTimeoutSet = false;
+        setCardStatus("errorConnection");
+        setTimeout(() => {
+          isCloseTimeoutSet = false;
+          setCardStatus("iddle");
+        }, 3000);
+    
         setIsConnected(true);
       };
     }
@@ -105,9 +113,21 @@ const Apply = () => {
       }
     };
 
+    
+
     socketRef.current.onclose = () => {
+      console.log("status: ", isCloseTimeoutSet);
       console.log("WebSocket connection closed");
       setIsConnected(false);
+      setCardStatus("errorConnection");
+      setTimeout(() => {
+        console.log("tahap timeout status", isCloseTimeoutSet);
+        isCloseTimeoutSet = true;
+      }, 3000);
+      if (!isCloseTimeoutSet) {
+        console.log("tahap close");
+        setCardStatus("errorWebsocket");
+      }
     };
   };
 
@@ -355,7 +375,7 @@ const Apply = () => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.form_url !== null) {
+      if (data.code === 200 && data.data.form_url === null) {
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -370,7 +390,7 @@ const Apply = () => {
         setDisabled(false);
         setIsEnableStep(true);
         setIsEnableBack(false);
-      } else if (data.code === 200) {
+      } else if (data.code === 200 && data.message === "E-Voa created successfuly!") {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -418,6 +438,7 @@ const Apply = () => {
             setCardStatus("errorVoa");
             setTitleFooter("Next Step");
             setTabStatus(1);
+            setTitleHeader("Apply VOA");
             setCardPaymentProps({
               isWaiting: false,
               isCreditCard: false,
@@ -434,11 +455,13 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
+              
             }, 5000);
           } else if (
             messageError === "Passport is not active for at least 6 months."
           ) {
             setDisabled(false);
+            setTitleHeader("Apply VOA");
             setCardStatus("errorBulan");
             setTitleFooter("Next Step");
             setTabStatus(1);
@@ -461,6 +484,7 @@ const Apply = () => {
             }, 5000);
           } else if (messageError === "Passport is from danger country.") {
             setDisabled(false);
+            setTitleHeader("Apply VOA");
             setCardStatus("errorDanger");
             setTitleFooter("Next Step");
             setTabStatus(1);
@@ -504,6 +528,7 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
+              setTitleHeader("Apply VOA");
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
             setTimeout(() => {

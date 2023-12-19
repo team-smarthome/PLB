@@ -370,6 +370,7 @@ label {
 .credit-card-payment2 {
   /* background-color: red; */
   /* margin-top: 3%; */
+  overflow: hidden;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -379,18 +380,46 @@ label {
 
  .credit-card-value1 input{
    border-radius: 1.2vh;
-   margin-left: 1.5%;
-  width: 34.6vh;
+   /* margin-left: 1%; */
+  width: 43.7vh;
   margin-top: 2vh;
   height: 1rem;
   /* text-align: right; */
   background-color: rgba(217, 217, 217, 0.75);
 }
 
-.credit-card-value2 input{
+.credit-card-value10 {
+  display: flex;
+  width: 60%;
+  flex-direction: row;
+  gap: 5%;
+  align-items: flex-start;
+  /* background-color: red; */
+}
+
+.credit-card-value10X input{
+  border-radius: 1.2vh;
+ height: 1rem;
+ width: 34.6vh;
+ margin-left: 1.5%;
+ /* text-align: right; */
+ background-color: rgba(217, 217, 217, 0.75);
+}
+
+.credit-card-value10Y input{
   border-radius: 1.2vh;
   margin-left: 1.5%;
-  width: 34.6vh;
+ height: 1rem;
+ width: 15vh;
+ /* text-align: right; */
+ background-color: rgba(217, 217, 217, 0.75);
+}
+
+
+.credit-card-value2 input{
+  border-radius: 1.2vh;
+  margin-left: 1%;
+  width: 55vh;
   margin-top: 2vh;
   height: 1rem;
   text-align: left;
@@ -400,8 +429,8 @@ label {
 .credit-card-value3 input{
   border: 1px solid #C70000;
   border-radius: 1.2vh;
-  margin-left: 1.5%;
-  width: 34.6vh;
+  margin-left: 1%;
+  width: 55vh;
   margin-top: 2vh;
   height: 1rem;
   /* text-align: left; */
@@ -474,6 +503,41 @@ label {
     .form-group-payment-submit3 button:hover {
       background-color: #fbaf17;
     }
+
+    .credit-card-payment21 {
+      /* background-color: red; */
+      /* margin-top: 3%; */
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      /* margin-bottom: 1%; */
+     }
+
+
+    .credit-card-payment31 {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      margin-top: 3vh;
+     }
+    
+     .credit-card-payment31 p:nth-child(1) {
+      color: #000000;
+     margin-top: 2vh;
+     }
+     .credit-card-payment31 p:nth-child(2) {
+      color: #000000;
+      margin-top: 2vh;
+      }
+      .credit-card-payment31 p:nth-child(3) {
+        color: #000000;
+        margin-top: 2vh;
+        }
+    
 
 @media print {
   .issusccess-register1 {

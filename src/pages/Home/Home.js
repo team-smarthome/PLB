@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
-
+import Logout from "../../assets/images/logout.png";
 const Home = () => {
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const navigate = useNavigate();
 
   const btnOnClick_Apply = () => {
@@ -14,10 +15,20 @@ const Home = () => {
     console.log("INFORMASI");
   };
 
-  // const getCurrentTimestamp = () => {
-  //   const currentTimestamp = new Date().toISOString();
-  //   return currentTimestamp;
-  // };
+  const handleLogout = () => {
+    // Menampilkan konfirmasi alert ketika tombol logout diklik
+    const userConfirmed = window.confirm("Are you sure you want to log out?");
+
+    if (userConfirmed) {
+      // Proses logout di sini (hapus localStorage, dll.)
+      navigate("/");
+      localStorage.removeItem("user");
+      localStorage.removeItem("JwtToken");
+      localStorage.removeItem("cardNumberPetugas");
+      localStorage.removeItem("key");
+      localStorage.removeItem("token");
+    }
+  };
 
   return (
     <div className="bg-home">
@@ -37,6 +48,11 @@ const Home = () => {
             <div className="bg-information" onClick={btnOnClick_Informasi}>
               <h2 className="text-information">Information</h2>
             </div>
+          </div>
+        </div>
+        <div className="logout" onClick={handleLogout}>
+          <div className="logout-2">
+            <img src={Logout} alt="Logout" className="logout-image" />
           </div>
         </div>
       </div>

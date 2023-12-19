@@ -89,8 +89,9 @@ height: 12%;
 }
 
 .form-login button {
-  margin-left: 24%;
+  margin-left: 22%;
   margin-top: 30px;
+  margin-bottom: 5%;
   width: 50%;
   background-color: #1b4186;
   padding: 15px 0;
@@ -135,6 +136,24 @@ height: 12%;
       transform: rotate(360deg);
   }
   } 
+
+  .version-voa {
+    margin-left: -10%;
+    /* background-color: red; */
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+  }
+
+  .version-voa p {
+    padding-top: 2%;
+    text-align: center;
+    font-size: 1rem;
+    /* position: absolute; */
+    color: black;
+
+  }
 
 
 @media screen and (max-width: 462px) {
