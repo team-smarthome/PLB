@@ -11,7 +11,7 @@ import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 import io from "socket.io-client";
 
-const socket = io("localhost:4499");
+const socket = io("http://192.168.1.38:4499");
 
 const CardPayment = ({
   onStatusChange,
@@ -23,6 +23,7 @@ const CardPayment = ({
   isPrinted,
   isWaiting,
   isSuccess,
+  isPyamentUrl,
   cardNumberPetugas,
   sendDataUpdatePayment,
   dataUser,
@@ -41,6 +42,7 @@ const CardPayment = ({
   const [expiryWarning, setExpiryWarning] = useState(false);
 
   const [cvv, setCvv] = useState("");
+  const [type, setType] = useState("");
   const [cvvWarning, setCvvWarning] = useState(false);
 
   const [seconds, setSeconds] = useState(8);
@@ -49,6 +51,7 @@ const CardPayment = ({
 
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
+  const [url, setUrl] = useState("");
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -62,10 +65,12 @@ const CardPayment = ({
     isFailed,
     isPrinted,
     isSuccess,
+    isPyamentUrl,
     paymentMethod,
     cardNumber,
     expiry,
     cvv,
+    type,
   });
 
   useEffect(() => {
@@ -113,6 +118,7 @@ const CardPayment = ({
         !isSuccess &&
         !isPaymentCredit &&
         !isPaymentCash &&
+        !isPyamentUrl &&
         isCreditCard
       ) {
         sendDataUpdatePayment({
@@ -123,10 +129,12 @@ const CardPayment = ({
           isSuccess: false,
           isPaymentCredit: true,
           isPaymentCash: false,
+          isPyamentUrl: false,
           paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
           cvv: cvv,
+          type: type,
         });
 
         setDataPasporUser(dataUser);
@@ -139,6 +147,7 @@ const CardPayment = ({
     paymentMethod,
     cardNumber,
     cvv,
+    type,
     dataNumberPermohonan,
     dataUser,
     expiry,
@@ -146,6 +155,7 @@ const CardPayment = ({
     isFailed,
     isPrinted,
     isSuccess,
+    isPyamentUrl,
     isCreditCard,
     sendDataUpdatePayment,
   ]);
@@ -161,11 +171,13 @@ const CardPayment = ({
       !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
-      !isCreditCard
+      !isCreditCard &&
+      !isPyamentUrl
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
       setNumber(dataPermohonanUser?.visa_number ?? "123213");
       setReceipt(dataPermohonanUser?.visa_receipt ?? "12321312313");
+      setUrl(dataPermohonanUser?.form_url ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -174,11 +186,13 @@ const CardPayment = ({
           isFailed: false,
           isPrinted: false,
           isSuccess: true,
+          isPyamentUrl: false,
           isPaymentCredit: false,
           paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
           cvv: cvv,
+          type: type,
         });
       }, 3000);
 
@@ -188,6 +202,7 @@ const CardPayment = ({
     paymentMethod,
     cardNumber,
     cvv,
+    type,
     dataPermohonanUser,
     expiry,
     isWaiting,
@@ -195,9 +210,46 @@ const CardPayment = ({
     isPrinted,
     isSuccess,
     isCreditCard,
+    isPyamentUrl,
     isPaymentCredit,
     sendDataUpdatePayment,
     handlePrint,
+  ]);
+
+  useEffect(() => {
+    // ini jika isPaymentUrl true
+    setDataPasporUser(dataUser);
+    setDataPermohonanUser(dataNumberPermohonan);
+    if (
+      !isPrinted &&
+      !isFailed &&
+      !isSuccess &&
+      !isWaiting &&
+      !isPaymentCredit &&
+      !isPaymentCash &&
+      !isCreditCard &&
+      isPyamentUrl
+    ) {
+      console.log("dataPermohonanUser: ", dataPermohonanUser);
+      setNumber(dataPermohonanUser?.visa_number ?? "123213");
+      setReceipt(dataPermohonanUser?.visa_receipt ?? "12321312313");
+      setUrl(dataPermohonanUser?.form_url ?? "https://www.wikipedia.org/");
+    }
+  }, [
+    paymentMethod,
+    cardNumber,
+    cvv,
+    type,
+    dataPermohonanUser,
+    expiry,
+    isWaiting,
+    isFailed,
+    isPrinted,
+    isSuccess,
+    isCreditCard,
+    isPyamentUrl,
+    isPaymentCredit,
+    sendDataUpdatePayment,
   ]);
 
   useEffect(() => {
@@ -209,7 +261,8 @@ const CardPayment = ({
       !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
-      !isCreditCard
+      !isCreditCard &&
+      !isPyamentUrl
     ) {
       const timer = setInterval(() => {
         setSeconds((prevSeconds) => (prevSeconds > 0 ? prevSeconds - 1 : 0));
@@ -225,6 +278,7 @@ const CardPayment = ({
     isPaymentCredit,
     isPaymentCash,
     isCreditCard,
+    isPyamentUrl,
   ]);
 
   useEffect(() => {
@@ -271,18 +325,21 @@ const CardPayment = ({
       isPrinted: false,
       isSuccess: false,
       isCreditCard: true,
+      isPyamentUrl: false,
       isPaymentCredit: false,
       paymentMethod: paymentMethod,
       cardNumber: cardNumber,
       expiry: expiry,
       cvv: cvv,
+      type: type,
     });
   };
 
   const handlePaymentCash = () => {
     setPaymentMethod("KICASH");
-    setExpiry("12/25");
-    setCvv("123");
+    setExpiry("00/00");
+    setCvv("000");
+    setType("CASH");
     setDataPasporUser(dataUser);
     console.log("berhasil");
     setCardNumber(cardNumberPetugas);
@@ -292,12 +349,14 @@ const CardPayment = ({
       isPrinted: false,
       isSuccess: false,
       isCreditCard: false,
+      isPyamentUrl: false,
       isPaymentCredit: false,
       isPaymentCash: true,
       paymentMethod: paymentMethod,
       cardNumber: cardNumber,
       expiry: expiry,
       cvv: cvv,
+      type: type,
     });
   };
 
@@ -308,8 +367,7 @@ const CardPayment = ({
   const handleConfirm = () => {
     const newStatusConfirm = !confirm;
     onStatusConfirm(newStatusConfirm);
-  }
-
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -328,6 +386,7 @@ const CardPayment = ({
         cc_no: cardNumber,
         cc_exp: expiry,
         cvv: cvv,
+        type: type,
       };
 
       const bill_data = {
@@ -359,6 +418,7 @@ const CardPayment = ({
         cardNumber: cardNumber,
         expiry: expiry,
         cvv: cvv,
+        type: type,
       });
       const newStatusPaymentCreditCard = !statusPaymentCredit;
       onStatusChange(newStatusPaymentCreditCard);
@@ -384,6 +444,7 @@ const CardPayment = ({
         cc_no: cardNumber,
         cc_exp: expiry,
         cvv: cvv,
+        type: type,
       };
 
       const bill_data = {
@@ -417,6 +478,7 @@ const CardPayment = ({
         cardNumber: cardNumber,
         expiry: expiry,
         cvv: cvv,
+        type: type,
       });
       const newStatusPaymentCreditCard = !statusPaymentCredit;
       onStatusChange(newStatusPaymentCreditCard);
@@ -446,7 +508,7 @@ const CardPayment = ({
               "Confirmation Payment - Cash"
             ) : isWaiting ? (
               ""
-            ) : (
+            ) : isPyamentUrl ? null : (
               "Chose payment method"
             )}
           </h1>
@@ -489,7 +551,9 @@ const CardPayment = ({
               </div>
               <img src={Failed} alt="" className="card-image-issuccess1" />
               <div className="form-group-payment-submit1">
-                <button type="submit" onClick={handleConfirm}>Confirm</button>
+                <button type="submit" onClick={handleConfirm}>
+                  Confirm
+                </button>
               </div>
             </div>
           ) : isCreditCard ? (
@@ -522,6 +586,7 @@ const CardPayment = ({
                     <p>Card Number</p>
                     <p>Expired</p>
                     <p>CVV</p>
+                    <p>Type</p>
                   </div>
                   <div className="credit-card-payment4">
                     <div className="credit-card-value1">
@@ -546,6 +611,14 @@ const CardPayment = ({
                         // value="asddsa"
                         value={cvv}
                         onChange={(e) => setCvv(e.target.value)}
+                      />
+                    </div>
+                    <div className="credit-card-value2">
+                      <input
+                        type="text"
+                        // value="12/25"
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
                       />
                     </div>
                   </div>
@@ -608,6 +681,10 @@ const CardPayment = ({
             <div style={{ color: "#3d5889" }}>
               <h1>Please wait...</h1>
             </div>
+          ) : isPyamentUrl ? (
+            <>
+              <iframe src={url} className="iframe-url" />
+            </>
           ) : (
             <div className="payment-method">
               <div className="payment-credit" onClick={handlePaymentCredit}>

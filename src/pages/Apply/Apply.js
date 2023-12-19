@@ -36,6 +36,7 @@ const Apply = () => {
     isSuccess: false,
     isWaiting: false,
     isFailed: false,
+    isPyamentUrl: false,
   });
 
   const [shareDataPaymentProps, setShareDataPaymentProps] = useState({
@@ -43,12 +44,13 @@ const Apply = () => {
     cardNumber: "",
     expiry: "",
     cvv: "",
+    type: "",
   });
 
   const [receiveTempData, setRecievedTempData] = useState([]);
 
   const connectWebSocket = () => {
-    const ipAddress = "192.168.1.81";
+    const ipAddress = "192.168.100.107";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -115,13 +117,13 @@ const Apply = () => {
     }
   };
 
-  useEffect(()=> {
+  useEffect(() => {
     const cardNumberPetugas = localStorage.getItem("cardNumberPetugas");
- 
+
     if (cardNumberPetugas) {
       setCardNumberPetugas(cardNumberPetugas);
     }
-  })
+  });
 
   useEffect(() => {
     connectWebSocket();
@@ -130,7 +132,6 @@ const Apply = () => {
       closeWebSocket();
     };
   }, []);
-
 
   useEffect(() => {
     console.log("tahap nol");
@@ -251,6 +252,31 @@ const Apply = () => {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
         setDisabled(true);
+      } else if (titleFooter === "Next Print") {
+        setCardPaymentProps({
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isWaiting: false,
+          isPrinted: true,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+        });
+        setTimeout(() => {
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: true,
+            isFailed: false,
+          });
+          setStatusPaymentCredit(false);
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+        }, 3000);
       }
     }
   };
@@ -261,8 +287,7 @@ const Apply = () => {
 
   const updateStatusConfirm = (newStatusConfirm) => {
     setConfirm(newStatusConfirm);
-  }
-
+  };
 
   useEffect(() => {
     if (receiveTempData.length > 2) {
@@ -276,10 +301,6 @@ const Apply = () => {
     }
   }, [statusPaymentCredit]);
 
-
-
-
-
   const doSaveRequestVoaPayment = async (sharedData) => {
     console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
@@ -288,10 +309,10 @@ const Apply = () => {
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
       Authorization: `Bearer ${bearerToken}`,
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     };
     //chek apakah payment Method ada atau tidak
-    console.log("sharedDataPaymentProps", shareDataPaymentProps)
+    console.log("sharedDataPaymentProps", shareDataPaymentProps);
     const bodyParam = {
       passportNumber: sharedData.passportData.docNumber,
       expiredDate: sharedData.passportData.formattedExpiryDate,
@@ -304,9 +325,10 @@ const Apply = () => {
       photoFace: sharedData.photoFace,
       email: sharedData.email,
       paymentMethod: shareDataPaymentProps.paymentMethod,
-      cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ''),
-      cc_exp: shareDataPaymentProps.expiry.replace('/', ''),
+      cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
+      cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
       cvv: shareDataPaymentProps.cvv,
+      type: shareDataPaymentProps.type,
       token: token,
       key: key,
     };
@@ -321,12 +343,28 @@ const Apply = () => {
         isPrinted: false,
         isSuccess: false,
         isFailed: false,
+        isPyamentUrl: false,
       });
       const res = await apiPaymentGateway(header, bodyParam);
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200) {
+      if (data.code === 200 && data.data.form_url !== null) {
+        setTitleFooter("Next Print");
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: true,
+        });
+        setDisabled(false);
+        setIsEnableStep(true);
+        setIsEnableBack(false);
+      } else if (data.code === 200) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -351,8 +389,11 @@ const Apply = () => {
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
         }, 3000);
-  
-      } else if (data.status === "Failed" || data.code === 500 || data.status === "failed") {
+      } else if (
+        data.status === "Failed" ||
+        data.code === 500 ||
+        data.status === "failed"
+      ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
         setCardPaymentProps({
@@ -363,6 +404,7 @@ const Apply = () => {
           isPrinted: false,
           isSuccess: false,
           isFailed: true,
+          isPyamentUrl: false,
         });
         setTimeout(() => {
           if (messageError === "Passport is not from voa country.") {
@@ -378,6 +420,7 @@ const Apply = () => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
+              isPyamentUrl: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -401,6 +444,7 @@ const Apply = () => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
+              isPyamentUrl: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -422,6 +466,7 @@ const Apply = () => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
+              isPyamentUrl: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -445,6 +490,7 @@ const Apply = () => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
+              isPyamentUrl: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -471,6 +517,7 @@ const Apply = () => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
+                isPyamentUrl: false,
               });
             }, 5000);
           }

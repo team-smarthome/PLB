@@ -90,7 +90,7 @@ const Login = () => {
             type="text"
             name="username"
             id="username"
-            placeholder="Enter email or phone"
+            placeholder="Enter UserName"
             onChange={(e) => setUsername(e.target.value)}
           />
 
