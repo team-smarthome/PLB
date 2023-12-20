@@ -12,7 +12,7 @@ const App = () => {
   // }, [isLoggedIn]);
 
   return (
-    <Router basename="/kiosk">
+    <Router basename="/molina-lte">
       <Routes />
     </Router>
   );

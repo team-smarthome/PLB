@@ -1,7 +1,7 @@
 {
   "name": "imi_kiosk",
   "version": "0.1.0",
-  "homepage": "/kiosk",
+  "homepage": "/molina-lte",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
