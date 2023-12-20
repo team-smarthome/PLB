@@ -52,10 +52,11 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
   const connectWebSocket = () => {
-    const ipAddress = "192.168.100.107";
+    const ipAddress = process.env.REACT_APP_WEBSOCKET_URL;
+    const port = process.env.REACT_APP_WEBSOCKET_PORT;
 
     if (ipAddress) {
-      const socketURL = `ws://${ipAddress}:4488`;
+      const socketURL = `ws://${ipAddress}:${port}`;
       socketRef.current = new WebSocket(socketURL);
 
       socketRef.current.onopen = () => {
@@ -374,7 +375,7 @@ const Apply = () => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.form_url !== null) {
+      if (data.code === 200 && data.data.form_url) {
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -420,7 +421,8 @@ const Apply = () => {
       } else if (
         data.status === "Failed" ||
         data.code === 500 ||
-        data.status === "failed"
+        data.status === "failed" ||
+        data.status === 500
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
