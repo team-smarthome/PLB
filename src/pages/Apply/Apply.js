@@ -28,7 +28,6 @@ const Apply = () => {
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const [meesageConfirm, setMessageConfirm] = useState("");
 
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
@@ -52,11 +51,10 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
   const connectWebSocket = () => {
-    const ipAddress = process.env.REACT_APP_WEBSOCKET_URL;
-    const port = process.env.REACT_APP_WEBSOCKET_PORT;
+    const ipAddress = "192.168.1.81";
 
     if (ipAddress) {
-      const socketURL = `ws://${ipAddress}:${port}`;
+      const socketURL = `ws://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
 
       socketRef.current.onopen = () => {
@@ -375,7 +373,7 @@ const Apply = () => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.form_url) {
+      if (data.code === 200 && data.data.form_url === null) {
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -421,12 +419,10 @@ const Apply = () => {
       } else if (
         data.status === "Failed" ||
         data.code === 500 ||
-        data.status === "failed" ||
-        data.status === 500
+        data.status === "failed"
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
-        setMessageConfirm(messageError);
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -555,27 +551,6 @@ const Apply = () => {
                 isPyamentUrl: false,
               });
             }, 5000);
-          } else {
-            setTimeout(() => {
-              setDisabled(false);
-              setTitleFooter("Next Step");
-              setTabStatus(1);
-              setStatusPaymentCredit(false);
-              setCardStatus("iddle");
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-              setCardPaymentProps({
-                isWaiting: false,
-                isCreditCard: false,
-                isPaymentCredit: false,
-                isPaymentCash: false,
-                isPrinted: false,
-                isSuccess: false,
-                isFailed: false,
-                isPyamentUrl: false,
-              });
-            }, 5000);
           }
         }, 5000);
       }
@@ -588,7 +563,7 @@ const Apply = () => {
 
   useEffect(() => {
     if (confirm) {
-      if (meesageConfirm === "Passport is not from voa country.") {
+      if (cardStatus === "errorVoa") {
         setDisabled(false);
         setCardStatus("errorVoa");
         setTitleFooter("Next Step");
@@ -611,7 +586,7 @@ const Apply = () => {
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
         }, 5000);
-      } else if (meesageConfirm === "Passport is not active for at least 6 months.") {
+      } else if (cardStatus === "errorBulan") {
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorBulan");
@@ -634,7 +609,7 @@ const Apply = () => {
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
         }, 5000);
-      } else if (meesageConfirm === "Passport is from danger country.") {
+      } else if (cardStatus === "errorDanger") {
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorDanger");
