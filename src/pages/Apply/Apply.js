@@ -5,8 +5,8 @@ import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
+import io from "socket.io-client";
 import "./ApplyStyle.css";
-import { is } from "@babel/types";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -50,9 +50,7 @@ const Apply = () => {
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
-  const connectWebSocket = () => {
-    const ipAddress = "192.168.1.81";
-
+  const connectWebSocket = (ipAddress) => {
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
@@ -68,65 +66,67 @@ const Apply = () => {
 
         setIsConnected(true);
       };
-    }
 
-    socketRef.current.onmessage = (event) => {
-      const dataJson = JSON.parse(event.data);
-      switch (dataJson.msgType) {
-        case "passportData":
-          let fullName = dataJson.foreName + " " + dataJson.surName;
-          const [day, month, year] = dataJson.birthDate.split("-").map(Number);
-          const [day1, month1, year1] = dataJson.expiryDate
-            .split("-")
-            .map(Number);
+      socketRef.current.onmessage = (event) => {
+        const dataJson = JSON.parse(event.data);
+        switch (dataJson.msgType) {
+          case "passportData":
+            let fullName = dataJson.foreName + " " + dataJson.surName;
+            const [day, month, year] = dataJson.birthDate
+              .split("-")
+              .map(Number);
+            const [day1, month1, year1] = dataJson.expiryDate
+              .split("-")
+              .map(Number);
 
-          const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+            const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
 
-          const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-            .toISOString()
-            .split("T")[0];
-          const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-            .toISOString()
-            .split("T")[0];
+            const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+              .toISOString()
+              .split("T")[0];
+            const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+              .toISOString()
+              .split("T")[0];
 
-          dataJson.fullName = fullName;
-          dataJson.formattedBirthDate = formattedDate;
-          dataJson.formattedExpiryDate = expiryDate;
+            dataJson.fullName = fullName;
+            dataJson.formattedBirthDate = formattedDate;
+            dataJson.formattedExpiryDate = expiryDate;
 
-          // Pemeriksaan docNumber
-          if (
-            dataJson.docNumber &&
-            dataJson.docNumber !== "" &&
-            !dataJson.docNumber.includes("*")
-          ) {
+            // Pemeriksaan docNumber
+            if (
+              dataJson.docNumber &&
+              dataJson.docNumber !== "" &&
+              !dataJson.docNumber.includes("*")
+            ) {
+              setRecievedTempData((previous) => [...previous, dataJson]);
+            } else {
+              setDataPrimaryPassport(null);
+            }
+
+            break;
+          case "visibleImage":
             setRecievedTempData((previous) => [...previous, dataJson]);
-          } else {
-            setDataPrimaryPassport(null);
-          }
+            break;
+          default:
+            break;
+        }
+      };
 
-          break;
-        case "visibleImage":
-          setRecievedTempData((previous) => [...previous, dataJson]);
-          break;
-        default:
-          break;
-      }
-    };
-
-    socketRef.current.onclose = () => {
-      console.log("status: ", isCloseTimeoutSet);
-      console.log("WebSocket connection closed");
-      setIsConnected(false);
-      setCardStatus("errorConnection");
-      setTimeout(() => {
-        console.log("tahap timeout status", isCloseTimeoutSet);
-        isCloseTimeoutSet = true;
-      }, 3000);
-      if (!isCloseTimeoutSet) {
-        console.log("tahap close");
-        setCardStatus("errorWebsocket");
-      }
-    };
+      socketRef.current.onclose = () => {
+        console.log("status: ", isCloseTimeoutSet);
+        console.log("WebSocket connection closed");
+        setIsConnected(false);
+        setCardStatus("errorConnection");
+        setTimeout(() => {
+          console.log("tahap timeout status", isCloseTimeoutSet);
+          isCloseTimeoutSet = true;
+        }, 3000);
+        if (!isCloseTimeoutSet) {
+          console.log("tahap close");
+          setCardStatus("errorWebsocket");
+        }
+      };
+    }
   };
 
   const closeWebSocket = () => {
@@ -144,6 +144,29 @@ const Apply = () => {
   });
 
   useEffect(() => {
+    // Start Connect to Server Socket.IO
+    const socket_IO = io("http://localhost:4499");
+
+    socket_IO.on("connect", () => {
+      console.log("Connected to server socket.io");
+    });
+
+    socket_IO.on("disconnect", () => {
+      console.log("Disconnected from server socket.io");
+    });
+
+    socket_IO.on("getIpAddress", (data) => {
+      console.log("Received data from server socket.io:", data);
+      connectWebSocket(data.ipAddressV4);
+    });
+
+    return () => {
+      socket_IO.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    //Start Connect to Server Websocket
     connectWebSocket();
 
     return () => {
