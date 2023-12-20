@@ -17,6 +17,32 @@ const io = socketIo(server, {
     allowedHeaders: ["Content-Type", "Authorization"],
   },
 });
+const { networkInterfaces } = require("os");
+
+const nets = networkInterfaces();
+const results = Object.create(null); // Or just '{}', an empty object
+
+for (const name of Object.keys(nets)) {
+  for (const net of nets[name]) {
+    const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
+    if (net.family === familyV4Value && !net.internal) {
+      if (!results[name]) {
+        results[name] = [];
+      }
+      results[name].push(net.address);
+    }
+  }
+}
+
+const wifiResults = {};
+for (const name of Object.keys(results)) {
+  if (name.toLowerCase().includes("wi-fi")) {
+    const ipAddressV4 = results[name][0]; // Ambil alamat IP pertama dari antarmuka
+    wifiResults.ipAddressV4 = ipAddressV4;
+  }
+}
+
+console.log(wifiResults);
 
 function splitAFL(dataHex) {
   const chunks = dataHex.match(/.{1,8}/g) || [];
@@ -255,7 +281,8 @@ io.on("connection", (socket) => {
   console.log("connected");
   let status = "connected";
   socket.emit("connected", status);
-  // socket.emit("getCredentials", data);
+  socket.emit("getCredentials", data);
+  socket.emit("getIpAddress", wifiResults);
 });
 
 server.listen(4499, () => {
