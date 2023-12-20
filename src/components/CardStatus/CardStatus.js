@@ -184,6 +184,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
       case "errorIntal":
       case "inputEmail":
       case "photoNotMatch":
+      case "errorWebsocket":
         return Gambar3;
       case "lookCamera":
         return Gambar6;
@@ -191,6 +192,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         return Gambar7;
       case "emailSucces":
         return Gambar2;
+      case "errorConnection":
+        return Gambar1;
       default:
         return Gambar1;
     }
@@ -218,6 +221,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         return ["Email Successfully Saved"];
       case "photoNotMatch":
         return ["Face Paspor and", "photo not Match"];
+      case "errorConnection":
+        return ["Connecting Device", "Please wait..."];
+      case "errorWebsocket":
+        return ["Error Connecting Device", "Device connection failed"];
       default:
         return [];
     }

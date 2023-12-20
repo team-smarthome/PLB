@@ -54,10 +54,12 @@ const BodyContent = ({
     isFailed,
     isPrinted,
     isSuccess,
+    isPyamentUrl,
     paymentMethod,
     cardNumber,
     expiry,
     cvv,
+    type,
   }) => {
     setCardPaymentProps({
       ...cardPaymentProps,
@@ -68,6 +70,7 @@ const BodyContent = ({
       isFailed,
       isPrinted,
       isSuccess,
+      isPyamentUrl,
     });
 
     setShareDataPaymentProps({
@@ -76,6 +79,7 @@ const BodyContent = ({
       cardNumber,
       expiry,
       cvv,
+      type
     });
   };
 

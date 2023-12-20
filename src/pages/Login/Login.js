@@ -17,6 +17,8 @@ const Login = () => {
 
   const [loading, isLoading] = useState(false);
 
+  const version = "1.0.0";
+
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
   };
@@ -41,6 +43,7 @@ const Login = () => {
 
       if (response.data.status === "success") {
         isLoading(false);
+        console.log(response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
         localStorage.setItem(
           "cardNumberPetugas",
@@ -90,7 +93,7 @@ const Login = () => {
             type="text"
             name="username"
             id="username"
-            placeholder="Enter email or phone"
+            placeholder="Enter UserName"
             onChange={(e) => setUsername(e.target.value)}
           />
 
@@ -113,7 +116,11 @@ const Login = () => {
           <button className="login-button" type="submit">
             Log In
           </button>
+          <div className="version-voa">
+          <p>Version: {version}</p>
           {/* <hr /> */}
+          </div>
+         
         </form>
       </div>
     </>
