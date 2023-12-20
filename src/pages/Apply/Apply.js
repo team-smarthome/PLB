@@ -28,6 +28,7 @@ const Apply = () => {
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [meesageConfirm, setMessageConfirm] = useState("");
 
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
@@ -51,7 +52,7 @@ const Apply = () => {
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
   const connectWebSocket = () => {
-    const ipAddress = "192.168.1.81";
+    const ipAddress = "192.168.100.107";
 
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
@@ -65,7 +66,7 @@ const Apply = () => {
           isCloseTimeoutSet = false;
           setCardStatus("iddle");
         }, 3000);
-    
+
         setIsConnected(true);
       };
     }
@@ -112,8 +113,6 @@ const Apply = () => {
           break;
       }
     };
-
-    
 
     socketRef.current.onclose = () => {
       console.log("status: ", isCloseTimeoutSet);
@@ -322,7 +321,7 @@ const Apply = () => {
   }, [statusPaymentCredit]);
 
   useEffect(() => {
-    if(cardPaymentProps.isPrinted) {
+    if (cardPaymentProps.isPrinted) {
       setDisabled(true);
     }
   }, [cardPaymentProps]);
@@ -375,7 +374,7 @@ const Apply = () => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.form_url === null) {
+      if (data.code === 200 && data.data.form_url !== null) {
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -390,7 +389,10 @@ const Apply = () => {
         setDisabled(false);
         setIsEnableStep(true);
         setIsEnableBack(false);
-      } else if (data.code === 200 && data.message === "E-Voa created successfuly!") {
+      } else if (
+        data.code === 200 &&
+        data.message === "E-Voa created successfuly!"
+      ) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -422,6 +424,7 @@ const Apply = () => {
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
+        setMessageConfirm(messageError);
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -455,7 +458,6 @@ const Apply = () => {
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
-              
             }, 5000);
           } else if (
             messageError === "Passport is not active for at least 6 months."
@@ -551,6 +553,27 @@ const Apply = () => {
                 isPyamentUrl: false,
               });
             }, 5000);
+          } else {
+            setTimeout(() => {
+              setDisabled(false);
+              setTitleFooter("Next Step");
+              setTabStatus(1);
+              setStatusPaymentCredit(false);
+              setCardStatus("iddle");
+              setRecievedTempData([]);
+              setDataPrimaryPassport(null);
+              setIsEnableBack(true);
+              setCardPaymentProps({
+                isWaiting: false,
+                isCreditCard: false,
+                isPaymentCredit: false,
+                isPaymentCash: false,
+                isPrinted: false,
+                isSuccess: false,
+                isFailed: false,
+                isPyamentUrl: false,
+              });
+            }, 5000);
           }
         }, 5000);
       }
@@ -563,12 +586,83 @@ const Apply = () => {
 
   useEffect(() => {
     if (confirm) {
-      setTabStatus(1);
-      setStatusPaymentCredit(false);
-      setCardStatus("iddle");
-      setRecievedTempData([]);
-      setDataPrimaryPassport(null);
-      setIsEnableBack(true);
+      if (meesageConfirm === "Passport is not from voa country.") {
+        setDisabled(false);
+        setCardStatus("errorVoa");
+        setTitleFooter("Next Step");
+        setTabStatus(1);
+        setTitleHeader("Apply VOA");
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+        });
+        setTimeout(() => {
+          setStatusPaymentCredit(false);
+          setCardStatus("iddle");
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+          setIsEnableBack(true);
+        }, 5000);
+      } else if (meesageConfirm === "Passport is not active for at least 6 months.") {
+        setDisabled(false);
+        setTitleHeader("Apply VOA");
+        setCardStatus("errorBulan");
+        setTitleFooter("Next Step");
+        setTabStatus(1);
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+        });
+        setTimeout(() => {
+          setStatusPaymentCredit(false);
+          setCardStatus("iddle");
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+          setIsEnableBack(true);
+        }, 5000);
+      } else if (meesageConfirm === "Passport is from danger country.") {
+        setDisabled(false);
+        setTitleHeader("Apply VOA");
+        setCardStatus("errorDanger");
+        setTitleFooter("Next Step");
+        setTabStatus(1);
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+        });
+        setTimeout(() => {
+          setStatusPaymentCredit(false);
+          setCardStatus("iddle");
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+          setIsEnableBack(true);
+        }, 5000);
+      } else {
+        setTabStatus(1);
+        setStatusPaymentCredit(false);
+        setCardStatus("iddle");
+        setRecievedTempData([]);
+        setDataPrimaryPassport(null);
+        setIsEnableBack(true);
+      }
     }
   }, [confirm]);
 

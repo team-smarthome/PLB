@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import Logout from "../../assets/images/logout.png";
+import LogoutIcon from "../../assets/images/logoutnew.png";
+
 const Home = () => {
-  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const navigate = useNavigate();
 
   const btnOnClick_Apply = () => {
@@ -15,11 +17,17 @@ const Home = () => {
     console.log("INFORMASI");
   };
 
-  const handleLogout = () => {
-    // Menampilkan konfirmasi alert ketika tombol logout diklik
-    const userConfirmed = window.confirm("Are you sure you want to log out?");
+  const handleLogout = async () => {
+    // Menampilkan konfirmasi alert ketika tombol logout diklik menggunakan SweetAlert2
+    const result = await Swal.fire({
+      title: "Are you sure want to logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+    });
 
-    if (userConfirmed) {
+    if (result.isConfirmed) {
       // Proses logout di sini (hapus localStorage, dll.)
       navigate("/");
       localStorage.removeItem("user");
@@ -45,14 +53,20 @@ const Home = () => {
             <div className="bg-apply" onClick={btnOnClick_Apply}>
               <h2 className="text-apply">APPLY</h2>
             </div>
-            <div className="bg-information" onClick={btnOnClick_Informasi}>
+            <div
+              className="bg-information"
+              onClick={btnOnClick_Informasi}
+            >
               <h2 className="text-information">Information</h2>
             </div>
           </div>
         </div>
-        <div className="logout" onClick={handleLogout}>
-          <div className="logout-2">
-            <img src={Logout} alt="Logout" className="logout-image" />
+        <div className="logoutNew" onClick={handleLogout}>
+          <div className="logout-text">
+            <p className="text-logout">LOGOUT</p>
+          </div>
+          <div className="logout-image">
+            <img src={LogoutIcon} alt="Logout" className="logout-icon" />
           </div>
         </div>
       </div>

@@ -243,8 +243,8 @@ const CardPayment = ({
       isPyamentUrl
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
-      setNumber(dataPermohonanUser?.visa_number ?? "123213");
-      setReceipt(dataPermohonanUser?.visa_receipt ?? "12321312313");
+      setNumber(dataPermohonanUser?.visa_number ?? "");
+      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       setUrl(dataPermohonanUser?.form_url ?? "https://www.wikipedia.org/");
     }
   }, [
