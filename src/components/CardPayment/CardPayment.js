@@ -154,6 +154,38 @@ const CardPayment = ({
         setDataPasporUser(dataUser);
         setDataPermohonanUser(dataNumberPermohonan);
       }
+    } else {
+      setTimeout(() => {
+        if (
+          !isFailed &&
+          !isWaiting &&
+          !isPrinted &&
+          !isSuccess &&
+          !isPaymentCredit &&
+          !isPaymentCash &&
+          !isPyamentUrl &&
+          isCreditCard
+        ) {
+          sendDataUpdatePayment({
+            isCreditCard: false,
+            isWaiting: false,
+            isFailed: false,
+            isPrinted: false,
+            isSuccess: false,
+            isPaymentCredit: true,
+            isPaymentCash: false,
+            isPyamentUrl: false,
+            paymentMethod: paymentMethod,
+            cardNumber: cardNumber,
+            expiry: expiry,
+            cvv: cvv,
+            type: type,
+          });
+  
+          setDataPasporUser(dataUser);
+          setDataPermohonanUser(dataNumberPermohonan);
+        }
+      }, 8000);
     }
   }, [
     paymentMethod,

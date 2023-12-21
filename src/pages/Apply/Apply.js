@@ -28,6 +28,7 @@ const Apply = () => {
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [meesageConfirm, setMessageConfirm] = useState("");
 
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
@@ -442,10 +443,12 @@ const Apply = () => {
       } else if (
         data.status === "Failed" ||
         data.code === 500 ||
-        data.status === "failed"
+        data.status === "failed" ||
+        data.status == 500
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
+        setMessageConfirm(messageError);
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -574,6 +577,32 @@ const Apply = () => {
                 isPyamentUrl: false,
               });
             }, 5000);
+          } else if (messageError === "Invalid JWT Token") {
+            setTimeout(() => {
+              setDisabled(false);
+              setTitleFooter("Next Step");
+              setTabStatus(1);
+              setStatusPaymentCredit(false);
+              setCardStatus("iddle");
+              setRecievedTempData([]);
+              setDataPrimaryPassport(null);
+              setIsEnableBack(true);
+              setCardPaymentProps({
+                isWaiting: false,
+                isCreditCard: false,
+                isPaymentCredit: false,
+                isPaymentCash: false,
+                isPrinted: false,
+                isSuccess: false,
+                isFailed: false,
+                isPyamentUrl: false,
+              });
+              localStorage.removeItem('user');
+              localStorage.removeItem('JwtToken');
+              localStorage.removeItem('cardNumberPetugas');
+              localStorage.removeItem('key');
+              localStorage.removeItem('token');
+            }, 5000);
           }
         }, 5000);
       }
@@ -583,10 +612,11 @@ const Apply = () => {
       throw err;
     }
   };
+  
 
   useEffect(() => {
     if (confirm) {
-      if (cardStatus === "errorVoa") {
+      if (meesageConfirm === "Passport is not from voa country.") {
         setDisabled(false);
         setCardStatus("errorVoa");
         setTitleFooter("Next Step");
@@ -608,8 +638,9 @@ const Apply = () => {
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
+          setConfirm(false);
         }, 5000);
-      } else if (cardStatus === "errorBulan") {
+      } else if (meesageConfirm === "Passport is not active for at least 6 months.") {
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorBulan");
@@ -631,8 +662,9 @@ const Apply = () => {
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
+          setConfirm(false);
         }, 5000);
-      } else if (cardStatus === "errorDanger") {
+      } else if (meesageConfirm === "Passport is from danger country.") {
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorDanger");
@@ -654,14 +686,30 @@ const Apply = () => {
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
+          setConfirm(false);
         }, 5000);
       } else {
+        console.log("jalan gk ya??")
+        setDisabled(false); 
         setTabStatus(1);
+        setTitleFooter("Next Step");
+        setTitleHeader("Apply VOA");
         setStatusPaymentCredit(false);
         setCardStatus("iddle");
         setRecievedTempData([]);
         setDataPrimaryPassport(null);
         setIsEnableBack(true);
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+        });
+        setConfirm(false);
       }
     }
   }, [confirm]);
