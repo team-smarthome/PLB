@@ -459,7 +459,7 @@ const Apply = () => {
         data.status === "Failed" ||
         data.code === 500 ||
         data.status === "failed" ||
-        data.status == 500 || data.code == 400 || data.code == 401
+        data.status == 500 || data.code == 400 || data.code == 401 || data.status === "error"
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
@@ -619,6 +619,50 @@ const Apply = () => {
               localStorage.removeItem('key');
               localStorage.removeItem('token');
             }, 5000);
+          } else if (messageError === "Required field 'photoFace' is missing") {
+            setDisabled(false);
+            setCardStatus("photoNotMatch");
+            setTitleFooter("Next Step");
+            setTabStatus(1);
+            setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: false,
+              isSuccess: false,
+              isFailed: false,
+              isPyamentUrl: false,
+            });
+            setTimeout(() => {
+              setStatusPaymentCredit(false);
+              setCardStatus("iddle");
+              setRecievedTempData([]);
+              setDataPrimaryPassport(null);
+              setIsEnableBack(true);
+              setTitleHeader("Apply VOA");
+            }, 5000);
+          } else {
+            setTimeout(() => {
+              setDisabled(false);
+              setTitleFooter("Next Step");
+              setTabStatus(1);
+              setStatusPaymentCredit(false);
+              setCardStatus("iddle");
+              setRecievedTempData([]);
+              setDataPrimaryPassport(null);
+              setIsEnableBack(true);
+              setCardPaymentProps({
+                isWaiting: false,
+                isCreditCard: false,
+                isPaymentCredit: false,
+                isPaymentCash: false,
+                isPrinted: false,
+                isSuccess: false,
+                isFailed: false,
+                isPyamentUrl: false,
+              });
+            }, 5000);
           }
         }, 5000);
       }
@@ -684,6 +728,30 @@ const Apply = () => {
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorDanger");
+        setTitleFooter("Next Step");
+        setTabStatus(1);
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+        });
+        setTimeout(() => {
+          setStatusPaymentCredit(false);
+          setCardStatus("iddle");
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+          setIsEnableBack(true);
+          setConfirm(false);
+        }, 5000);
+      } else if (meesageConfirm === "Required field 'photoFace' is missing") {
+        setDisabled(false);
+        setTitleHeader("Apply VOA");
+        setCardStatus("photoNotMatch");
         setTitleFooter("Next Step");
         setTabStatus(1);
         setCardPaymentProps({
