@@ -371,7 +371,7 @@ const Apply = () => {
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
-      photoFace: sharedData.photoFace,
+      photoFace: sharedData.photoFace ? sharedData.photoFace : null,
       email: sharedData.email,
       paymentMethod: shareDataPaymentProps.paymentMethod,
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
