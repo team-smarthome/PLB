@@ -51,7 +51,7 @@ const Apply = () => {
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
-  const connectWebSocket = (ipAddress) => {
+  const connectWebSocket = (ipAddress, socket_IO) => { //image2
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
@@ -126,6 +126,7 @@ const Apply = () => {
           console.log("tahap close");
           setCardStatus("errorWebsocket");
         }
+        socket_IO.emit("clientData", "re-newIpAddress") //image 1
       };
     }
   };
@@ -158,7 +159,7 @@ const Apply = () => {
 
     socket_IO.on("getIpAddress", (data) => {
       console.log("Received data from server socket.io:", data);
-      connectWebSocket(data.ipAddressV4);
+      connectWebSocket(data.ipAddressV4, socket_IO); //gambar 3
     });
 
     return () => {
@@ -397,7 +398,7 @@ const Apply = () => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.form_url === null) {
+      if (data.code === 200 && data.data.form_url) {
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -412,7 +413,21 @@ const Apply = () => {
         setDisabled(false);
         setIsEnableStep(true);
         setIsEnableBack(false);
-      } else if (
+      } else if (data.code === 200 && data.data.form_url === null) {
+        setStatusPaymentCredit(false);
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: true,
+          isPyamentUrl: false,
+        });
+      }
+      
+      else if (
         data.code === 200 &&
         data.message === "E-Voa created successfuly!"
       ) {
@@ -444,7 +459,7 @@ const Apply = () => {
         data.status === "Failed" ||
         data.code === 500 ||
         data.status === "failed" ||
-        data.status == 500
+        data.status == 500 || data.code == 400 || data.code == 401
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
@@ -597,6 +612,7 @@ const Apply = () => {
                 isFailed: false,
                 isPyamentUrl: false,
               });
+              navigate("/");
               localStorage.removeItem('user');
               localStorage.removeItem('JwtToken');
               localStorage.removeItem('cardNumberPetugas');
