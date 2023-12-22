@@ -10,6 +10,7 @@ import { useReactToPrint } from "react-to-print";
 import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 import io from "socket.io-client";
+import Iframe from "react-iframe";
 
 const socket = io("http://localhost:4499");
 
@@ -275,9 +276,10 @@ const CardPayment = ({
       isPyamentUrl
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
+      const IframeUrl = dataPermohonanUser !== null ? dataPermohonanUser[0].form_url : "https://www.wikipedia.org/";
       setNumber(dataPermohonanUser?.visa_number ?? "");
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
-      setUrl(dataPermohonanUser?.form_url ?? "https://www.wikipedia.org/");
+      setUrl(IframeUrl);
     }
   }, [
     paymentMethod,
@@ -529,6 +531,8 @@ const CardPayment = ({
     }
   };
 
+  console.log(url);
+
   return (
     <div className="card-status">
       <div className="card-container">
@@ -726,7 +730,8 @@ const CardPayment = ({
             </div>
           ) : isPyamentUrl ? (
             <>
-              <iframe src={url} className="iframe-url" />
+              <Iframe url={url}  className="iframe-url"/>
+              {/* <iframe src={url} className="iframe-url" /> */}
             </>
           ) : (
             <div className="payment-method">

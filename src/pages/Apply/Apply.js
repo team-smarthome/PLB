@@ -70,6 +70,8 @@ const Apply = () => {
 
       socketRef.current.onmessage = (event) => {
         const dataJson = JSON.parse(event.data);
+        console.log("Received data from server websocket:", dataJson);
+
         switch (dataJson.msgType) {
           case "passportData":
             let fullName = dataJson.foreName + " " + dataJson.surName;
@@ -108,6 +110,15 @@ const Apply = () => {
           case "visibleImage":
             setRecievedTempData((previous) => [...previous, dataJson]);
             break;
+          case "DeviceController":
+          let airportId = dataJson.airportId;
+          let deviceId = dataJson.deviceId;
+          let jenisDeviceId = dataJson.jenisDeviceId;
+
+          localStorage.setItem("airportId", airportId);
+          localStorage.setItem("deviceId", deviceId);
+          localStorage.setItem("jenisDeviceId", jenisDeviceId);
+          break;
           default:
             break;
         }
@@ -354,6 +365,9 @@ const Apply = () => {
     console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
     const key = localStorage.getItem("key");
+    const devicedId = localStorage.getItem("deviceId");
+    const airportId = localStorage.getItem("airportId");
+    const jenisDeviceId = localStorage.getItem("jenisDeviceId");
 
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
@@ -362,6 +376,9 @@ const Apply = () => {
     };
     //chek apakah payment Method ada atau tidak
     console.log("sharedDataPaymentProps", shareDataPaymentProps);
+
+   
+
     const bodyParam = {
       passportNumber: sharedData.passportData.docNumber,
       expiredDate: sharedData.passportData.formattedExpiryDate,
@@ -371,7 +388,7 @@ const Apply = () => {
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : null,
+      photoFace: sharedData.photoFace,
       email: sharedData.email,
       paymentMethod: shareDataPaymentProps.paymentMethod,
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
@@ -380,6 +397,9 @@ const Apply = () => {
       type: shareDataPaymentProps.type,
       token: token,
       key: key,
+      deviceId: devicedId,
+      airportId: airportId,
+      jenisDeviceId: jenisDeviceId,
     };
     setIsEnableStep(false);
 
@@ -398,7 +418,7 @@ const Apply = () => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.form_url) {
+      if (data.code === 200 && data.data.length > 0 && data.data[0].form_url) {
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -459,7 +479,8 @@ const Apply = () => {
         data.status === "Failed" ||
         data.code === 500 ||
         data.status === "failed" ||
-        data.status == 500 || data.code == 400 || data.code == 401 || data.status === "error"
+        data.status === 500 || data.code === 400 || data.code === 401 || data.status === "error" ||
+        data.status === "Error" || data.status === 400
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
@@ -673,7 +694,6 @@ const Apply = () => {
     }
   };
   
-
   useEffect(() => {
     if (confirm) {
       if (meesageConfirm === "Passport is not from voa country.") {

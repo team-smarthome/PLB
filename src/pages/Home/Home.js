@@ -35,6 +35,9 @@ const Home = () => {
       localStorage.removeItem("cardNumberPetugas");
       localStorage.removeItem("key");
       localStorage.removeItem("token");
+      localStorage.removeItem("jenisDeviceId");
+      localStorage.removeItem("deviceId");
+      localStorage.removeItem("airportId");
     }
   };
 
