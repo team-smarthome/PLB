@@ -7,6 +7,7 @@ import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
+import axios from "axios";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -307,6 +308,7 @@ const Apply = () => {
         setTitleHeader("Payment");
         setDisabled(true);
       } else if (titleFooter === "Next Print") {
+        
         setCardPaymentProps({
           isCreditCard: false,
           isPaymentCredit: false,
@@ -361,6 +363,8 @@ const Apply = () => {
     }
   }, [cardPaymentProps]);
 
+
+  
   const doSaveRequestVoaPayment = async (sharedData) => {
     console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
@@ -376,8 +380,6 @@ const Apply = () => {
     };
     //chek apakah payment Method ada atau tidak
     console.log("sharedDataPaymentProps", shareDataPaymentProps);
-
-   
 
     const bodyParam = {
       passportNumber: sharedData.passportData.docNumber,
@@ -431,7 +433,16 @@ const Apply = () => {
           isPyamentUrl: true,
         });
         setDisabled(false);
-        setIsEnableStep(true);
+        setIsEnableStep(false);
+        
+        const rest =  axios.get("https://www.wikipedia.org/");
+        const data = rest.data;
+        setDataPermohonan(data.data);
+        if (data.code === 200 && data.visa_number && data.visa_receipt) {
+          setIsEnableStep(true);
+        } else {
+          setIsEnableStep(false);
+        }
         setIsEnableBack(false);
       } else if (data.code === 200 && data.data.form_url === null) {
         setStatusPaymentCredit(false);
@@ -693,6 +704,8 @@ const Apply = () => {
       throw err;
     }
   };
+
+  
   
   useEffect(() => {
     if (confirm) {
@@ -821,6 +834,23 @@ const Apply = () => {
   const updateSharedData = (newSharedData) => {
     setSharedData(newSharedData);
   };
+
+  
+  // if (titleFooter === "Next Print") {
+  //   setIsEnableStep(false);
+  // }
+
+  // if (titleFooter === "Next Print") {
+  //   setIsEnableStep(false);
+  //   // const res =  axios.get("https://www.wikipedia.org/");
+  //   // const data = res.data;
+  //   // setDataPermohonan(data.data);
+  //   // if (data.code === 200 && data.visa_number && data.visa_receipt) {
+  //   //   setIsEnableStep(true);
+  //   // } else if (data === null && res === null){
+  //   //   setIsEnableStep(false);
+  //   // } 
+  // }
 
   return (
     <div className="background-apply-voa">
