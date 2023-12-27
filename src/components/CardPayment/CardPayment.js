@@ -953,10 +953,11 @@ const CardPayment = ({
             </div>
           ) : isPyamentUrl ? (
             <>
-              <Iframe url={url}  
+              
+              {/* <Iframe url={url}  
                 x-frame-options="deny"
               className="iframe-url"/>
-              {/* <iframe src={url} className="iframe-url" /> */}
+              <iframe src={url} className="iframe-url" /> */}
             </>
           ) : (
             <div className="payment-method">

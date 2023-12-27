@@ -3,6 +3,7 @@ import { Route, Routes as ReactRoutes, Navigate } from "react-router-dom";
 import Apply from "../pages/Apply/Apply";
 import Login from "../pages/Login/Login";
 import Home from "../pages/Home/Home";
+import StatusPayment from "../pages/StatusPayment/StatusPayment";
 
 const isAuthenticated = () => {
   const jwtToken = localStorage.getItem('JwtToken');
@@ -47,6 +48,7 @@ const Routes = () => {
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
+      <Route path="/status-payment" element={<ProtectedRoute element={<StatusPayment />} />} />
     </ReactRoutes>
   );
 };

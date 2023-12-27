@@ -7,6 +7,7 @@ import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
+import { Redirect } from 'react-router-dom';
 import axios from "axios";
 
 const Apply = () => {
@@ -421,20 +422,22 @@ const Apply = () => {
       console.log("data", data);
       setDataPermohonan(data.data);
       if (data.code === 200 && data.data.length > 0 && data.data[0].form_url) {
-        setDataPermohonan(data.data);
-        setTitleFooter("Next Print");
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPyamentUrl: true,
-        });
-        setDisabled(false);
-        setIsEnableStep(false);
+        window.location.href = data.data[0].form_url;
+        // setDataPermohonan(data.data);
+        // setTitleFooter("Next Print");
+        // setCardPaymentProps({
+        //   isWaiting: false,
+        //   isCreditCard: false,
+        //   isPaymentCredit: false,
+        //   isPaymentCash: false,
+        //   isPrinted: false,
+        //   isSuccess: false,
+        //   isFailed: false,
+        //   isPyamentUrl: true,
+        // });
+        // setDisabled(false);
+        // setIsEnableStep(false);
+        // <Route path='/redirect-page' element={ <Redirect to="" /> }/>
         
         // const rest =  axios.get("https://www.wikipedia.org/");
         // const data = rest.data;
