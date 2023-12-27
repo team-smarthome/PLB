@@ -12,9 +12,15 @@ import Gambar7 from "../../assets/images/image-7.svg";
 const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [email, setEmail] = useState(null);
+  const [emailConfirmation, setEmailConfirmation] = useState(null);
+  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [isValidEmailConfirmation, setIsValidEmailConfirmation] =
+    useState(true);
+  const [emailConfirmWarning, setEmailConfirmWarning] = useState(false);
   const [emailWarning, setEmailWarning] = useState(false);
   const webcamRef = useRef(null);
-
+  const [titleWarning, setTitleWarning] = useState("");
+  
   const capture = () => {
     const imageSrc = webcamRef.current.getScreenshot();
     setCapturedImage(imageSrc);
@@ -42,21 +48,49 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
     console.log("Email Input Change:", event.target.value);
     setEmail(event.target.value);
     setEmailWarning(false);
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    setIsValidEmail(emailRegex.test(event.target.value));
+  };
+
+  const handleEmailConfirmationChange = (event) => {
+    console.log("Email Confirmation Input Change:", event.target.value);
+    setEmailConfirmation(event.target.value);
+    setEmailConfirmWarning(false);
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    setIsValidEmailConfirmation(emailRegex.test(event.target.value)); 
   };
 
   const handleOkButtonClick = () => {
     if (!email) {
+      setTitleWarning("Please enter your email address!");
       setEmailWarning(true);
       return;
+    } else if (!emailConfirmation) {
+      setTitleWarning("Please enter your email address confirmation!");
+      setEmailConfirmWarning(true);
+      return;
+    } else if (email !== emailConfirmation) {
+      setTitleWarning("Email confirmation not match!");
+      setEmailConfirmWarning(true);
+      return;
+    } else if (!isValidEmail) {
+      setTitleWarning("Please enter a valid email address!");
+      setEmailWarning(true);
+      return;
+    } else if (!isValidEmailConfirmation) {
+      setTitleWarning("Please enter a valid email address confirmation!");
+      setEmailConfirmWarning(true);
+      return;
     }
-
-    sendDataToInput({
-      statusCardBox: "emailSucces",
-      emailUser: email,
-      capturedImage: capturedImage,
-      titleHeader: "Apply VOA",
-      titleFooter: "Payment",
-    });
+    else {
+      sendDataToInput({
+        statusCardBox: "emailSucces",
+        emailUser: email,
+        capturedImage: capturedImage,
+        titleHeader: "Apply VOA",
+        titleFooter: "Payment",
+      });
+    }
   };
 
   const renderCardContent = () => {
@@ -75,7 +109,21 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
               />
             </div>
             {emailWarning && (
-              <div className="warning">Please enter your email address!</div>
+              <div className="warning">{titleWarning}</div>
+            )}
+            <div className="input-email">
+              <input
+              style={{marginTop: "5%"}}
+                type="text"
+                name="email-confirmation"
+                placeholder="Email Confirmation"
+                onChange={handleEmailConfirmationChange}
+              />
+            </div>
+            {emailConfirmWarning && (
+              <div className="warning">
+                {titleWarning}
+              </div>
             )}
             <button
               type="button"

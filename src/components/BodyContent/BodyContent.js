@@ -46,6 +46,14 @@ const BodyContent = ({
     setCardStatus(statusCardBox);
   };
 
+  //useeffect apakah dataNumberPermohonan ada isinya atau tidak
+  useEffect(() => {
+    if (dataNumberPermohonan) {
+      console.log("masuk oiii", dataNumberPermohonan);
+    }
+  }, [dataNumberPermohonan]);
+
+
   const handleDataFormPaymentStatus = ({
     isCreditCard,
     isPaymentCredit,

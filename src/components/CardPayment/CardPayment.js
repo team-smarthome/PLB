@@ -11,6 +11,9 @@ import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 import io from "socket.io-client";
 import Iframe from "react-iframe";
+import Swal from "sweetalert2";
+import axios from "axios";  
+import { Toast } from "../Toast/Toast";
 
 const socket = io("http://localhost:4499");
 
@@ -35,6 +38,13 @@ const CardPayment = ({
   const navigate = useNavigate();
   const printRef = useRef();
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, isLoading] = useState(false); 
+
+  const [popUpOpen, setPopupOpen] = useState(false);
+
+
   const [paymentMethod, setPaymentMethod] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardNumberWarning, setCardNumberWarning] = useState(false);
@@ -53,6 +63,15 @@ const CardPayment = ({
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
   const [url, setUrl] = useState("");
+
+  // const handleLogin = () => {
+  //   if (username === 'user' && password === 'password') {
+  //     Swal.fire('Login berhasil!', 'Selamat datang ' + username, 'success');
+  //   } else {
+  //     Swal.fire('Login gagal', 'Username atau password salah', 'error');
+  //   }
+  // };
+
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -263,8 +282,9 @@ const CardPayment = ({
 
   useEffect(() => {
     // ini jika isPaymentUrl true
-    setDataPasporUser(dataUser);
     setDataPermohonanUser(dataNumberPermohonan);
+    console.log("dataPermohonanUserGUYSSS: ", dataNumberPermohonan)
+    setDataPasporUser(dataUser);
     if (
       !isPrinted &&
       !isFailed &&
@@ -275,10 +295,10 @@ const CardPayment = ({
       !isCreditCard &&
       isPyamentUrl
     ) {
-      console.log("dataPermohonanUser: ", dataPermohonanUser);
-      const IframeUrl = dataPermohonanUser !== null ? dataPermohonanUser[0].form_url : "https://www.wikipedia.org/";
-      setNumber(dataPermohonanUser?.visa_number ?? "");
-      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
+      console.log("dataPermohonanUser: ", dataNumberPermohonan);
+      const  IframeUrl = dataNumberPermohonan !== null || dataNumberPermohonan !== undefined ? dataNumberPermohonan[0].form_url : "";
+      setNumber(dataNumberPermohonan?.visa_number ?? "");
+      setReceipt(dataNumberPermohonan?.visa_receipt ?? "");
       setUrl(IframeUrl);
     }
   }, [
@@ -418,62 +438,80 @@ const CardPayment = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (cardNumber === "") {
-      setCardNumberWarning(true);
-    } else if (expiry === "") {
-      setExpiryWarning(true);
-    } else if (cvv === "") {
-      setCvvWarning(true);
-    } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
-      setCardNumberWarning(false);
-      setExpiryWarning(false);
-      setCvvWarning(false);
-      const card_data = {
-        cc_no: cardNumber,
-        cc_exp: expiry,
-        cvv: cvv,
-        type: type,
-      };
+    Swal.fire({
+      title: "Are you sure want to Pay?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3D5889",
+      cancelButtonColor: "#d33", 
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Jika pengguna mengklik tombol "Yes"
 
-      const bill_data = {
-        billing_id: "",
-        amount: "",
-        currency: "",
-      };
+        if (cardNumber === "") {
+          setCardNumberWarning(true);
+        } else if (expiry === "") {
+          setExpiryWarning(true);
+        } else if (cvv === "") {
+          setCvvWarning(true);
+        } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
+          setCardNumberWarning(false);
+          setExpiryWarning(false);
+          setCvvWarning(false);
+          const card_data = {
+            cc_no: cardNumber,
+            cc_exp: expiry,
+            cvv: cvv,
+            type: type,
+          };
+    
+          const bill_data = {
+            billing_id: "",
+            amount: "",
+            currency: "",
+          };
+    
+          const user_data = {
+            pass_no: dataPasporUser.passportData.docNumber,
+            pass_name: dataPasporUser.passportData.fullName,
+            country: dataPasporUser.passportData.nationality,
+          };
+    
+          const dataParam = {
+            card_data: { ...card_data },
+            bill_data: { ...bill_data },
+            user_data: { ...user_data },
+          };
+    
+          console.log("dataParam: ", dataParam);
+          sendDataUpdatePayment({
+            isWaiting: false,
+            isConfirm: false,
+            isFailed: false,
+            isPrinted: false,
+            isSuccess: false,
+            paymentMethod: paymentMethod,
+            cardNumber: cardNumber,
+            expiry: expiry,
+            cvv: cvv,
+            type: type,
+          });
+          const newStatusPaymentCreditCard = !statusPaymentCredit;
+          onStatusChange(newStatusPaymentCreditCard);
+        }
+      } 
+    });
+    
 
-      const user_data = {
-        pass_no: dataPasporUser.passportData.docNumber,
-        pass_name: dataPasporUser.passportData.fullName,
-        country: dataPasporUser.passportData.nationality,
-      };
-
-      const dataParam = {
-        card_data: { ...card_data },
-        bill_data: { ...bill_data },
-        user_data: { ...user_data },
-      };
-
-      console.log("dataParam: ", dataParam);
-      sendDataUpdatePayment({
-        isWaiting: false,
-        isConfirm: false,
-        isFailed: false,
-        isPrinted: false,
-        isSuccess: false,
-        paymentMethod: paymentMethod,
-        cardNumber: cardNumber,
-        expiry: expiry,
-        cvv: cvv,
-        type: type,
-      });
-      const newStatusPaymentCreditCard = !statusPaymentCredit;
-      onStatusChange(newStatusPaymentCreditCard);
-    }
+   
   };
 
-  const handleSubmitCash = (e) => {
+  const handleSubmitKICASH= () => {
+    isLoading(false);
     console.log("dataPasporUser1: ", dataPasporUser);
-    e.preventDefault();
+    // e.preventDefault();
     console.log("dataPasporUser2: ", dataPasporUser);
     setCardNumber(cardNumberPetugas);
     if (cardNumber === "") {
@@ -529,6 +567,191 @@ const CardPayment = ({
       const newStatusPaymentCreditCard = !statusPaymentCredit;
       onStatusChange(newStatusPaymentCreditCard);
     }
+  }
+
+
+  const handleLogin = async (username, password) => {
+    // e.preventDefault();
+    try {
+      isLoading(true);
+      console.log("username", username);
+      console.log("password", password);
+      const response = await axios.post(
+        "http://10.20.68.82/molina-lte/api/Login.php",
+        {
+          username,
+          password,
+        }
+      );
+
+      console.log("response KICASH", response);
+      
+
+      if (response.data.status === "success") {
+        isLoading(false);
+        console.log(response.data);
+        localStorage.setItem("JwtToken", response.data.JwtToken.token);
+        localStorage.setItem(
+          "cardNumberPetugas",
+          response.data.profile.card.number
+        );
+        localStorage.setItem("key", response.data.profile.api.key);
+        localStorage.setItem("token", response.data.profile.api.token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify(response.data.profile.user_data)
+        );
+        sendDataUpdatePayment({
+          isConfirm: false,
+          isFailed: false,
+          isPrinted: false,
+          isSuccess: false,
+          isWaiting: true,
+          paymentMethod: paymentMethod,
+          cardNumber: cardNumber,
+          expiry: expiry,
+          cvv: cvv,
+          type: type,
+        });
+        handleSubmitKICASH();
+        
+      } else {
+        alert("Username atau password salah!");
+      }
+    } catch (error) {
+      isLoading(false);
+      console.error("Error during login:", error);
+      Toast.fire({
+        icon: "error",
+        title: "Gagal Masuk, UserName atau Password salah",
+      });
+    }
+  };
+
+  const handleSubmitCash = (e) => {
+    e.preventDefault();
+
+
+    
+    Swal.fire({
+      title: "Are you sure want to Pay?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3D5889",
+      cancelButtonColor: "#d33",  
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Login",
+          html:
+            '<input id="swal-input1" class="swal2-input" placeholder="UserName">' +
+            '<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonText: "Submit",
+          confirmButtonColor: "#3D5889",
+          cancelButtonText: "Cancel",
+          cancelButtonColor: "#d33",  
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const username = document.getElementById('swal-input1').value;
+            const password = document.getElementById('swal-input2').value;
+    
+            // Lakukan sesuatu dengan email dan password yang diambil
+    
+            if (username && password) {
+              sendDataUpdatePayment({
+                isConfirm: false,
+                isFailed: false,
+                isPrinted: false,
+                isSuccess: false,
+                isWaiting: true,
+                paymentMethod: paymentMethod,
+                cardNumber: cardNumber,
+                expiry: expiry,
+                cvv: cvv,
+                type: type,
+              });
+              handleLogin(username, password);
+              // Swal.fire({
+              //   title: 'Please wait...',
+              //   // allowOutsideClick: () => !Swal.isLoading(),
+              //   showConfirmButton: false,
+              // });
+            } else {
+              Swal.fire("Please enter username and password");
+            }
+          }
+        });
+        
+      }
+    });
+    
+
+    
+    
+    
+
+    
+    // console.log("dataPasporUser1: ", dataPasporUser);
+    // e.preventDefault();
+    // console.log("dataPasporUser2: ", dataPasporUser);
+    // setCardNumber(cardNumberPetugas);
+    // if (cardNumber === "") {
+    //   setCardNumberWarning(true);
+    // } else if (expiry === "") {
+    //   setExpiryWarning(true);
+    // } else if (cvv === "") {
+    //   setCvvWarning(true);
+    // } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
+    //   setCardNumberWarning(false);
+    //   setExpiryWarning(false);
+    //   setCvvWarning(false);
+    //   const card_data = {
+    //     cc_no: cardNumber,
+    //     cc_exp: expiry,
+    //     cvv: cvv,
+    //     type: type,
+    //   };
+
+    //   const bill_data = {
+    //     billing_id: "",
+    //     amount: "",
+    //     currency: "",
+    //   };
+
+    //   const user_data = {
+    //     pass_no: dataPasporUser.passportData.docNumber,
+    //     pass_name: dataPasporUser.passportData.fullName,
+    //     country: dataPasporUser.passportData.nationality,
+    //   };
+
+    //   console.log("dataPasporUser: ", dataPasporUser);
+
+    //   const dataParam = {
+    //     card_data: { ...card_data },
+    //     bill_data: { ...bill_data },
+    //     user_data: { ...user_data },
+    //   };
+
+    //   console.log("dataParam: ", dataParam);
+    //   sendDataUpdatePayment({
+    //     isWaiting: false,
+    //     isConfirm: false,
+    //     isFailed: false,
+    //     isPrinted: false,
+    //     isSuccess: false,
+    //     paymentMethod: paymentMethod,
+    //     cardNumber: cardNumber,
+    //     expiry: expiry,
+    //     cvv: cvv,
+    //     type: type,
+    //   });
+    //   const newStatusPaymentCreditCard = !statusPaymentCredit;
+    //   onStatusChange(newStatusPaymentCreditCard);
+    // }
   };
 
   console.log(url);
@@ -718,7 +941,7 @@ const CardPayment = ({
                 <div className="confirm-payment-credit">
                   <div className="confirm-payment-credit2">
                     <div className="form-group-payment-submit3">
-                      <button type="submit">Confirm</button>
+                      <button type="submit"  >Confirm</button>
                     </div>
                   </div>
                 </div>
@@ -730,7 +953,9 @@ const CardPayment = ({
             </div>
           ) : isPyamentUrl ? (
             <>
-              <Iframe url={url}  className="iframe-url"/>
+              <Iframe url={url}  
+                x-frame-options="deny"
+              className="iframe-url"/>
               {/* <iframe src={url} className="iframe-url" /> */}
             </>
           ) : (

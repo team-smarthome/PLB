@@ -421,6 +421,7 @@ const Apply = () => {
       console.log("data", data);
       setDataPermohonan(data.data);
       if (data.code === 200 && data.data.length > 0 && data.data[0].form_url) {
+        setDataPermohonan(data.data);
         setTitleFooter("Next Print");
         setCardPaymentProps({
           isWaiting: false,
@@ -435,15 +436,15 @@ const Apply = () => {
         setDisabled(false);
         setIsEnableStep(false);
         
-        const rest =  axios.get("https://www.wikipedia.org/");
-        const data = rest.data;
-        setDataPermohonan(data.data);
-        if (data.code === 200 && data.visa_number && data.visa_receipt) {
-          setIsEnableStep(true);
-        } else {
-          setIsEnableStep(false);
-        }
-        setIsEnableBack(false);
+        // const rest =  axios.get("https://www.wikipedia.org/");
+        // const data = rest.data;
+        // setDataPermohonan(data.data);
+        // if (data.code === 200 && data.visa_number && data.visa_receipt) {
+        //   setIsEnableStep(true);
+        // } else {
+        //   setIsEnableStep(false);
+        // }
+        // setIsEnableBack(false);
       } else if (data.code === 200 && data.data.form_url === null) {
         setStatusPaymentCredit(false);
         setCardPaymentProps({
