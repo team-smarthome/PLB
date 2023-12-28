@@ -79,11 +79,20 @@ const StatusPayment = () => {
       handlePrint(); // Call handlePrint when isPrinted becomes true
     }
     const timerPrintOut = setTimeout(() => {
-      setStatusPaymentProps({
-        isFailed: false,
-        isSuccess: true,
-        isPrinted: false,
-      });
+      if(statusParams == "200"){
+        setStatusPaymentProps({
+          isFailed: false,
+          isSuccess: true,
+          isPrinted: false,
+        });
+      }
+      else if(statusParams == "500"){
+        setStatusPaymentProps({
+          isFailed: true,
+          isSuccess: false,
+          isPrinted: false,
+        });
+      }
     }, 5000);
     return () => clearTimeout(timerPrintOut);
 

@@ -151,7 +151,7 @@ const Apply = () => {
   };
 
   useEffect(() => {
-    const cardNumberPetugas = localStorage.getItem("cardNumberPetugas");
+    const cardNumberPetugas = '11' + localStorage.getItem("deviceId");
 
     if (cardNumberPetugas) {
       setCardNumberPetugas(cardNumberPetugas);
