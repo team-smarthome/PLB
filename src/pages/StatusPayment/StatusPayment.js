@@ -4,28 +4,60 @@ import Success from "../../assets/images/image-2.svg";
 import Print from "../../assets/images/image-9.svg";
 import Failed from "../../assets/images/image-3.svg";
 import "./StatusPaymentStyle.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Printer from "../../components/Printer/Printer";
 
 const StatusPayment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  console.log("searchParams", searchParams);
+  const statusParams = searchParams.get("status");
+  // console.log('test logging: ', searchParams.get("status"), searchParams.get("voa"), searchParams.get("receipt"))
+  const voaParams =  searchParams.get("voa");
+  const recieptParams = searchParams.get("receipt");
   const printRef = useRef();
   const [seconds, setSeconds] = useState(8);
   const [statusPaymentProps, setStatusPaymentProps] = useState({
-    isPrinted: true,
+    isPrinted: false,
     isSuccess: false,
     isFailed: false,
   });
 
-  const [number, setNumber] = useState("12345");
-  const [receipt, setReceipt] = useState("12345");
+  const [number, setNumber] = useState("");
+  const [receipt, setReceipt] = useState("");
 
   const [title, setTitle] = useState("");
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
+  useEffect(() => {
+    if (statusParams === "200") {
+      setStatusPaymentProps({
+        isFailed: false,
+        isSuccess: false,
+        isPrinted: true,
+      });
+      setNumber(voaParams);
+      setReceipt(recieptParams);
+      console.log("voaParams", voaParams);
+      console.log("recieptParams", recieptParams);
+    } else if (statusParams === "500") {
+      setStatusPaymentProps({
+        isFailed: true,
+        isSuccess: false,
+        isPrinted: false,
+      });
+    } else {
+      setStatusPaymentProps({
+        isFailed: true,
+        isSuccess: false,
+        isPrinted: false,
+      });
+    }
+  }, [statusParams]);
 
   useEffect(() => {
     if (statusPaymentProps.isFailed) {
@@ -114,8 +146,8 @@ const StatusPayment = () => {
                         <h3>Visa Receipt: </h3>
                       </div>
                       <div className="issusccess-register2">
-                      <h3>{number}</h3>
-                  <h3>{receipt}</h3>
+                      <h3>{voaParams}</h3>
+                  <h3>{recieptParams}</h3>
                       </div>
                     </div>
                     <h4>Please capture this page when receipt not printed out</h4>
@@ -145,8 +177,8 @@ const StatusPayment = () => {
         </div>
       </div>
       <Printer
-        dataNumberPermohonanPropsVisa={number}
-        dataNumberPermohonanPropsReceipt={receipt}
+        dataNumberPermohonanPropsVisa={voaParams}
+        dataNumberPermohonanPropsReceipt={recieptParams}
         printRefProps={printRef}
       />
     </>

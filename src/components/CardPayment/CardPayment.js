@@ -616,14 +616,30 @@ const CardPayment = ({
         handleSubmitKICASH();
         
       } else {
-        alert("Username atau password salah!");
+        console.log("Gagal euy, INVALID")
+        alert("Username or Password Invalid!");
       }
     } catch (error) {
       isLoading(false);
       console.error("Error during login:", error);
       Toast.fire({
         icon: "error",
-        title: "Gagal Masuk, UserName atau Password salah",
+        title: "Username or Password Invalid!",
+      });
+      sendDataUpdatePayment({
+        isWaiting: false,
+        isFailed: false,
+        isPrinted: false,
+        isSuccess: false,
+        isCreditCard: false,
+        isPyamentUrl: false,
+        isPaymentCredit: false,
+        isPaymentCash: true,
+        paymentMethod: paymentMethod,
+        cardNumber: cardNumber,
+        expiry: expiry,
+        cvv: cvv,
+        type: type,
       });
     }
   };
