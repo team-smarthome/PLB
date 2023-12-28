@@ -16,9 +16,25 @@ export async function apiValidationPassport(header, body) {
   }
 }
 
+
+export async function apiCheckStatus(header, body) {
+  const apiUrl = `${url_dev}CheckStatus.php`;
+  
+  const headers = header;
+
+  const requestBody = body;
+
+  try {
+    const response = await axios.post(apiUrl, requestBody, { headers });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function apiSimpanPermohonan(header, body) {
   const apiUrl = `${url_dev}api/visa/application`;
-
+  
   const headers = header;
 
   const requestBody = body;
