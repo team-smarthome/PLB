@@ -152,6 +152,7 @@ const Apply = () => {
   };
 
   useEffect(() => {
+    //===== START TESTING TANPA ALAT =====//
     let airportId = "CGK";
     let deviceId = "01320000001255";
     let jenisDeviceId = "01";
@@ -159,11 +160,10 @@ const Apply = () => {
     localStorage.setItem("airportId", airportId);
     localStorage.setItem("deviceId", deviceId);
     localStorage.setItem("jenisDeviceId", jenisDeviceId);
+    const cardNumberPetugas = "1101320000001255";
+    //===== END TESTING TANPA ALAT =====//
 
     // const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
-
-    const cardNumberPetugas = "1101320000001255";
-
     if (cardNumberPetugas) {
       setCardNumberPetugas(cardNumberPetugas);
     }
@@ -286,6 +286,9 @@ const Apply = () => {
       }
     } else {
       console.log("testing else akhir");
+
+      // =================== START TESTING TANPA ALAT ===================//
+
       const dataHardCodePaspor = dataPasporUser;
       const dataHarCodePasporImg = dataPasporImg;
 
@@ -321,6 +324,8 @@ const Apply = () => {
 
       setIsEnableStep(true);
       setIsEnableBack(false);
+
+      // =================== END TESTING TANPA ALAT ===================//
     }
   }, [receiveTempData, passportUser, passportImage]);
 
