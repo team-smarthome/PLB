@@ -17,7 +17,7 @@ const Login = () => {
 
   const [loading, isLoading] = useState(false);
 
-  const version = "1.0.5";
+  const version = "1.0.6 Beta";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
@@ -78,9 +78,9 @@ const Login = () => {
     <>
       <div className={loading ? "form-loading-login" : "form-login-container"}>
         <div className="loader-login-spin">
-        {loading && <span className="loader-loading-login"></span>}
+          {loading && <span className="loader-loading-login"></span>}
         </div>
-     
+
         <img
           src={icon_kemenkumham}
           alt="icon_kemenkumham"
@@ -117,10 +117,9 @@ const Login = () => {
             Log In
           </button>
           <div className="version-voa">
-          <p>Version: {version}</p>
-          {/* <hr /> */}
+            <p>Version: {version}</p>
+            {/* <hr /> */}
           </div>
-         
         </form>
       </div>
     </>

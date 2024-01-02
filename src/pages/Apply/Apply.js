@@ -5,10 +5,10 @@ import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
+import dataPasporUser from "../../utils/dataPaspor";
+import dataPasporImg from "../../utils/dataPhotoPaspor";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
-import { Redirect } from 'react-router-dom';
-import axios from "axios";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -53,7 +53,8 @@ const Apply = () => {
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
-  const connectWebSocket = (ipAddress, socket_IO) => { //image2
+  const connectWebSocket = (ipAddress, socket_IO) => {
+    //image2
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
@@ -113,14 +114,14 @@ const Apply = () => {
             setRecievedTempData((previous) => [...previous, dataJson]);
             break;
           case "DeviceController":
-          let airportId = dataJson.airportId;
-          let deviceId = dataJson.deviceId;
-          let jenisDeviceId = dataJson.jenisDeviceId;
+            let airportId = dataJson.airportId;
+            let deviceId = dataJson.deviceId;
+            let jenisDeviceId = dataJson.jenisDeviceId;
 
-          localStorage.setItem("airportId", airportId);
-          localStorage.setItem("deviceId", deviceId);
-          localStorage.setItem("jenisDeviceId", jenisDeviceId);
-          break;
+            localStorage.setItem("airportId", airportId);
+            localStorage.setItem("deviceId", deviceId);
+            localStorage.setItem("jenisDeviceId", jenisDeviceId);
+            break;
           default:
             break;
         }
@@ -139,7 +140,7 @@ const Apply = () => {
           console.log("tahap close");
           setCardStatus("errorWebsocket");
         }
-        socket_IO.emit("clientData", "re-newIpAddress") //image 1
+        socket_IO.emit("clientData", "re-newIpAddress"); //image 1
       };
     }
   };
@@ -151,7 +152,17 @@ const Apply = () => {
   };
 
   useEffect(() => {
-    const cardNumberPetugas = '11' + localStorage.getItem("deviceId");
+    let airportId = "CGK";
+    let deviceId = "01320000001255";
+    let jenisDeviceId = "01";
+
+    localStorage.setItem("airportId", airportId);
+    localStorage.setItem("deviceId", deviceId);
+    localStorage.setItem("jenisDeviceId", jenisDeviceId);
+
+    // const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
+
+    const cardNumberPetugas = "1101320000001255";
 
     if (cardNumberPetugas) {
       setCardNumberPetugas(cardNumberPetugas);
@@ -275,6 +286,41 @@ const Apply = () => {
       }
     } else {
       console.log("testing else akhir");
+      const dataHardCodePaspor = dataPasporUser;
+      const dataHarCodePasporImg = dataPasporImg;
+
+      let fullName =
+        dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
+      const [day, month, year] = dataHardCodePaspor.birthDate
+        .split("-")
+        .map(Number);
+      const [day1, month1, year1] = dataHardCodePaspor.expiryDate
+        .split("-")
+        .map(Number);
+
+      const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+
+      const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+        .toISOString()
+        .split("T")[0];
+      const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+        .toISOString()
+        .split("T")[0];
+
+      dataHardCodePaspor.fullName = fullName;
+      dataHardCodePaspor.formattedBirthDate = formattedDate;
+      dataHardCodePaspor.formattedExpiryDate = expiryDate;
+
+      setDataPrimaryPassport(dataHardCodePaspor);
+      setDataPhotoPassport(dataHarCodePasporImg);
+
+      setCardStatus("success");
+      setTimeout(() => {
+        setCardStatus("checkData");
+      }, 2000);
+
+      setIsEnableStep(true);
+      setIsEnableBack(false);
     }
   }, [receiveTempData, passportUser, passportImage]);
 
@@ -309,7 +355,6 @@ const Apply = () => {
         setTitleHeader("Payment");
         setDisabled(true);
       } else if (titleFooter === "Next Print") {
-        
         setCardPaymentProps({
           isCreditCard: false,
           isPaymentCredit: false,
@@ -364,8 +409,6 @@ const Apply = () => {
     }
   }, [cardPaymentProps]);
 
-
-  
   const doSaveRequestVoaPayment = async (sharedData) => {
     console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
@@ -438,7 +481,7 @@ const Apply = () => {
         // setDisabled(false);
         // setIsEnableStep(false);
         // <Route path='/redirect-page' element={ <Redirect to="" /> }/>
-        
+
         // const rest =  axios.get("https://www.wikipedia.org/");
         // const data = rest.data;
         // setDataPermohonan(data.data);
@@ -460,9 +503,7 @@ const Apply = () => {
           isFailed: true,
           isPyamentUrl: false,
         });
-      }
-      
-      else if (
+      } else if (
         data.code === 200 &&
         data.message === "E-Voa created successfuly!"
       ) {
@@ -494,8 +535,12 @@ const Apply = () => {
         data.status === "Failed" ||
         data.code === 500 ||
         data.status === "failed" ||
-        data.status === 500 || data.code === 400 || data.code === 401 || data.status === "error" ||
-        data.status === "Error" || data.status === 400
+        data.status === 500 ||
+        data.code === 400 ||
+        data.code === 401 ||
+        data.status === "error" ||
+        data.status === "Error" ||
+        data.status === 400
       ) {
         setStatusPaymentCredit(false);
         const messageError = data.message;
@@ -649,11 +694,11 @@ const Apply = () => {
                 isPyamentUrl: false,
               });
               navigate("/");
-              localStorage.removeItem('user');
-              localStorage.removeItem('JwtToken');
-              localStorage.removeItem('cardNumberPetugas');
-              localStorage.removeItem('key');
-              localStorage.removeItem('token');
+              localStorage.removeItem("user");
+              localStorage.removeItem("JwtToken");
+              localStorage.removeItem("cardNumberPetugas");
+              localStorage.removeItem("key");
+              localStorage.removeItem("token");
             }, 5000);
           } else if (messageError === "Required field 'photoFace' is missing") {
             setDisabled(false);
@@ -709,8 +754,6 @@ const Apply = () => {
     }
   };
 
-  
-  
   useEffect(() => {
     if (confirm) {
       if (meesageConfirm === "Passport is not from voa country.") {
@@ -737,7 +780,9 @@ const Apply = () => {
           setIsEnableBack(true);
           setConfirm(false);
         }, 5000);
-      } else if (meesageConfirm === "Passport is not active for at least 6 months.") {
+      } else if (
+        meesageConfirm === "Passport is not active for at least 6 months."
+      ) {
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorBulan");
@@ -810,8 +855,8 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else {
-        console.log("jalan gk ya??")
-        setDisabled(false); 
+        console.log("jalan gk ya??");
+        setDisabled(false);
         setTabStatus(1);
         setTitleFooter("Next Step");
         setTitleHeader("Apply VOA");
@@ -839,7 +884,6 @@ const Apply = () => {
     setSharedData(newSharedData);
   };
 
-  
   // if (titleFooter === "Next Print") {
   //   setIsEnableStep(false);
   // }
@@ -853,7 +897,7 @@ const Apply = () => {
   //   //   setIsEnableStep(true);
   //   // } else if (data === null && res === null){
   //   //   setIsEnableStep(false);
-  //   // } 
+  //   // }
   // }
 
   return (
