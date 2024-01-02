@@ -356,7 +356,11 @@ const CardPayment = ({
   // useEffect jika isFailed true, maka setFailedMessage dengan FailedMessage
   useEffect(() => {
     if (isFailed) {
-      setFailedMessage(FailedMessage);
+      if (failedMessage === "Invalid JWT Token") {
+        setFailedMessage("please re-login and re-scan passport.")
+      } else {
+        setFailedMessage(FailedMessage);
+      }
     }
   }, [FailedMessage, isFailed]);
 
