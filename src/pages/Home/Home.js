@@ -15,6 +15,7 @@ const Home = () => {
 
   const btnOnClick_Informasi = () => {
     console.log("INFORMASI");
+    navigate("/information");
   };
 
   const handleLogout = async () => {
@@ -56,10 +57,7 @@ const Home = () => {
             <div className="bg-apply" onClick={btnOnClick_Apply}>
               <h2 className="text-apply">APPLY</h2>
             </div>
-            <div
-              className="bg-information"
-              onClick={btnOnClick_Informasi}
-            >
+            <div className="bg-information" onClick={btnOnClick_Informasi}>
               <h2 className="text-information">Information</h2>
             </div>
           </div>

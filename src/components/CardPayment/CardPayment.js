@@ -10,9 +10,9 @@ import { useReactToPrint } from "react-to-print";
 import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 import io from "socket.io-client";
-import Iframe from "react-iframe";
+// import Iframe from "react-iframe";
 import Swal from "sweetalert2";
-import axios from "axios";  
+import axios from "axios";
 import { Toast } from "../Toast/Toast";
 
 const socket = io("http://localhost:4499");
@@ -38,12 +38,11 @@ const CardPayment = ({
   const navigate = useNavigate();
   const printRef = useRef();
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, isLoading] = useState(false); 
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, isLoading] = useState(false);
 
   const [popUpOpen, setPopupOpen] = useState(false);
-
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -71,7 +70,6 @@ const CardPayment = ({
   //     Swal.fire('Login gagal', 'Username atau password salah', 'error');
   //   }
   // };
-
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -130,21 +128,18 @@ const CardPayment = ({
           const cleanedType = inputType.replace(" CREDIT", "");
           setType(cleanedType);
           console.log("cleanedType: ", cleanedType);
-        }};
-        // const cardType = data.cardType;
-        //   setType(cardType);
-        // }
-        console.log("data: ", data);
+        }
+      }
+      // const cardType = data.cardType;
+      //   setType(cardType);
+      // }
+      console.log("data: ", data);
     });
   }, []);
 
   useEffect(() => {
     // ini jika semua false
-    if (
-      paymentMethod &&
-      cardNumber !== "" &&
-      expiry !== ""
-    ) {
+    if (paymentMethod && cardNumber !== "" && expiry !== "") {
       if (
         !isFailed &&
         !isWaiting &&
@@ -201,7 +196,7 @@ const CardPayment = ({
             cvv: cvv,
             type: type,
           });
-  
+
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
@@ -222,7 +217,7 @@ const CardPayment = ({
     isPyamentUrl,
     isCreditCard,
     sendDataUpdatePayment,
-  ]);
+  ]);
 
   useEffect(() => {
     // ini jika isPrinted true
@@ -283,7 +278,7 @@ const CardPayment = ({
   useEffect(() => {
     // ini jika isPaymentUrl true
     setDataPermohonanUser(dataNumberPermohonan);
-    console.log("dataPermohonanUserGUYSSS: ", dataNumberPermohonan)
+    console.log("dataPermohonanUserGUYSSS: ", dataNumberPermohonan);
     setDataPasporUser(dataUser);
     if (
       !isPrinted &&
@@ -296,7 +291,10 @@ const CardPayment = ({
       isPyamentUrl
     ) {
       console.log("dataPermohonanUser: ", dataNumberPermohonan);
-      const  IframeUrl = dataNumberPermohonan !== null || dataNumberPermohonan !== undefined ? dataNumberPermohonan[0].form_url : "";
+      const IframeUrl =
+        dataNumberPermohonan !== null || dataNumberPermohonan !== undefined
+          ? dataNumberPermohonan[0].form_url
+          : "";
       setNumber(dataNumberPermohonan?.visa_number ?? "");
       setReceipt(dataNumberPermohonan?.visa_receipt ?? "");
       setUrl(IframeUrl);
@@ -445,7 +443,7 @@ const CardPayment = ({
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
       confirmButtonColor: "#3D5889",
-      cancelButtonColor: "#d33", 
+      cancelButtonColor: "#d33",
     }).then((result) => {
       if (result.isConfirmed) {
         // Jika pengguna mengklik tombol "Yes"
@@ -466,25 +464,25 @@ const CardPayment = ({
             cvv: cvv,
             type: type,
           };
-    
+
           const bill_data = {
             billing_id: "",
             amount: "",
             currency: "",
           };
-    
+
           const user_data = {
             pass_no: dataPasporUser.passportData.docNumber,
             pass_name: dataPasporUser.passportData.fullName,
             country: dataPasporUser.passportData.nationality,
           };
-    
+
           const dataParam = {
             card_data: { ...card_data },
             bill_data: { ...bill_data },
             user_data: { ...user_data },
           };
-    
+
           console.log("dataParam: ", dataParam);
           sendDataUpdatePayment({
             isWaiting: false,
@@ -501,14 +499,11 @@ const CardPayment = ({
           const newStatusPaymentCreditCard = !statusPaymentCredit;
           onStatusChange(newStatusPaymentCreditCard);
         }
-      } 
+      }
     });
-    
-
-   
   };
 
-  const handleSubmitKICASH= () => {
+  const handleSubmitKICASH = () => {
     isLoading(false);
     console.log("dataPasporUser1: ", dataPasporUser);
     // e.preventDefault();
@@ -567,8 +562,7 @@ const CardPayment = ({
       const newStatusPaymentCreditCard = !statusPaymentCredit;
       onStatusChange(newStatusPaymentCreditCard);
     }
-  }
-
+  };
 
   const handleLogin = async (username, password) => {
     // e.preventDefault();
@@ -585,7 +579,6 @@ const CardPayment = ({
       );
 
       console.log("response KICASH", response);
-      
 
       if (response.data.status === "success") {
         isLoading(false);
@@ -614,9 +607,8 @@ const CardPayment = ({
           type: type,
         });
         handleSubmitKICASH();
-        
       } else {
-        console.log("Gagal euy, INVALID")
+        console.log("Gagal euy, INVALID");
         alert("Username or Password Invalid!");
       }
     } catch (error) {
@@ -647,8 +639,6 @@ const CardPayment = ({
   const handleSubmitCash = (e) => {
     e.preventDefault();
 
-
-    
     Swal.fire({
       title: "Are you sure want to Pay?",
       icon: "question",
@@ -656,7 +646,7 @@ const CardPayment = ({
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
       confirmButtonColor: "#3D5889",
-      cancelButtonColor: "#d33",  
+      cancelButtonColor: "#d33",
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
@@ -669,14 +659,14 @@ const CardPayment = ({
           confirmButtonText: "Submit",
           confirmButtonColor: "#3D5889",
           cancelButtonText: "Cancel",
-          cancelButtonColor: "#d33",  
+          cancelButtonColor: "#d33",
         }).then((result) => {
           if (result.isConfirmed) {
-            const username = document.getElementById('swal-input1').value;
-            const password = document.getElementById('swal-input2').value;
-    
+            const username = document.getElementById("swal-input1").value;
+            const password = document.getElementById("swal-input2").value;
+
             // Lakukan sesuatu dengan email dan password yang diambil
-    
+
             if (username && password) {
               sendDataUpdatePayment({
                 isConfirm: false,
@@ -701,16 +691,9 @@ const CardPayment = ({
             }
           }
         });
-        
       }
     });
-    
 
-    
-    
-    
-
-    
     // console.log("dataPasporUser1: ", dataPasporUser);
     // e.preventDefault();
     // console.log("dataPasporUser2: ", dataPasporUser);
@@ -957,7 +940,7 @@ const CardPayment = ({
                 <div className="confirm-payment-credit">
                   <div className="confirm-payment-credit2">
                     <div className="form-group-payment-submit3">
-                      <button type="submit"  >Confirm</button>
+                      <button type="submit">Confirm</button>
                     </div>
                   </div>
                 </div>
@@ -969,7 +952,6 @@ const CardPayment = ({
             </div>
           ) : isPyamentUrl ? (
             <>
-              
               {/* <Iframe url={url}  
                 x-frame-options="deny"
               className="iframe-url"/>
