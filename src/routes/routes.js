@@ -5,6 +5,8 @@ import Login from "../pages/Login/Login";
 import Home from "../pages/Home/Home";
 import StatusPayment from "../pages/StatusPayment/StatusPayment";
 import Information from "../pages/Information/Information";
+import SpvLogin from "../pages/SpvLogin/SpvLogin";
+import Report from "../pages/Report/Report";
 
 const isAuthenticated = () => {
   const jwtToken = localStorage.getItem("JwtToken");
@@ -45,12 +47,14 @@ const Routes = () => {
   return (
     <ReactRoutes>
       <Route path="/" element={<Login />} />
+      <Route path="/menu" element={<ProtectedRoute element={<SpvLogin />} />} />
+      <Route path="/report" element={<ProtectedRoute element={<Report />} />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
-      <Route
+      {/* <Route
         path="/information"
         element={<ProtectedRoute element={<Information />} />}
-      />
+      /> */}
       <Route
         path="/status-payment"
         element={<ProtectedRoute element={<StatusPayment />} />}

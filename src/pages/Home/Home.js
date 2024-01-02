@@ -15,22 +15,6 @@ const Home = () => {
 
   const btnOnClick_Informasi = () => {
     console.log("INFORMASI");
-    const userInfo = JSON.parse(localStorage.getItem("user"));
-    console.log(userInfo.group.code);
-    if (
-      userInfo.group.code.includes("ADM") ||
-      userInfo.group.code.includes("SPV")
-    ) {
-      navigate("/information");
-    } else {
-      Swal.fire({
-        icon: "error",
-        // title: "Oops...",
-        text: "You're not authorized to access this feature",
-        confirmButtonColor: "#3D5889",
-      });
-    }
-    // navigate("/information");
   };
 
   const handleLogout = async () => {

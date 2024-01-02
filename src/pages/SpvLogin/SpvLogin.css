@@ -1,0 +1,38 @@
+/* :root {
+  background-color: #3d5889;
+  text-align: center;
+} */
+
+.body-spv {
+  background-color: #3d5889;
+  text-align: center;
+  height: 118vh;
+  color: #fff;
+  /* margin-top: 100px; */
+}
+
+.title-page {
+  margin-bottom: 9%;
+}
+
+.button-combo {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  /* gap: 40px; */
+}
+
+.button {
+  padding: 20px 30px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #3dbb6f;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.disabled {
+  background-color: #7d7b7d;
+}

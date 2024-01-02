@@ -1,0 +1,74 @@
+.body {
+  text-align: center;
+  align-items: center;
+  background-color: #3d5889;
+  height: auto;
+  color: #fff;
+}
+
+.form-filter {
+  display: flex;
+  flex-direction: row; /* Display items in a row */
+  align-items: center; /* Align items vertically in the center */
+  /* justify-content: space-evenly; */
+}
+.header-combo {
+  margin: 3% 4% 3% 4%;
+}
+
+/* Apply styles to each label and input pair */
+.form-filter input {
+  margin-right: 6%; /* Add some spacing between label-input pairs */
+  width: 10px;
+  height: 30px;
+}
+
+/* Apply styles to the last input to prevent extra margin */
+.form-filter input:last-child {
+  margin-right: 0; /* Remove margin from the last input */
+}
+
+.form-filter label {
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2%;
+}
+
+.form-filter button {
+  padding: 15px 40px;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #3dbb6f;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.content {
+  margin: 3% 4% 3% 4%;
+  background-color: #fff;
+  border-radius: 10px;
+  height: 80vh;
+  padding: 2%;
+}
+
+.table-header {
+  display: flex;
+  justify-content: flex-end; /* Align items to the far end (right) */
+  align-items: flex-end;
+  margin-bottom: 3%;
+}
+
+.print-pdf {
+  padding: 11px 20px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #e6af3c;
+  color: #fff;
+  border-radius: 6px;
+}

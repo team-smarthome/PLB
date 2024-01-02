@@ -43,7 +43,7 @@ const Login = () => {
 
       if (response.data.status === "success") {
         isLoading(false);
-        console.log(response.data);
+        console.log("response: ", response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
         localStorage.setItem(
           "cardNumberPetugas",
@@ -56,11 +56,24 @@ const Login = () => {
           JSON.stringify(response.data.profile.user_data)
         );
 
-        Toast.fire({
-          icon: "success",
-          title: "Berhasil Masuk",
-        });
-        navigate("/home");
+        const userInfo = await JSON.parse(localStorage.getItem("user"));
+        console.log(userInfo.group.code);
+        if (
+          userInfo.group.code.includes("ADM") ||
+          userInfo.group.code.includes("SPV")
+        ) {
+          Toast.fire({
+            icon: "success",
+            title: "Welcome, Supervisor.",
+          });
+          navigate("/menu");
+        } else {
+          Toast.fire({
+            icon: "success",
+            title: "Berhasil Masuk",
+          });
+          navigate("/home");
+        }
       } else {
         alert("Username atau password salah!");
       }
