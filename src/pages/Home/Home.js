@@ -41,6 +41,7 @@ const Home = () => {
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
+      confirmButtonColor: "#3D5889",
     });
 
     if (result.isConfirmed) {
