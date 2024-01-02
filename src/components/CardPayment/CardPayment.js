@@ -10,7 +10,6 @@ import { useReactToPrint } from "react-to-print";
 import Credit from "../../assets/images/credit.png";
 import Cash from "../../assets/images/cash.png";
 import io from "socket.io-client";
-// import Iframe from "react-iframe";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { Toast } from "../Toast/Toast";
@@ -33,6 +32,7 @@ const CardPayment = ({
   dataUser,
   confirm,
   dataNumberPermohonan,
+  FailedMessage,
   statusPaymentCredit,
 }) => {
   const navigate = useNavigate();
@@ -58,6 +58,7 @@ const CardPayment = ({
   const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
   const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
+  const [failedMessage, setFailedMessage] = useState("");
 
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
@@ -350,6 +351,14 @@ const CardPayment = ({
       navigate("/home");
     }
   }, [navigate, seconds]);
+
+
+  // useEffect jika isFailed true, maka setFailedMessage dengan FailedMessage
+  useEffect(() => {
+    if (isFailed) {
+      setFailedMessage(FailedMessage);
+    }
+  }, [FailedMessage, isFailed]);
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
@@ -817,7 +826,7 @@ const CardPayment = ({
           ) : isFailed ? (
             <div className="isfailed-payment">
               <div className="isfailed-payment2">
-                <h3>Reason Failed : Network / Card error / declined dll</h3>
+                <h3>Reason Failed : {failedMessage}</h3>
               </div>
               <img src={Failed} alt="" className="card-image-issuccess1" />
               <div className="form-group-payment-submit1">

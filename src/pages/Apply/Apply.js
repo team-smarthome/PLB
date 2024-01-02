@@ -19,7 +19,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(false);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("iddle");
+  const [cardStatus, setCardStatus] = useState("goPayment");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [dataPhotoPassport, setDataPhotoPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
@@ -471,31 +471,6 @@ const Apply = () => {
       setDataPermohonan(data.data);
       if (data.code === 200 && data.data.length > 0 && data.data[0].form_url) {
         window.location.href = data.data[0].form_url;
-        // setDataPermohonan(data.data);
-        // setTitleFooter("Next Print");
-        // setCardPaymentProps({
-        //   isWaiting: false,
-        //   isCreditCard: false,
-        //   isPaymentCredit: false,
-        //   isPaymentCash: false,
-        //   isPrinted: false,
-        //   isSuccess: false,
-        //   isFailed: false,
-        //   isPyamentUrl: true,
-        // });
-        // setDisabled(false);
-        // setIsEnableStep(false);
-        // <Route path='/redirect-page' element={ <Redirect to="" /> }/>
-
-        // const rest =  axios.get("https://www.wikipedia.org/");
-        // const data = rest.data;
-        // setDataPermohonan(data.data);
-        // if (data.code === 200 && data.visa_number && data.visa_receipt) {
-        //   setIsEnableStep(true);
-        // } else {
-        //   setIsEnableStep(false);
-        // }
-        // setIsEnableBack(false);
       } else if (data.code === 200 && data.data.form_url === null) {
         setStatusPaymentCredit(false);
         setCardPaymentProps({
@@ -889,22 +864,6 @@ const Apply = () => {
     setSharedData(newSharedData);
   };
 
-  // if (titleFooter === "Next Print") {
-  //   setIsEnableStep(false);
-  // }
-
-  // if (titleFooter === "Next Print") {
-  //   setIsEnableStep(false);
-  //   // const res =  axios.get("https://www.wikipedia.org/");
-  //   // const data = res.data;
-  //   // setDataPermohonan(data.data);
-  //   // if (data.code === 200 && data.visa_number && data.visa_receipt) {
-  //   //   setIsEnableStep(true);
-  //   // } else if (data === null && res === null){
-  //   //   setIsEnableStep(false);
-  //   // }
-  // }
-
   return (
     <div className="background-apply-voa">
       <Header title={titleHeader} />
@@ -926,6 +885,7 @@ const Apply = () => {
         shareDataPaymentProps={shareDataPaymentProps}
         setShareDataPaymentProps={setShareDataPaymentProps}
         dataNumberPermohonan={dataPermohonan}
+        FailedMessage={meesageConfirm}
       />
       <Footer
         titleBack="Back"
