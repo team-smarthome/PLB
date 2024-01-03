@@ -7,9 +7,13 @@ function SpvLogin() {
   const storage = JSON.parse(localStorage.getItem("user"));
   const name = storage.fullName;
 
-  const handleLaporan = async (e) => {
+  const handleLaporan = () => {
     navigate("/report");
     console.log("navigate to /report");
+  };
+
+  const handleMenu = () => {
+    navigate("/home");
   };
 
   return (
@@ -19,7 +23,7 @@ function SpvLogin() {
         <button className="button" onClick={handleLaporan}>
           Laporan Per Petugas
         </button>
-        <button disabled={true} className="button disabled">
+        <button className="menu" onClick={handleMenu}>
           Menu
         </button>
       </div>

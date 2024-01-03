@@ -4,6 +4,7 @@
   background-color: #3d5889;
   height: auto;
   color: #fff;
+  overflow: hidden;
 }
 
 .form-filter {

@@ -6,8 +6,9 @@
 .body-spv {
   background-color: #3d5889;
   text-align: center;
-  height: 118vh;
+  height: 125vh;
   color: #fff;
+  overflow: hidden;
   /* margin-top: 100px; */
 }
 
@@ -33,6 +34,13 @@
   border-radius: 10px;
 }
 
-.disabled {
-  background-color: #7d7b7d;
+.menu {
+  padding: 20px 30px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #7b7d7b;
+  color: #fff;
+  border-radius: 10px;
 }
