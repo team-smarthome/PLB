@@ -64,6 +64,17 @@ const CardPayment = ({
   const [receipt, setReceipt] = useState("");
   const [url, setUrl] = useState("");
 
+  //price
+  const storedValue = localStorage.getItem('price');
+  const parsedValue = JSON.parse(storedValue) ?? { fee: "0", value: "0.0000" };
+
+
+  const fee = parseInt(parsedValue.fee);
+  const value = parseInt(parsedValue.value);
+  const formattedFee = fee.toLocaleString("id-ID", { minimumFractionDigits: 0 });
+  const formattedValue = value.toLocaleString("id-ID", { minimumFractionDigits: 0 });
+  const formattedTotal = (value + fee).toLocaleString("id-ID", { minimumFractionDigits: 0 });
+
   // const handleLogin = () => {
   //   if (username === 'user' && password === 'password') {
   //     Swal.fire('Login berhasil!', 'Selamat datang ' + username, 'success');
@@ -854,13 +865,13 @@ const CardPayment = ({
                   </div>
                   <div className="amount-price">
                     <div className="amount-box1">
-                      <input type="text" value="Rp. 500.000" />
+                      <input type="text" value={`Rp. ${formattedValue}`} />
                     </div>
                     <div className="amount-box2">
-                      <input type="text" value="Rp. 19.500" />
+                      <input type="text"value={`Rp. ${formattedFee}`} />
                     </div>
                     <div className="amount-box3">
-                      <input type="text" value="Rp. 519.500" />
+                      <input type="text" value={`Rp. ${formattedTotal}`} />
                     </div>
                   </div>
                 </div>
@@ -925,13 +936,13 @@ const CardPayment = ({
                   </div>
                   <div className="amount-price">
                     <div className="amount-box1">
-                      <input type="text" value="Rp. 500.000" />
+                      <input type="text" value={`Rp. ${formattedValue}`} />
                     </div>
                     <div className="amount-box2">
-                      <input type="text" value="Rp. 19.500" />
+                      <input type="text" value={`Rp. ${formattedFee}`} />
                     </div>
                     <div className="amount-box3">
-                      <input type="text" value="Rp. 519.500" />
+                      <input type="text" value={`Rp. ${formattedTotal}`} />
                     </div>
                   </div>
                 </div>
