@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Report.css";
 import Table from "../../components/Table/Table";
+import Pagination from "../../components/Pagination/Pagination";
 
 function Report() {
+  const perPage = 5;
+  const data = Array.from({ length: 50 }, (_, index) => `Item ${index + 1}`); // Dummy data array
+
+  const [currentPageData, setCurrentPageData] = useState(
+    data.slice(0, perPage)
+  );
+
+  const handlePageChange = (newPageData) => {
+    setCurrentPageData(newPageData);
+  };
   return (
     <div className="body">
       <h1>Laporan Petugas</h1>
@@ -29,6 +40,9 @@ function Report() {
           <button className="print-pdf">Cetak PDF</button>
         </div>
         <Table />
+        <div className="table-footer">
+          <Pagination onPageChange={handlePageChange} />
+        </div>
       </div>
     </div>
   );

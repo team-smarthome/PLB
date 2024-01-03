@@ -1,21 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Table.css";
+import { apiPaymentHistory } from "../../services/api";
 
-const data = [
-  {
-    id: 1,
-    registerNumber: 2022019201123,
-    name: "IRFAN BACHDIM",
-    passportNumber: "X01292382",
-    nationality: "Inggris",
-    voaNumber: "Z2A777770",
-    receiptNumber: "Z2A777770",
-    transactionType: "CASH",
-    amount: "519.500",
-  },
-  // ... other data items
-];
 const Table = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    // Call the payment history function when the component mounts
+    doPaymentHistory();
+  }, []);
+
+  const doPaymentHistory = async () => {
+    const bearerToken = localStorage.getItem("JwtToken");
+    const header = {
+      Authorization: `Bearer ${bearerToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const bodyParams = {
+      startDate: "2023-11-11",
+      endDate: "2023-12-21",
+      paymentMethod: ["KICASH"],
+      username: ["leamida", "admin"],
+      limit: 10,
+      page: 1,
+    };
+
+    try {
+      const res = await apiPaymentHistory(header, bodyParams);
+      const dataRes = res.data && res.data[0]; // Ambil elemen pertama dari array
+      setData(dataRes && dataRes.status === "success" ? dataRes.data : []);
+    } catch (error) {
+      console.error("error:", error);
+    }
+  };
+
   return (
     <table className="custom-table">
       <thead>
@@ -32,17 +51,17 @@ const Table = () => {
         </tr>
       </thead>
       <tbody>
-        {data.map((item) => (
-          <tr key={item.id}>
-            <td>{item.id}</td>
-            <td>{item.registerNumber}</td>
-            <td>{item.name}</td>
-            <td>{item.passportNumber}</td>
-            <td>{item.nationality}</td>
-            <td>{item.voaNumber}</td>
-            <td>{item.receiptNumber}</td>
-            <td>{item.transactionType}</td>
-            <td>{item.amount}</td>
+        {data.map((item, index) => (
+          <tr key={index}>
+            <td>{index + 1}</td>
+            <td>{item.register_number}</td>
+            <td>{item.full_name}</td>
+            <td>{item.passport_number}</td>
+            <td>{item.citizenship}</td>
+            <td>{item.visa_number}</td>
+            <td>{item.receipt}</td>
+            <td>{item.payment_method}</td>
+            <td>{item.timestamp}</td>
           </tr>
         ))}
       </tbody>

@@ -3,8 +3,11 @@
   align-items: center;
   background-color: #3d5889;
   height: auto;
-  color: #fff;
   overflow: hidden;
+}
+
+.body h1 {
+  color: #fff;
 }
 
 .form-filter {
@@ -35,6 +38,7 @@
   align-items: center;
   justify-content: center;
   margin-right: 2%;
+  color: #fff;
 }
 
 .form-filter button {
@@ -52,7 +56,7 @@
   margin: 3% 4% 3% 4%;
   background-color: #fff;
   border-radius: 10px;
-  height: 80vh;
+  height: auto;
   padding: 2%;
 }
 
@@ -72,4 +76,12 @@
   background-color: #e6af3c;
   color: #fff;
   border-radius: 6px;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: flex-end; /* Align items to the far end (right) */
+  align-items: flex-end;
+  margin-top: 2%;
+  color: black;
 }

@@ -1,0 +1,33 @@
+/* Pagination.css */
+
+/* Styles for the pagination container */
+.pagination {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+}
+
+/* Styles for individual pagination items */
+.pagination li {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+/* Styles for the active pagination item */
+.pagination li.active a {
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 3px;
+  padding: 5px 10px;
+}
+
+/* Styles for the previous and next buttons */
+.pagination li a {
+  color: #3d5889;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+}
