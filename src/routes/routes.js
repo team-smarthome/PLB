@@ -4,16 +4,19 @@ import Apply from "../pages/Apply/Apply";
 import Login from "../pages/Login/Login";
 import Home from "../pages/Home/Home";
 import StatusPayment from "../pages/StatusPayment/StatusPayment";
+import Information from "../pages/Information/Information";
+import SpvLogin from "../pages/SpvLogin/SpvLogin";
+import Report from "../pages/Report/Report";
 
 const isAuthenticated = () => {
-  const jwtToken = localStorage.getItem('JwtToken');
+  const jwtToken = localStorage.getItem("JwtToken");
 
   if (!jwtToken) {
     // Token is not present, consider the user as not authenticated
     return false;
   }
 
-  const decodedToken = JSON.parse(atob(jwtToken.split('.')[1]));
+  const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
   const expirationTime = decodedToken.exp * 1000;
   const now = Date.now();
   const isExpired = now > expirationTime;
@@ -22,16 +25,15 @@ const isAuthenticated = () => {
 
   if (isExpired) {
     // Clear localStorage if token is expired
-    localStorage.removeItem('user');
-    localStorage.removeItem('JwtToken');
-    localStorage.removeItem('cardNumberPetugas');
-    localStorage.removeItem('key');
-    localStorage.removeItem('token');
+    localStorage.removeItem("user");
+    localStorage.removeItem("JwtToken");
+    localStorage.removeItem("cardNumberPetugas");
+    localStorage.removeItem("key");
+    localStorage.removeItem("token");
   }
 
   return !isExpired;
 };
-
 
 const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? (
@@ -41,14 +43,22 @@ const ProtectedRoute = ({ element }) => {
   );
 };
 
-
 const Routes = () => {
   return (
     <ReactRoutes>
       <Route path="/" element={<Login />} />
+      <Route path="/menu" element={<ProtectedRoute element={<SpvLogin />} />} />
+      <Route path="/report" element={<ProtectedRoute element={<Report />} />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
-      <Route path="/status-payment" element={<ProtectedRoute element={<StatusPayment />} />} />
+      {/* <Route
+        path="/information"
+        element={<ProtectedRoute element={<Information />} />}
+      /> */}
+      <Route
+        path="/status-payment"
+        element={<ProtectedRoute element={<StatusPayment />} />}
+      />
     </ReactRoutes>
   );
 };

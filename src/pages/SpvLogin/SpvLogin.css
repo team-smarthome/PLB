@@ -1,0 +1,46 @@
+/* :root {
+  background-color: #3d5889;
+  text-align: center;
+} */
+
+.body-spv {
+  background-color: #3d5889;
+  text-align: center;
+  height: 125vh;
+  color: #fff;
+  overflow: hidden;
+  /* margin-top: 100px; */
+}
+
+.title-page {
+  margin-bottom: 9%;
+}
+
+.button-combo {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  /* gap: 40px; */
+}
+
+.button {
+  padding: 20px 30px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #3dbb6f;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.menu {
+  padding: 20px 30px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #7b7d7b;
+  color: #fff;
+  border-radius: 10px;
+}
