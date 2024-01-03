@@ -21,8 +21,6 @@ if ($authorizationHeader) {
     }
 }
 
-require_once 'Encryptor.php';
-
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -34,18 +32,19 @@ if (stripos($_SERVER["CONTENT_TYPE"], "application/json") === 0) {
     $param_POST = json_decode(file_get_contents("php://input"));
 }
 
-// Params token & key
-$token  = (empty($_POST['token'])) ? trim($param_POST->token) : trim($_POST['token']);
-$key    = (empty($_POST['key'])) ? trim($param_POST->key) : trim($_POST['key']);
-
-// Param RegisterNumber
-$registerNumber = (empty($_POST['registerNumber'])) ? trim($param_POST->registerNumber) : trim($_POST['registerNumber']);
+// Param 
+$startDate = (empty($_POST['startDate'])) ? trim($param_POST->startDate) : trim($_POST['startDate']);
+$endDate = (empty($_POST['endDate'])) ? trim($param_POST->endDate) : trim($_POST['endDate']);
+$paymentMethod = (empty($_POST['paymentMethod'])) ? [] : $_POST['paymentMethod'];
+$username = (empty($_POST['username'])) ? [] : $_POST['username'];
+$limit = (empty($_POST['limit'])) ? trim($param_POST->limit) : trim($_POST['limit']);
+$page = (empty($_POST['page'])) ? trim($param_POST->page) : trim($_POST['page']);
 
 
 $response = array();
 
 $requiredFields = array(
-    'registerNumber', 'token', 'key'
+    'startDate', 'endDate', 'limit', 'page'
 );
 
 // Required fields
@@ -60,21 +59,29 @@ foreach ($requiredFields as $field) {
 }
 
 
-$url = "http://molina-dev-alb-313167115.ap-southeast-3.elb.amazonaws.com/api/visa/application/check-status";
+$url = "http://molina-dev-alb-313167115.ap-southeast-3.elb.amazonaws.com/api/visa/application/transaction-history";
 
 // Headers
 $headers = array(
-    'Key: ' . $key,
-    'Token: ' . $token,
     'Authorization: Bearer ' . $jwtToken,
     'Accept: application/json',
     'Content-Type: application/json',
 );
 
-$url .= "?registerNumber=" . urlencode($registerNumber);
+$bodyData = array(
+    'startDate' => $startDate,
+    'endDate' => $endDate,
+    'paymentMethod' => $paymentMethod,
+    'username' => $username,
+    'limit' => $limit,
+    'page' => $page,
+);
+
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($bodyData));
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 $result = curl_exec($ch);

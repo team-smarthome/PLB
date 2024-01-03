@@ -133,7 +133,7 @@ $cardData = json_decode($decryptedCard, true);
 
 // echo "\n";
 
-$url = "https://devapi-molina.imigrasi.go.id/api/visa/application/bank";
+$url = "http://molina-dev-alb-313167115.ap-southeast-3.elb.amazonaws.com/api/visa/application/bank";
 
 // Headers
 $headers = array(

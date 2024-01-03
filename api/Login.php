@@ -27,7 +27,7 @@ if (empty($username) || empty($password)) {
     http_response_code(400);
 } else {
     // Hit Api Login
-    $urlLogin = "https://devapi-molina.imigrasi.go.id/api/login";
+    $urlLogin = "http://molina-dev-alb-313167115.ap-southeast-3.elb.amazonaws.com/api/login";
     $dataLogin = array(
         'username' => $username,
         'password' => $password
@@ -53,7 +53,7 @@ if (empty($username) || empty($password)) {
         // Token From Login
         $token = $loginData['token'];
 
-        $urlMe = "https://devapi-molina.imigrasi.go.id/api/me";
+        $urlMe = "http://molina-dev-alb-313167115.ap-southeast-3.elb.amazonaws.com/api/me";
         $chMe = curl_init($urlMe);
         curl_setopt($chMe, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($chMe, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $token));
