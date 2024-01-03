@@ -1,19 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Report.css";
 import Table from "../../components/Table/Table";
 import Pagination from "../../components/Pagination/Pagination";
+import { apiPaymentHistory } from "../../services/api";
 
 function Report() {
-  const perPage = 5;
-  const data = Array.from({ length: 50 }, (_, index) => `Item ${index + 1}`); // Dummy data array
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const perPage = 10;
 
-  const [currentPageData, setCurrentPageData] = useState(
-    data.slice(0, perPage)
-  );
+  useEffect(() => {
+    // Call the payment history function when the component mounts
+    doPaymentHistory();
+  }, []);
 
-  const handlePageChange = (newPageData) => {
-    setCurrentPageData(newPageData);
+  const doPaymentHistory = async () => {
+    const bearerToken = localStorage.getItem("JwtToken");
+    const header = {
+      Authorization: `Bearer ${bearerToken}`,
+      "Content-Type": "application/json",
+    };
+
+    const bodyParams = {
+      startDate: "2023-11-11",
+      endDate: "2023-12-21",
+      paymentMethod: ["KICASH"],
+      username: ["leamida", "admin"],
+      limit: 10,
+      page: 1,
+    };
+
+    try {
+      const res = await apiPaymentHistory(header, bodyParams);
+      const dataRes = res.data && res.data[0]; // Ambil elemen pertama dari array
+      console.log(dataRes);
+      setData(dataRes && dataRes.status === "success" ? dataRes.data : []);
+    } catch (error) {
+      console.error("error:", error);
+    }
   };
+
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage);
+  };
+
+  const startIndex = currentPage * perPage;
+  const endIndex = startIndex + perPage;
+  const currentPageData = data.slice(startIndex, endIndex);
+
   return (
     <div className="body">
       <h1>Laporan Petugas</h1>
@@ -39,9 +73,12 @@ function Report() {
         <div className="table-header">
           <button className="print-pdf">Cetak PDF</button>
         </div>
-        <Table />
+        <Table data={currentPageData} />
         <div className="table-footer">
-          <Pagination onPageChange={handlePageChange} />
+          <Pagination
+            pageCount={Math.ceil(data.length / perPage)}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </div>

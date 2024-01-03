@@ -1,40 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./Table.css";
-import { apiPaymentHistory } from "../../services/api";
 
-const Table = () => {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    // Call the payment history function when the component mounts
-    doPaymentHistory();
-  }, []);
-
-  const doPaymentHistory = async () => {
-    const bearerToken = localStorage.getItem("JwtToken");
-    const header = {
-      Authorization: `Bearer ${bearerToken}`,
-      "Content-Type": "application/json",
-    };
-
-    const bodyParams = {
-      startDate: "2023-11-11",
-      endDate: "2023-12-21",
-      paymentMethod: ["KICASH"],
-      username: ["leamida", "admin"],
-      limit: 10,
-      page: 1,
-    };
-
-    try {
-      const res = await apiPaymentHistory(header, bodyParams);
-      const dataRes = res.data && res.data[0]; // Ambil elemen pertama dari array
-      setData(dataRes && dataRes.status === "success" ? dataRes.data : []);
-    } catch (error) {
-      console.error("error:", error);
-    }
-  };
-
+const Table = ({ data }) => {
+  // Check if data is not an array or is empty
+  if (!Array.isArray(data) || data.length === 0) {
+    return <div>No data available</div>;
+  }
   return (
     <table className="custom-table">
       <thead>
