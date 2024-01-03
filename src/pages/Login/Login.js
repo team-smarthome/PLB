@@ -56,6 +56,8 @@ const Login = () => {
           JSON.stringify(response.data.profile.user_data)
         );
 
+        localStorage.setItem("price", JSON.stringify(response.data.profile.price));
+
         const userInfo = await JSON.parse(localStorage.getItem("user"));
         console.log(userInfo.group.code);
         if (
