@@ -1,12 +1,12 @@
 import React from "react";
 import "./Table.css";
 
-const Table = ({ data }) => {
-  console.log(data);
+const Table = ({ data, startIndex }) => {
   // Check if data is not an array or is empty
-  // if (!Array.isArray(data) || data.length === 0) {
-  //   return <div>No data available</div>;
-  // }
+  if (!Array.isArray(data) || data.length === 0) {
+    return <div>No data available</div>;
+  }
+
   return (
     <table className="custom-table">
       <thead>
@@ -25,7 +25,7 @@ const Table = ({ data }) => {
       <tbody>
         {data.map((item, index) => (
           <tr key={index}>
-            <td>{index + 1}</td>
+            <td>{startIndex + index + 1}</td>
             <td>{item.register_number}</td>
             <td>{item.full_name}</td>
             <td>{item.passport_number}</td>

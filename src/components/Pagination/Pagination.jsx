@@ -1,24 +1,31 @@
-import React from "react";
+// Pagination.js
+import React, { useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import "./Pagination.css";
 
-const Pagination = ({ onPageChange, pageCount }) => {
+const Pagination = ({ onPageChange, pageCount, currentPage }) => {
   const handlePageClick = ({ selected }) => {
-    onPageChange(selected);
+    onPageChange(selected + 1);
   };
+
+  useEffect(() => {
+    onPageChange(currentPage);
+  }, [currentPage, onPageChange]);
 
   return (
     <div>
       <ReactPaginate
-        previousLabel={"Prev"}
-        nextLabel={"Next"}
+        previousLabel={"previous"}
+        nextLabel={"next"}
         breakLabel={"..."}
+        breakClassName={"break-me"}
         pageCount={pageCount}
         marginPagesDisplayed={2}
         pageRangeDisplayed={5}
         onPageChange={handlePageClick}
         containerClassName={"pagination"}
         activeClassName={"active"}
+        forcePage={currentPage - 1}
       />
     </div>
   );
