@@ -34,7 +34,7 @@ const Login = () => {
       console.log("username", username);
       console.log("password", password);
       const response = await axios.post(
-        "http://10.20.68.82/molina-lte/api/Login.php",
+        "http://10.20.66.97/molina-lte/api/Login.php",
         {
           username,
           password,

@@ -19,7 +19,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(false);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("goPayment");
+  const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [dataPhotoPassport, setDataPhotoPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
