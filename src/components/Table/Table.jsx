@@ -2,10 +2,11 @@ import React from "react";
 import "./Table.css";
 
 const Table = ({ data }) => {
+  console.log(data);
   // Check if data is not an array or is empty
-  if (!Array.isArray(data) || data.length === 0) {
-    return <div>No data available</div>;
-  }
+  // if (!Array.isArray(data) || data.length === 0) {
+  //   return <div>No data available</div>;
+  // }
   return (
     <table className="custom-table">
       <thead>
@@ -32,7 +33,7 @@ const Table = ({ data }) => {
             <td>{item.visa_number}</td>
             <td>{item.receipt}</td>
             <td>{item.payment_method}</td>
-            <td>{item.timestamp}</td>
+            <td>Rp. {item.billed_price}</td>
           </tr>
         ))}
       </tbody>

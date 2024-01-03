@@ -3,11 +3,18 @@ import "./Report.css";
 import Table from "../../components/Table/Table";
 import Pagination from "../../components/Pagination/Pagination";
 import { apiPaymentHistory } from "../../services/api";
+import generatePDF from "../../components/ConvertPDF/ConvertPDF";
+import Select from "react-select";
 
 function Report() {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const perPage = 10;
+  const options = [
+    { value: "CASH", label: "CASH" },
+    { value: "CC", label: "CC" },
+    { value: "ALL", label: "ALL" },
+  ];
 
   useEffect(() => {
     // Call the payment history function when the component mounts
@@ -22,11 +29,11 @@ function Report() {
     };
 
     const bodyParams = {
-      startDate: "2023-11-11",
-      endDate: "2023-12-21",
+      startDate: "2024-01-03",
+      endDate: "2024-01-03",
       paymentMethod: ["KICASH"],
-      username: ["leamida", "admin"],
-      limit: 10,
+      username: "1907411008",
+      limit: 5,
       page: 1,
     };
 
@@ -48,32 +55,37 @@ function Report() {
   const endIndex = startIndex + perPage;
   const currentPageData = data.slice(startIndex, endIndex);
 
+  const exportToPDF = () => {
+    console.log("exportToPDF");
+    generatePDF(currentPageData);
+  };
+
   return (
     <div className="body">
       <h1>Laporan Petugas</h1>
       <div className="header-combo">
         <form action="#" method="POST" className="form-filter">
-          <label htmlFor="tanggal">Tanggal</label>
+          <label htmlFor="tanggal">Tanggal Awal</label>
+          <input type="date" name="tanggal" id="tanggal" />
+
+          <label htmlFor="tanggal">Tanggal Akhir</label>
           <input type="date" name="tanggal" id="tanggal" />
 
           <label htmlFor="petugas">Petugas</label>
           <input type="text" name="petugas" id="petugas" />
 
           <label htmlFor="payment">Tipe</label>
-          <input
-            type="text"
-            name="payment"
-            id="payment"
-            placeholder="CASH/CC/ALL"
-          />
+          <Select id="payment" options={options} />
           <button type="submit">Submit</button>
         </form>
       </div>
       <div className="content">
         <div className="table-header">
-          <button className="print-pdf">Cetak PDF</button>
+          <button className="print-pdf" onClick={exportToPDF}>
+            Cetak PDF
+          </button>
         </div>
-        <Table data={currentPageData} />
+        <Table id="table-to-export" data={currentPageData} />
         <div className="table-footer">
           <Pagination
             pageCount={Math.ceil(data.length / perPage)}
