@@ -5,6 +5,8 @@ import Table from "../../components/Table/Table";
 import Pagination from "../../components/Pagination/Pagination";
 import { apiPaymentHistory } from "../../services/api";
 import Select from "react-select";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 function Report() {
   const [data, setData] = useState([]);
@@ -16,7 +18,7 @@ function Report() {
     value: ["KICASH", "KIOSK"],
     label: "ALL",
   });
-  const perPage = 6;
+  const perPage = 20;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
@@ -66,6 +68,85 @@ function Report() {
 
   console.log("All data from API:", data);
 
+  const generatePDF = () => {
+    const pdf = new jsPDF();
+
+    const fontSize = 10;
+    // const lineSpacing = 5;
+
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.toLocaleDateString(
+      "en-GB"
+    )} ${currentDate.toLocaleTimeString("en-US", { hour12: true })}`;
+
+    pdf.setFontSize(fontSize);
+
+    pdf.text(`Reconsiliation Date: ${startDate} -  ${endDate} `, 16, 20);
+
+    const itemHeaders = [
+      "No",
+      "Date",
+      "Register No.",
+      "Full Name",
+      "Passport No.",
+      "Nationality",
+      "Visa Number",
+      "Receipt",
+      "Type",
+      "Billed Price",
+    ];
+    const itemRows = data.map((item, index) => [
+      index + 1,
+      `${item.timestamp}`,
+      `${item.register_number}`,
+      `${item.full_name}`,
+      `${item.passport_number}`,
+      `${item.citizenship}`,
+      `${item.visa_number}`,
+      `${item.receipt}`,
+      `${item.payment_method}`,
+      new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(item.billed_price),
+    ]);
+
+    pdf.autoTable({
+      head: [itemHeaders],
+      body: itemRows,
+      startY: 30,
+      styles: {
+        fontSize: 6,
+      },
+    });
+
+    // const spaceBetweenTables = 10;
+    // const startYForSummary = pdf.autoTable.previous.finalY + spaceBetweenTables;
+
+    // const summaryHeaders = ["Summary", ""];
+    // const summaryRows = [
+    //   [
+    //     `Total`,
+    //     new Intl.NumberFormat("id-ID", {
+    //       style: "currency",
+    //       currency: "IDR",
+    //     }).format(data.total),
+    //   ],
+    // ];
+
+    // pdf.autoTable({
+    //   head: [summaryHeaders],
+    //   body: summaryRows,
+    //   startY: startYForSummary,
+    // });
+
+    // pdf.text("", 20, pdf.autoTable.previous.finalY + spaceBetweenTables + 60);
+
+    const filename = `${formattedDate}`.replace(/\s+/g, "_");
+
+    pdf.save(`${filename}.pdf`);
+  };
+
   return (
     <div className="body">
       <h1>Laporan Petugas</h1>
@@ -102,7 +183,7 @@ function Report() {
           <Select
             id="payment"
             options={options}
-            value={selectedPaymentMethod} 
+            value={selectedPaymentMethod}
             onChange={(selectedOption) =>
               setSelectedPaymentMethod(selectedOption)
             }
@@ -114,7 +195,9 @@ function Report() {
       </div>
       <div className="content">
         <div className="table-header">
-          <button className="print-pdf">Cetak PDF</button>
+          <button className="print-pdf" onClick={() => generatePDF()}>
+            Cetak PDF
+          </button>
         </div>
         <Table data={data} startIndex={startIndex} />
 

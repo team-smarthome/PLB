@@ -33,7 +33,12 @@ const Table = ({ data, startIndex }) => {
             <td>{item.visa_number}</td>
             <td>{item.receipt}</td>
             <td>{item.payment_method}</td>
-            <td>Rp. {item.billed_price}</td>
+            <td>
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(item.billed_price)}
+            </td>
           </tr>
         ))}
       </tbody>
