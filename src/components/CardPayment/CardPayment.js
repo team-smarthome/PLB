@@ -65,15 +65,18 @@ const CardPayment = ({
   const [url, setUrl] = useState("");
 
   //price
-  const storedValue = localStorage.getItem('price');
-  const parsedValue = JSON.parse(storedValue) ?? { fee: "0", value: "0.0000" };
+  const { fee, fee_cash, value } = JSON.parse(localStorage.getItem('price')) ?? { fee: "0", fee_cash: "0", value: "0.0000" };
 
+  const formattedNumber = (num) => parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
+  
+  const formattedFee = formattedNumber(fee);
+  const formattedFeeCash = formattedNumber(fee_cash);
+  const formattedValue = formattedNumber(value);
+  const formattedTotal = formattedNumber(value + fee);
 
-  const fee = parseInt(parsedValue.fee);
-  const value = parseInt(parsedValue.value);
-  const formattedFee = fee.toLocaleString("id-ID", { minimumFractionDigits: 0 });
-  const formattedValue = value.toLocaleString("id-ID", { minimumFractionDigits: 0 });
-  const formattedTotal = (value + fee).toLocaleString("id-ID", { minimumFractionDigits: 0 });
+  //cardNumberPetugass
+  const cardNumberPetugass = "11" + localStorage.getItem("deviceId");
+  
 
   // const handleLogin = () => {
   //   if (username === 'user' && password === 'password') {
@@ -87,21 +90,28 @@ const CardPayment = ({
     content: () => printRef.current,
   });
 
-  console.table({
-    isCreditCard,
-    isPaymentCredit,
-    isPaymentCash,
-    isWaiting,
-    isFailed,
-    isPrinted,
-    isSuccess,
-    isPyamentUrl,
-    paymentMethod,
-    cardNumber,
-    expiry,
-    cvv,
-    type,
-  });
+  // console.table({
+  //   isCreditCard,
+  //   isPaymentCredit,
+  //   isPaymentCash,
+  //   isWaiting,
+  //   isFailed,
+  //   isPrinted,
+  //   isSuccess,
+  //   isPyamentUrl,
+  //   paymentMethod,
+  //   cardNumber,
+  //   expiry,
+  //   cvv,
+  //   type,
+  // });
+
+
+  //useEffect cardNumberPetugas
+  // useEffect(() => {
+  //   setCardNumber(cardNumberPetugas);
+  //   console.log("cardNumberPetugasUseFfect: ", cardNumberPetugas);
+  // }, [cardNumberPetugas]);
 
   useEffect(() => {
     socket.on("connected", (message) => {
@@ -290,7 +300,7 @@ const CardPayment = ({
   useEffect(() => {
     // ini jika isPaymentUrl true
     setDataPermohonanUser(dataNumberPermohonan);
-    console.log("dataPermohonanUserGUYSSS: ", dataNumberPermohonan);
+    // console.log("dataPermohonanUserGUYSSS: ", dataNumberPermohonan);
     setDataPasporUser(dataUser);
     if (
       !isPrinted &&
@@ -369,11 +379,14 @@ const CardPayment = ({
     if (isFailed) {
       if (failedMessage === "Invalid JWT Token") {
         setFailedMessage("please re-login and re-scan passport.")
+      } else if(failedMessage === undefined || failedMessage === null || failedMessage === "") {
+        setFailedMessage("Network / Card error / declined dll")
       } else {
         setFailedMessage(FailedMessage);
       }
     }
   }, [FailedMessage, isFailed]);
+
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
@@ -431,6 +444,7 @@ const CardPayment = ({
     setDataPasporUser(dataUser);
     console.log("berhasil");
     setCardNumber(cardNumberPetugas);
+    console.log("cardNumberPetugas: ", cardNumberPetugas);
     sendDataUpdatePayment({
       isWaiting: false,
       isFailed: false,
@@ -447,6 +461,8 @@ const CardPayment = ({
       type: type,
     });
   };
+
+
 
   const handleBackHome = () => {
     navigate("/home");
@@ -544,7 +560,7 @@ const CardPayment = ({
       setExpiryWarning(false);
       setCvvWarning(false);
       const card_data = {
-        cc_no: cardNumber,
+        cc_no: cardNumberPetugass,
         cc_exp: expiry,
         cvv: cvv,
         type: type,
@@ -939,7 +955,7 @@ const CardPayment = ({
                       <input type="text" value={`Rp. ${formattedValue}`} />
                     </div>
                     <div className="amount-box2">
-                      <input type="text" value={`Rp. ${formattedFee}`} />
+                      <input type="text" value={`Rp. ${formattedFeeCash}`} />
                     </div>
                     <div className="amount-box3">
                       <input type="text" value={`Rp. ${formattedTotal}`} />
@@ -952,7 +968,7 @@ const CardPayment = ({
                   </div>
                   <div className="credit-card-payment4">
                     <div className="credit-card-value1">
-                      <input type="text" value={cardNumberPetugas} />
+                      <input type="text" value={cardNumberPetugass} />
                     </div>
                     {cardNumberWarning && (
                       <div className="warning">
