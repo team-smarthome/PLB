@@ -68,6 +68,35 @@
   padding: 2%;
 }
 
+.content-loading {
+  margin-bottom: 9%;
+  background-color: white; /* Change background color to white */
+  opacity: 0.5;
+  width: 100%;
+  height: 100%; /* Use 100% height to fill its parent */
+  display: flex;
+  justify-items: center;
+  background-size: cover;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loader-report-spin {
+  z-index: 9999;
+  position: absolute;
+}
+
+.loader-loading-report {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #3d5889;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
 .table-header {
   display: flex;
   justify-content: flex-end; /* Align items to the far end (right) */

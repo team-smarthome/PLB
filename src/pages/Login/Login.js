@@ -36,8 +36,6 @@ const Login = () => {
     e.preventDefault();
     try {
       isLoading(true);
-      console.log("username", username);
-      console.log("password", password);
       const response = await axios.post(
         `${url_dev2}Login.php`,
         {
@@ -63,7 +61,6 @@ const Login = () => {
         );
 
         const userInfo = await JSON.parse(localStorage.getItem("user"));
-        console.log(userInfo.group.code);
         if (
           userInfo.group.code.includes("ADM") ||
           userInfo.group.code.includes("SPV")

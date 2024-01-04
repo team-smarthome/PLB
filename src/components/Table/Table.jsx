@@ -5,7 +5,7 @@ import "./Table.css";
 const Table = ({ data, page }) => {
   // Check if data is not an array or is empty
   if (!Array.isArray(data) || data.length === 0) {
-    return <div>No data available</div>;
+    return <div>No data available.</div>;
   }
 
   // Calculate the start and end indices based on the page parameter

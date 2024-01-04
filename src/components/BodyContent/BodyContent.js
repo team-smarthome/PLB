@@ -100,6 +100,13 @@ const BodyContent = ({
     setSharedData({ passportData: dataPrimaryPassport });
   }, [dataPrimaryPassport]);
 
+  //useEffect failedPesan
+  useEffect(() => {
+    if (FailedMessage) {
+      console.log("FailedMessage", FailedMessage);
+    }
+  }, [FailedMessage]);
+
   return (
     <div className="body-content">
       <div className="left-panel">
@@ -121,7 +128,7 @@ const BodyContent = ({
             sendDataUpdatePayment={handleDataFormPaymentStatus}
             dataUser={sharedData}
             dataNumberPermohonan={dataNumberPermohonan}
-            FailedMessage={FailedMessage}
+            FailedPesan={FailedMessage}
             onStatusChange={onStatusChange}
             onStatusConfirm={onStatusConfirm}
             cardNumberPetugas={cardNumberPetugas}
