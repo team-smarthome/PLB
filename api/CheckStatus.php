@@ -60,7 +60,7 @@ foreach ($requiredFields as $field) {
 }
 
 
-$url = "http://molina-dev-alb-313167115.ap-southeast-3.elb.amazonaws.com/api/visa/application/check-status";
+$url = "https://devapi-molina.imigrasi.go.id/api/visa/application/check-status";
 
 // Headers
 $headers = array(
