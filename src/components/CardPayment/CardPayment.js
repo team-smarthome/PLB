@@ -32,7 +32,7 @@ const CardPayment = ({
   dataUser,
   confirm,
   dataNumberPermohonan,
-  FailedMessage,
+  FailedPesan,
   statusPaymentCredit,
 }) => {
   const navigate = useNavigate();
@@ -76,6 +76,7 @@ const CardPayment = ({
 
   //cardNumberPetugass
   const cardNumberPetugass = "11" + localStorage.getItem("deviceId");
+
   
 
   // const handleLogin = () => {
@@ -377,15 +378,21 @@ const CardPayment = ({
   // useEffect jika isFailed true, maka setFailedMessage dengan FailedMessage
   useEffect(() => {
     if (isFailed) {
-      if (failedMessage === "Invalid JWT Token") {
+      if (FailedPesan === "Invalid JWT Token") {
         setFailedMessage("please re-login and re-scan passport.")
-      } else if(failedMessage === undefined || failedMessage === null || failedMessage === "") {
+      } else if(FailedPesan === undefined || FailedPesan === null || FailedPesan === "") {
         setFailedMessage("Network / Card error / declined dll")
       } else {
-        setFailedMessage(FailedMessage);
+        setFailedMessage(FailedPesan);
       }
     }
-  }, [FailedMessage, isFailed]);
+  }, [FailedPesan, isFailed]);
+
+
+  useEffect(()=> {
+    setFailedMessage(FailedPesan);
+    console.log("failedMessage cardPayment: ", failedMessage);
+  }, [FailedPesan, failedMessage]);
 
 
   const handleExpiryChange = (e) => {
@@ -443,8 +450,8 @@ const CardPayment = ({
     setType("CASH");
     setDataPasporUser(dataUser);
     console.log("berhasil");
-    setCardNumber(cardNumberPetugas);
-    console.log("cardNumberPetugas: ", cardNumberPetugas);
+    setCardNumber(cardNumberPetugass);
+    console.log("cardNumberPetugas: ", cardNumberPetugass);
     sendDataUpdatePayment({
       isWaiting: false,
       isFailed: false,
@@ -548,7 +555,7 @@ const CardPayment = ({
     console.log("dataPasporUser1: ", dataPasporUser);
     // e.preventDefault();
     console.log("dataPasporUser2: ", dataPasporUser);
-    setCardNumber(cardNumberPetugas);
+    setCardNumber(cardNumberPetugass);
     if (cardNumber === "") {
       setCardNumberWarning(true);
     } else if (expiry === "") {
@@ -560,7 +567,7 @@ const CardPayment = ({
       setExpiryWarning(false);
       setCvvWarning(false);
       const card_data = {
-        cc_no: cardNumberPetugass,
+        cc_no: cardNumber,
         cc_exp: expiry,
         cvv: cvv,
         type: type,
@@ -608,8 +615,6 @@ const CardPayment = ({
     // e.preventDefault();
     try {
       isLoading(true);
-      console.log("username", username);
-      console.log("password", password);
       const response = await axios.post(
         "http://10.20.68.82/molina-lte/api/Login.php",
         {
