@@ -146,9 +146,12 @@ function Report() {
 
     pdf.save(`${filename}.pdf`);
   };
+  const storage = JSON.parse(localStorage.getItem("user"));
+  const name = storage.fullName;
 
   return (
     <div className="body">
+      <h1 className="">Welcome SPV, {name}</h1>
       <h1>Laporan Petugas</h1>
       <div className="header-combo">
         <form action="#" method="POST" className="form-filter">
