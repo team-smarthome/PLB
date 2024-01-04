@@ -1,20 +1,13 @@
-// Pagination.js
 import React, { useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import "./Pagination.css";
 
-const Pagination = ({ onPageChange, pageCount, currentPage }) => {
-  const handlePageClick = ({ selected }) => {
-    onPageChange(selected + 1);
-  };
-
-  useEffect(() => {
-    onPageChange(currentPage);
-  }, [currentPage, onPageChange]);
+const Pagination = ({ onPageChange, pageCount }) => {
+ 
 
   return (
     <div>
-      <ReactPaginate
+    <ReactPaginate
         previousLabel={"previous"}
         nextLabel={"next"}
         breakLabel={"..."}
@@ -22,11 +15,11 @@ const Pagination = ({ onPageChange, pageCount, currentPage }) => {
         pageCount={pageCount}
         marginPagesDisplayed={2}
         pageRangeDisplayed={5}
-        onPageChange={handlePageClick}
+        onPageChange={(selected) => onPageChange(selected.selected + 1)}
         containerClassName={"pagination"}
+        subContainerClassName={"pages pagination"}
         activeClassName={"active"}
-        forcePage={currentPage - 1}
-      />
+    />
     </div>
   );
 };

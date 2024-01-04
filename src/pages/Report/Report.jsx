@@ -18,7 +18,7 @@ function Report() {
     value: ["KICASH", "KIOSK"],
     label: "ALL",
   });
-  const perPage = 20;
+  const perPage = 1000;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
@@ -27,7 +27,7 @@ function Report() {
 
   useEffect(() => {
     doPaymentHistory();
-  }, [currentPage, startDate, endDate, petugas, selectedPaymentMethod]);
+  }, [startDate, endDate, petugas, selectedPaymentMethod]);
 
   const doPaymentHistory = async () => {
     const bearerToken = localStorage.getItem("JwtToken");
@@ -42,7 +42,7 @@ function Report() {
       paymentMethod: selectedPaymentMethod.value,
       username: petugas,
       limit: perPage,
-      page: currentPage,
+      page: 1,
     };
 
     try {
@@ -60,6 +60,7 @@ function Report() {
     setCurrentPage(selectedPage);
   };
 
+
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = Math.min(startIndex + perPage, data.length);
   console.log("current page", currentPage);
@@ -67,6 +68,8 @@ function Report() {
   console.log("endIndex:", endIndex);
 
   console.log("All data from API:", data);
+
+  const pageCount = endIndex / 10;
 
   const generatePDF = () => {
     const pdf = new jsPDF();
@@ -202,13 +205,12 @@ function Report() {
             Cetak PDF
           </button>
         </div>
-        <Table data={data} startIndex={startIndex} />
+        <Table data={data} page={currentPage} />
 
         <div className="table-footer">
-          <Pagination
+        <Pagination
             onPageChange={handlePageClick}
-            pageCount={10}
-            currentPage={currentPage}
+            pageCount={pageCount}
           />
         </div>
       </div>
