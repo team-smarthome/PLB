@@ -7,6 +7,7 @@ import StatusPayment from "../pages/StatusPayment/StatusPayment";
 import Information from "../pages/Information/Information";
 import SpvLogin from "../pages/SpvLogin/SpvLogin";
 import Report from "../pages/Report/Report";
+import Swal from "sweetalert2";
 
 const isAuthenticated = () => {
   const jwtToken = localStorage.getItem("JwtToken");
@@ -25,11 +26,19 @@ const isAuthenticated = () => {
 
   if (isExpired) {
     // Clear localStorage if token is expired
-    localStorage.removeItem("user");
-    localStorage.removeItem("JwtToken");
-    localStorage.removeItem("cardNumberPetugas");
-    localStorage.removeItem("key");
-    localStorage.removeItem("token");
+    Swal.fire({
+      icon: "error",
+      text: "Invalid JWT Token",
+      confirmButtonColor: "#3d5889",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("JwtToken");
+        localStorage.removeItem("cardNumberPetugas");
+        localStorage.removeItem("key");
+        localStorage.removeItem("token");
+      }
+    });
   }
 
   return !isExpired;
