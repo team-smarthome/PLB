@@ -18,17 +18,19 @@ const Login = () => {
 
   const [loading, isLoading] = useState(false);
 
-  const version = "1.0.10";
+  const version = "1.0.11";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
   };
 
   if (isAuthenticated()) {
-
-    if(JSON.parse(localStorage.getItem("user")).group.code.includes("ADM") || JSON.parse(localStorage.getItem("user")).group.code.includes("SPV")){
+    if (
+      JSON.parse(localStorage.getItem("user")).group.code.includes("ADM") ||
+      JSON.parse(localStorage.getItem("user")).group.code.includes("SPV")
+    ) {
       return <Navigate to="/report" replace />;
-    } 
+    }
     return <Navigate to="/home" replace />;
   }
 
@@ -36,13 +38,10 @@ const Login = () => {
     e.preventDefault();
     try {
       isLoading(true);
-      const response = await axios.post(
-        `${url_dev2}Login.php`,
-        {
-          username,
-          password,
-        }
-      );
+      const response = await axios.post(`${url_dev2}Login.php`, {
+        username,
+        password,
+      });
 
       if (response.data.status === "success") {
         isLoading(false);
