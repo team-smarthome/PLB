@@ -71,7 +71,7 @@ const Login = () => {
             icon: "success",
             title: "Welcome, Supervisor.",
           });
-          navigate("/menu");
+          navigate("/report");
         } else {
           Toast.fire({
             icon: "success",
