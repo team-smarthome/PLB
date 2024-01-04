@@ -620,7 +620,7 @@ const CardPayment = ({
 
       console.log("response KICASH", response);
 
-      if (response.data.status === "success") {
+      if (response.data.status === "success" && response.data.profile.api.key === localStorage.getItem("key") && response.data.profile.api.token === localStorage.getItem("token")){
         isLoading(false);
         console.log(response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
@@ -647,6 +647,27 @@ const CardPayment = ({
           type: type,
         });
         handleSubmitKICASH();
+      } else if (response.data.status === "success" && response.data.profile.api.key !== localStorage.getItem("key") && response.data.profile.api.token !== localStorage.getItem("token")) {
+        isLoading(false);
+        Swal.fire({
+          icon: "error",
+          title: "Please use the same account from the previous login",
+        });
+        sendDataUpdatePayment({
+          isWaiting: false,
+          isFailed: false,
+          isPrinted: false,
+          isSuccess: false,
+          isCreditCard: false,
+          isPyamentUrl: false,
+          isPaymentCredit: false,
+          isPaymentCash: true,
+          paymentMethod: paymentMethod,
+          cardNumber: cardNumber,
+          expiry: expiry,
+          cvv: cvv,
+          type: type,
+        });
       } else {
         console.log("Gagal euy, INVALID");
         alert("Username or Password Invalid!");
@@ -708,15 +729,6 @@ const CardPayment = ({
             // Lakukan sesuatu dengan email dan password yang diambil
 
             if (username && password) {
-
-              if (username !== JSON.parse(localStorage.getItem("user")).username) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Username Invalid!",
-                });
-                return;
-              }
-
               sendDataUpdatePayment({
                 isConfirm: false,
                 isFailed: false,
