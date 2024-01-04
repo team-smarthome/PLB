@@ -17,7 +17,7 @@ const Login = () => {
 
   const [loading, isLoading] = useState(false);
 
-  const version = "1.0.8";
+  const version = "1.0.9";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
@@ -56,7 +56,10 @@ const Login = () => {
           JSON.stringify(response.data.profile.user_data)
         );
 
-        localStorage.setItem("price", JSON.stringify(response.data.profile.price));
+        localStorage.setItem(
+          "price",
+          JSON.stringify(response.data.profile.price)
+        );
 
         const userInfo = await JSON.parse(localStorage.getItem("user"));
         console.log(userInfo.group.code);
