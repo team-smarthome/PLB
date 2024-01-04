@@ -17,7 +17,7 @@ const Login = () => {
 
   const [loading, isLoading] = useState(false);
 
-  const version = "1.0.9";
+  const version = "1.0.10";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
