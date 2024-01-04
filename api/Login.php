@@ -43,6 +43,8 @@ if (empty($username) || empty($password)) {
     $httpCodeLogin = curl_getinfo($chLogin, CURLINFO_HTTP_CODE);
     curl_close($chLogin);
 
+    // print_r($resultLogin);
+
     if ($httpCodeLogin === 200) {
         // Success
         $response['status'] = "success";

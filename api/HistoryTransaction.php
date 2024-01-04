@@ -32,15 +32,23 @@ if (stripos($_SERVER["CONTENT_TYPE"], "application/json") === 0) {
     $param_POST = json_decode(file_get_contents("php://input"));
 }
 
+$postData = file_get_contents("php://input");
+
+$jsonData = json_decode($postData, true);
+
+
 // Param 
-$startDate = (empty($_POST['startDate'])) ? trim($param_POST->startDate) : trim($_POST['startDate']);
-$endDate = (empty($_POST['endDate'])) ? trim($param_POST->endDate) : trim($_POST['endDate']);
-$paymentMethod = (empty($_POST['paymentMethod'])) ? [] : $_POST['paymentMethod'];
-$username = (empty($_POST['username'])) ? [] : $_POST['username'];
-$limit = (empty($_POST['limit'])) ? trim($param_POST->limit) : trim($_POST['limit']);
-$page = (empty($_POST['page'])) ? trim($param_POST->page) : trim($_POST['page']);
+$startDate = (empty($jsonData['startDate'])) ? trim($param_POST->startDate) : trim($jsonData['startDate']);
+$endDate = (empty($jsonData['endDate'])) ? trim($param_POST->endDate) : trim($jsonData['endDate']);
+$paymentMethod = (empty($jsonData['paymentMethod'])) ? [] : $jsonData['paymentMethod'];
+$username = (empty($jsonData['username'])) ? [] : $jsonData['username'];
+$limit = (empty($jsonData['limit'])) ? trim($param_POST->limit) : trim($jsonData['limit']);
+$page = (empty($jsonData['page'])) ? trim($param_POST->page) : trim($jsonData['page']);
 
+// var_dump($param_POST);
 
+// echo "nanana";
+// echo $username;
 $response = array();
 
 $requiredFields = array(
@@ -77,6 +85,7 @@ $bodyData = array(
     'page' => $page,
 );
 
+// print_r($bodyData);
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
