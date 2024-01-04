@@ -7,18 +7,23 @@ import { apiPaymentHistory } from "../../services/api";
 import Select from "react-select";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function Report() {
+  const navigate = useNavigate();
+  const [loading, isLoading] = useState(false);
+  const currentDate = new Date(Date.now()).toISOString().split("T")[0];
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [startDate, setStartDate] = useState("2024-01-03");
-  const [endDate, setEndDate] = useState("2024-01-03");
-  const [petugas, setPetugas] = useState("1907411008");
+  const [startDate, setStartDate] = useState(currentDate);
+  const [endDate, setEndDate] = useState(currentDate);
+  const [petugas, setPetugas] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
-    value: ["KICASH", "KIOSK"],
-    label: "ALL",
+    value: "KICASH",
+    label: "CASH",
   });
-  const perPage = 1000;
+  const perPage = 20;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
@@ -27,30 +32,67 @@ function Report() {
 
   useEffect(() => {
     doPaymentHistory();
-  }, [startDate, endDate, petugas, selectedPaymentMethod]);
+  }, []);
 
   const doPaymentHistory = async () => {
+    isLoading(true);
+
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
       Authorization: `Bearer ${bearerToken}`,
       "Content-Type": "application/json",
     };
+    let paymentMethodValue = [selectedPaymentMethod.value];
 
+    if (Array.isArray(selectedPaymentMethod.value)) {
+      paymentMethodValue = selectedPaymentMethod.value;
+    }
     const bodyParams = {
       startDate: startDate,
       endDate: endDate,
-      paymentMethod: selectedPaymentMethod.value,
-      username: petugas,
+      paymentMethod: paymentMethodValue,
+      username: [petugas],
       limit: perPage,
       page: 1,
     };
 
     try {
       const res = await apiPaymentHistory(header, bodyParams);
-      const dataRes = res.data && res.data[0];
-      console.log("Data received from server:", dataRes);
-      setData(dataRes && dataRes.status === "success" ? dataRes.data : []);
-      console.log("Updated data state:", data);
+      console.log("res: ", res);
+      // if jwt token expired
+      if (res.data.message === "Invalid JWT Token") {
+        isLoading(false);
+        console.log("jwt expired");
+        Swal.fire({
+          icon: "error",
+          text: "Invalid JWT Token",
+          confirmButtonColor: "#3d5889",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            localStorage.removeItem("user");
+            localStorage.removeItem("JwtToken");
+            localStorage.removeItem("cardNumberPetugas");
+            localStorage.removeItem("key");
+            localStorage.removeItem("token");
+            navigate("/");
+          }
+        });
+      } else {
+        if (res.data[0].status === "success") {
+          isLoading(false);
+          const dataRes = res.data && res.data[0];
+          console.log("Data received from server:", dataRes);
+          setData(dataRes && dataRes.status === "success" ? dataRes.data : []);
+          console.log("Updated data state:", data);
+        } else {
+          isLoading(false);
+          Swal.fire({
+            icon: "error",
+            text: "error getting data from server",
+            confirmButtonColor: "#3d5889",
+          });
+        }
+      }
     } catch (error) {
       console.error("error:", error);
     }
@@ -59,7 +101,6 @@ function Report() {
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
   };
-
 
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = Math.min(startIndex + perPage, data.length);
@@ -123,28 +164,6 @@ function Report() {
       },
     });
 
-    // const spaceBetweenTables = 10;
-    // const startYForSummary = pdf.autoTable.previous.finalY + spaceBetweenTables;
-
-    // const summaryHeaders = ["Summary", ""];
-    // const summaryRows = [
-    //   [
-    //     `Total`,
-    //     new Intl.NumberFormat("id-ID", {
-    //       style: "currency",
-    //       currency: "IDR",
-    //     }).format(data.total),
-    //   ],
-    // ];
-
-    // pdf.autoTable({
-    //   head: [summaryHeaders],
-    //   body: summaryRows,
-    //   startY: startYForSummary,
-    // });
-
-    // pdf.text("", 20, pdf.autoTable.previous.finalY + spaceBetweenTables + 60);
-
     const filename = `${formattedDate}`.replace(/\s+/g, "_");
 
     pdf.save(`${filename}.pdf`);
@@ -205,14 +224,23 @@ function Report() {
             Cetak PDF
           </button>
         </div>
-        <Table data={data} page={currentPage} />
-
-        <div className="table-footer">
-        <Pagination
-            onPageChange={handlePageClick}
-            pageCount={pageCount}
-          />
-        </div>
+        {loading ? (
+          <div className={"content-loading"}>
+            <div className="loader-report-spin">
+              {loading && <span className="loader-loading-report"></span>}
+            </div>
+          </div>
+        ) : (
+          <>
+            <Table data={data} page={currentPage} />
+            <div className="table-footer">
+              <Pagination
+                onPageChange={handlePageClick}
+                pageCount={pageCount}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
