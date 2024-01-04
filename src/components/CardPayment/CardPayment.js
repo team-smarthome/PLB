@@ -624,15 +624,13 @@ const CardPayment = ({
       );
 
       console.log("response KICASH", response);
+        const localKey = localStorage.getItem("key");
+        const localToken = localStorage.getItem("token");
 
       if (response.data.status === "success" && response.data.profile.api.key === localStorage.getItem("key") && response.data.profile.api.token === localStorage.getItem("token")){
         isLoading(false);
         console.log(response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-        localStorage.setItem(
-          "cardNumberPetugas",
-          response.data.profile.card.number
-        );
         localStorage.setItem("key", response.data.profile.api.key);
         localStorage.setItem("token", response.data.profile.api.token);
         localStorage.setItem(
