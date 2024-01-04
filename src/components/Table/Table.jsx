@@ -1,11 +1,19 @@
 import React from "react";
 import "./Table.css";
+// ...
 
-const Table = ({ data, startIndex }) => {
+const Table = ({ data, page }) => {
   // Check if data is not an array or is empty
   if (!Array.isArray(data) || data.length === 0) {
     return <div>No data available</div>;
   }
+
+  // Calculate the start and end indices based on the page parameter
+  const startIndex = (page - 1) * 10;
+  const endIndex = Math.min(startIndex + 10, data.length);
+
+  // Display only the data within the calculated indices
+  const slicedData = data.slice(startIndex, endIndex);
 
   return (
     <table className="custom-table">
@@ -23,7 +31,7 @@ const Table = ({ data, startIndex }) => {
         </tr>
       </thead>
       <tbody>
-        {data.map((item, index) => (
+        {slicedData.map((item, index) => (
           <tr key={index}>
             <td>{startIndex + index + 1}</td>
             <td>{item.register_number}</td>
