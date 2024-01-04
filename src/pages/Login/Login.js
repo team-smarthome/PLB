@@ -4,6 +4,7 @@ import "./LoginStyle.css";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
+import { url_dev2 } from "../../services/env";
 // import { Spinner } from "flowbite-react";
 
 const Login = () => {
@@ -24,6 +25,10 @@ const Login = () => {
   };
 
   if (isAuthenticated()) {
+
+    if(JSON.parse(localStorage.getItem("user")).group.code.includes("ADM") || JSON.parse(localStorage.getItem("user")).group.code.includes("SPV")){
+      return <Navigate to="/report" replace />;
+    } 
     return <Navigate to="/home" replace />;
   }
 
@@ -34,7 +39,7 @@ const Login = () => {
       console.log("username", username);
       console.log("password", password);
       const response = await axios.post(
-        "http://10.20.66.97/molina-lte/api/Login.php",
+        `${url_dev2}Login.php`,
         {
           username,
           password,
@@ -45,10 +50,6 @@ const Login = () => {
         isLoading(false);
         console.log("response: ", response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-        localStorage.setItem(
-          "cardNumberPetugas",
-          response.data.profile.card.number
-        );
         localStorage.setItem("key", response.data.profile.api.key);
         localStorage.setItem("token", response.data.profile.api.token);
         localStorage.setItem(
