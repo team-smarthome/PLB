@@ -20,10 +20,10 @@ function Report() {
   const [endDate, setEndDate] = useState(currentDate);
   const [petugas, setPetugas] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
-    value: "KICASH",
-    label: "CASH",
+    value: ["KICASH", "KIOSK"],
+    label: "ALL",
   });
-  const perPage = 20;
+  const perPage = 100;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
@@ -110,7 +110,7 @@ function Report() {
 
   console.log("All data from API:", data);
 
-  const pageCount = endIndex / 10;
+  const pageCount = endIndex / 6;
 
   const generatePDF = () => {
     const pdf = new jsPDF();
