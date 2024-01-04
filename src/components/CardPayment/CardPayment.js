@@ -708,6 +708,15 @@ const CardPayment = ({
             // Lakukan sesuatu dengan email dan password yang diambil
 
             if (username && password) {
+
+              if (username !== JSON.parse(localStorage.getItem("user")).username) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Username Invalid!",
+                });
+                return;
+              }
+
               sendDataUpdatePayment({
                 isConfirm: false,
                 isFailed: false,
