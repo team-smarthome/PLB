@@ -19,20 +19,19 @@ function Report() {
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(currentDate);
   const [petugas, setPetugas] = useState("");
+  const [pages, setPages] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
     value: ["KICASH", "KIOSK"],
     label: "ALL",
   });
-  const perPage = 100;
+  const perPage = 2;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
     { value: ["KICASH", "KIOSK"], label: "ALL" },
   ];
 
-  useEffect(() => {
-    doPaymentHistory();
-  }, []);
+
 
   const doPaymentHistory = async () => {
     isLoading(true);
@@ -53,7 +52,7 @@ function Report() {
       paymentMethod: paymentMethodValue,
       username: [petugas],
       limit: perPage,
-      page: 1,
+      page: pages,
     };
 
     try {
@@ -78,12 +77,17 @@ function Report() {
           }
         });
       } else {
-        if (res.data[0].status === "success") {
+        if (Array.isArray(res.data) && res.data.length > 0 && res.data[0].status === "success" && res.data[0].data.length > 0) {
+          console.log("masuk ke tahap")
           isLoading(false);
           const dataRes = res.data && res.data[0];
           console.log("Data received from server:", dataRes);
-          setData(dataRes && dataRes.status === "success" ? dataRes.data : []);
+          setData((prevData) => [
+            ...prevData,
+            ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
+          ]);
           console.log("Updated data state:", data);
+          setPages((prevPages) => prevPages + 1);
         } else {
           isLoading(false);
           Swal.fire({
@@ -98,6 +102,26 @@ function Report() {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await doPaymentHistory();
+  
+    };
+  
+    // Check if data is not an empty array before making additional calls
+    if (data.length === 0) {
+      fetchData();
+      setPages(1);
+    }
+    
+  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, pages]);
+  
+  
+
+    console.log("total data lenght:", data.length)
+
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
   };
@@ -110,7 +134,9 @@ function Report() {
 
   console.log("All data from API:", data);
 
-  const pageCount = endIndex / 6;
+  const pageCount = data.length / 10;
+
+  console.log("pageCount:", pageCount)
 
   const generatePDF = () => {
     const pdf = new jsPDF();
