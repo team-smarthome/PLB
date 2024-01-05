@@ -99,9 +99,37 @@
 
 .table-header {
   display: flex;
-  justify-content: flex-end; /* Align items to the far end (right) */
-  align-items: flex-end;
+  justify-content: space-between; /* Align items to the far end (right) */
+  align-items: center;
   margin-bottom: 3%;
+}
+
+.combo {
+  display: flex; /* Use flexbox to align items */
+  gap: 10px; /* Add some spacing between buttons */
+  align-items: center;
+}
+
+.report-logout {
+  padding: 11px 20px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: red;
+  color: #fff;
+  border-radius: 6px;
+}
+
+.menu {
+  padding: 11px 20px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #3d5889;
+  color: #fff;
+  border-radius: 6px;
 }
 
 .print-pdf {
@@ -113,6 +141,12 @@
   background-color: #e6af3c;
   color: #fff;
   border-radius: 6px;
+}
+
+.print-pdf:disabled {
+  background-color: #ccc; /* Change the background color when disabled */
+  color: #999; /* Change the text color when disabled */
+  cursor: not-allowed; /* Change the cursor when disabled */
 }
 
 .table-footer {

@@ -32,9 +32,9 @@ function Report() {
   ];
 
   const doPaymentHistory = async (page) => {
-    if (data.length === 0) {
-      isLoading(true);
-    }
+    // if (data.length === 0) {
+    isLoading(true);
+    // }
 
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
@@ -56,12 +56,21 @@ function Report() {
       page,
     };
 
+    let payloadTempt = {};
+    payloadTempt = bodyParams;
+
+    if (bodyParams !== payloadTempt) {
+      console.log("payload is not the same");
+    } else {
+      console.log("hehe");
+    }
+
     try {
       const res = await apiPaymentHistory(header, bodyParams);
-      console.log("res: ", res);
+      // console.log("res: ", res);
       if (res.data.message === "Invalid JWT Token") {
         isLoading(false);
-        console.log("jwt expired");
+        // console.log("jwt invalid");
         Swal.fire({
           icon: "error",
           text: "Invalid JWT Token",
@@ -83,14 +92,15 @@ function Report() {
           res.data[0].status === "success" &&
           res.data[0].data.length > 0
         ) {
+          isLoading(false);
           console.log("masuk ke tahap");
           const dataRes = res.data && res.data[0];
-          console.log("Data received from server:", dataRes);
+          // console.log("Data received from server:", dataRes);
           setData((prevData) => [
             ...prevData,
             ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
           ]);
-          console.log("Updated data state:", data);
+          // console.log("Updated data state:", data);
           setPages((prevPages) => prevPages + 1);
           await doPaymentHistory(page + 1);
         }
@@ -116,7 +126,7 @@ function Report() {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [data, pages]);
 
-  console.log("total data lenght:", data.length);
+  // console.log("total data lenght:", data.length);
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
@@ -124,15 +134,15 @@ function Report() {
 
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = Math.min(startIndex + perPage, data.length);
-  console.log("current page", currentPage);
-  console.log("startIndex:", startIndex);
-  console.log("endIndex:", endIndex);
+  // console.log("current page", currentPage);
+  // console.log("startIndex:", startIndex);
+  // console.log("endIndex:", endIndex);
 
-  console.log("All data from API:", data);
+  // console.log("All data from API:", data);
 
   const pageCount = data.length / 10;
 
-  console.log("pageCount:", pageCount);
+  // console.log("pageCount:", pageCount);
 
   const generatePDF = () => {
     const pdf = new jsPDF();
@@ -193,6 +203,31 @@ function Report() {
   const storage = JSON.parse(localStorage.getItem("user"));
   const name = storage.fullName;
 
+  const handleLogout = async () => {
+    // Menampilkan konfirmasi alert ketika tombol logout diklik menggunakan SweetAlert2
+    const result = await Swal.fire({
+      title: "Are you sure want to logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3D5889",
+    });
+
+    if (result.isConfirmed) {
+      // Proses logout di sini (hapus localStorage, dll.)
+      navigate("/");
+      localStorage.removeItem("user");
+      localStorage.removeItem("JwtToken");
+      localStorage.removeItem("cardNumberPetugas");
+      localStorage.removeItem("key");
+      localStorage.removeItem("token");
+      localStorage.removeItem("jenisDeviceId");
+      localStorage.removeItem("deviceId");
+      localStorage.removeItem("airportId");
+    }
+  };
+
   return (
     <div className="body">
       <h1 className="">Welcome SPV, {name}</h1>
@@ -242,7 +277,19 @@ function Report() {
       </div>
       <div className="content">
         <div className="table-header">
-          <button className="print-pdf" onClick={() => generatePDF()}>
+          <div className="combo">
+            <button className="report-logout" onClick={handleLogout}>
+              Logout
+            </button>
+            <button className="menu" onClick={() => navigate("/home")}>
+              Home
+            </button>
+          </div>
+          <button
+            className="print-pdf"
+            disabled={data.length === 0 ? true : false}
+            onClick={() => generatePDF()}
+          >
             Cetak PDF
           </button>
         </div>
