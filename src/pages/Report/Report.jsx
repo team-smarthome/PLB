@@ -33,9 +33,9 @@ function Report() {
 
   const doPaymentHistory = async (page) => {
     console.log(pages);
-    // if (data.length === 0) {
-    //   isLoading(true);
-    // }
+    if (data.length === 0) {
+      isLoading(true);
+    }
 
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
