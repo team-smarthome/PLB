@@ -2,7 +2,7 @@ import axios from "axios";
 import { url_dev, url_dev2, url_pg_sendbox } from "./env";
 
 export async function apiPaymentHistory(header, body) {
-  const apiUrl = `${url_dev2}HistoryTransaction.php`;
+  const apiUrl = `${url_dev}HistoryTransaction.php`;
   const headers = header;
   const requestBody = body;
 
@@ -60,7 +60,7 @@ export async function apiSimpanPermohonan(header, body) {
 }
 
 export async function apiPaymentGateway(header, body) {
-  const apiUrl = `${url_dev2}ApplicationBank.php`;
+  const apiUrl = `${url_dev}ApplicationBank.php`;
   const headers = header;
   const requestBody = body;
 
