@@ -32,10 +32,9 @@ function Report() {
   ];
 
   const doPaymentHistory = async (page) => {
-    console.log(pages);
-    // if (data.length === 0) {
-    //   isLoading(true);
-    // }
+    if (data.length === 0) {
+      isLoading(true);
+    }
 
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
@@ -85,7 +84,6 @@ function Report() {
           res.data[0].data.length > 0
         ) {
           console.log("masuk ke tahap");
-          // isLoading(false);
           const dataRes = res.data && res.data[0];
           console.log("Data received from server:", dataRes);
           setData((prevData) => [
@@ -99,6 +97,8 @@ function Report() {
       }
     } catch (error) {
       console.error("error:", error);
+    } finally {
+      isLoading(false); // Set loading to false after the data is fetched or if there's an error
     }
   };
 
