@@ -62,6 +62,13 @@ const Home = () => {
             </div>
           </div>
         </div>
+        {JSON.parse(localStorage.getItem("user")).group.code.includes("SPV") ? (
+          <div className="menuButton" onClick={() => navigate("/report")}>
+            <div className="logout-text">
+              <p className="text-logout">REPORT</p>
+            </div>
+          </div>
+        ) : null}
         <div className="logoutNew" onClick={handleLogout}>
           <div className="logout-text">
             <p className="text-logout">LOGOUT</p>
