@@ -65,14 +65,20 @@ const CardPayment = ({
   const [url, setUrl] = useState("");
 
   //price
-  const { fee, fee_cash, value } = JSON.parse(localStorage.getItem('price')) ?? { fee: "0", fee_cash: "0", value: "0.0000" };
+const { fee, fee_cash, value } = JSON.parse(localStorage.getItem('price')) ?? { fee: "0", fee_cash: "0", value: "0.0000" };
 
-  const formattedNumber = (num) => parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
-  
-  const formattedFee = formattedNumber(fee);
-  const formattedFeeCash = formattedNumber(fee_cash);
-  const formattedValue = formattedNumber(value);
-  const formattedTotal = formattedNumber(value + fee);
+const formattedNumber = (num) => parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
+
+const numericValue = parseFloat(value);
+const numericFee = parseFloat(fee);
+const numericFeeCash = parseFloat(fee_cash);
+
+const formattedFees = formattedNumber(numericFee);
+const formattedFee = formattedNumber(fee);
+const formattedFeeCash = formattedNumber(numericFeeCash);
+const formattedValue = formattedNumber(numericValue);
+const formattedTotal = formattedNumber(numericValue + numericFee);
+const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
 
   //cardNumberPetugass
   const cardNumberPetugass = "11" + localStorage.getItem("deviceId");
@@ -982,7 +988,7 @@ const CardPayment = ({
                       <input type="text" value={`Rp. ${formattedFeeCash}`} />
                     </div>
                     <div className="amount-box3">
-                      <input type="text" value={`Rp. ${formattedTotal}`} />
+                      <input type="text" value={`Rp. ${formattedTotalCash}`} />
                     </div>
                   </div>
                 </div>
