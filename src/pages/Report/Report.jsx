@@ -24,17 +24,18 @@ function Report() {
     value: ["KICASH", "KIOSK"],
     label: "ALL",
   });
-  const perPage = 2;
+  const perPage = 20;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
     { value: ["KICASH", "KIOSK"], label: "ALL" },
   ];
 
-
-
-  const doPaymentHistory = async () => {
-    isLoading(true);
+  const doPaymentHistory = async (page) => {
+    console.log(pages);
+    // if (data.length === 0) {
+    //   isLoading(true);
+    // }
 
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
@@ -46,19 +47,19 @@ function Report() {
     if (Array.isArray(selectedPaymentMethod.value)) {
       paymentMethodValue = selectedPaymentMethod.value;
     }
+
     const bodyParams = {
       startDate: startDate,
       endDate: endDate,
       paymentMethod: paymentMethodValue,
       username: [petugas],
       limit: perPage,
-      page: pages,
+      page,
     };
 
     try {
       const res = await apiPaymentHistory(header, bodyParams);
       console.log("res: ", res);
-      // if jwt token expired
       if (res.data.message === "Invalid JWT Token") {
         isLoading(false);
         console.log("jwt expired");
@@ -77,9 +78,14 @@ function Report() {
           }
         });
       } else {
-        if (Array.isArray(res.data) && res.data.length > 0 && res.data[0].status === "success" && res.data[0].data.length > 0) {
-          console.log("masuk ke tahap")
-          isLoading(false);
+        if (
+          Array.isArray(res.data) &&
+          res.data.length > 0 &&
+          res.data[0].status === "success" &&
+          res.data[0].data.length > 0
+        ) {
+          console.log("masuk ke tahap");
+          // isLoading(false);
           const dataRes = res.data && res.data[0];
           console.log("Data received from server:", dataRes);
           setData((prevData) => [
@@ -88,13 +94,7 @@ function Report() {
           ]);
           console.log("Updated data state:", data);
           setPages((prevPages) => prevPages + 1);
-        } else {
-          isLoading(false);
-          Swal.fire({
-            icon: "error",
-            text: "error getting data from server",
-            confirmButtonColor: "#3d5889",
-          });
+          await doPaymentHistory(page + 1);
         }
       }
     } catch (error) {
@@ -102,25 +102,21 @@ function Report() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await doPaymentHistory();
-  
-    };
-  
-    // Check if data is not an empty array before making additional calls
-    if (data.length === 0) {
-      fetchData();
-      setPages(1);
-    }
-    
-  
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, pages]);
-  
-  
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     await doPaymentHistory();
+  //   };
 
-    console.log("total data lenght:", data.length)
+  //   // Check if data is not an empty array before making additional calls
+  //   if (data.length === 0) {
+  //     fetchData();
+  //     setPages(1);
+  //   }
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [data, pages]);
+
+  console.log("total data lenght:", data.length);
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
@@ -136,7 +132,7 @@ function Report() {
 
   const pageCount = data.length / 10;
 
-  console.log("pageCount:", pageCount)
+  console.log("pageCount:", pageCount);
 
   const generatePDF = () => {
     const pdf = new jsPDF();
@@ -239,7 +235,7 @@ function Report() {
               setSelectedPaymentMethod(selectedOption)
             }
           />
-          <button type="button" onClick={() => doPaymentHistory()}>
+          <button type="button" onClick={() => doPaymentHistory(pages)}>
             Submit
           </button>
         </form>
