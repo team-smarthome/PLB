@@ -1,4 +1,3 @@
-// Report.js
 import React, { useEffect, useState } from "react";
 import "./Report.css";
 import Table from "../../components/Table/Table";
@@ -31,22 +30,26 @@ function Report() {
     { value: ["KICASH", "KIOSK"], label: "ALL" },
   ];
 
-  const doPaymentHistory = async (page) => {
-    // if (data.length === 0) {
-    isLoading(true);
-    // }
 
+
+
+  let payloadTempt = {}; 
+
+  const doPaymentHistory = async (page) => {
+    isLoading(true);
+  
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
       Authorization: `Bearer ${bearerToken}`,
       "Content-Type": "application/json",
     };
+  
     let paymentMethodValue = [selectedPaymentMethod.value];
-
+  
     if (Array.isArray(selectedPaymentMethod.value)) {
       paymentMethodValue = selectedPaymentMethod.value;
     }
-
+  
     const bodyParams = {
       startDate: startDate,
       endDate: endDate,
@@ -55,22 +58,26 @@ function Report() {
       limit: perPage,
       page,
     };
-
-    let payloadTempt = {};
-    payloadTempt = bodyParams;
-
-    if (bodyParams !== payloadTempt) {
-      console.log("payload is not the same");
-    } else {
-      console.log("hehe");
+  
+    // Menambahkan kondisi untuk memeriksa perubahan parameter
+    if (
+      startDate !== payloadTempt.startDate ||
+      endDate !== payloadTempt.endDate ||
+      JSON.stringify(paymentMethodValue) !== JSON.stringify(payloadTempt.paymentMethod) ||
+      JSON.stringify([petugas]) !== JSON.stringify(payloadTempt.username) ||
+      perPage !== payloadTempt.limit
+    ) {
+      setPages(1);
+      setData([]);
+      setCurrentPage(1);
+      payloadTempt = { ...bodyParams };
     }
-
+  
     try {
       const res = await apiPaymentHistory(header, bodyParams);
-      // console.log("res: ", res);
+  
       if (res.data.message === "Invalid JWT Token") {
         isLoading(false);
-        // console.log("jwt invalid");
         Swal.fire({
           icon: "error",
           text: "Invalid JWT Token",
@@ -93,62 +100,47 @@ function Report() {
           res.data[0].data.length > 0
         ) {
           isLoading(false);
-          console.log("masuk ke tahap");
           const dataRes = res.data && res.data[0];
-          // console.log("Data received from server:", dataRes);
           setData((prevData) => [
             ...prevData,
             ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
           ]);
-          // console.log("Updated data state:", data);
           setPages((prevPages) => prevPages + 1);
           await doPaymentHistory(page + 1);
+        } else {
+          setCurrentPage(1);
         }
       }
     } catch (error) {
       console.error("error:", error);
     } finally {
-      isLoading(false); // Set loading to false after the data is fetched or if there's an error
+      isLoading(false);
     }
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     await doPaymentHistory();
-  //   };
+    
+  useEffect(() => {
+    // Reset page to 1 when startDate, endDate, or petugas changes
+    setCurrentPage(1);
+  }, [startDate, endDate, petugas]);
 
-  //   // Check if data is not an empty array before making additional calls
-  //   if (data.length === 0) {
-  //     fetchData();
-  //     setPages(1);
-  //   }
+  console.log("nilai currentPage:", currentPage);
+  
 
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [data, pages]);
-
-  // console.log("total data lenght:", data.length);
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
   };
 
   const startIndex = (currentPage - 1) * perPage;
-  const endIndex = Math.min(startIndex + perPage, data.length);
-  // console.log("current page", currentPage);
-  // console.log("startIndex:", startIndex);
-  // console.log("endIndex:", endIndex);
-
-  // console.log("All data from API:", data);
 
   const pageCount = data.length / 10;
-
-  // console.log("pageCount:", pageCount);
 
   const generatePDF = () => {
     const pdf = new jsPDF();
 
     const fontSize = 10;
-    // const lineSpacing = 5;
+
 
     const currentDate = new Date();
     const formattedDate = `${currentDate.toLocaleDateString(
@@ -270,7 +262,7 @@ function Report() {
               setSelectedPaymentMethod(selectedOption)
             }
           />
-          <button type="button" onClick={() => doPaymentHistory(pages)}>
+          <button type="button" onClick={() => doPaymentHistory(1)}>
             Submit
           </button>
         </form>

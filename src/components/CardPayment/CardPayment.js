@@ -58,7 +58,7 @@ const CardPayment = ({
   const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
   const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
-  const [failedMessage, setFailedMessage] = useState("");
+  const [failedMessage, setFailedMessage] = useState("Network / Card error / declined dll");
 
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
