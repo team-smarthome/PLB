@@ -5,6 +5,7 @@ import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
 import { url_dev } from "../../services/env";
+import { url_dev2 } from "../../services/env";
 // import { Spinner } from "flowbite-react";
 
 const Login = () => {
@@ -38,7 +39,7 @@ const Login = () => {
     e.preventDefault();
     try {
       isLoading(true);
-      const response = await axios.post(`${url_dev}Login.php`, {
+      const response = await axios.post(`${url_dev2}Login.php`, {
         username,
         password,
       });
