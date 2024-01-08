@@ -89,6 +89,10 @@ html {
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
 }
 
+.bg-apply:hover {
+  cursor: pointer;
+}
+
 .bg-information {
   background-color: #3d5889;
   border-radius: 15px;
