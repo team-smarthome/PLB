@@ -152,12 +152,17 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           }
         });
 
+        // const inputType = data.cardtype;
+        // if (inputType.includes("CREDIT")) {
+        //   const cleanedType = inputType.replace(" CREDIT", "");
+        //   setType(cleanedType);
+        //   console.log("cleanedType: ", cleanedType);
+        // }
+
         const inputType = data.cardtype;
-        if (inputType.includes("CREDIT")) {
-          const cleanedType = inputType.replace(" CREDIT", "");
-          setType(cleanedType);
-          console.log("cleanedType: ", cleanedType);
-        }
+        const cleanedType = inputType.replace("Credit", "").trim();
+        const finalType = cleanedType === "Visa" ? cleanedType.toUpperCase() : cleanedType;
+        setType(finalType);
       }
       // const cardType = data.cardType;
       //   setType(cardType);
