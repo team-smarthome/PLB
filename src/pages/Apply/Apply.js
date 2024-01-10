@@ -534,7 +534,7 @@ useEffect(() => {
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
-      photoFace: sharedData.photoFace,
+      photoFace: sharedData.photoFace ? sharedData.photoFace : "",
       email: sharedData.email,
       postalCode: sharedData.postal_code,
       paymentMethod: shareDataPaymentProps.paymentMethod,
@@ -845,10 +845,21 @@ useEffect(() => {
         }, 5000);
       }
     } catch (err) {
-      // setMessageConfirm("Network / Card error / declined dll")
-      console.log("tahap error");
-      console.log(err);
-      throw err;
+      setCardPaymentProps({
+        isWaiting: false,
+        isCreditCard: false,
+        isPaymentCredit: false,
+        isPaymentCash: false,
+        isPrinted: false,
+        isSuccess: false,
+        isFailed: false,
+        isPyamentUrl: false,
+        isPhoto: true,
+        isDoRetake: false,
+      });
+      setIsEnableBack(false);
+      setIsEnableStep(false);
+      setDisabled(false);
     }
   };
 
