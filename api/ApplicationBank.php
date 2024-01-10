@@ -46,6 +46,7 @@ $photoPassport = (empty($_POST['photoPassport'])) ? trim($param_POST->photoPassp
 $photoFace = (empty($_POST['photoFace'])) ? trim($param_POST->photoFace) : trim($_POST['photoFace']);
 $email = (empty($_POST['email'])) ? trim($param_POST->email) : trim($_POST['email']);
 $paymentMethod = (empty($_POST['paymentMethod'])) ? trim($param_POST->paymentMethod) : trim($_POST['paymentMethod']);
+$postalCode = (empty($_POST['postalCode'])) ? trim($param_POST->postalCode) : trim($_POST['postalCode']);
 
 // Params body for cc
 $cc_no = (empty($_POST['cc_no'])) ? trim($param_POST->cc_no) : trim($_POST['cc_no']);
@@ -159,6 +160,7 @@ $bodyData = array(
     'email' => $email,
     'paymentMethod' => $paymentMethod,
     'payment' => $encryptedCard,
+    'postalCode' => $postalCode
 );
 
 
