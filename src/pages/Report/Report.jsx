@@ -76,11 +76,11 @@ function Report() {
     try {
       const res = await apiPaymentHistory(header, bodyParams);
   
-      if (res.data.message === "Invalid JWT Token") {
+      if (res.data.message === "Invalid JWT Token" || res.data.message === "Expired JWT Token") {
         isLoading(false);
         Swal.fire({
           icon: "error",
-          text: "Invalid JWT Token",
+          text:  `${res.data.message}`,
           confirmButtonColor: "#3d5889",
         }).then((result) => {
           if (result.isConfirmed) {
@@ -204,6 +204,7 @@ function Report() {
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
       confirmButtonColor: "#3D5889",
+      cancelButtonColor: "#d33",
     });
 
     if (result.isConfirmed) {

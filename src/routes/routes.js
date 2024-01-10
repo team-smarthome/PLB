@@ -26,19 +26,17 @@ const isAuthenticated = () => {
 
   if (isExpired) {
     // Clear localStorage if token is expired
+
     Swal.fire({
       icon: "error",
-      text: "Invalid JWT Token",
+      text: "Expired JWT Token",
       confirmButtonColor: "#3d5889",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("JwtToken");
-        localStorage.removeItem("cardNumberPetugas");
-        localStorage.removeItem("key");
-        localStorage.removeItem("token");
-      }
     });
+    localStorage.removeItem("user");
+    localStorage.removeItem("JwtToken");
+    localStorage.removeItem("cardNumberPetugas");
+    localStorage.removeItem("key");
+    localStorage.removeItem("token");
   }
 
   return !isExpired;

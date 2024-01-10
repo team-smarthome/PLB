@@ -11,7 +11,7 @@ const dataPaspor = {
   dateOfBirthMrz: "881204",
   docId: "PASSPORT KOREA",
   expiredDocumentFlag: "false",
-  expiryDate: "24-09-2030",
+  expiryDate: "24-09-2020",
   expiryDateMrz: "300924",
   optionalData1: "2932311V183659",
   optionalData2: "",

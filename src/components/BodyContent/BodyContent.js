@@ -33,6 +33,7 @@ const BodyContent = ({
     statusCardBox,
     capturedImage,
     emailUser,
+    postalCode,
     titleHeader,
     titleFooter,
   }) => {
@@ -40,12 +41,33 @@ const BodyContent = ({
       ...prevData,
       photoFace: capturedImage,
       email: emailUser,
+      postal_code : postalCode
     }));
 
     setTitleHeader(titleHeader);
     setTitleFooter(titleFooter);
     setCardStatus(statusCardBox);
   };
+
+
+  const handleDataFormCardPaymentStatus = ({
+    capturedImages,
+    isDoRetake,
+    isPhoto,
+  }) => {
+
+    setCardPaymentProps({
+      ...cardPaymentProps,
+      isDoRetake,
+      isPhoto,
+    });
+    
+    setSharedData((prevData) => ({
+      ...prevData,
+      photoFace: capturedImages,
+    }));
+  };
+
 
   //useeffect apakah dataNumberPermohonan ada isinya atau tidak
   useEffect(() => {
@@ -64,6 +86,8 @@ const BodyContent = ({
     isPrinted,
     isSuccess,
     isPyamentUrl,
+    isPhoto,
+    isDoRetake,
     paymentMethod,
     cardNumber,
     expiry,
@@ -80,6 +104,8 @@ const BodyContent = ({
       isPrinted,
       isSuccess,
       isPyamentUrl,
+      isPhoto,
+      isDoRetake,
     });
 
     setShareDataPaymentProps({
@@ -126,6 +152,7 @@ const BodyContent = ({
           <CardPayment
             {...cardPaymentProps}
             sendDataUpdatePayment={handleDataFormPaymentStatus}
+            sendDataPhotoPayment={handleDataFormCardPaymentStatus}
             dataUser={sharedData}
             dataNumberPermohonan={dataNumberPermohonan}
             FailedPesan={FailedMessage}

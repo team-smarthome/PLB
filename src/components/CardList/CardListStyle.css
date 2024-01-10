@@ -10,7 +10,7 @@ html {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .card-list-item {
@@ -19,6 +19,7 @@ html {
 }
 
 .number-badge {
+  height: 15px;
   background-color: #a3a9a5;
   width: 5%;
   font-size: 20px;
@@ -39,6 +40,7 @@ html {
   background-color: #a3a9a5;
   width: 100%;
   font-size: 20px;
+  height: 15px;
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
   padding: 1rem;

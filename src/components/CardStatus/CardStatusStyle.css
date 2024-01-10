@@ -89,6 +89,7 @@ p {
 }
 
 .ok-button {
+  cursor: pointer;
   background-color: #3d5889;
   border: 1px solid #3d5889;
   border-radius: 18px;
@@ -101,10 +102,12 @@ p {
 }
 
 .ok-button:hover {
+  cursor: pointer;
   background-color: #fbaf17;
 }
 
 .retake-button {
+  cursor: pointer;
   background-color: red;
   border: 1px solid red;
   border-radius: 18px;
@@ -117,6 +120,7 @@ p {
 }
 
 .retake-button:hover {
+  cursor: pointer;
   background-color: #fbaf17;
 }
 

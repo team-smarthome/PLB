@@ -9,6 +9,7 @@ import dataPasporUser from "../../utils/dataPaspor";
 import dataPasporImg from "../../utils/dataPhotoPaspor";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
+import Swal from "sweetalert2";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -30,7 +31,9 @@ const Apply = () => {
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const [meesageConfirm, setMessageConfirm] = useState("");
+  const [meesageConfirm, setMessageConfirm] = useState(
+    "Network / Card error / declined dll"
+  );
 
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
@@ -41,6 +44,8 @@ const Apply = () => {
     isWaiting: false,
     isFailed: false,
     isPyamentUrl: false,
+    isPhoto: false,
+    isDoRetake: false,
   });
 
   const [shareDataPaymentProps, setShareDataPaymentProps] = useState({
@@ -53,8 +58,48 @@ const Apply = () => {
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   let isCloseTimeoutSet = false;
+  const checkAndHandleTokenExpiration = () => {
+    const jwtToken = localStorage.getItem("JwtToken");
+    if (!jwtToken) {
+      // Token is not present, consider the user as not authenticated
+      return false;
+    }
+
+    const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
+    const expirationTime = decodedToken.exp * 1000;
+    const now = Date.now();
+    const isExpired = now > expirationTime;
+
+    return !isExpired;
+  };
+
+  // Contoh penggunaan di tempat lain
+  const handleTokenExpiration = () => {
+    const isTokenValid = checkAndHandleTokenExpiration();
+
+    if (!isTokenValid) {
+      // Token has expired, handle the expiration here
+      Swal.fire({
+        icon: "error",
+        text: "Expired JWT Token",
+        confirmButtonColor: "#3d5889",
+      }).then((result) => {
+        // If the user clicks "OK", clear localStorage
+        if (result.isConfirmed) {
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+        }
+      });
+    }
+  };
+
   const connectWebSocket = (ipAddress, socket_IO) => {
     //image2
+    handleTokenExpiration();
     if (ipAddress) {
       const socketURL = `ws://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
@@ -168,7 +213,6 @@ const Apply = () => {
       setCardNumberPetugas(cardNumberPetugas);
     }
   }, []);
-
 
   useEffect(() => {
     // Start Connect to Server Socket.IO
@@ -341,9 +385,43 @@ const Apply = () => {
     setIsEnableBack(false);
   };
 
+useEffect(() => {
+  if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
+    setIsEnableBack(true);
+  } else if (cardPaymentProps.isWaiting) {
+    setDisabled(true); 
+  } else if (cardPaymentProps.isDoRetake) {
+    setIsEnableStep(true);
+  } else if (cardPaymentProps.isPhoto) {
+    setIsEnableStep(false);
+  }
+}, [cardPaymentProps]);
+
+
   const btnOnClick_Back = () => {
     if (isEnableBack) {
-      navigate("/home");
+      if (cardPaymentProps.isPaymentCredit || cardPaymentProps.isPaymentCash) {
+        setCardPaymentProps({
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isWaiting: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+          isDoRetake: false,
+        });
+        setShareDataPaymentProps({
+          paymentMethod: "",
+          cardNumber: "",
+          expiry: "",
+          cvv: "",
+          type: "",
+        });
+      } else if (cardStatus === "iddle") {
+        navigate("/home");
+      }
     }
   };
 
@@ -355,11 +433,14 @@ const Apply = () => {
       } else if (cardStatus === "takePhotoSucces") {
         setCardStatus("inputEmail");
         setTabStatus(3);
-      } else if (titleFooter === "Payment") {
+      } else if (cardStatus === "emailSucces") {
+        setCardStatus("postalCode");
+        setTabStatus(4);
+      } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         console.log("sharedData: ", sharedData);
         setCardStatus("goPayment");
         setTitleHeader("Payment");
-        setDisabled(true);
+        // setDisabled(false);
       } else if (titleFooter === "Next Print") {
         setCardPaymentProps({
           isCreditCard: false,
@@ -370,6 +451,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
         setTimeout(() => {
           setCardPaymentProps({
@@ -380,14 +463,25 @@ const Apply = () => {
             isPrinted: false,
             isSuccess: true,
             isFailed: false,
+            isPhoto: false,
+            isDoRetake: false,
           });
           setStatusPaymentCredit(false);
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
         }, 3000);
+      } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
+        console.log("ini dijalankan")
+        doSaveRequestVoaPayment(sharedData);
       }
     }
   };
+
+  useEffect(() => {
+    if (cardStatus === "goPayment") {
+      setIsEnableStep(false);
+    }
+  }, [cardStatus]);
 
   const updateStatusPaymentCredit = (newstatusPaymentCredit) => {
     setStatusPaymentCredit(newstatusPaymentCredit);
@@ -442,6 +536,7 @@ const Apply = () => {
       photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
       photoFace: sharedData.photoFace,
       email: sharedData.email,
+      postalCode: sharedData.postal_code,
       paymentMethod: shareDataPaymentProps.paymentMethod,
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
@@ -453,6 +548,7 @@ const Apply = () => {
       airportId: airportId,
       jenisDeviceId: jenisDeviceId,
     };
+
     setIsEnableStep(false);
 
     try {
@@ -465,6 +561,8 @@ const Apply = () => {
         isSuccess: false,
         isFailed: false,
         isPyamentUrl: false,
+        isPhoto: false,
+        isDoRetake: false,
       });
       const res = await apiPaymentGateway(header, bodyParam);
       const data = res.data;
@@ -483,6 +581,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: true,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
       } else if (
         data.code === 200 &&
@@ -496,6 +596,8 @@ const Apply = () => {
           isPrinted: true,
           isSuccess: false,
           isFailed: false,
+          isPyamentUrl: false,
+          isPhoto: false,
         });
         setDisabled(true);
         setTimeout(() => {
@@ -507,6 +609,8 @@ const Apply = () => {
             isPrinted: false,
             isSuccess: true,
             isFailed: false,
+            isPyamentUrl: false,
+            isPhoto: false,
           });
           setStatusPaymentCredit(false);
           setRecievedTempData([]);
@@ -535,6 +639,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: true,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
         setTimeout(() => {
           if (messageError === "Passport is not from voa country.") {
@@ -552,6 +658,8 @@ const Apply = () => {
               isSuccess: false,
               isFailed: false,
               isPyamentUrl: false,
+              isPhoto: false,
+              isDoRetake: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -561,7 +669,7 @@ const Apply = () => {
               setIsEnableBack(true);
             }, 5000);
           } else if (
-            messageError === "Passport is not active for at least 6 months."
+            messageError === "Passport is not active for at least"
           ) {
             setDisabled(false);
             setTitleHeader("Apply VOA");
@@ -577,6 +685,8 @@ const Apply = () => {
               isSuccess: false,
               isFailed: false,
               isPyamentUrl: false,
+              isPhoto: false,
+              isDoRetake: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -600,6 +710,8 @@ const Apply = () => {
               isSuccess: false,
               isFailed: false,
               isPyamentUrl: false,
+              isPhoto: false,
+              isDoRetake: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -624,6 +736,8 @@ const Apply = () => {
               isSuccess: false,
               isFailed: false,
               isPyamentUrl: false,
+              isPhoto: false,
+              isDoRetake: false,
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
@@ -652,6 +766,8 @@ const Apply = () => {
                 isSuccess: false,
                 isFailed: false,
                 isPyamentUrl: false,
+                isPhoto: false,
+                isDoRetake: false,
               });
             }, 5000);
           } else if (messageError === "Invalid JWT Token") {
@@ -673,6 +789,8 @@ const Apply = () => {
                 isSuccess: false,
                 isFailed: false,
                 isPyamentUrl: false,
+                isPhoto: false,
+                isDoRetake: false,
               });
               navigate("/");
               localStorage.removeItem("user");
@@ -681,11 +799,7 @@ const Apply = () => {
               localStorage.removeItem("key");
               localStorage.removeItem("token");
             }, 5000);
-          } else if (messageError === "Required field 'photoFace' is missing") {
-            setDisabled(false);
-            setCardStatus("photoNotMatch");
-            setTitleFooter("Next Step");
-            setTabStatus(1);
+          } else if (messageError === "Required field 'photoFace' is missing" || messageError === "Face on the passport doesn't match with captured image.") {
             setCardPaymentProps({
               isWaiting: false,
               isCreditCard: false,
@@ -695,15 +809,15 @@ const Apply = () => {
               isSuccess: false,
               isFailed: false,
               isPyamentUrl: false,
+              isPhoto: true,
+              isDoRetake: false,
             });
-            setTimeout(() => {
-              setStatusPaymentCredit(false);
-              setCardStatus("iddle");
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-              setTitleHeader("Apply VOA");
-            }, 5000);
+            setIsEnableBack(false);
+            setIsEnableStep(false);
+            setDisabled(false);
+
+            //ubah nilai photoFace jadi null
+            sharedData.photoFace = "";
           } else {
             setTimeout(() => {
               setDisabled(false);
@@ -723,12 +837,15 @@ const Apply = () => {
                 isSuccess: false,
                 isFailed: false,
                 isPyamentUrl: false,
+                isPhoto: false,
+                isDoRetake: false,
               });
             }, 5000);
           }
         }, 5000);
       }
     } catch (err) {
+      // setMessageConfirm("Network / Card error / declined dll")
       console.log("tahap error");
       console.log(err);
       throw err;
@@ -752,6 +869,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
@@ -778,6 +897,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
@@ -802,6 +923,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
@@ -811,12 +934,7 @@ const Apply = () => {
           setIsEnableBack(true);
           setConfirm(false);
         }, 5000);
-      } else if (meesageConfirm === "Required field 'photoFace' is missing") {
-        setDisabled(false);
-        setTitleHeader("Apply VOA");
-        setCardStatus("photoNotMatch");
-        setTitleFooter("Next Step");
-        setTabStatus(1);
+      } else if (meesageConfirm === "Required field 'photoFace' is missing" || meesageConfirm === "Face on the passport doesn't match with captured image.") {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -826,15 +944,12 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
+          isPhoto: true,
+          isDoRetake: false,
         });
-        setTimeout(() => {
-          setStatusPaymentCredit(false);
-          setCardStatus("iddle");
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
-          setIsEnableBack(true);
-          setConfirm(false);
-        }, 5000);
+        setIsEnableBack(false);
+        setIsEnableStep(false);
+        setDisabled(false);
       } else {
         console.log("jalan gk ya??");
         setDisabled(false);
@@ -855,6 +970,8 @@ const Apply = () => {
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
         });
         setConfirm(false);
       }
