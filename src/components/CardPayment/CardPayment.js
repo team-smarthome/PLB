@@ -59,7 +59,7 @@ const CardPayment = ({
 
   const [cvv, setCvv] = useState("");
   const [type, setType] = useState("");
-  const [typeWarning, setTypeWarning] = useState(false);
+  // const [typeWarning, setTypeWarning] = useState(false);
   const [cvvWarning, setCvvWarning] = useState(false);
 
   const [seconds, setSeconds] = useState(8);
@@ -168,6 +168,30 @@ const CardPayment = ({
   };
 
   useEffect(() => {
+    
+    axios.get("http://10.20.68.82/molina-lte/api/TypeCard.php")
+    .then((res) => {
+      const responseData = res.data;
+  
+      if (responseData && responseData.status === 200 && responseData.data && Array.isArray(responseData.data)) {
+        const creditTypes = responseData.data.map((item) => {
+          return {
+            value: item.value,
+            label: item.label,
+          };
+        });
+  
+        setOptionCreditTypes(creditTypes);
+      } else {
+        console.error("Invalid or unexpected API response format");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+  }, []);
+
+  useEffect(() => {
     socket.on("connected", (message) => {
       console.log("connected client to server");
     });
@@ -212,37 +236,6 @@ const CardPayment = ({
         console.log("inputType: ", inputType);
 
 
-        axios.get("http://10.20.68.82/molina-lte/api/TypeCard.php")
-        .then((res) => {
-          const responseData = res.data;
-      
-          if (responseData && responseData.status === 200 && responseData.data && Array.isArray(responseData.data)) {
-            const creditTypes = responseData.data.map((item) => {
-              return {
-                value: item.value,
-                label: item.label,
-              };
-            });
-      
-            setOptionCreditTypes(creditTypes);
-          } else {
-            console.error("Invalid or unexpected API response format");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-      
-        console.log("creditTypes: ", optionCreditTypes)
-        
-        // const creditTypes = [
-        //   { value: "VISA", label: "VISA" },
-        //   { value: "MASTERCARD", label: "MASTERCARD" },
-        //   { value: "JCB", label: "JCB" },
-        //   { value: "AMEX", label: "AMEX" },
-        // ];
-
-        // setOptionCreditTypes(creditTypes);
       }
       console.log("data: ", data);
     });
@@ -519,11 +512,11 @@ const CardPayment = ({
     }
   }, [cvv]);
 
-  useEffect(() => {
-    if (type !== "") {
-      setTypeWarning(false);
-    }
-  }, [type]);
+  // useEffect(() => {
+  //   if (type !== "") {
+  //     setTypeWarning(false);
+  //   }
+  // }, [type]);
 
   useEffect(() => {
     if (seconds === 0) {
@@ -651,14 +644,11 @@ const CardPayment = ({
       setExpiryWarning(true);
     } else if (cvv === "") {
       setCvvWarning(true);
-    } else if (type === "") {
-      setTypeWarning(true);
     } else {
       // SweetAlert dialog and further actions
       setCvvWarning(false);
       setCardNumberWarning(false);
       setExpiryWarning(false);
-      setTypeWarning(false);
       Swal.fire({
         title: "Are you sure want to Pay?",
         icon: "question",
@@ -1099,9 +1089,9 @@ const CardPayment = ({
                             }),
                           }}
                         />
-                        {typeWarning && (
+                        {/* {typeWarning && (
                           <div className="warning">Please enter Card Type!</div>
-                        )}
+                        )} */}
                       </div>
                     </div>
                     <div className="credit-card-value2">
