@@ -2,7 +2,7 @@ import React from "react";
 import "./CardListStyle.css";
 
 const CardList = ({ status }) => {
-  const listData = ["Scan Passport", "Take Photo", "Input Email"];
+  const listData = ["Scan Passport", "Take Photo", "Input Email", "Postal Code"];
 
   return (
     <ul className="card-list-container">

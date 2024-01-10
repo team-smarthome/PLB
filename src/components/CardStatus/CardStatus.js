@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import "./CardStatusStyle.css";
 
@@ -8,6 +8,11 @@ import Gambar3 from "../../assets/images/image-3.svg";
 import Gambar4 from "../../assets/images/image-4.svg";
 import Gambar6 from "../../assets/images/image-6.svg";
 import Gambar7 from "../../assets/images/image-7.svg";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import dataKodePos from "../../utils/dataKodePos";
+import { Label } from "flowbite-react";
+import Select from "react-select";
 
 const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -17,10 +22,58 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const [isValidEmailConfirmation, setIsValidEmailConfirmation] =
     useState(true);
   const [emailConfirmWarning, setEmailConfirmWarning] = useState(false);
+  const [postalCodeWarning, setPostalCodeWarning] = useState(false);
   const [emailWarning, setEmailWarning] = useState(false);
   const webcamRef = useRef(null);
   const [titleWarning, setTitleWarning] = useState("");
-  
+  const navigate = useNavigate();
+  const [selectedKabupaten, setSelectedKabupaten] = useState(null);
+  const [kodePos, setKodePos] = useState("");
+
+  const kabupatenOptions = dataKodePos.data.map((item) => ({
+    value: item.kabupaten,
+    label: item.kabupaten,
+  }));
+
+  const checkAndHandleTokenExpiration = () => {
+    const jwtToken = localStorage.getItem("JwtToken");
+    if (!jwtToken) {
+      // Token is not present, consider the user as not authenticated
+      return false;
+    }
+
+    const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
+    const expirationTime = decodedToken.exp * 1000;
+    const now = Date.now();
+    const isExpired = now > expirationTime;
+
+    return !isExpired;
+  };
+
+  // Contoh penggunaan di tempat lain
+  const handleTokenExpiration = () => {
+    const isTokenValid = checkAndHandleTokenExpiration();
+
+    if (!isTokenValid) {
+      // Token has expired, handle the expiration here
+      Swal.fire({
+        icon: "error",
+        text: "Expired JWT Token",
+        confirmButtonColor: "#3d5889",
+      }).then((result) => {
+        // If the user clicks "OK", clear localStorage
+        if (result.isConfirmed) {
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+        }
+      });
+    }
+  };
+
   const capture = () => {
     const imageSrc = webcamRef.current.getScreenshot();
     setCapturedImage(imageSrc);
@@ -57,7 +110,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
     setEmailConfirmation(event.target.value);
     setEmailConfirmWarning(false);
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    setIsValidEmailConfirmation(emailRegex.test(event.target.value)); 
+    setIsValidEmailConfirmation(emailRegex.test(event.target.value));
   };
 
   const handleOkButtonClick = () => {
@@ -81,17 +134,56 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
       setTitleWarning("Please enter a valid email address confirmation!");
       setEmailConfirmWarning(true);
       return;
-    }
-    else {
+    } else {
       sendDataToInput({
         statusCardBox: "emailSucces",
         emailUser: email,
         capturedImage: capturedImage,
         titleHeader: "Apply VOA",
-        titleFooter: "Payment",
+        titleFooter: "Next Step",
       });
     }
   };
+
+  const handleKabupatenChange = (selectedOption) => {
+    setSelectedKabupaten(selectedOption);
+  };
+
+  const handleButtonClickPostalCode = () => {
+
+    if (!selectedKabupaten) {
+      setTitleWarning("Please select your city!");
+      setPostalCodeWarning(true);
+      return;
+    } else {
+      sendDataToInput({
+        statusCardBox: "postalCodeSucces",
+        emailUser: email,
+        postalCode: kodePos,
+        capturedImage: capturedImage,
+        titleHeader: "Apply VOA",
+        titleFooter: "Payment",
+      });
+    }
+
+  };
+
+  useEffect(() => {
+    // Cari data kode pos berdasarkan kabupaten yang dipilih
+    if (selectedKabupaten) {
+      const selectedKabupatenData = dataKodePos.data.find(
+        (item) => item.kabupaten === selectedKabupaten.value
+      );
+
+      if (selectedKabupatenData) {
+        setKodePos(selectedKabupatenData.kode_pos);
+      }
+    }
+  }, [selectedKabupaten]);
+
+  useEffect(() => {
+    handleTokenExpiration();
+  }, [capturedImage, doRetake, email, emailConfirmation]);
 
   const renderCardContent = () => {
     switch (statusCardBox) {
@@ -108,12 +200,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 onChange={handleEmailChange}
               />
             </div>
-            {emailWarning && (
-              <div className="warning">{titleWarning}</div>
-            )}
+            {emailWarning && <div className="warning">{titleWarning}</div>}
             <div className="input-email">
               <input
-              style={{marginTop: "5%"}}
+                style={{ marginTop: "5%" }}
                 type="text"
                 name="email-confirmation"
                 placeholder="Email Confirmation"
@@ -121,14 +211,72 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
               />
             </div>
             {emailConfirmWarning && (
-              <div className="warning">
-                {titleWarning}
-              </div>
+              <div className="warning">{titleWarning}</div>
             )}
             <button
               type="button"
               className="ok-button"
               onClick={handleOkButtonClick}
+            >
+              OK
+            </button>
+          </>
+        );
+
+      case "postalCode":
+        return (
+          <>
+            <h1 className="card-title" style={{
+              marginBottom: "8%"
+            }}>Please Input Your City</h1>
+            <div className="input-email">
+              <Select
+                value={selectedKabupaten}
+                onChange={handleKabupatenChange}
+                options={kabupatenOptions}
+                className="basic-single"
+                classNamePrefix="select"
+                styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "50vh",
+                  maxHeight: "30px",
+                  borderRadius: "500px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                  marginBottom: "15%",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+              }}
+              />
+            </div>
+            <div className="input-email" style={{marginBottom: "4%"}}>
+              <input
+                type="text"
+                name="postal-code"
+                placeholder="Postal Code"
+                value={kodePos}
+                readOnly
+                disabled
+              />
+            </div>
+            {postalCodeWarning && (
+              <div className="warning">{titleWarning}</div>
+            )}
+            <button
+              type="button"
+              className="ok-button"
+              onClick={handleButtonClickPostalCode}
             >
               OK
             </button>
@@ -239,6 +387,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
       case "takePhotoSucces":
         return Gambar7;
       case "emailSucces":
+      case "postalCodeSucces":
         return Gambar2;
       case "errorConnection":
         return Gambar1;
@@ -267,6 +416,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         return ["Please Input Your Email Address", "VOA will be sent to email"];
       case "emailSucces":
         return ["Email Successfully Saved"];
+      case "postalCodeSucces":
+        return ["Postal Code Successfully Saved"];
       case "photoNotMatch":
         return ["Face Paspor and", "photo not Match"];
       case "errorConnection":

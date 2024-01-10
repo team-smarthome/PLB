@@ -28,6 +28,7 @@
   align-items: center;
   color: #fff;
   height: 50px;
+  cursor: pointer;
 }
 
 .bg-back {

@@ -19,8 +19,6 @@ const io = socketIo(server, {
 });
 const { networkInterfaces } = require("os");
 
-
-
 function splitAFL(dataHex) {
   const chunks = dataHex.match(/.{1,8}/g) || [];
   return chunks;
@@ -113,9 +111,17 @@ devices.on("device-activated", (event) => {
         tlv = TLV.parse(res);
         let temp = tlv.find("50");
         cardtype = hex2ascii("0x" + temp.value);
+        console.log("cardtype", cardtype);
         data.cardtype = cardtype;
         pdol = tlv.find("9f38");
-        if (pdol) {
+        if (pdol && cardtype.includes("Debit")) {
+          return application.issueCommand(
+            new CommandApdu({
+              // set this bytes to send data 500k idr + 19,5k idr for visa on arrival proposal
+              bytes: [0x80, 0xa8, 0x00, 0x00, 0x04, 0x83, 0x02, 0x69, 0x64],
+            })
+          );
+        } else if (pdol) {
           console.log("PDOL found");
           return application.issueCommand(
             new CommandApdu({
@@ -140,7 +146,7 @@ devices.on("device-activated", (event) => {
         }
       })
       .then((response) => {
-        console.info(`GPO Response: '${response}' '${response.meaning()}'`);
+        console.info(`GPO Response: '${response} '${response.meaning()}'`);
         res = response.data;
         tlv = TLV.parse(res);
         let cc = tlv.find("57");
@@ -160,9 +166,12 @@ devices.on("device-activated", (event) => {
           // console.log("afl: ", afl);
 
           const aflChunks = splitAFL(afl);
+          console.log("afl: ", aflChunks);
 
           const substringChunk = aflChunks[0].substring(0, 2);
           const decimalValue = parseInt(substringChunk, 16);
+          console.log(substringChunk);
+
           let p1 = aflChunks[0].substring(2, 4);
           let p2 = aflChunks[0].substring(4, 6);
           const updatedDecimalValue = decimalValue + 4;
@@ -171,8 +180,8 @@ devices.on("device-activated", (event) => {
             .padStart(2, "0");
           console.log(
             `[=] ${1}: ${substringChunk} ${
-              aflChunks[1]
-            } SFI: ${updatedHexValue} P1 ${p1} P2 ${p2}`
+              aflChunks[0]
+            } SFI: ${updatedHexValue} P1: ${p1} P2: ${p2}`
           );
           return application.issueCommand(
             new CommandApdu({
@@ -200,7 +209,7 @@ devices.on("device-activated", (event) => {
           console.log(
             `[=] ${1}: ${substringChunk} ${
               aflChunks[1]
-            } SFI: ${updatedHexValue} P1 ${p1} P2 ${p2}`
+            } SFI: ${updatedHexValue} P1: ${p1} P2: ${p2}`
           );
           return application.issueCommand(
             new CommandApdu({
@@ -216,21 +225,50 @@ devices.on("device-activated", (event) => {
           if (isGPO === 77) {
             res = response.data;
             tlv = TLV.parse(res);
-            ccnum = tlv.find("5a").value;
-            expdate = tlv.find("5f24").value;
-            console.table(data);
-            data.ccnum = ccnum;
-            data.expdate = expdate;
-            sendServertoClient(data);
+            if (data.cardtype.includes("NSICCS")) {
+              console.log("response NSICCS: ", response);
+              let tlvFindCartType = tlv.find("5f20");
+              console.log("tlvFindCartType", tlvFindCartType.value);
+              let cc = tlv.find("57");
+              const ccnum = cc.value.slice(0, 16);
+              const expdate = cc.value.slice(17, 21);
+              data.ccnum = ccnum;
+              data.expdate = expdate;
+              let temp = hex2ascii("0x" + tlvFindCartType.value);
+              const cardVisa = temp.match(/\bVISA\b/g);
+              const cardMastercard = temp.match(/\bMastercard\b/g);
+              const cardJCB = temp.match(/\bJCB\b/g);
+              const cardGPN = temp.match(/\bGPN\b/g);
+              if (cardVisa) {
+                data.cardtype = cardVisa[0];
+              } else if (cardMastercard) {
+                data.cardtype = cardMastercard[0];
+              } else if (cardJCB) {
+                data.cardtype = cardJCB[0];
+              } else if (cardGPN) {
+                data.cardtype = cardGPN[0];
+              } else {
+                data.cardtype = "";
+              }
+              console.table(data);
+              sendServertoClient(data);
+            } else {
+              ccnum = tlv.find("5a").value;
+              expdate = tlv.find("5f24").value;
+              data.ccnum = ccnum;
+              data.expdate = expdate;
+              console.table(data);
+              sendServertoClient(data);
+            }
           } else if (isGPO === 80) {
             res = response.data;
             tlv = TLV.parse(res);
             let cc = tlv.find("57");
             ccnum = cc.value.slice(0, 16);
             expdate = cc.value.slice(17, 21);
-            console.table(data);
             data.ccnum = ccnum;
             data.expdate = expdate;
+            console.table(data);
             sendServertoClient(data);
           }
         }
@@ -311,5 +349,5 @@ function getWifiResults() {
     wifiResults.ipAddressV4 = ipAddressV4 || "No local IP found";
   }
 
-  return wifiResults;
+  return wifiResults;
 }

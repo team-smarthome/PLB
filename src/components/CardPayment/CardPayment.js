@@ -13,6 +13,7 @@ import io from "socket.io-client";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { Toast } from "../Toast/Toast";
+import Webcam from "react-webcam";
 
 const socket = io("http://localhost:4499");
 
@@ -27,16 +28,20 @@ const CardPayment = ({
   isWaiting,
   isSuccess,
   isPyamentUrl,
-  cardNumberPetugas,
+  isPhoto,
+  isDoRetake,
   sendDataUpdatePayment,
   dataUser,
   confirm,
   dataNumberPermohonan,
   FailedPesan,
   statusPaymentCredit,
+  sendDataPhotoPayment,
 }) => {
   const navigate = useNavigate();
   const printRef = useRef();
+  const webcamRef = useRef(null);
+  const [capturedImages, setCapturedImages] = useState(null);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -53,37 +58,60 @@ const CardPayment = ({
 
   const [cvv, setCvv] = useState("");
   const [type, setType] = useState("");
+  const [typeWarning, setTypeWarning] = useState(false);
   const [cvvWarning, setCvvWarning] = useState(false);
 
   const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
   const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
-  const [failedMessage, setFailedMessage] = useState("Network / Card error / declined dll");
+  const [failedMessage, setFailedMessage] = useState(
+    "Network / Card error / declined dll"
+  );
 
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
   const [url, setUrl] = useState("");
 
   //price
-const { fee, fee_cash, value } = JSON.parse(localStorage.getItem('price')) ?? { fee: "0", fee_cash: "0", value: "0.0000" };
+  const { fee, fee_cash, value } = JSON.parse(
+    localStorage.getItem("price")
+  ) ?? { fee: "0", fee_cash: "0", value: "0.0000" };
 
-const formattedNumber = (num) => parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
+  const formattedNumber = (num) =>
+    parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
 
-const numericValue = parseFloat(value);
-const numericFee = parseFloat(fee);
-const numericFeeCash = parseFloat(fee_cash);
+  const numericValue = parseFloat(value);
+  const numericFee = parseFloat(fee);
+  const numericFeeCash = parseFloat(fee_cash);
 
-const formattedFees = formattedNumber(numericFee);
-const formattedFee = formattedNumber(fee);
-const formattedFeeCash = formattedNumber(numericFeeCash);
-const formattedValue = formattedNumber(numericValue);
-const formattedTotal = formattedNumber(numericValue + numericFee);
-const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
+  const formattedFees = formattedNumber(numericFee);
+  const formattedFee = formattedNumber(fee);
+  const formattedFeeCash = formattedNumber(numericFeeCash);
+  const formattedValue = formattedNumber(numericValue);
+  const formattedTotal = formattedNumber(numericValue + numericFee);
+  const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
 
   //cardNumberPetugass
   const cardNumberPetugass = "11" + localStorage.getItem("deviceId");
 
-  
+  const capture = () => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setCapturedImages(imageSrc);
+
+    sendDataPhotoPayment({
+      isDoRetake: true,
+      isPhoto: false,
+      capturedImages: imageSrc,
+    });
+  };
+
+  const doRetake = () => {
+    sendDataPhotoPayment({
+      isDoRetake: false,
+      isPhoto: true,
+      capturedImages: null,
+    });
+  };
 
   // const handleLogin = () => {
   //   if (username === 'user' && password === 'password') {
@@ -97,28 +125,44 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
     content: () => printRef.current,
   });
 
-  // console.table({
-  //   isCreditCard,
-  //   isPaymentCredit,
-  //   isPaymentCash,
-  //   isWaiting,
-  //   isFailed,
-  //   isPrinted,
-  //   isSuccess,
-  //   isPyamentUrl,
-  //   paymentMethod,
-  //   cardNumber,
-  //   expiry,
-  //   cvv,
-  //   type,
-  // });
+  const checkAndHandleTokenExpiration = () => {
+    const jwtToken = localStorage.getItem("JwtToken");
+    if (!jwtToken) {
+      // Token is not present, consider the user as not authenticated
+      return false;
+    }
 
+    const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
+    const expirationTime = decodedToken.exp * 1000;
+    const now = Date.now();
+    const isExpired = now > expirationTime;
 
-  //useEffect cardNumberPetugas
-  // useEffect(() => {
-  //   setCardNumber(cardNumberPetugas);
-  //   console.log("cardNumberPetugasUseFfect: ", cardNumberPetugas);
-  // }, [cardNumberPetugas]);
+    return !isExpired;
+  };
+
+  // Contoh penggunaan di tempat lain
+  const handleTokenExpiration = () => {
+    const isTokenValid = checkAndHandleTokenExpiration();
+
+    if (!isTokenValid) {
+      // Token has expired, handle the expiration here
+      Swal.fire({
+        icon: "error",
+        text: "Expired JWT Token",
+        confirmButtonColor: "#3d5889",
+      }).then((result) => {
+        // If the user clicks "OK", clear localStorage
+        if (result.isConfirmed) {
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     socket.on("connected", (message) => {
@@ -152,28 +196,36 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           }
         });
 
-        // const inputType = data.cardtype;
-        // if (inputType.includes("CREDIT")) {
-        //   const cleanedType = inputType.replace(" CREDIT", "");
-        //   setType(cleanedType);
-        //   console.log("cleanedType: ", cleanedType);
-        // }
-
         const inputType = data.cardtype;
-        const cleanedType = inputType.replace("Credit", "").trim();
-        const finalType = cleanedType === "Visa" ? cleanedType.toUpperCase() : cleanedType;
+        const capitalizedType = inputType.toLowerCase().toUpperCase();
+        const cleanedType = capitalizedType.replace("CREDIT", "").trim();
+        const finalType = cleanedType === "Visa" ? "VISA" : cleanedType === "Mastercard" ? "MASTERCARD" : cleanedType;
         setType(finalType);
+        console.log("inputType: ", inputType);
       }
-      // const cardType = data.cardType;
-      //   setType(cardType);
-      // }
       console.log("data: ", data);
     });
   }, []);
 
+  console.table({
+    isCreditCard,
+    isPaymentCredit,
+    isPaymentCash,
+    isWaiting,
+    isFailed,
+    isPrinted,
+    isSuccess,
+    isPyamentUrl,
+    paymentMethod,
+    cardNumber,
+    expiry,
+    cvv,
+    type,
+  });
+
   useEffect(() => {
     // ini jika semua false
-    if (paymentMethod && cardNumber !== "" && expiry !== "") {
+    if (paymentMethod && cardNumber !== "" && expiry !== "" && type !== "") {
       if (
         !isFailed &&
         !isWaiting &&
@@ -182,6 +234,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
         !isPaymentCredit &&
         !isPaymentCash &&
         !isPyamentUrl &&
+        !isPhoto &&
+        !isDoRetake &&
         isCreditCard
       ) {
         sendDataUpdatePayment({
@@ -193,13 +247,18 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           isPaymentCredit: true,
           isPaymentCash: false,
           isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
           paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
           cvv: cvv,
           type: type,
         });
-
+        setCardNumber("");
+        setExpiry("");
+        setCvv("");
+        setType("");
         setDataPasporUser(dataUser);
         setDataPermohonanUser(dataNumberPermohonan);
       }
@@ -213,6 +272,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           !isPaymentCredit &&
           !isPaymentCash &&
           !isPyamentUrl &&
+          !isPhoto &&
+          !isDoRetake &&
           isCreditCard
         ) {
           sendDataUpdatePayment({
@@ -224,6 +285,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
             isPaymentCredit: true,
             isPaymentCash: false,
             isPyamentUrl: false,
+            isPhoto: false,
+            isDoRetake: false,
             paymentMethod: paymentMethod,
             cardNumber: cardNumber,
             expiry: expiry,
@@ -234,7 +297,7 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
-      }, 8000);
+      }, 3000);
     }
   }, [
     paymentMethod,
@@ -250,6 +313,10 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
     isSuccess,
     isPyamentUrl,
     isCreditCard,
+    isPaymentCredit,
+    isPaymentCash,
+    isDoRetake,
+    isPhoto,
     sendDataUpdatePayment,
   ]);
 
@@ -281,6 +348,9 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           isSuccess: true,
           isPyamentUrl: false,
           isPaymentCredit: false,
+          isPaymentCash: false,
+          isPhoto: false,
+          isDoRetake: false,
           paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
@@ -305,6 +375,9 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
     isCreditCard,
     isPyamentUrl,
     isPaymentCredit,
+    isPaymentCash,
+    isPhoto,
+    isDoRetake,
     sendDataUpdatePayment,
     handlePrint,
   ]);
@@ -322,6 +395,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
       !isPaymentCredit &&
       !isPaymentCash &&
       !isCreditCard &&
+      !isPhoto &&
+      !isDoRetake &&
       isPyamentUrl
     ) {
       console.log("dataPermohonanUser: ", dataNumberPermohonan);
@@ -346,6 +421,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
     isSuccess,
     isCreditCard,
     isPyamentUrl,
+    isPhoto,
+    isDoRetake,
     isPaymentCredit,
     sendDataUpdatePayment,
   ]);
@@ -360,6 +437,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
       !isPaymentCredit &&
       !isPaymentCash &&
       !isCreditCard &&
+      !isPhoto &&
+      !isDoRetake &&
       !isPyamentUrl
     ) {
       const timer = setInterval(() => {
@@ -377,7 +456,34 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
     isPaymentCash,
     isCreditCard,
     isPyamentUrl,
+    isPhoto,
+    isDoRetake,
   ]);
+
+  useEffect(() => {
+    if (cardNumber !== "") {
+      setCardNumberWarning(false);
+    }
+  }, [cardNumber]);
+
+
+  useEffect(() => {
+    if (expiry !== "") {
+      setExpiryWarning(false);
+    }
+  }, [expiry]);
+
+  useEffect(() => {
+    if (cvv !== "") {
+      setCvvWarning(false);
+    }
+  }, [cvv]);
+
+  useEffect(() => {
+    if (type !== "") {
+      setTypeWarning(false);
+    }
+  }, [type]);
 
   useEffect(() => {
     if (seconds === 0) {
@@ -385,26 +491,26 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
     }
   }, [navigate, seconds]);
 
-
   // useEffect jika isFailed true, maka setFailedMessage dengan FailedMessage
   useEffect(() => {
     if (isFailed) {
       if (FailedPesan === "Invalid JWT Token") {
-        setFailedMessage("please re-login and re-scan passport.")
-      } else if(FailedPesan === undefined || FailedPesan === null || FailedPesan === "") {
-        setFailedMessage("Network / Card error / declined dll")
+        setFailedMessage("please re-login and re-scan passport.");
+      } else if (
+        FailedPesan === "Network / Card error / declined dll" ||
+        failedMessage === ""
+      ) {
+        setFailedMessage("Network / Card error / declined dll");
       } else {
         setFailedMessage(FailedPesan);
       }
     }
   }, [FailedPesan, isFailed]);
 
-
-  useEffect(()=> {
+  useEffect(() => {
     setFailedMessage(FailedPesan);
     console.log("failedMessage cardPayment: ", failedMessage);
   }, [FailedPesan, failedMessage]);
-
 
   const handleExpiryChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
@@ -436,6 +542,7 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
   };
 
   const handlePaymentCredit = () => {
+    handleTokenExpiration();
     setPaymentMethod("KIOSK");
     console.log("berhasil");
     sendDataUpdatePayment({
@@ -446,6 +553,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
       isCreditCard: true,
       isPyamentUrl: false,
       isPaymentCredit: false,
+      isPhoto: false,
+      isDoRetake: false,
       paymentMethod: paymentMethod,
       cardNumber: cardNumber,
       expiry: expiry,
@@ -455,6 +564,7 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
   };
 
   const handlePaymentCash = () => {
+    handleTokenExpiration();
     setPaymentMethod("KICASH");
     setExpiry("00/00");
     setCvv("000");
@@ -472,6 +582,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
       isPyamentUrl: false,
       isPaymentCredit: false,
       isPaymentCash: true,
+      isPhoto: false,
+      isDoRetake: false,
       paymentMethod: paymentMethod,
       cardNumber: cardNumber,
       expiry: expiry,
@@ -479,8 +591,6 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
       type: type,
     });
   };
-
-
 
   const handleBackHome = () => {
     navigate("/home");
@@ -492,30 +602,33 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
   };
 
   const handleSubmit = (e) => {
+    handleTokenExpiration();
     e.preventDefault();
 
-    Swal.fire({
-      title: "Are you sure want to Pay?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#3D5889",
-      cancelButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Jika pengguna mengklik tombol "Yes"
-
-        if (cardNumber === "") {
-          setCardNumberWarning(true);
-        } else if (expiry === "") {
-          setExpiryWarning(true);
-        } else if (cvv === "") {
-          setCvvWarning(true);
-        } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
-          setCardNumberWarning(false);
-          setExpiryWarning(false);
-          setCvvWarning(false);
+    if (cardNumber === "") {
+      setCardNumberWarning(true);
+    } else if (expiry === "") {
+      setExpiryWarning(true);
+    } else if (cvv === "") {
+      setCvvWarning(true);
+    } else if (type === "") {
+      setTypeWarning(true);
+    } else {
+      // SweetAlert dialog and further actions
+      setCvvWarning(false);
+      setCardNumberWarning(false);
+      setExpiryWarning(false);
+      setTypeWarning(false);
+      Swal.fire({
+        title: "Are you sure want to Pay?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#3D5889",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        if (result.isConfirmed) {
           const card_data = {
             cc_no: cardNumber,
             cc_exp: expiry,
@@ -548,20 +661,24 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
             isFailed: false,
             isPrinted: false,
             isSuccess: false,
+            isPhoto: false,
+            isDoRetake: false,
             paymentMethod: paymentMethod,
             cardNumber: cardNumber,
             expiry: expiry,
             cvv: cvv,
             type: type,
           });
+
           const newStatusPaymentCreditCard = !statusPaymentCredit;
           onStatusChange(newStatusPaymentCreditCard);
         }
-      }
-    });
+      });
+    }
   };
 
   const handleSubmitKICASH = () => {
+    handleTokenExpiration();
     isLoading(false);
     console.log("dataPasporUser1: ", dataPasporUser);
     // e.preventDefault();
@@ -611,6 +728,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
         isFailed: false,
         isPrinted: false,
         isSuccess: false,
+        isPhoto: false,
+        isDoRetake: false,
         paymentMethod: paymentMethod,
         cardNumber: cardNumber,
         expiry: expiry,
@@ -635,10 +754,14 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
       );
 
       console.log("response KICASH", response);
-        const localKey = localStorage.getItem("key");
-        const localToken = localStorage.getItem("token");
+      const localKey = localStorage.getItem("key");
+      const localToken = localStorage.getItem("token");
 
-      if (response.data.status === "success" && response.data.profile.api.key === localStorage.getItem("key") && response.data.profile.api.token === localStorage.getItem("token")){
+      if (
+        response.data.status === "success" &&
+        response.data.profile.api.key === localStorage.getItem("key") &&
+        response.data.profile.api.token === localStorage.getItem("token")
+      ) {
         isLoading(false);
         console.log(response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
@@ -654,6 +777,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           isPrinted: false,
           isSuccess: false,
           isWaiting: true,
+          isPhoto: false,
+          isDoRetake: false,
           paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
@@ -661,7 +786,11 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           type: type,
         });
         handleSubmitKICASH();
-      } else if (response.data.status === "success" && response.data.profile.api.key !== localStorage.getItem("key") && response.data.profile.api.token !== localStorage.getItem("token")) {
+      } else if (
+        response.data.status === "success" &&
+        response.data.profile.api.key !== localStorage.getItem("key") &&
+        response.data.profile.api.token !== localStorage.getItem("token")
+      ) {
         isLoading(false);
         Swal.fire({
           icon: "error",
@@ -676,6 +805,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           isPyamentUrl: false,
           isPaymentCredit: false,
           isPaymentCash: true,
+          isPhoto: false,
+          isDoRetake: false,
           paymentMethod: paymentMethod,
           cardNumber: cardNumber,
           expiry: expiry,
@@ -702,6 +833,8 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
         isPyamentUrl: false,
         isPaymentCredit: false,
         isPaymentCash: true,
+        isPhoto: false,
+        isDoRetake: false,
         paymentMethod: paymentMethod,
         cardNumber: cardNumber,
         expiry: expiry,
@@ -756,11 +889,6 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
                 type: type,
               });
               handleLogin(username, password);
-              // Swal.fire({
-              //   title: 'Please wait...',
-              //   // allowOutsideClick: () => !Swal.isLoading(),
-              //   showConfirmButton: false,
-              // });
             } else {
               Swal.fire("Please enter username and password");
             }
@@ -768,64 +896,6 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
         });
       }
     });
-
-    // console.log("dataPasporUser1: ", dataPasporUser);
-    // e.preventDefault();
-    // console.log("dataPasporUser2: ", dataPasporUser);
-    // setCardNumber(cardNumberPetugas);
-    // if (cardNumber === "") {
-    //   setCardNumberWarning(true);
-    // } else if (expiry === "") {
-    //   setExpiryWarning(true);
-    // } else if (cvv === "") {
-    //   setCvvWarning(true);
-    // } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
-    //   setCardNumberWarning(false);
-    //   setExpiryWarning(false);
-    //   setCvvWarning(false);
-    //   const card_data = {
-    //     cc_no: cardNumber,
-    //     cc_exp: expiry,
-    //     cvv: cvv,
-    //     type: type,
-    //   };
-
-    //   const bill_data = {
-    //     billing_id: "",
-    //     amount: "",
-    //     currency: "",
-    //   };
-
-    //   const user_data = {
-    //     pass_no: dataPasporUser.passportData.docNumber,
-    //     pass_name: dataPasporUser.passportData.fullName,
-    //     country: dataPasporUser.passportData.nationality,
-    //   };
-
-    //   console.log("dataPasporUser: ", dataPasporUser);
-
-    //   const dataParam = {
-    //     card_data: { ...card_data },
-    //     bill_data: { ...bill_data },
-    //     user_data: { ...user_data },
-    //   };
-
-    //   console.log("dataParam: ", dataParam);
-    //   sendDataUpdatePayment({
-    //     isWaiting: false,
-    //     isConfirm: false,
-    //     isFailed: false,
-    //     isPrinted: false,
-    //     isSuccess: false,
-    //     paymentMethod: paymentMethod,
-    //     cardNumber: cardNumber,
-    //     expiry: expiry,
-    //     cvv: cvv,
-    //     type: type,
-    //   });
-    //   const newStatusPaymentCreditCard = !statusPaymentCredit;
-    //   onStatusChange(newStatusPaymentCreditCard);
-    // }
   };
 
   console.log(url);
@@ -853,7 +923,11 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
               "Confirmation Payment - Cash"
             ) : isWaiting ? (
               ""
-            ) : isPyamentUrl ? null : (
+            ) : isPhoto ? (
+              "Please look at camera"
+            ) : isDoRetake ? (
+              "Take Photo Success"
+            ) : (
               "Chose payment method"
             )}
           </h1>
@@ -892,7 +966,12 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
           ) : isFailed ? (
             <div className="isfailed-payment">
               <div className="isfailed-payment2">
-                <h3>Reason Failed : {failedMessage}</h3>
+                <h3>
+                  Reason Failed :{" "}
+                  {failedMessage
+                    ? failedMessage
+                    : "Network / Card error / declined"}
+                </h3>
               </div>
               <img src={Failed} alt="" className="card-image-issuccess1" />
               <div className="form-group-payment-submit1">
@@ -919,7 +998,7 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
                       <input type="text" value={`Rp. ${formattedValue}`} />
                     </div>
                     <div className="amount-box2">
-                      <input type="text"value={`Rp. ${formattedFee}`} />
+                      <input type="text" value={`Rp. ${formattedFee}`} />
                     </div>
                     <div className="amount-box3">
                       <input type="text" value={`Rp. ${formattedTotal}`} />
@@ -940,6 +1019,11 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
                           value={cardNumber}
                           onChange={handleCardNumberChange}
                         />
+                        {cardNumberWarning && (
+                          <div className="warning">
+                            Please enter Card Number!
+                          </div>
+                        )}
                       </div>
                       <div className="credit-card-value10Y">
                         <input
@@ -947,6 +1031,9 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
                           value={type}
                           onChange={(e) => setType(e.target.value)}
                         />
+                        {typeWarning && (
+                          <div className="warning">Please enter Card Type!</div>
+                        )}
                       </div>
                     </div>
                     <div className="credit-card-value2">
@@ -956,6 +1043,9 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
                         value={expiry}
                         onChange={handleExpiryChange}
                       />
+                      {expiryWarning && (
+                        <div className="warning">Please enter Expiry Card!</div>
+                      )}
                     </div>
                     <div className="credit-card-value3">
                       <input
@@ -964,6 +1054,9 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
                         value={cvv}
                         onChange={(e) => setCvv(e.target.value)}
                       />
+                      {cvvWarning && (
+                        <div className="warning">Please enter cvv!</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1025,12 +1118,42 @@ const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
             <div style={{ color: "#3d5889" }}>
               <h1>Please wait...</h1>
             </div>
-          ) : isPyamentUrl ? (
+          ) : isPhoto ? (
             <>
-              {/* <Iframe url={url}  
-                x-frame-options="deny"
-              className="iframe-url"/>
-              <iframe src={url} className="iframe-url" /> */}
+              <div className="webcam-container" style={{marginTop: "5%", marginBottom: "8%"}}>
+                <Webcam
+                  className="webcam"
+                  audio={false}
+                  ref={webcamRef}
+                  mirrored={true}
+                  screenshotFormat="image/jpeg"
+                  width={120}
+                  height={220}
+                  videoConstraints={{
+                    width: { min: 120 },
+                    height: { min: 220 },
+                    aspectRatio: 0.6666666667,
+                  }}
+                />
+                <div className="bounding-box"></div>
+              </div>
+              <button onClick={capture} className="ok-button">
+                Take a face photo
+              </button>
+            </>
+          ) : isDoRetake ? (
+            <>
+              <div className="box-image">
+                <img
+                  src={capturedImages}
+                  alt="Captured Image"
+                  className="potrait-image"
+                  style={{width: "40vh", height: "35vh", marginLeft: "12vh", marginBottom: "10%", marginTop: "5%"}}
+                />
+              </div>
+              <button onClick={doRetake} className="retake-button">
+                Retake
+              </button>
             </>
           ) : (
             <div className="payment-method">

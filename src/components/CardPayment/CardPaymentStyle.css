@@ -257,6 +257,7 @@ label {
 }
 
 .payment-credit {
+  cursor: pointer;
   padding-left: 4%;
   margin-top: 4%;
   display: flex;
@@ -278,6 +279,7 @@ label {
 }
 
 .payment-cash {
+  cursor: pointer;
   padding-left: 4%;
   margin-top: 12%;
   margin-bottom: 5%;
@@ -477,6 +479,7 @@ label {
 }
 
 .form-group-payment-submit2 button {
+  cursor: pointer;
   width: 180px;
   height: 50px;
   border-radius: 18px;
@@ -498,6 +501,7 @@ label {
 }
 
 .form-group-payment-submit3 button {
+  cursor: pointer;
   margin-top: 10vh;
   width: 180px;
   height: 50px;
