@@ -14,6 +14,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { Toast } from "../Toast/Toast";
 import Webcam from "react-webcam";
+import Select from "react-select";
 
 const socket = io("http://localhost:4499");
 
@@ -71,6 +72,8 @@ const CardPayment = ({
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
   const [url, setUrl] = useState("");
+
+  const [optionCreditTypes, setOptionCreditTypes] = useState([]);
 
   //price
   const { fee, fee_cash, value } = JSON.parse(
@@ -199,9 +202,47 @@ const CardPayment = ({
         const inputType = data.cardtype;
         const capitalizedType = inputType.toLowerCase().toUpperCase();
         const cleanedType = capitalizedType.replace("CREDIT", "").trim();
-        const finalType = cleanedType === "Visa" ? "VISA" : cleanedType === "Mastercard" ? "MASTERCARD" : cleanedType;
+        const finalType =
+          cleanedType === "Visa"
+            ? "VISA"
+            : cleanedType === "Mastercard"
+            ? "MASTERCARD"
+            : cleanedType;
         setType(finalType);
         console.log("inputType: ", inputType);
+
+
+        axios.get("http://10.20.68.82/molina-lte/api/TypeCard.php")
+        .then((res) => {
+          const responseData = res.data;
+      
+          if (responseData && responseData.status === 200 && responseData.data && Array.isArray(responseData.data)) {
+            const creditTypes = responseData.data.map((item) => {
+              return {
+                value: item.value,
+                label: item.label,
+              };
+            });
+      
+            setOptionCreditTypes(creditTypes);
+          } else {
+            console.error("Invalid or unexpected API response format");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+      
+        console.log("creditTypes: ", optionCreditTypes)
+        
+        // const creditTypes = [
+        //   { value: "VISA", label: "VISA" },
+        //   { value: "MASTERCARD", label: "MASTERCARD" },
+        //   { value: "JCB", label: "JCB" },
+        //   { value: "AMEX", label: "AMEX" },
+        // ];
+
+        // setOptionCreditTypes(creditTypes);
       }
       console.log("data: ", data);
     });
@@ -465,7 +506,6 @@ const CardPayment = ({
       setCardNumberWarning(false);
     }
   }, [cardNumber]);
-
 
   useEffect(() => {
     if (expiry !== "") {
@@ -1026,10 +1066,38 @@ const CardPayment = ({
                         )}
                       </div>
                       <div className="credit-card-value10Y">
-                        <input
-                          type="text"
-                          value={type}
-                          onChange={(e) => setType(e.target.value)}
+                        <Select
+                          id="creditType"
+                          value={optionCreditTypes.find(
+                            (option) => option.value === type
+                          )}
+                          onChange={(selectedOption) =>
+                            setType(selectedOption.value)
+                          }
+                          options={optionCreditTypes}
+                          className="basic-single"
+                          // classNamePrefix="select"
+                          styles={{
+                            container: (provided) => ({
+                              ...provided,
+                              flex: 1,
+                              width: "26vh",
+                              borderRadius: "10px",
+                              backgroundColor: "rgba(217, 217, 217, 0.75)",
+                              fontFamily: "Roboto, Arial, sans-serif",
+                            }),
+                            valueContainer: (provided) => ({
+                              ...provided,
+                              flex: 1,
+                              width: "100%",
+                            }),
+                            control: (provided) => ({
+                              ...provided,
+                              flex: 1,
+                              width: "100%",
+                              backgroundColor: "rgba(217, 217, 217, 0.75)",
+                            }),
+                          }}
                         />
                         {typeWarning && (
                           <div className="warning">Please enter Card Type!</div>
@@ -1120,7 +1188,10 @@ const CardPayment = ({
             </div>
           ) : isPhoto ? (
             <>
-              <div className="webcam-container" style={{marginTop: "5%", marginBottom: "8%"}}>
+              <div
+                className="webcam-container"
+                style={{ marginTop: "5%", marginBottom: "8%" }}
+              >
                 <Webcam
                   className="webcam"
                   audio={false}
@@ -1148,7 +1219,13 @@ const CardPayment = ({
                   src={capturedImages}
                   alt="Captured Image"
                   className="potrait-image"
-                  style={{width: "40vh", height: "35vh", marginLeft: "12vh", marginBottom: "10%", marginTop: "5%"}}
+                  style={{
+                    width: "40vh",
+                    height: "35vh",
+                    marginLeft: "12vh",
+                    marginBottom: "10%",
+                    marginTop: "5%",
+                  }}
                 />
               </div>
               <button onClick={doRetake} className="retake-button">
