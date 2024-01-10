@@ -385,6 +385,7 @@ label {
 .credit-card-payment2 {
   /* background-color: red; */
   /* margin-top: 3%; */
+  padding-bottom: 3%;
   overflow: hidden;
   display: flex;
   flex-direction: row;
@@ -415,7 +416,7 @@ label {
 .credit-card-value10X input {
   border-radius: 1.2vh;
   height: 1rem;
-  width: 34.6vh;
+  width: 28vh;
   margin-left: 1.5%;
   /* text-align: right; */
   background-color: rgba(217, 217, 217, 0.75);
