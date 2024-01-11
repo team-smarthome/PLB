@@ -58,10 +58,6 @@ const Routes = () => {
       <Route path="/report" element={<ProtectedRoute element={<Report />} />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
-      {/* <Route
-        path="/information"
-        element={<ProtectedRoute element={<Information />} />}
-      /> */}
       <Route
         path="/status-payment"
         element={<ProtectedRoute element={<StatusPayment />} />}

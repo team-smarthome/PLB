@@ -5,8 +5,6 @@ import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
-import dataPasporUser from "../../utils/dataPaspor";
-import dataPasporImg from "../../utils/dataPhotoPaspor";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
@@ -61,7 +59,6 @@ const Apply = () => {
   const checkAndHandleTokenExpiration = () => {
     const jwtToken = localStorage.getItem("JwtToken");
     if (!jwtToken) {
-      // Token is not present, consider the user as not authenticated
       return false;
     }
 
@@ -249,10 +246,6 @@ const Apply = () => {
     console.log("tahap nol");
     setDataPrimaryPassport(null);
     console.log("receiveTempData: ", receiveTempData);
-
-    const prevPassportUserLength = passportUser.length;
-    const prevPassportImageLength = passportImage.length;
-
     if (receiveTempData.length > 0) {
       const passportUser = receiveTempData.filter(
         (obj) => obj.msgType === "passportData"
@@ -440,7 +433,6 @@ useEffect(() => {
         console.log("sharedData: ", sharedData);
         setCardStatus("goPayment");
         setTitleHeader("Payment");
-        // setDisabled(false);
       } else if (titleFooter === "Next Print") {
         setCardPaymentProps({
           isCreditCard: false,
@@ -568,23 +560,7 @@ useEffect(() => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.length > 0 && data.data[0].form_url) {
-        window.location.href = data.data[0].form_url;
-      } else if (data.code === 200 && data.data.form_url === null) {
-        setStatusPaymentCredit(false);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: true,
-          isPyamentUrl: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-      } else if (
+     if (
         data.code === 200 &&
         data.message === "E-Voa created successfuly!"
       ) {
@@ -770,7 +746,7 @@ useEffect(() => {
                 isDoRetake: false,
               });
             }, 5000);
-          } else if (messageError === "Invalid JWT Token") {
+          } else if (messageError === "Invalid JWT Token" || messageError === "Expired JWT Token") {
             setTimeout(() => {
               setDisabled(false);
               setTitleFooter("Next Step");
@@ -961,6 +937,35 @@ useEffect(() => {
         setIsEnableBack(false);
         setIsEnableStep(false);
         setDisabled(false);
+      } else if (meesageConfirm === "Invalid JWT Token" || meesageConfirm === "Expired JWT Token") {
+        setTimeout(() => {
+          setDisabled(false);
+          setTitleFooter("Next Step");
+          setTabStatus(1);
+          setStatusPaymentCredit(false);
+          setCardStatus("iddle");
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+          setIsEnableBack(true);
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: false,
+            isFailed: false,
+            isPyamentUrl: false,
+            isPhoto: false,
+            isDoRetake: false,
+          });
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+        }, 5000);
       } else {
         console.log("jalan gk ya??");
         setDisabled(false);
