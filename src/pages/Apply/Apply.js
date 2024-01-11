@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
+import dataPasporUser from "../../utils/dataPaspor";
+import dataPasporImg from "../../utils/dataPhotoPaspor";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 import { apiPaymentGateway } from "../../services/api";
 import io from "socket.io-client";
@@ -821,6 +823,7 @@ useEffect(() => {
         }, 5000);
       }
     } catch (err) {
+      setMessageConfirm("Required field 'photoFace' is missing");
       setCardPaymentProps({
         isWaiting: false,
         isCreditCard: false,
@@ -828,14 +831,28 @@ useEffect(() => {
         isPaymentCash: false,
         isPrinted: false,
         isSuccess: false,
-        isFailed: false,
+        isFailed: true,
         isPyamentUrl: false,
-        isPhoto: true,
+        isPhoto: false,
         isDoRetake: false,
       });
-      setIsEnableBack(false);
-      setIsEnableStep(false);
-      setDisabled(false);
+      setTimeout(() => {
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+          isPhoto: true,
+          isDoRetake: false,
+        });
+        setIsEnableBack(false);
+        setIsEnableStep(false);
+        setDisabled(false);
+      }, 5000);
     }
   };
 

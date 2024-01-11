@@ -315,7 +315,7 @@ const CardPayment = ({
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
-      }, 3000);
+      }, 1000);
     }
   }, [
     paymentMethod,
