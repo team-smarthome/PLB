@@ -29,7 +29,6 @@ const CardPayment = ({
   isPrinted,
   isWaiting,
   isSuccess,
-  isPyamentUrl,
   isPhoto,
   isDoRetake,
   sendDataUpdatePayment,
@@ -52,6 +51,7 @@ const CardPayment = ({
   const [expiryWarning, setExpiryWarning] = useState(false);
   const [cvv, setCvv] = useState("");
   const [type, setType] = useState("");
+  const [isCheckedType, setIsCheckedType] = useState(false);
   const [cvvWarning, setCvvWarning] = useState(false);
   const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
@@ -220,6 +220,12 @@ const CardPayment = ({
             : cleanedType;
         setType(finalType);
         console.log("inputType: ", inputType);
+
+        if (data.cardtype === "") {
+          setIsCheckedType(true)
+        } else {
+          setIsCheckedType(false)
+        }
       }
       console.log("data: ", data);
     });
@@ -233,7 +239,6 @@ const CardPayment = ({
     isFailed,
     isPrinted,
     isSuccess,
-    isPyamentUrl,
     paymentMethod,
     cardNumber,
     expiry,
@@ -251,7 +256,6 @@ const CardPayment = ({
         !isSuccess &&
         !isPaymentCredit &&
         !isPaymentCash &&
-        !isPyamentUrl &&
         !isPhoto &&
         !isDoRetake &&
         isCreditCard
@@ -264,7 +268,6 @@ const CardPayment = ({
           isSuccess: false,
           isPaymentCredit: true,
           isPaymentCash: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
           paymentMethod: paymentMethod,
@@ -289,7 +292,6 @@ const CardPayment = ({
           !isSuccess &&
           !isPaymentCredit &&
           !isPaymentCash &&
-          !isPyamentUrl &&
           !isPhoto &&
           !isDoRetake &&
           isCreditCard
@@ -302,7 +304,6 @@ const CardPayment = ({
             isSuccess: false,
             isPaymentCredit: true,
             isPaymentCash: false,
-            isPyamentUrl: false,
             isPhoto: false,
             isDoRetake: false,
             paymentMethod: paymentMethod,
@@ -329,7 +330,6 @@ const CardPayment = ({
     isFailed,
     isPrinted,
     isSuccess,
-    isPyamentUrl,
     isCreditCard,
     isPaymentCredit,
     isPaymentCash,
@@ -349,8 +349,7 @@ const CardPayment = ({
       !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
-      !isCreditCard &&
-      !isPyamentUrl
+      !isCreditCard 
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
       setNumber(dataPermohonanUser?.visa_number ?? "");
@@ -364,7 +363,6 @@ const CardPayment = ({
           isFailed: false,
           isPrinted: false,
           isSuccess: true,
-          isPyamentUrl: false,
           isPaymentCredit: false,
           isPaymentCash: false,
           isPhoto: false,
@@ -391,56 +389,12 @@ const CardPayment = ({
     isPrinted,
     isSuccess,
     isCreditCard,
-    isPyamentUrl,
     isPaymentCredit,
     isPaymentCash,
     isPhoto,
     isDoRetake,
     sendDataUpdatePayment,
     handlePrint,
-  ]);
-
-  useEffect(() => {
-    setDataPermohonanUser(dataNumberPermohonan);
-    setDataPasporUser(dataUser);
-    if (
-      !isPrinted &&
-      !isFailed &&
-      !isSuccess &&
-      !isWaiting &&
-      !isPaymentCredit &&
-      !isPaymentCash &&
-      !isCreditCard &&
-      !isPhoto &&
-      !isDoRetake &&
-      isPyamentUrl
-    ) {
-      console.log("dataPermohonanUser: ", dataNumberPermohonan);
-      const IframeUrl =
-        dataNumberPermohonan !== null || dataNumberPermohonan !== undefined
-          ? dataNumberPermohonan[0].form_url
-          : "";
-      setNumber(dataNumberPermohonan?.visa_number ?? "");
-      setReceipt(dataNumberPermohonan?.visa_receipt ?? "");
-      setUrl(IframeUrl);
-    }
-  }, [
-    paymentMethod,
-    cardNumber,
-    cvv,
-    type,
-    dataPermohonanUser,
-    expiry,
-    isWaiting,
-    isFailed,
-    isPrinted,
-    isSuccess,
-    isCreditCard,
-    isPyamentUrl,
-    isPhoto,
-    isDoRetake,
-    isPaymentCredit,
-    sendDataUpdatePayment,
   ]);
 
   useEffect(() => {
@@ -454,8 +408,7 @@ const CardPayment = ({
       !isPaymentCash &&
       !isCreditCard &&
       !isPhoto &&
-      !isDoRetake &&
-      !isPyamentUrl
+      !isDoRetake
     ) {
       const timer = setInterval(() => {
         setSeconds((prevSeconds) => (prevSeconds > 0 ? prevSeconds - 1 : 0));
@@ -471,7 +424,6 @@ const CardPayment = ({
     isPaymentCredit,
     isPaymentCash,
     isCreditCard,
-    isPyamentUrl,
     isPhoto,
     isDoRetake,
   ]);
@@ -560,7 +512,6 @@ const CardPayment = ({
       isPrinted: false,
       isSuccess: false,
       isCreditCard: true,
-      isPyamentUrl: false,
       isPaymentCredit: false,
       isPhoto: false,
       isDoRetake: false,
@@ -588,7 +539,6 @@ const CardPayment = ({
       isPrinted: false,
       isSuccess: false,
       isCreditCard: false,
-      isPyamentUrl: false,
       isPaymentCredit: false,
       isPaymentCash: true,
       isPhoto: false,
@@ -801,7 +751,6 @@ const CardPayment = ({
           isPrinted: false,
           isSuccess: false,
           isCreditCard: false,
-          isPyamentUrl: false,
           isPaymentCredit: false,
           isPaymentCash: true,
           isPhoto: false,
@@ -831,7 +780,6 @@ const CardPayment = ({
         isPrinted: false,
         isSuccess: false,
         isCreditCard: false,
-        isPyamentUrl: false,
         isPaymentCredit: false,
         isPaymentCash: true,
         isPhoto: false,
@@ -1033,6 +981,7 @@ const CardPayment = ({
                           onChange={(selectedOption) =>
                             setType(selectedOption.value)
                           }
+                          isDisabled={isCheckedType}
                           options={optionCreditTypes}
                           className="basic-single"
                           // classNamePrefix="select"

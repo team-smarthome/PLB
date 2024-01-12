@@ -76,7 +76,6 @@ const BodyContent = ({
     isFailed,
     isPrinted,
     isSuccess,
-    isPyamentUrl,
     isPhoto,
     isDoRetake,
     paymentMethod,
@@ -94,7 +93,6 @@ const BodyContent = ({
       isFailed,
       isPrinted,
       isSuccess,
-      isPyamentUrl,
       isPhoto,
       isDoRetake,
     });

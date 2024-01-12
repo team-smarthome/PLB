@@ -43,7 +43,6 @@ const Apply = () => {
     isSuccess: false,
     isWaiting: false,
     isFailed: false,
-    isPyamentUrl: false,
     isPhoto: false,
     isDoRetake: false,
   });
@@ -107,9 +106,11 @@ const Apply = () => {
         console.log("WebSocket connection opened");
         isCloseTimeoutSet = false;
         setCardStatus("errorConnection");
+        // setCardStatus("checkData");
         setTimeout(() => {
           isCloseTimeoutSet = false;
           setCardStatus("iddle");
+          // setCardStatus("checkData");
         }, 3000);
 
         setIsConnected(true);
@@ -404,7 +405,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isDoRetake: false,
         });
         setShareDataPaymentProps({
@@ -444,7 +444,6 @@ useEffect(() => {
           isPrinted: true,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -535,7 +534,7 @@ useEffect(() => {
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
       cvv: shareDataPaymentProps.cvv,
-      type: shareDataPaymentProps.type,
+      type: shareDataPaymentProps.type === '' ? null : shareDataPaymentProps.type,
       token: token,
       key: key,
       deviceId: devicedId,
@@ -554,7 +553,6 @@ useEffect(() => {
         isPrinted: false,
         isSuccess: false,
         isFailed: false,
-        isPyamentUrl: false,
         isPhoto: false,
         isDoRetake: false,
       });
@@ -574,7 +572,6 @@ useEffect(() => {
           isPrinted: true,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
         });
         setDisabled(true);
@@ -587,7 +584,6 @@ useEffect(() => {
             isPrinted: false,
             isSuccess: true,
             isFailed: false,
-            isPyamentUrl: false,
             isPhoto: false,
           });
           setStatusPaymentCredit(false);
@@ -616,7 +612,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: true,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -635,7 +630,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -662,7 +656,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -687,7 +680,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -713,7 +705,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -743,7 +734,6 @@ useEffect(() => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
-                isPyamentUrl: false,
                 isPhoto: false,
                 isDoRetake: false,
               });
@@ -766,7 +756,6 @@ useEffect(() => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
-                isPyamentUrl: false,
                 isPhoto: false,
                 isDoRetake: false,
               });
@@ -786,7 +775,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: true,
               isDoRetake: false,
             });
@@ -814,7 +802,6 @@ useEffect(() => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
-                isPyamentUrl: false,
                 isPhoto: false,
                 isDoRetake: false,
               });
@@ -832,7 +819,6 @@ useEffect(() => {
         isPrinted: false,
         isSuccess: false,
         isFailed: true,
-        isPyamentUrl: false,
         isPhoto: false,
         isDoRetake: false,
       });
@@ -845,7 +831,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: true,
           isDoRetake: false,
         });
@@ -872,7 +857,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -900,7 +884,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -926,7 +909,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -947,7 +929,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: true,
           isDoRetake: false,
         });
@@ -972,7 +953,6 @@ useEffect(() => {
             isPrinted: false,
             isSuccess: false,
             isFailed: false,
-            isPyamentUrl: false,
             isPhoto: false,
             isDoRetake: false,
           });
@@ -1002,7 +982,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
