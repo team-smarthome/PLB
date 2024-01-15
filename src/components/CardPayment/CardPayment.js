@@ -222,9 +222,9 @@ const CardPayment = ({
         console.log("inputType: ", inputType);
 
         if (data.cardtype === "") {
-          setIsCheckedType(true)
+          setIsCheckedType(true);
         } else {
-          setIsCheckedType(false)
+          setIsCheckedType(false);
         }
       }
       console.log("data: ", data);
@@ -248,7 +248,7 @@ const CardPayment = ({
 
   useEffect(() => {
     // ini jika semua false
-    if (paymentMethod && cardNumber !== "" && expiry !== "" && type !== "") {
+    if (paymentMethod && cardNumber !== "" && expiry !== "") {
       if (
         !isFailed &&
         !isWaiting &&
@@ -280,6 +280,7 @@ const CardPayment = ({
         setExpiry("");
         setCvv("");
         setType("");
+        setIsCheckedType(false);
         setDataPasporUser(dataUser);
         setDataPermohonanUser(dataNumberPermohonan);
       }
@@ -312,7 +313,6 @@ const CardPayment = ({
             cvv: cvv,
             type: type,
           });
-
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
@@ -349,7 +349,7 @@ const CardPayment = ({
       !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
-      !isCreditCard 
+      !isCreditCard
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
       setNumber(dataPermohonanUser?.visa_number ?? "");
@@ -525,6 +525,7 @@ const CardPayment = ({
 
   const handlePaymentCash = () => {
     handleTokenExpiration();
+    setIsCheckedType(false)
     setPaymentMethod("KICASH");
     setExpiry("00/00");
     setCvv("000");
@@ -975,16 +976,19 @@ const CardPayment = ({
                       <div className="credit-card-value10Y">
                         <Select
                           id="creditType"
-                          value={optionCreditTypes.find(
-                            (option) => option.value === type
-                          )}
+                          value={
+                            type
+                              ? optionCreditTypes.find(
+                                  (option) => option.value === type
+                                )
+                              : ""
+                          }
                           onChange={(selectedOption) =>
                             setType(selectedOption.value)
                           }
                           isDisabled={isCheckedType}
                           options={optionCreditTypes}
                           className="basic-single"
-                          // classNamePrefix="select"
                           styles={{
                             container: (provided) => ({
                               ...provided,
