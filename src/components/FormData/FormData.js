@@ -463,7 +463,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="paspor_type">Paspor Type</label>
+              <label htmlFor="paspor_type">Passport Type</label>
             </div>
             <input
               type="text"

@@ -221,11 +221,9 @@ const CardPayment = ({
         setType(finalType);
         console.log("inputType: ", inputType);
 
-        if (data.cardtype === "") {
+        if (data.cardtype === "" || data.cardtype !== "") {
           setIsCheckedType(true);
-        } else {
-          setIsCheckedType(false);
-        }
+        } 
       }
       console.log("data: ", data);
     });
@@ -1144,7 +1142,7 @@ const CardPayment = ({
             <div className="payment-method">
               <div className="payment-credit" onClick={handlePaymentCredit}>
                 <img src={Credit} alt="" />
-                <p>Credit Card</p>
+                <p>Credit/Debit Card</p>
               </div>
               <div className="payment-cash" onClick={handlePaymentCash}>
                 <img src={Cash} alt="" />

@@ -51,11 +51,11 @@ const Home = () => {
           className="icon-image"
         />
         <h1 className="title1">Welcome to</h1>
-        <h1 className="title2">VISA on Arrival Machine</h1>
+        <h1 className="title2">Visa on Arrival Application</h1>
         <div className="bg-apply-information">
           <div className="grid-box-apply-information">
             <div className="bg-apply" onClick={btnOnClick_Apply}>
-              <h2 className="text-apply">APPLY</h2>
+              <h2 className="text-apply">Apply</h2>
             </div>
             <div className="bg-information" onClick={btnOnClick_Informasi}>
               <h2 className="text-information">Information</h2>
@@ -65,13 +65,13 @@ const Home = () => {
         {JSON.parse(localStorage.getItem("user")).group.code.includes("SPV") ? (
           <div className="menuButton" onClick={() => navigate("/report")}>
             <div className="logout-text">
-              <p className="text-logout">REPORT</p>
+              <p className="text-logout">Report</p>
             </div>
           </div>
         ) : null}
         <div className="logoutNew" onClick={handleLogout}>
           <div className="logout-text">
-            <p className="text-logout">LOGOUT</p>
+            <p className="text-logout">Logout</p>
           </div>
           <div className="logout-image">
             <img src={LogoutIcon} alt="Logout" className="logout-icon" />
