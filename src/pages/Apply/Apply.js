@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
-import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
-import { apiPaymentGateway } from "../../services/api";
 import dataPasporUser from "../../utils/dataPaspor";
 import dataPasporImg from "../../utils/dataPhotoPaspor";
+import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
+import { apiPaymentGateway } from "../../services/api";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
@@ -43,7 +43,6 @@ const Apply = () => {
     isSuccess: false,
     isWaiting: false,
     isFailed: false,
-    isPyamentUrl: false,
     isPhoto: false,
     isDoRetake: false,
   });
@@ -61,7 +60,6 @@ const Apply = () => {
   const checkAndHandleTokenExpiration = () => {
     const jwtToken = localStorage.getItem("JwtToken");
     if (!jwtToken) {
-      // Token is not present, consider the user as not authenticated
       return false;
     }
 
@@ -108,9 +106,11 @@ const Apply = () => {
         console.log("WebSocket connection opened");
         isCloseTimeoutSet = false;
         setCardStatus("errorConnection");
+        // setCardStatus("checkData");
         setTimeout(() => {
           isCloseTimeoutSet = false;
           setCardStatus("iddle");
+          // setCardStatus("checkData");
         }, 3000);
 
         setIsConnected(true);
@@ -249,10 +249,6 @@ const Apply = () => {
     console.log("tahap nol");
     setDataPrimaryPassport(null);
     console.log("receiveTempData: ", receiveTempData);
-
-    const prevPassportUserLength = passportUser.length;
-    const prevPassportImageLength = passportImage.length;
-
     if (receiveTempData.length > 0) {
       const passportUser = receiveTempData.filter(
         (obj) => obj.msgType === "passportData"
@@ -409,7 +405,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isDoRetake: false,
         });
         setShareDataPaymentProps({
@@ -440,7 +435,6 @@ useEffect(() => {
         console.log("sharedData: ", sharedData);
         setCardStatus("goPayment");
         setTitleHeader("Payment");
-        // setDisabled(false);
       } else if (titleFooter === "Next Print") {
         setCardPaymentProps({
           isCreditCard: false,
@@ -450,7 +444,6 @@ useEffect(() => {
           isPrinted: true,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -541,7 +534,7 @@ useEffect(() => {
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
       cvv: shareDataPaymentProps.cvv,
-      type: shareDataPaymentProps.type,
+      type: shareDataPaymentProps.type === '' ? null : shareDataPaymentProps.type,
       token: token,
       key: key,
       deviceId: devicedId,
@@ -560,7 +553,6 @@ useEffect(() => {
         isPrinted: false,
         isSuccess: false,
         isFailed: false,
-        isPyamentUrl: false,
         isPhoto: false,
         isDoRetake: false,
       });
@@ -568,23 +560,7 @@ useEffect(() => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.data.length > 0 && data.data[0].form_url) {
-        window.location.href = data.data[0].form_url;
-      } else if (data.code === 200 && data.data.form_url === null) {
-        setStatusPaymentCredit(false);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: true,
-          isPyamentUrl: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-      } else if (
+     if (
         data.code === 200 &&
         data.message === "E-Voa created successfuly!"
       ) {
@@ -596,7 +572,6 @@ useEffect(() => {
           isPrinted: true,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
         });
         setDisabled(true);
@@ -609,7 +584,6 @@ useEffect(() => {
             isPrinted: false,
             isSuccess: true,
             isFailed: false,
-            isPyamentUrl: false,
             isPhoto: false,
           });
           setStatusPaymentCredit(false);
@@ -638,7 +612,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: true,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -657,7 +630,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -684,7 +656,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -709,7 +680,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -735,7 +705,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: false,
               isDoRetake: false,
             });
@@ -765,12 +734,11 @@ useEffect(() => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
-                isPyamentUrl: false,
                 isPhoto: false,
                 isDoRetake: false,
               });
             }, 5000);
-          } else if (messageError === "Invalid JWT Token") {
+          } else if (messageError === "Invalid JWT Token" || messageError === "Expired JWT Token") {
             setTimeout(() => {
               setDisabled(false);
               setTitleFooter("Next Step");
@@ -788,7 +756,6 @@ useEffect(() => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
-                isPyamentUrl: false,
                 isPhoto: false,
                 isDoRetake: false,
               });
@@ -808,7 +775,6 @@ useEffect(() => {
               isPrinted: false,
               isSuccess: false,
               isFailed: false,
-              isPyamentUrl: false,
               isPhoto: true,
               isDoRetake: false,
             });
@@ -836,7 +802,6 @@ useEffect(() => {
                 isPrinted: false,
                 isSuccess: false,
                 isFailed: false,
-                isPyamentUrl: false,
                 isPhoto: false,
                 isDoRetake: false,
               });
@@ -845,6 +810,7 @@ useEffect(() => {
         }, 5000);
       }
     } catch (err) {
+      setMessageConfirm("Required field 'photoFace' is missing");
       setCardPaymentProps({
         isWaiting: false,
         isCreditCard: false,
@@ -852,14 +818,26 @@ useEffect(() => {
         isPaymentCash: false,
         isPrinted: false,
         isSuccess: false,
-        isFailed: false,
-        isPyamentUrl: false,
-        isPhoto: true,
+        isFailed: true,
+        isPhoto: false,
         isDoRetake: false,
       });
-      setIsEnableBack(false);
-      setIsEnableStep(false);
-      setDisabled(false);
+      setTimeout(() => {
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPhoto: true,
+          isDoRetake: false,
+        });
+        setIsEnableBack(false);
+        setIsEnableStep(false);
+        setDisabled(false);
+      }, 5000);
     }
   };
 
@@ -879,7 +857,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -907,7 +884,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -933,7 +909,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });
@@ -954,13 +929,40 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: true,
           isDoRetake: false,
         });
         setIsEnableBack(false);
         setIsEnableStep(false);
         setDisabled(false);
+      } else if (meesageConfirm === "Invalid JWT Token" || meesageConfirm === "Expired JWT Token") {
+        setTimeout(() => {
+          setDisabled(false);
+          setTitleFooter("Next Step");
+          setTabStatus(1);
+          setStatusPaymentCredit(false);
+          setCardStatus("iddle");
+          setRecievedTempData([]);
+          setDataPrimaryPassport(null);
+          setIsEnableBack(true);
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: false,
+            isFailed: false,
+            isPhoto: false,
+            isDoRetake: false,
+          });
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+        }, 5000);
       } else {
         console.log("jalan gk ya??");
         setDisabled(false);
@@ -980,7 +982,6 @@ useEffect(() => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
         });

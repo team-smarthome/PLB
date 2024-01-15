@@ -68,15 +68,6 @@ const BodyContent = ({
     }));
   };
 
-
-  //useeffect apakah dataNumberPermohonan ada isinya atau tidak
-  useEffect(() => {
-    if (dataNumberPermohonan) {
-      console.log("masuk oiii", dataNumberPermohonan);
-    }
-  }, [dataNumberPermohonan]);
-
-
   const handleDataFormPaymentStatus = ({
     isCreditCard,
     isPaymentCredit,
@@ -85,7 +76,6 @@ const BodyContent = ({
     isFailed,
     isPrinted,
     isSuccess,
-    isPyamentUrl,
     isPhoto,
     isDoRetake,
     paymentMethod,
@@ -103,7 +93,6 @@ const BodyContent = ({
       isFailed,
       isPrinted,
       isSuccess,
-      isPyamentUrl,
       isPhoto,
       isDoRetake,
     });
@@ -125,13 +114,6 @@ const BodyContent = ({
   useEffect(() => {
     setSharedData({ passportData: dataPrimaryPassport });
   }, [dataPrimaryPassport]);
-
-  //useEffect failedPesan
-  useEffect(() => {
-    if (FailedMessage) {
-      console.log("FailedMessage", FailedMessage);
-    }
-  }, [FailedMessage]);
 
   return (
     <div className="body-content">

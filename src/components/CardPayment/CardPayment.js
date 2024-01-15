@@ -15,6 +15,7 @@ import axios from "axios";
 import { Toast } from "../Toast/Toast";
 import Webcam from "react-webcam";
 import Select from "react-select";
+import { url_dev2 } from "../../services/env";
 
 const socket = io("http://localhost:4499");
 
@@ -28,7 +29,6 @@ const CardPayment = ({
   isPrinted,
   isWaiting,
   isSuccess,
-  isPyamentUrl,
   isPhoto,
   isDoRetake,
   sendDataUpdatePayment,
@@ -43,36 +43,25 @@ const CardPayment = ({
   const printRef = useRef();
   const webcamRef = useRef(null);
   const [capturedImages, setCapturedImages] = useState(null);
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, isLoading] = useState(false);
-
-  const [popUpOpen, setPopupOpen] = useState(false);
-
   const [paymentMethod, setPaymentMethod] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardNumberWarning, setCardNumberWarning] = useState(false);
-
   const [expiry, setExpiry] = useState("");
   const [expiryWarning, setExpiryWarning] = useState(false);
-
   const [cvv, setCvv] = useState("");
   const [type, setType] = useState("");
-  // const [typeWarning, setTypeWarning] = useState(false);
+  const [isCheckedType, setIsCheckedType] = useState(false);
   const [cvvWarning, setCvvWarning] = useState(false);
-
   const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
   const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
   const [failedMessage, setFailedMessage] = useState(
     "Network / Card error / declined dll"
   );
-
   const [number, setNumber] = useState("");
   const [receipt, setReceipt] = useState("");
   const [url, setUrl] = useState("");
-
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
 
   //price
@@ -115,14 +104,6 @@ const CardPayment = ({
       capturedImages: null,
     });
   };
-
-  // const handleLogin = () => {
-  //   if (username === 'user' && password === 'password') {
-  //     Swal.fire('Login berhasil!', 'Selamat datang ' + username, 'success');
-  //   } else {
-  //     Swal.fire('Login gagal', 'Username atau password salah', 'error');
-  //   }
-  // };
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -168,27 +149,32 @@ const CardPayment = ({
   };
 
   useEffect(() => {
-    
-    axios.get("http://10.20.68.82/molina-lte/api/TypeCard.php")
-    .then((res) => {
-      const responseData = res.data;
-  
-      if (responseData && responseData.status === 200 && responseData.data && Array.isArray(responseData.data)) {
-        const creditTypes = responseData.data.map((item) => {
-          return {
-            value: item.value,
-            label: item.label,
-          };
-        });
-  
-        setOptionCreditTypes(creditTypes);
-      } else {
-        console.error("Invalid or unexpected API response format");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-    });
+    axios
+      .get(`${url_dev2}TypeCard.php`)
+      .then((res) => {
+        const responseData = res.data;
+
+        if (
+          responseData &&
+          responseData.status === 200 &&
+          responseData.data &&
+          Array.isArray(responseData.data)
+        ) {
+          const creditTypes = responseData.data.map((item) => {
+            return {
+              value: item.value,
+              label: item.label,
+            };
+          });
+
+          setOptionCreditTypes(creditTypes);
+        } else {
+          console.error("Invalid or unexpected API response format");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
   useEffect(() => {
@@ -235,7 +221,11 @@ const CardPayment = ({
         setType(finalType);
         console.log("inputType: ", inputType);
 
-
+        if (data.cardtype === "") {
+          setIsCheckedType(true);
+        } else {
+          setIsCheckedType(false);
+        }
       }
       console.log("data: ", data);
     });
@@ -249,7 +239,6 @@ const CardPayment = ({
     isFailed,
     isPrinted,
     isSuccess,
-    isPyamentUrl,
     paymentMethod,
     cardNumber,
     expiry,
@@ -259,7 +248,7 @@ const CardPayment = ({
 
   useEffect(() => {
     // ini jika semua false
-    if (paymentMethod && cardNumber !== "" && expiry !== "" && type !== "") {
+    if (paymentMethod && cardNumber !== "" && expiry !== "") {
       if (
         !isFailed &&
         !isWaiting &&
@@ -267,7 +256,6 @@ const CardPayment = ({
         !isSuccess &&
         !isPaymentCredit &&
         !isPaymentCash &&
-        !isPyamentUrl &&
         !isPhoto &&
         !isDoRetake &&
         isCreditCard
@@ -280,7 +268,6 @@ const CardPayment = ({
           isSuccess: false,
           isPaymentCredit: true,
           isPaymentCash: false,
-          isPyamentUrl: false,
           isPhoto: false,
           isDoRetake: false,
           paymentMethod: paymentMethod,
@@ -293,6 +280,7 @@ const CardPayment = ({
         setExpiry("");
         setCvv("");
         setType("");
+        setIsCheckedType(false);
         setDataPasporUser(dataUser);
         setDataPermohonanUser(dataNumberPermohonan);
       }
@@ -305,7 +293,6 @@ const CardPayment = ({
           !isSuccess &&
           !isPaymentCredit &&
           !isPaymentCash &&
-          !isPyamentUrl &&
           !isPhoto &&
           !isDoRetake &&
           isCreditCard
@@ -318,7 +305,6 @@ const CardPayment = ({
             isSuccess: false,
             isPaymentCredit: true,
             isPaymentCash: false,
-            isPyamentUrl: false,
             isPhoto: false,
             isDoRetake: false,
             paymentMethod: paymentMethod,
@@ -327,11 +313,10 @@ const CardPayment = ({
             cvv: cvv,
             type: type,
           });
-
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
-      }, 3000);
+      }, 1000);
     }
   }, [
     paymentMethod,
@@ -345,7 +330,6 @@ const CardPayment = ({
     isFailed,
     isPrinted,
     isSuccess,
-    isPyamentUrl,
     isCreditCard,
     isPaymentCredit,
     isPaymentCash,
@@ -365,12 +349,11 @@ const CardPayment = ({
       !isWaiting &&
       !isPaymentCredit &&
       !isPaymentCash &&
-      !isCreditCard &&
-      !isPyamentUrl
+      !isCreditCard
     ) {
       console.log("dataPermohonanUser: ", dataPermohonanUser);
-      setNumber(dataPermohonanUser?.visa_number ?? "123213");
-      setReceipt(dataPermohonanUser?.visa_receipt ?? "12321312313");
+      setNumber(dataPermohonanUser?.visa_number ?? "");
+      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       setUrl(dataPermohonanUser?.form_url ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
@@ -380,7 +363,6 @@ const CardPayment = ({
           isFailed: false,
           isPrinted: false,
           isSuccess: true,
-          isPyamentUrl: false,
           isPaymentCredit: false,
           isPaymentCash: false,
           isPhoto: false,
@@ -407,58 +389,12 @@ const CardPayment = ({
     isPrinted,
     isSuccess,
     isCreditCard,
-    isPyamentUrl,
     isPaymentCredit,
     isPaymentCash,
     isPhoto,
     isDoRetake,
     sendDataUpdatePayment,
     handlePrint,
-  ]);
-
-  useEffect(() => {
-    // ini jika isPaymentUrl true
-    setDataPermohonanUser(dataNumberPermohonan);
-    // console.log("dataPermohonanUserGUYSSS: ", dataNumberPermohonan);
-    setDataPasporUser(dataUser);
-    if (
-      !isPrinted &&
-      !isFailed &&
-      !isSuccess &&
-      !isWaiting &&
-      !isPaymentCredit &&
-      !isPaymentCash &&
-      !isCreditCard &&
-      !isPhoto &&
-      !isDoRetake &&
-      isPyamentUrl
-    ) {
-      console.log("dataPermohonanUser: ", dataNumberPermohonan);
-      const IframeUrl =
-        dataNumberPermohonan !== null || dataNumberPermohonan !== undefined
-          ? dataNumberPermohonan[0].form_url
-          : "";
-      setNumber(dataNumberPermohonan?.visa_number ?? "");
-      setReceipt(dataNumberPermohonan?.visa_receipt ?? "");
-      setUrl(IframeUrl);
-    }
-  }, [
-    paymentMethod,
-    cardNumber,
-    cvv,
-    type,
-    dataPermohonanUser,
-    expiry,
-    isWaiting,
-    isFailed,
-    isPrinted,
-    isSuccess,
-    isCreditCard,
-    isPyamentUrl,
-    isPhoto,
-    isDoRetake,
-    isPaymentCredit,
-    sendDataUpdatePayment,
   ]);
 
   useEffect(() => {
@@ -472,8 +408,7 @@ const CardPayment = ({
       !isPaymentCash &&
       !isCreditCard &&
       !isPhoto &&
-      !isDoRetake &&
-      !isPyamentUrl
+      !isDoRetake
     ) {
       const timer = setInterval(() => {
         setSeconds((prevSeconds) => (prevSeconds > 0 ? prevSeconds - 1 : 0));
@@ -489,7 +424,6 @@ const CardPayment = ({
     isPaymentCredit,
     isPaymentCash,
     isCreditCard,
-    isPyamentUrl,
     isPhoto,
     isDoRetake,
   ]);
@@ -511,12 +445,6 @@ const CardPayment = ({
       setCvvWarning(false);
     }
   }, [cvv]);
-
-  // useEffect(() => {
-  //   if (type !== "") {
-  //     setTypeWarning(false);
-  //   }
-  // }, [type]);
 
   useEffect(() => {
     if (seconds === 0) {
@@ -584,7 +512,6 @@ const CardPayment = ({
       isPrinted: false,
       isSuccess: false,
       isCreditCard: true,
-      isPyamentUrl: false,
       isPaymentCredit: false,
       isPhoto: false,
       isDoRetake: false,
@@ -598,6 +525,7 @@ const CardPayment = ({
 
   const handlePaymentCash = () => {
     handleTokenExpiration();
+    setIsCheckedType(false)
     setPaymentMethod("KICASH");
     setExpiry("00/00");
     setCvv("000");
@@ -612,7 +540,6 @@ const CardPayment = ({
       isPrinted: false,
       isSuccess: false,
       isCreditCard: false,
-      isPyamentUrl: false,
       isPaymentCredit: false,
       isPaymentCash: true,
       isPhoto: false,
@@ -775,17 +702,10 @@ const CardPayment = ({
     // e.preventDefault();
     try {
       isLoading(true);
-      const response = await axios.post(
-        "http://10.20.68.82/molina-lte/api/Login.php",
-        {
-          username,
-          password,
-        }
-      );
-
-      console.log("response KICASH", response);
-      const localKey = localStorage.getItem("key");
-      const localToken = localStorage.getItem("token");
+      const response = await axios.post(`${url_dev2}Login.php`, {
+        username,
+        password,
+      });
 
       if (
         response.data.status === "success" &&
@@ -832,7 +752,6 @@ const CardPayment = ({
           isPrinted: false,
           isSuccess: false,
           isCreditCard: false,
-          isPyamentUrl: false,
           isPaymentCredit: false,
           isPaymentCash: true,
           isPhoto: false,
@@ -844,8 +763,10 @@ const CardPayment = ({
           type: type,
         });
       } else {
-        console.log("Gagal euy, INVALID");
-        alert("Username or Password Invalid!");
+        Toast.fire({
+          icon: "error",
+          title: "Username or Password Invalid!",
+        });
       }
     } catch (error) {
       isLoading(false);
@@ -860,7 +781,6 @@ const CardPayment = ({
         isPrinted: false,
         isSuccess: false,
         isCreditCard: false,
-        isPyamentUrl: false,
         isPaymentCredit: false,
         isPaymentCash: true,
         isPhoto: false,
@@ -927,8 +847,6 @@ const CardPayment = ({
       }
     });
   };
-
-  console.log(url);
 
   return (
     <div className="card-status">
@@ -1058,15 +976,19 @@ const CardPayment = ({
                       <div className="credit-card-value10Y">
                         <Select
                           id="creditType"
-                          value={optionCreditTypes.find(
-                            (option) => option.value === type
-                          )}
+                          value={
+                            type
+                              ? optionCreditTypes.find(
+                                  (option) => option.value === type
+                                )
+                              : ""
+                          }
                           onChange={(selectedOption) =>
                             setType(selectedOption.value)
                           }
+                          isDisabled={isCheckedType}
                           options={optionCreditTypes}
                           className="basic-single"
-                          // classNamePrefix="select"
                           styles={{
                             container: (provided) => ({
                               ...provided,
@@ -1089,9 +1011,6 @@ const CardPayment = ({
                             }),
                           }}
                         />
-                        {/* {typeWarning && (
-                          <div className="warning">Please enter Card Type!</div>
-                        )} */}
                       </div>
                     </div>
                     <div className="credit-card-value2">
@@ -1108,7 +1027,6 @@ const CardPayment = ({
                     <div className="credit-card-value3">
                       <input
                         type="text"
-                        // value="asddsa"
                         value={cvv}
                         onChange={(e) => setCvv(e.target.value)}
                       />

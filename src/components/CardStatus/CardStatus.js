@@ -229,7 +229,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
             <h1 className="card-title" style={{
               marginBottom: "8%"
             }}>Please Input Your City</h1>
-            <div className="input-email">
+            <div className="input-postal-code">
               <Select
                 value={selectedKabupaten}
                 onChange={handleKabupatenChange}
@@ -245,6 +245,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                   borderRadius: "500px",
                   backgroundColor: "rgba(217, 217, 217, 0.75)",
                   fontFamily: "Roboto, Arial, sans-serif",
+                  
                   marginBottom: "15%",
                 }),
                 valueContainer: (provided) => ({
