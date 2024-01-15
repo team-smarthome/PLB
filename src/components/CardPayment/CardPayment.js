@@ -223,7 +223,7 @@ const CardPayment = ({
 
         if (data.cardtype === "" || data.cardtype !== "") {
           setIsCheckedType(true);
-        } 
+        }
       }
       console.log("data: ", data);
     });
@@ -523,7 +523,7 @@ const CardPayment = ({
 
   const handlePaymentCash = () => {
     handleTokenExpiration();
-    setIsCheckedType(false)
+    setIsCheckedType(false);
     setPaymentMethod("KICASH");
     setExpiry("00/00");
     setCvv("000");
@@ -1024,7 +1024,7 @@ const CardPayment = ({
                     </div>
                     <div className="credit-card-value3">
                       <input
-                        type="text"
+                        type="password"
                         value={cvv}
                         onChange={(e) => setCvv(e.target.value)}
                       />
