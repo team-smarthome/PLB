@@ -381,18 +381,17 @@ const Apply = () => {
     setIsEnableBack(false);
   };
 
-useEffect(() => {
-  if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
-    setIsEnableBack(true);
-  } else if (cardPaymentProps.isWaiting) {
-    setDisabled(true); 
-  } else if (cardPaymentProps.isDoRetake) {
-    setIsEnableStep(true);
-  } else if (cardPaymentProps.isPhoto) {
-    setIsEnableStep(false);
-  }
-}, [cardPaymentProps]);
-
+  useEffect(() => {
+    if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
+      setIsEnableBack(true);
+    } else if (cardPaymentProps.isWaiting) {
+      setDisabled(true);
+    } else if (cardPaymentProps.isDoRetake) {
+      setIsEnableStep(true);
+    } else if (cardPaymentProps.isPhoto) {
+      setIsEnableStep(false);
+    }
+  }, [cardPaymentProps]);
 
   const btnOnClick_Back = () => {
     if (isEnableBack) {
@@ -464,7 +463,7 @@ useEffect(() => {
           setDataPrimaryPassport(null);
         }, 3000);
       } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
-        console.log("ini dijalankan")
+        console.log("ini dijalankan");
         doSaveRequestVoaPayment(sharedData);
       }
     }
@@ -526,7 +525,7 @@ useEffect(() => {
       nationalityCode: sharedData.passportData.nationality,
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
-      photoPassport: `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
+      photoPassport: `data:image/jpeg;base64,${sharedData.visibleImage}`,
       photoFace: sharedData.photoFace ? sharedData.photoFace : "",
       email: sharedData.email,
       postalCode: sharedData.postal_code,
@@ -534,7 +533,8 @@ useEffect(() => {
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
       cvv: shareDataPaymentProps.cvv,
-      type: shareDataPaymentProps.type === '' ? null : shareDataPaymentProps.type,
+      type:
+        shareDataPaymentProps.type === "" ? null : shareDataPaymentProps.type,
       token: token,
       key: key,
       deviceId: devicedId,
@@ -560,10 +560,7 @@ useEffect(() => {
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-     if (
-        data.code === 200 &&
-        data.message === "E-Voa created successfuly!"
-      ) {
+      if (data.code === 200 && data.message === "E-Voa created successfuly!") {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -640,9 +637,7 @@ useEffect(() => {
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
             }, 5000);
-          } else if (
-            messageError === "Passport is not active for at least"
-          ) {
+          } else if (messageError === "Passport is not active for at least") {
             setDisabled(false);
             setTitleHeader("Apply VOA");
             setCardStatus("errorBulan");
@@ -738,7 +733,10 @@ useEffect(() => {
                 isDoRetake: false,
               });
             }, 5000);
-          } else if (messageError === "Invalid JWT Token" || messageError === "Expired JWT Token") {
+          } else if (
+            messageError === "Invalid JWT Token" ||
+            messageError === "Expired JWT Token"
+          ) {
             setTimeout(() => {
               setDisabled(false);
               setTitleFooter("Next Step");
@@ -766,7 +764,11 @@ useEffect(() => {
               localStorage.removeItem("key");
               localStorage.removeItem("token");
             }, 5000);
-          } else if (messageError === "Required field 'photoFace' is missing" || messageError === "Face on the passport doesn't match with captured image.") {
+          } else if (
+            messageError === "Required field 'photoFace' is missing" ||
+            messageError ===
+              "Face on the passport doesn't match with captured image."
+          ) {
             setCardPaymentProps({
               isWaiting: false,
               isCreditCard: false,
@@ -920,7 +922,11 @@ useEffect(() => {
           setIsEnableBack(true);
           setConfirm(false);
         }, 5000);
-      } else if (meesageConfirm === "Required field 'photoFace' is missing" || meesageConfirm === "Face on the passport doesn't match with captured image.") {
+      } else if (
+        meesageConfirm === "Required field 'photoFace' is missing" ||
+        meesageConfirm ===
+          "Face on the passport doesn't match with captured image."
+      ) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -935,7 +941,10 @@ useEffect(() => {
         setIsEnableBack(false);
         setIsEnableStep(false);
         setDisabled(false);
-      } else if (meesageConfirm === "Invalid JWT Token" || meesageConfirm === "Expired JWT Token") {
+      } else if (
+        meesageConfirm === "Invalid JWT Token" ||
+        meesageConfirm === "Expired JWT Token"
+      ) {
         setTimeout(() => {
           setDisabled(false);
           setTitleFooter("Next Step");
