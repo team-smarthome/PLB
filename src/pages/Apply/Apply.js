@@ -525,7 +525,7 @@ const Apply = () => {
       nationalityCode: sharedData.passportData.nationality,
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
-      photoPassport: `data:image/jpeg;base64,${sharedData.visibleImage}`,
+      photoPassport: `data:image/jpeg;base64,${dataPhotoPassport.visibleImage}`,
       photoFace: sharedData.photoFace ? sharedData.photoFace : "",
       email: sharedData.email,
       postalCode: sharedData.postal_code,
