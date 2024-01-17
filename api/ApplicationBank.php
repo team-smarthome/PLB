@@ -136,7 +136,7 @@ $cardData = json_decode($decryptedCard, true);
 
 // $url = "http://10.20.75.36:8088/api/visa/application/bank";
 // $url = "https://devapi-molina.imigrasi.go.id/api/visa/application/bank";
-$url = "https://api-molina.imigrasi.go.id/visa/application/bank";
+$url = "https://api-molina.imigrasi.go.id/api/visa/application/bank";
 
 
 // print_r($url);
@@ -172,6 +172,9 @@ $bodyData = array(
 );
 
 
+// echo 'Payload: ';
+// print_r($bodyData);
+
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -181,6 +184,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 $result = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
+
 
 if ($httpCode === 200) {
     // Success
