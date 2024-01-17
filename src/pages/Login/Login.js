@@ -19,7 +19,7 @@ const Login = () => {
 
   const [loading, isLoading] = useState(false);
 
-  const version = "1.0.22";
+  const version = "1.0.23";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
@@ -43,26 +43,37 @@ const Login = () => {
         username,
         password,
       });
-  
-      if (response.data.JwtToken.token !== null && response.data.JwtToken.token !== "" && response.data.status === "success")  {
+
+      if (
+        response.data.JwtToken.token !== null &&
+        response.data.JwtToken.token !== "" &&
+        response.data.status === "success"
+      ) {
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-  
+
         const userProfile = await axios.get(`${url_dev2}ProfileMe.php`, {
           headers: {
             Authorization: `Bearer ${response.data.JwtToken.token}`,
           },
         });
-  
+
         // Check if userProfile.data.user_data is not null
-        if (userProfile.data.user_data !== null && userProfile.data.price !== null && userProfile.data.api !== null) {
+        if (
+          userProfile.data.user_data !== null &&
+          userProfile.data.price !== null &&
+          userProfile.data.api !== null
+        ) {
           isLoading(false);
-          localStorage.setItem("user", JSON.stringify(userProfile.data.user_data));
+          localStorage.setItem(
+            "user",
+            JSON.stringify(userProfile.data.user_data)
+          );
           localStorage.setItem("price", JSON.stringify(userProfile.data.price));
           localStorage.setItem("key", userProfile.data.api.key);
           localStorage.setItem("token", userProfile.data.api.token);
-  
+
           const userInfo = JSON.parse(localStorage.getItem("user"));
-  
+
           if (
             userInfo.group.code.includes("ADM") ||
             userInfo.group.code.includes("SPV")
@@ -87,8 +98,11 @@ const Login = () => {
             title: "Failed to Login",
           });
         }
-      } else if (response.data.status === "error" || response.data.message === "Login failed"){
-       Toast.fire({
+      } else if (
+        response.data.status === "error" ||
+        response.data.message === "Login failed"
+      ) {
+        Toast.fire({
           icon: "error",
           title: "Username or Password is Wrong",
         });
