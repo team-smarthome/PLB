@@ -103,7 +103,7 @@ const Apply = () => {
     //image2
     handleTokenExpiration();
     if (ipAddress) {
-      const socketURL = `ws://${ipAddress}:4488`;
+      const socketURL = `wss://${ipAddress}:4488`;
       socketRef.current = new WebSocket(socketURL);
 
       socketRef.current.onopen = () => {
