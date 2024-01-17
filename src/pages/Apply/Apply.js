@@ -90,6 +90,10 @@ const Apply = () => {
           localStorage.removeItem("cardNumberPetugas");
           localStorage.removeItem("key");
           localStorage.removeItem("token");
+          localStorage.removeItem("jenisDeviceId");
+          localStorage.removeItem("deviceId");
+          localStorage.removeItem("airportId");
+          localStorage.removeItem("price");
         }
       });
     }
@@ -583,9 +587,11 @@ const Apply = () => {
             isFailed: false,
             isPhoto: false,
           });
-          setStatusPaymentCredit(false);
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
+          setTimeout(() => {
+            setStatusPaymentCredit(false);
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
+          }, 3000);
         }, 3000);
       } else if (
         data.status === "Failed" ||
@@ -763,6 +769,10 @@ const Apply = () => {
               localStorage.removeItem("cardNumberPetugas");
               localStorage.removeItem("key");
               localStorage.removeItem("token");
+              localStorage.removeItem("jenisDeviceId");
+              localStorage.removeItem("deviceId");
+              localStorage.removeItem("airportId");
+              localStorage.removeItem("price");
             }, 5000);
           } else if (
             messageError === "Required field 'photoFace' is missing" ||
@@ -812,7 +822,6 @@ const Apply = () => {
         }, 5000);
       }
     } catch (err) {
-      setMessageConfirm("Required field 'photoFace' is missing");
       setCardPaymentProps({
         isWaiting: false,
         isCreditCard: false,
@@ -825,6 +834,14 @@ const Apply = () => {
         isDoRetake: false,
       });
       setTimeout(() => {
+        setDisabled(false);
+        setTitleFooter("Next Step");
+        setTabStatus(1);
+        setStatusPaymentCredit(false);
+        setCardStatus("iddle");
+        setRecievedTempData([]);
+        setDataPrimaryPassport(null);
+        setIsEnableBack(true);
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -833,12 +850,9 @@ const Apply = () => {
           isPrinted: false,
           isSuccess: false,
           isFailed: false,
-          isPhoto: true,
+          isPhoto: false,
           isDoRetake: false,
         });
-        setIsEnableBack(false);
-        setIsEnableStep(false);
-        setDisabled(false);
       }, 5000);
     }
   };
@@ -971,6 +985,10 @@ const Apply = () => {
           localStorage.removeItem("cardNumberPetugas");
           localStorage.removeItem("key");
           localStorage.removeItem("token");
+          localStorage.removeItem("jenisDeviceId");
+          localStorage.removeItem("deviceId");
+          localStorage.removeItem("airportId");
+          localStorage.removeItem("price");
         }, 5000);
       } else {
         console.log("jalan gk ya??");

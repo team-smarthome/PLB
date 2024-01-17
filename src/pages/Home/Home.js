@@ -39,6 +39,7 @@ const Home = () => {
       localStorage.removeItem("jenisDeviceId");
       localStorage.removeItem("deviceId");
       localStorage.removeItem("airportId");
+      localStorage.removeItem("price");
     }
   };
 
