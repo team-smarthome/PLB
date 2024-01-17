@@ -134,7 +134,11 @@ $cardData = json_decode($decryptedCard, true);
 
 // echo "\n";
 
-$url = "https://devapi-molina.imigrasi.go.id/api/visa/application/bank";
+$url = "http://10.20.75.36:8088/api/visa/application/bank";
+// $url = "https://devapi-molina.imigrasi.go.id/api/visa/application/bank";
+// $url = "https://api-molina.imigrasi.go.id/visa/application/bank";
+
+// print_r($url);
 
 // Headers
 $headers = array(
@@ -145,6 +149,9 @@ $headers = array(
     'Content-Type: application/json',
     'X-Device-Id: ' . $airportId . $jenisDeviceId . $deviceId
 );
+
+// echo 'Headers for cURL: ';
+// print_r($headers);
 
 // Body data
 $bodyData = array(
@@ -176,16 +183,16 @@ curl_close($ch);
 
 if ($httpCode === 200) {
     // Success
-    // $response['status'] = "success";
-    // $response['message'] = "Data submitted successfully";
-    // $response['data'] = json_decode($result, true);
+    $response['status'] = "success";
+    $response['message'] = "Data submitted successfully";
+    $response['data'] = json_decode($result, true);
     $response = json_decode($result, true);
 } else {
     // Error
-    // $response['status'] = "error";
-    // $response['message'] = "Error submitting data";
-    // $response['data'] = json_decode($result, true);
+    $response['status'] = "error";
+    $response['message'] = "Error submitting data";
+    $response['data'] = json_decode($result, true);
     $response = json_decode($result, true);
 }
 
-echo json_encode($response);
+echo $result;

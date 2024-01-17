@@ -27,7 +27,9 @@ if (empty($username) || empty($password)) {
     http_response_code(400);
 } else {
     // Hit Api Login
-    $urlLogin = "https://devapi-molina.imigrasi.go.id/api/login";
+    $urlLogin = "http://10.20.75.36:8088/api/login";
+    // $urlLogin = "https://devapi-molina.imigrasi.go.id/api/login";
+    // $urlLogin = "https://api-molina.imigrasi.go.id/api/login";
     $dataLogin = array(
         'username' => $username,
         'password' => $password
@@ -55,14 +57,29 @@ if (empty($username) || empty($password)) {
         // Token From Login
         $token = $loginData['token'];
 
-        $urlMe = "https://devapi-molina.imigrasi.go.id/api/me";
+        // print_r($token);
+
+        $urlLogin = "http://10.20.75.36:8088/api/me";
+        // $urlMe = "https://devapi-molina.imigrasi.go.id/api/me";
+        // $urlMe = "https://api-molina.imigrasi.go.id/api/me";
+
+        $headers = array(
+            'Authorization: Bearer ' . $token,
+            'Accept: application/json',
+            'Content-Type: application/json',
+        );
+
+
         $chMe = curl_init($urlMe);
+
         curl_setopt($chMe, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($chMe, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $token));
+        curl_setopt($chMe, CURLOPT_HTTPHEADER, $headers);
 
         $resultMe = curl_exec($chMe);
         $httpCodeMe = curl_getinfo($chMe, CURLINFO_HTTP_CODE);
         curl_close($chMe);
+
+        // print_r($httpCodeMe);
 
         if ($httpCodeMe === 200) {
             $response['profile'] = json_decode($resultMe, true);
@@ -77,5 +94,6 @@ if (empty($username) || empty($password)) {
         http_response_code(401);
     }
 }
+
 
 echo json_encode($response);
