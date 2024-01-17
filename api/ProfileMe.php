@@ -26,8 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-$url = "http://10.20.75.36:8088/api/me";
+// $url = "http://10.20.75.36:8088/api/me";
 // $url = "https://devapi-molina.imigrasi.go.id/api/me";
+$url = "https://api-molina.imigrasi.go.id/api/me";
 
 // print_r($url);
 

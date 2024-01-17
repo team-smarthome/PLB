@@ -134,9 +134,10 @@ $cardData = json_decode($decryptedCard, true);
 
 // echo "\n";
 
-$url = "http://10.20.75.36:8088/api/visa/application/bank";
+// $url = "http://10.20.75.36:8088/api/visa/application/bank";
 // $url = "https://devapi-molina.imigrasi.go.id/api/visa/application/bank";
-// $url = "https://api-molina.imigrasi.go.id/visa/application/bank";
+$url = "https://api-molina.imigrasi.go.id/visa/application/bank";
+
 
 // print_r($url);
 

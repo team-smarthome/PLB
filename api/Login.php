@@ -27,9 +27,9 @@ if (empty($username) || empty($password)) {
     http_response_code(400);
 } else {
     // Hit Api Login
-    $urlLogin = "http://10.20.75.36:8088/api/login";
+    // $urlLogin = "http://10.20.75.36:8088/api/login";
     // $urlLogin = "https://devapi-molina.imigrasi.go.id/api/login";
-    // $urlLogin = "https://api-molina.imigrasi.go.id/api/login";
+    $urlLogin = "https://api-molina.imigrasi.go.id/api/login";
     $dataLogin = array(
         'username' => $username,
         'password' => $password
@@ -59,9 +59,9 @@ if (empty($username) || empty($password)) {
 
         // print_r($token);
 
-        $urlLogin = "http://10.20.75.36:8088/api/me";
+        // $urlLogin = "http://10.20.75.36:8088/api/me";
         // $urlMe = "https://devapi-molina.imigrasi.go.id/api/me";
-        // $urlMe = "https://api-molina.imigrasi.go.id/api/me";
+        $urlMe = "https://api-molina.imigrasi.go.id/api/me";
 
         $headers = array(
             'Authorization: Bearer ' . $token,
