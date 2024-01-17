@@ -30,6 +30,9 @@ if (empty($username) || empty($password)) {
     // $urlLogin = "http://10.20.75.36:8088/api/login";
     // $urlLogin = "https://devapi-molina.imigrasi.go.id/api/login";
     $urlLogin = "https://api-molina.imigrasi.go.id/api/login";
+
+    // print_r($urlLogin);
+
     $dataLogin = array(
         'username' => $username,
         'password' => $password
