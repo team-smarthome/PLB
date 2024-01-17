@@ -69,6 +69,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
           localStorage.removeItem("cardNumberPetugas");
           localStorage.removeItem("key");
           localStorage.removeItem("token");
+          localStorage.removeItem("jenisDeviceId");
+          localStorage.removeItem("deviceId");
+          localStorage.removeItem("airportId");
+          localStorage.removeItem("price");
         }
       });
     }

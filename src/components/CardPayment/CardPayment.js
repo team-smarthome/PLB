@@ -15,7 +15,7 @@ import axios from "axios";
 import { Toast } from "../Toast/Toast";
 import Webcam from "react-webcam";
 import Select from "react-select";
-import { url_dev2 } from "../../services/env";
+import { url_dev2, url_dev3 } from "../../services/env";
 
 const socket = io("http://localhost:4499");
 
@@ -143,6 +143,10 @@ const CardPayment = ({
           localStorage.removeItem("cardNumberPetugas");
           localStorage.removeItem("key");
           localStorage.removeItem("token");
+          localStorage.removeItem("jenisDeviceId");
+          localStorage.removeItem("deviceId");
+          localStorage.removeItem("airportId");
+          localStorage.removeItem("price");
         }
       });
     }
@@ -697,7 +701,6 @@ const CardPayment = ({
   };
 
   const handleLogin = async (username, password) => {
-    // e.preventDefault();
     try {
       isLoading(true);
       const response = await axios.post(`${url_dev2}Login.php`, {
@@ -706,39 +709,82 @@ const CardPayment = ({
       });
 
       if (
-        response.data.status === "success" &&
-        response.data.profile.api.key === localStorage.getItem("key") &&
-        response.data.profile.api.token === localStorage.getItem("token")
+        response.data.JwtToken.token !== null &&
+        response.data.JwtToken.token !== "" &&
+        response.data.status === "success"
       ) {
-        isLoading(false);
-        console.log(response.data);
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-        localStorage.setItem("key", response.data.profile.api.key);
-        localStorage.setItem("token", response.data.profile.api.token);
-        localStorage.setItem(
-          "user",
-          JSON.stringify(response.data.profile.user_data)
-        );
-        sendDataUpdatePayment({
-          isConfirm: false,
-          isFailed: false,
-          isPrinted: false,
-          isSuccess: false,
-          isWaiting: true,
-          isPhoto: false,
-          isDoRetake: false,
-          paymentMethod: paymentMethod,
-          cardNumber: cardNumber,
-          expiry: expiry,
-          cvv: cvv,
-          type: type,
+        const userProfile = await axios.get(`${url_dev2}ProfileMe.php`, {
+          headers: {
+            Authorization: `Bearer ${response.data.JwtToken.token}`,
+          },
         });
-        handleSubmitKICASH();
-      } else if (
-        response.data.status === "success" &&
-        response.data.profile.api.key !== localStorage.getItem("key") &&
-        response.data.profile.api.token !== localStorage.getItem("token")
-      ) {
+
+        if (
+          userProfile.data.user_data !== null &&
+          userProfile.data.price !== null &&
+          userProfile.data.api !== null
+        ) {
+          if (userProfile.data.api.key === localStorage.getItem("key") && userProfile.data.api.token === localStorage.getItem("token")) {
+            localStorage.setItem("key", userProfile.data.api.key);
+            localStorage.setItem("token", userProfile.data.api.token);
+            localStorage.setItem(
+              "user",
+              JSON.stringify(userProfile.data.user_data)
+            );
+            localStorage.setItem("price", JSON.stringify(userProfile.data.price));
+            sendDataUpdatePayment({
+              isConfirm: false,
+              isFailed: false,
+              isPrinted: false,
+              isSuccess: false,
+              isWaiting: true,
+              isPhoto: false,
+              isDoRetake: false,
+              paymentMethod: paymentMethod,
+              cardNumber: cardNumber,
+              expiry: expiry,
+              cvv: cvv,
+              type: type,
+            });
+            handleSubmitKICASH();
+          } else if ( userProfile.data.api.key !== localStorage.getItem("key") && userProfile.data.api.token !== localStorage.getItem("token")) {
+            isLoading(false);
+            Swal.fire({
+              icon: "error",
+              title: "Please use the same account from the previous login",
+            });
+            sendDataUpdatePayment({
+              isWaiting: false,
+              isFailed: false,
+              isPrinted: false,
+              isSuccess: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: true,
+              isPhoto: false,
+              isDoRetake: false,
+              paymentMethod: paymentMethod,
+              cardNumber: cardNumber,
+              expiry: expiry,
+              cvv: cvv,
+              type: type,
+            });
+          } else {
+            isLoading(false);
+            Swal.fire({
+              icon: "error",
+              title: "Please use the same account from the previous login",
+            });
+          }
+        } else {
+          isLoading(false);
+          Swal.fire({
+            icon: "error",
+            title: "Failed to Payment",
+          });
+        }
+      } else if (response.data.status === "error" || response.data.message === "Login failed") {
         isLoading(false);
         Swal.fire({
           icon: "error",
@@ -769,10 +815,17 @@ const CardPayment = ({
     } catch (error) {
       isLoading(false);
       console.error("Error during login:", error);
-      Toast.fire({
-        icon: "error",
-        title: "Username or Password Invalid!",
-      });
+      if (error.response && error.response.status === 401) {
+        Toast.fire({
+          icon: "error",
+          title: "Username or Password is Wrong",
+        });
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: "Failed to Login",
+        });
+      }
       sendDataUpdatePayment({
         isWaiting: false,
         isFailed: false,

@@ -43,50 +43,78 @@ const Login = () => {
         username,
         password,
       });
-
-      if (response.data.status === "success") {
-        isLoading(false);
-        console.log("response: ", response.data);
+  
+      if (response.data.JwtToken.token !== null && response.data.JwtToken.token !== "" && response.data.status === "success")  {
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-        localStorage.setItem("key", response.data.profile.api.key);
-        localStorage.setItem("token", response.data.profile.api.token);
-        localStorage.setItem(
-          "user",
-          JSON.stringify(response.data.profile.user_data)
-        );
-
-        localStorage.setItem(
-          "price",
-          JSON.stringify(response.data.profile.price)
-        );
-
-        const userInfo = await JSON.parse(localStorage.getItem("user"));
-        if (
-          userInfo.group.code.includes("ADM") ||
-          userInfo.group.code.includes("SPV")
-        ) {
-          Toast.fire({
-            icon: "success",
-            title: "Welcome, Supervisor.",
-          });
-          navigate("/report");
+  
+        const userProfile = await axios.get(`${url_dev2}ProfileMe.php`, {
+          headers: {
+            Authorization: `Bearer ${response.data.JwtToken.token}`,
+          },
+        });
+  
+        // Check if userProfile.data.user_data is not null
+        if (userProfile.data.user_data !== null && userProfile.data.price !== null && userProfile.data.api !== null) {
+          isLoading(false);
+          localStorage.setItem("user", JSON.stringify(userProfile.data.user_data));
+          localStorage.setItem("price", JSON.stringify(userProfile.data.price));
+          localStorage.setItem("key", userProfile.data.api.key);
+          localStorage.setItem("token", userProfile.data.api.token);
+  
+          const userInfo = JSON.parse(localStorage.getItem("user"));
+  
+          if (
+            userInfo.group.code.includes("ADM") ||
+            userInfo.group.code.includes("SPV")
+          ) {
+            Toast.fire({
+              icon: "success",
+              title: "Welcome, Supervisor.",
+            });
+            navigate("/report");
+          } else {
+            Toast.fire({
+              icon: "success",
+              title: "Berhasil Masuk",
+            });
+            navigate("/home");
+          }
         } else {
+          isLoading(false);
+          localStorage.removeItem("JwtToken");
           Toast.fire({
-            icon: "success",
-            title: "Berhasil Masuk",
+            icon: "error",
+            title: "Failed to Login",
           });
-          navigate("/home");
         }
+      } else if (response.data.status === "error" || response.data.message === "Login failed"){
+       Toast.fire({
+          icon: "error",
+          title: "Username or Password is Wrong",
+        });
+        isLoading(false);
       } else {
-        alert("Username atau password salah!");
+        // Kondisi tambahan jika login tidak berhasil namun tidak ada pesan error yang sesuai
+        Toast.fire({
+          icon: "error",
+          title: "Failed to Login. Please try again.",
+        });
+        isLoading(false);
       }
     } catch (error) {
       isLoading(false);
-      console.error("Error during login:", error);
-      Toast.fire({
-        icon: "error",
-        title: "Gagal Masuk, UserName atau Password salah",
-      });
+      localStorage.removeItem("JwtToken");
+      if (error.response && error.response.status === 401) {
+        Toast.fire({
+          icon: "error",
+          title: "Username or Password is Wrong",
+        });
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: "Failed to Login",
+        });
+      }
     }
   };
 
