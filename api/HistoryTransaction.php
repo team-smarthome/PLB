@@ -71,7 +71,7 @@ foreach ($requiredFields as $field) {
 
 // print_r($url);
 // $url = "https://devapi-molina.imigrasi.go.id/api/visa/application/transaction-history";
-$url = "https://api-molina.imigrasi.go.id/visa/application/transaction_history";
+$url = "https://api-molina.imigrasi.go.id/api/visa/application/transaction_history";
 
 // Headers
 $headers = array(
