@@ -17,7 +17,7 @@ function Report() {
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(currentDate);
-  const [petugas, setPetugas] = useState("");
+  const [petugas, setPetugas] = useState([]);
   const [pages, setPages] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
     value: ["KICASH", "KIOSK"],
@@ -54,7 +54,7 @@ function Report() {
       startDate: startDate,
       endDate: endDate,
       paymentMethod: paymentMethodValue,
-      username: [petugas],
+      ername: petugas !== "" ? [petugas] : [],
       limit: perPage,
       page,
     };
@@ -64,7 +64,6 @@ function Report() {
       startDate !== payloadTempt.startDate ||
       endDate !== payloadTempt.endDate ||
       JSON.stringify(paymentMethodValue) !== JSON.stringify(payloadTempt.paymentMethod) ||
-      JSON.stringify([petugas]) !== JSON.stringify(payloadTempt.username) ||
       perPage !== payloadTempt.limit
     ) {
       setPages(1);
@@ -76,6 +75,8 @@ function Report() {
     try {
       const res = await apiPaymentHistory(header, bodyParams);
   
+      console.log("res:", res);
+
       if (res.data.message === "Invalid JWT Token" || res.data.message === "Expired JWT Token") {
         isLoading(false);
         Swal.fire({
