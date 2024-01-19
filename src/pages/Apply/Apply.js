@@ -717,14 +717,6 @@ const Apply = () => {
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
             setTimeout(() => {
-              setDisabled(false);
-              setTitleFooter("Next Step");
-              setTabStatus(1);
-              setStatusPaymentCredit(false);
-              setCardStatus("iddle");
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
               setCardPaymentProps({
                 isWaiting: false,
                 isCreditCard: false,
@@ -736,7 +728,7 @@ const Apply = () => {
                 isPhoto: false,
                 isDoRetake: false,
               });
-            }, 5000);
+            }, 2000);
           } else if (
             messageError === "Invalid JWT Token" ||
             messageError === "Expired JWT Token"
@@ -882,6 +874,18 @@ const Apply = () => {
           setIsEnableBack(true);
           setConfirm(false);
         }, 5000);
+      } else if (meesageConfirm === "Failed when request payment pg") {
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: false,
+            isFailed: false,
+            isPhoto: false,
+            isDoRetake: false,
+          });
       } else if (
         meesageConfirm === "Passport is not active for at least 6 months."
       ) {
