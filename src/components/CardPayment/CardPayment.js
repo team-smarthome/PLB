@@ -1210,6 +1210,7 @@ const CardPayment = ({
         dataNumberPermohonanPropsVisa={number}
         dataNumberPermohonanPropsReceipt={receipt}
         printRefProps={printRef}
+        dataPrice={formattedValue}
       />
     </div>
   );

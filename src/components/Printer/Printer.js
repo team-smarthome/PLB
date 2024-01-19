@@ -6,6 +6,7 @@ const Printer = ({
   dataNumberPermohonanPropsVisa,
   dataNumberPermohonanPropsReceipt,
   printRefProps,
+  dataPrice,
 }) => {
   console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
   console.log(
@@ -24,13 +25,17 @@ const Printer = ({
 
   const formattedTime = `${hour}:${minute}:${second}`;
   const formattedDate = `${day}/${month}/${year}`;
-  const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}`;
+  const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}, Price: ${dataPrice}`;
 
   return (
     <div className="container-print" ref={printRefProps}>
       <div className="wrappper-container">
         <h2>Date : {formattedDate}</h2>
         <h2>Time : {formattedTime}</h2>
+      </div>
+      <div className="wrappper-container">
+        <h2>IDR {dataPrice}</h2>
+
       </div>
 
       <div className="wrappper-container">

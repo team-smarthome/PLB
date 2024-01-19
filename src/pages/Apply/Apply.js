@@ -717,6 +717,7 @@ const Apply = () => {
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
             setTimeout(() => {
+              setDisabled(false);
               setCardPaymentProps({
                 isWaiting: false,
                 isCreditCard: false,
@@ -875,6 +876,7 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else if (meesageConfirm === "Failed when request payment pg") {
+        setDisabled(false);
           setCardPaymentProps({
             isWaiting: false,
             isCreditCard: false,
