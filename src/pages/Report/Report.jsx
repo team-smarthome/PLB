@@ -54,7 +54,7 @@ function Report() {
       startDate: startDate,
       endDate: endDate,
       paymentMethod: paymentMethodValue,
-      ername: petugas !== "" ? [petugas] : [],
+      username: petugas,
       limit: perPage,
       page,
     };
@@ -257,7 +257,7 @@ function Report() {
             name="petugas"
             id="petugas"
             value={petugas}
-            onChange={(e) => setPetugas(e.target.value)}
+            onChange={(e) => setPetugas([e.target.value])}
           />
 
           <label htmlFor="payment">Tipe</label>
