@@ -75,7 +75,7 @@ function Report() {
     try {
       const res = await apiPaymentHistory(header, bodyParams);
   
-      console.log("res:", res);
+      // console.log("res:", res);
 
       if (res.data.message === "Invalid JWT Token" || res.data.message === "Expired JWT Token") {
         isLoading(false);
@@ -117,7 +117,7 @@ function Report() {
         }
       }
     } catch (error) {
-      console.error("error:", error);
+      // console.error("error:", error);
     } finally {
       isLoading(false);
     }
@@ -129,7 +129,7 @@ function Report() {
     setCurrentPage(1);
   }, [startDate, endDate, petugas]);
 
-  console.log("nilai currentPage:", currentPage);
+  // console.log("nilai currentPage:", currentPage);
   
 
 

@@ -8,11 +8,11 @@ const Printer = ({
   printRefProps,
   dataPrice,
 }) => {
-  console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
-  console.log(
-    "dataNumberPermohonanPropsReceipt",
-    dataNumberPermohonanPropsReceipt
-  );
+  // console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
+  // console.log(
+  //   "dataNumberPermohonanPropsReceipt",
+  //   dataNumberPermohonanPropsReceipt
+  // );
   const tanggal = new Date();
 
   const day = String(tanggal.getDate()).padStart(2, "0");

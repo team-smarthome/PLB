@@ -9,7 +9,7 @@ function SpvLogin() {
 
   const handleLaporan = () => {
     navigate("/report");
-    console.log("navigate to /report");
+    // console.log("navigate to /report");
   };
 
   const handleMenu = () => {

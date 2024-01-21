@@ -102,7 +102,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   };
 
   const handleEmailChange = (event) => {
-    console.log("Email Input Change:", event.target.value);
+    // console.log("Email Input Change:", event.target.value);
     setEmail(event.target.value);
     setEmailWarning(false);
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -110,7 +110,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   };
 
   const handleEmailConfirmationChange = (event) => {
-    console.log("Email Confirmation Input Change:", event.target.value);
+    // console.log("Email Confirmation Input Change:", event.target.value);
     setEmailConfirmation(event.target.value);
     setEmailConfirmWarning(false);
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

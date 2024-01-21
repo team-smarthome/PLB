@@ -107,7 +107,7 @@ const Apply = () => {
     socketRef.current = new WebSocket(socketURL);
 
     socketRef.current.onopen = () => {
-      console.log("WebSocket connection opened");
+      // console.log("WebSocket connection opened");
       isCloseTimeoutSet = false;
       setCardStatus("errorConnection");
       // setCardStatus("checkData");
@@ -122,7 +122,7 @@ const Apply = () => {
 
     socketRef.current.onmessage = (event) => {
       const dataJson = JSON.parse(event.data);
-      console.log("Received data from server websocket:", dataJson);
+      // console.log("Received data from server websocket:", dataJson);
 
       switch (dataJson.msgType) {
         case "passportData":
@@ -175,16 +175,16 @@ const Apply = () => {
     };
 
     socketRef.current.onclose = () => {
-      console.log("status: ", isCloseTimeoutSet);
-      console.log("WebSocket connection closed");
+      // console.log("status: ", isCloseTimeoutSet);
+      // console.log("WebSocket connection closed");
       setIsConnected(false);
       setCardStatus("errorConnection");
       setTimeout(() => {
-        console.log("tahap timeout status", isCloseTimeoutSet);
+        // console.log("tahap timeout status", isCloseTimeoutSet);
         isCloseTimeoutSet = true;
       }, 3000);
       if (!isCloseTimeoutSet) {
-        console.log("tahap close");
+        // console.log("tahap close");
         setCardStatus("errorWebsocket");
       }
       // socket_IO.emit("clientData", "re-newIpAddress"); //image 1
@@ -248,9 +248,9 @@ const Apply = () => {
   }, []);
 
   useEffect(() => {
-    console.log("tahap nol");
+    // console.log("tahap nol");
     setDataPrimaryPassport(null);
-    console.log("receiveTempData: ", receiveTempData);
+    // console.log("receiveTempData: ", receiveTempData);
     if (receiveTempData.length > 0) {
       const passportUser = receiveTempData.filter(
         (obj) => obj.msgType === "passportData"
@@ -258,10 +258,10 @@ const Apply = () => {
       const passportImage = receiveTempData.filter(
         (obj) => obj.msgType === "visibleImage"
       );
-      console.log("passportUser", passportUser);
-      console.log("passportImage", passportImage);
+      // console.log("passportUser", passportUser);
+      // console.log("passportImage", passportImage);
       if (passportUser.length > 0 && passportImage.length > 0) {
-        console.log("tahap satu");
+        // console.log("tahap satu");
         const tempPassportUser = passportUser[0];
         const tempPassportImage = passportImage[0];
         if (
@@ -282,7 +282,7 @@ const Apply = () => {
           !tempPassportUser.sex.includes("*") &&
           tempPassportImage.visibleImage !== ""
         ) {
-          console.log("tahap dua");
+          // console.log("tahap dua");
           setTimeout(() => {
             setDataPrimaryPassport(tempPassportUser);
           }, 1000);
@@ -298,7 +298,7 @@ const Apply = () => {
         (passportUser.length === 0 && passportImage.length > 0) ||
         (passportUser.length > 0 && passportImage.length === 0)
       ) {
-        console.log("tahap testing");
+        // console.log("tahap testing");
 
         setCardStatus("waiting");
 
@@ -314,7 +314,7 @@ const Apply = () => {
             }, 3000);
             setRecievedTempData([]);
           } else {
-            console.log("Kondisi tidak terpenuhi setelah 10 detik");
+            // console.log("Kondisi tidak terpenuhi setelah 10 detik");
             setRecievedTempData([]);
           }
         }, 10000);
@@ -323,12 +323,12 @@ const Apply = () => {
 
         return cleanup;
       } else {
-        console.log("ttesting waiting");
+        // console.log("ttesting waiting");
         setCardStatus("errorchecksum");
         setDataPrimaryPassport(null);
       }
     } else {
-      console.log("testing else akhir");
+      // console.log("testing else akhir");
 
       // =================== START TESTING TANPA ALAT ===================//
 
@@ -373,7 +373,7 @@ const Apply = () => {
   }, [receiveTempData, passportUser, passportImage]);
 
   const doCheckValidationPassport = async (dataPaspor) => {
-    console.log("docheckvalid", dataPaspor);
+    // console.log("docheckvalid", dataPaspor);
     setCardStatus("success");
     setTimeout(() => {
       setCardStatus("checkData");
@@ -433,7 +433,7 @@ const Apply = () => {
         setCardStatus("postalCode");
         setTabStatus(4);
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
-        console.log("sharedData: ", sharedData);
+        // console.log("sharedData: ", sharedData);
         setCardStatus("goPayment");
         setTitleHeader("Payment");
       } else if (titleFooter === "Next Print") {
@@ -465,7 +465,7 @@ const Apply = () => {
           setDataPrimaryPassport(null);
         }, 3000);
       } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
-        console.log("ini dijalankan");
+        // console.log("ini dijalankan");
         doSaveRequestVoaPayment(sharedData);
       }
     }
@@ -504,7 +504,7 @@ const Apply = () => {
   }, [cardPaymentProps]);
 
   const doSaveRequestVoaPayment = async (sharedData) => {
-    console.log("doSaveRequestVoaPayment");
+    // console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
     const key = localStorage.getItem("key");
     const devicedId = localStorage.getItem("deviceId");
@@ -517,7 +517,7 @@ const Apply = () => {
       "Content-Type": "application/json",
     };
     //chek apakah payment Method ada atau tidak
-    console.log("sharedDataPaymentProps", shareDataPaymentProps);
+    // console.log("sharedDataPaymentProps", shareDataPaymentProps);
 
     const bodyParam = {
       passportNumber: sharedData.passportData.docNumber,
@@ -560,7 +560,7 @@ const Apply = () => {
       });
       const res = await apiPaymentGateway(header, bodyParam);
       const data = res.data;
-      console.log("data", data);
+      // console.log("data", data);
       setDataPermohonan(data.data);
       if (data.code === 200 && data.message === "E-Voa created successfuly!") {
         setCardPaymentProps({
@@ -995,7 +995,7 @@ const Apply = () => {
           localStorage.removeItem("price");
         }, 5000);
       } else {
-        console.log("jalan gk ya??");
+        // console.log("jalan gk ya??");
         setDisabled(false);
         setTabStatus(1);
         setTitleFooter("Next Step");

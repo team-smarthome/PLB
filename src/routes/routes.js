@@ -20,7 +20,7 @@ const isAuthenticated = () => {
   const now = Date.now();
   const isExpired = now > expirationTime;
   const date = new Date(expirationTime);
-  console.log(date.toString());
+  // console.log(date.toString());
 
   if (isExpired) {
     // Clear localStorage if token is expired

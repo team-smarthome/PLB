@@ -58,10 +58,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   const [formdata, setFormData] = useState(initialFormData);
   
   useEffect(() => {
-    console.log("test shared data", sharedData.passportData);
+    // console.log("test shared data", sharedData.passportData);
 
     if (sharedData.passportData === null) {
-      console.log("test shared data null");
+      // console.log("test shared data null");
       setFormData(initialFormData);
     } else {
       const dataNationality = dataNegara.data.map((negara) => ({
@@ -124,7 +124,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
+    // console.log(name, value);
     setFormData({
       ...formdata,
       [name]: value,
@@ -137,8 +137,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         [name]: value,
       },
     }));
-    console.log(sharedData);
-    console.log(formdata);
+    // console.log(sharedData);
+    // console.log(formdata);
   };
 
   const handleImageClick = (type) => {
@@ -167,7 +167,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
 
   const handleSelectChange = (selectedOption, fieldName) => {
-    console.log(selectedOption);
+    // console.log(selectedOption);
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: selectedOption,
@@ -181,7 +181,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
       },
     }));
 
-    console.log(formdata);
+    // console.log(formdata);
   };
 
   const handleSubmit = async (e) => {

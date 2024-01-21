@@ -14,7 +14,7 @@ const Home = () => {
   };
 
   const btnOnClick_Informasi = () => {
-    console.log("INFORMASI");
+    // console.log("INFORMASI");
   };
 
   const handleLogout = async () => {

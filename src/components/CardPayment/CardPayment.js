@@ -173,20 +173,20 @@ const CardPayment = ({
 
           setOptionCreditTypes(creditTypes);
         } else {
-          console.error("Invalid or unexpected API response format");
+          // console.error("Invalid or unexpected API response format");
         }
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       });
   }, []);
 
   useEffect(() => {
     socket.on("connected", (message) => {
-      console.log("connected client to server");
+      // console.log("connected client to server");
     });
     socket.on("getCredentials", (data) => {
-      console.log(`client getCredentials: ${JSON.stringify(data)}`);
+      // console.log(`client getCredentials: ${JSON.stringify(data)}`);
       if (data) {
         const inputCC = data.ccnum.replace(/\D/g, "");
         if (inputCC.length <= 16) {
@@ -223,30 +223,30 @@ const CardPayment = ({
             ? "MASTERCARD"
             : cleanedType;
         setType(finalType);
-        console.log("inputType: ", inputType);
+        // console.log("inputType: ", inputType);
 
         if (data.cardtype === "" || data.cardtype !== "") {
           setIsCheckedType(true);
         }
       }
-      console.log("data: ", data);
+      // console.log("data: ", data);
     });
   }, []);
 
-  console.table({
-    isCreditCard,
-    isPaymentCredit,
-    isPaymentCash,
-    isWaiting,
-    isFailed,
-    isPrinted,
-    isSuccess,
-    paymentMethod,
-    cardNumber,
-    expiry,
-    cvv,
-    type,
-  });
+  // console.table({
+  //   isCreditCard,
+  //   isPaymentCredit,
+  //   isPaymentCash,
+  //   isWaiting,
+  //   isFailed,
+  //   isPrinted,
+  //   isSuccess,
+  //   paymentMethod,
+  //   cardNumber,
+  //   expiry,
+  //   cvv,
+  //   type,
+  // });
 
   useEffect(() => {
     // ini jika semua false
@@ -353,7 +353,7 @@ const CardPayment = ({
       !isPaymentCash &&
       !isCreditCard
     ) {
-      console.log("dataPermohonanUser: ", dataPermohonanUser);
+      // console.log("dataPermohonanUser: ", dataPermohonanUser);
       setNumber(dataPermohonanUser?.visa_number ?? "");
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       setUrl(dataPermohonanUser?.form_url ?? "");
@@ -472,7 +472,7 @@ const CardPayment = ({
 
   useEffect(() => {
     setFailedMessage(FailedPesan);
-    console.log("failedMessage cardPayment: ", failedMessage);
+    // console.log("failedMessage cardPayment: ", failedMessage);
   }, [FailedPesan, failedMessage]);
 
   const handleExpiryChange = (e) => {
@@ -507,7 +507,7 @@ const CardPayment = ({
   const handlePaymentCredit = () => {
     handleTokenExpiration();
     setPaymentMethod("KIOSK");
-    console.log("berhasil");
+    // console.log("berhasil");
     sendDataUpdatePayment({
       isWaiting: false,
       isFailed: false,
@@ -533,9 +533,9 @@ const CardPayment = ({
     setCvv("000");
     setType("CASH");
     setDataPasporUser(dataUser);
-    console.log("berhasil");
+    // console.log("berhasil");
     setCardNumber(cardNumberPetugass);
-    console.log("cardNumberPetugas: ", cardNumberPetugass);
+    // console.log("cardNumberPetugas: ", cardNumberPetugass);
     sendDataUpdatePayment({
       isWaiting: false,
       isFailed: false,
@@ -613,7 +613,7 @@ const CardPayment = ({
             user_data: { ...user_data },
           };
 
-          console.log("dataParam: ", dataParam);
+          // console.log("dataParam: ", dataParam);
           sendDataUpdatePayment({
             isWaiting: false,
             isConfirm: false,
@@ -639,9 +639,9 @@ const CardPayment = ({
   const handleSubmitKICASH = () => {
     handleTokenExpiration();
     isLoading(false);
-    console.log("dataPasporUser1: ", dataPasporUser);
+    // console.log("dataPasporUser1: ", dataPasporUser);
     // e.preventDefault();
-    console.log("dataPasporUser2: ", dataPasporUser);
+    // console.log("dataPasporUser2: ", dataPasporUser);
     setCardNumber(cardNumberPetugass);
     if (cardNumber === "") {
       setCardNumberWarning(true);
@@ -672,7 +672,7 @@ const CardPayment = ({
         country: dataPasporUser.passportData.nationality,
       };
 
-      console.log("dataPasporUser: ", dataPasporUser);
+      // console.log("dataPasporUser: ", dataPasporUser);
 
       const dataParam = {
         card_data: { ...card_data },
@@ -680,7 +680,7 @@ const CardPayment = ({
         user_data: { ...user_data },
       };
 
-      console.log("dataParam: ", dataParam);
+      // console.log("dataParam: ", dataParam);
       sendDataUpdatePayment({
         isWaiting: false,
         isConfirm: false,
@@ -814,7 +814,7 @@ const CardPayment = ({
       }
     } catch (error) {
       isLoading(false);
-      console.error("Error during login:", error);
+      // console.error("Error during login:", error);
       if (error.response && error.response.status === 401) {
         Toast.fire({
           icon: "error",
