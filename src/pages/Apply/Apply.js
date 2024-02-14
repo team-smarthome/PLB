@@ -10,6 +10,7 @@ import { apiPaymentGateway } from "../../services/api";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
+import { Toast } from "../../components/Toast/Toast";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -34,6 +35,25 @@ const Apply = () => {
   const [meesageConfirm, setMessageConfirm] = useState(
     "Network / Card error / declined dll"
   );
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
@@ -132,7 +152,9 @@ const Apply = () => {
             .split("-")
             .map(Number);
 
-          const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+          // const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+          const currentYear = new Date().getFullYear();
+          const adjustedYear = year < currentYear - 2000 ? 2000 + year : 1900 + year;
 
           const formattedDate = new Date(adjustedYear, month - 1, day + 1)
             .toISOString()
@@ -179,12 +201,14 @@ const Apply = () => {
       // console.log("WebSocket connection closed");
       setIsConnected(false);
       setCardStatus("errorConnection");
+      // setCardStatus("checkData")
       setTimeout(() => {
         // console.log("tahap timeout status", isCloseTimeoutSet);
         isCloseTimeoutSet = true;
       }, 3000);
       if (!isCloseTimeoutSet) {
         // console.log("tahap close");
+        // setCardStatus("checkData")
         setCardStatus("errorWebsocket");
       }
       // socket_IO.emit("clientData", "re-newIpAddress"); //image 1
@@ -366,7 +390,7 @@ const Apply = () => {
       // }, 2000);
 
       // setIsEnableStep(true);
-      // setIsEnableBack(false);
+      // setIsEnableBack(true);
 
       // =================== END TESTING TANPA ALAT ===================//
     }
@@ -396,6 +420,15 @@ const Apply = () => {
   }, [cardPaymentProps]);
 
   const btnOnClick_Back = () => {
+    if (!isOnline) {
+      Toast.fire({
+        icon: "error",
+        title: "No Internet Connection",
+      });
+      return;
+    }
+
+
     if (isEnableBack) {
       if (cardPaymentProps.isPaymentCredit || cardPaymentProps.isPaymentCash) {
         setCardPaymentProps({
@@ -417,11 +450,27 @@ const Apply = () => {
         });
       } else if (cardStatus === "iddle") {
         navigate("/home");
+      } else if (cardStatus === "lookCamera" ) {
+        setTabStatus(1);
+        setCardStatus("checkData")
+      } else if (cardStatus === "postalCode" ) {
+        setTabStatus(3);
+        setCardStatus("inputEmail");
+      } else if (cardStatus === "takePhotoSucces") {
+        setTabStatus(1);
+        setCardStatus("checkData")
       }
     }
   };
 
   const btnOnClick_Step = () => {
+    if (!isOnline) {
+      Toast.fire({
+        icon: "error",
+        title: "No Internet Connection",
+      });
+      return;
+    }
     if (isEnableStep) {
       if (cardStatus === "checkData") {
         setCardStatus("lookCamera");

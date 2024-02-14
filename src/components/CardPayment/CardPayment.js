@@ -823,7 +823,7 @@ const CardPayment = ({
       } else {
         Toast.fire({
           icon: "error",
-          title: "Failed to Login",
+          title: "VPN connection is interrupted",
         });
       }
       sendDataUpdatePayment({

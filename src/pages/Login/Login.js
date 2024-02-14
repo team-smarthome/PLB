@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import "./LoginStyle.css";
 import axios from "axios";
@@ -18,8 +18,44 @@ const Login = () => {
   };
 
   const [loading, isLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  const version = "1.0.29";
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   let timer;
+  //   if (loading) {
+  //     timer = setTimeout(() => {
+  //       Toast.fire({
+  //         icon: "error",
+  //         title: "VPN connection is interrupted",
+  //       });
+  //       isLoading(false)
+  //     }, 10000); // 0 seconds
+  //   } else {
+  //     clearTimeout(timer);
+  //   }
+
+  //   return () => clearTimeout(timer);
+  // }, [loading]);
+
+  const version = "1.0.30";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;
@@ -37,6 +73,13 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!isOnline) {
+      Toast.fire({
+        icon: "error",
+        title: "No Internet Connection",
+      });
+      return;
+    }
     try {
       isLoading(true);
       const response = await axios.post(`${url_dev2}Login.php`, {
@@ -126,7 +169,7 @@ const Login = () => {
       } else {
         Toast.fire({
           icon: "error",
-          title: "Failed to Login",
+          title: "VPN connection is interrupted",
         });
       }
     }
