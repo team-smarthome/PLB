@@ -2,7 +2,7 @@ import React from "react";
 import "./Table.css";
 // ...
 
-const Table = ({ data, page }) => {
+const Table = ({ data, page, response }) => {
   // Check if data is not an array or is empty
   if (!Array.isArray(data) || data.length === 0) {
     return <div>No data available.</div>;
@@ -14,6 +14,7 @@ const Table = ({ data, page }) => {
 
   // Display only the data within the calculated indices
   const slicedData = data.slice(startIndex, endIndex);
+  const isLastPage = endIndex === data.length;
 
   return (
     <table className="custom-table">
@@ -50,6 +51,20 @@ const Table = ({ data, page }) => {
           </tr>
         ))}
       </tbody>
+      {/* Total row */}
+      {isLastPage && (
+      <tfoot>
+        <tr>
+          <td colSpan="8">Total Payment</td>
+          <td>
+            {new Intl.NumberFormat("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            }).format(response[0].payment_summary.total)}
+          </td>
+        </tr>
+      </tfoot>
+         )}
     </table>
   );
 };

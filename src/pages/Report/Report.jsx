@@ -8,12 +8,15 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { dataPetugasDenpasar, dataPetugasJakarta } from "../../utils/dataPetugas";
 
 function Report() {
   const navigate = useNavigate();
   const [loading, isLoading] = useState(false);
   const currentDate = new Date(Date.now()).toISOString().split("T")[0];
   const [data, setData] = useState([]);
+  const [response, setResponse] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(currentDate);
@@ -30,26 +33,25 @@ function Report() {
     { value: ["KICASH", "KIOSK"], label: "ALL" },
   ];
 
+  const [petugasOptions, setPetugasOptions] = useState([]);
 
-
-
-  let payloadTempt = {}; 
+  let payloadTempt = {};
 
   const doPaymentHistory = async (page) => {
     isLoading(true);
-  
+
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
       Authorization: `Bearer ${bearerToken}`,
       "Content-Type": "application/json",
     };
-  
+
     let paymentMethodValue = [selectedPaymentMethod.value];
-  
+
     if (Array.isArray(selectedPaymentMethod.value)) {
       paymentMethodValue = selectedPaymentMethod.value;
     }
-  
+
     const bodyParams = {
       startDate: startDate,
       endDate: endDate,
@@ -58,12 +60,13 @@ function Report() {
       limit: perPage,
       page,
     };
-  
+
     // Menambahkan kondisi untuk memeriksa perubahan parameter
     if (
       startDate !== payloadTempt.startDate ||
       endDate !== payloadTempt.endDate ||
-      JSON.stringify(paymentMethodValue) !== JSON.stringify(payloadTempt.paymentMethod) ||
+      JSON.stringify(paymentMethodValue) !==
+        JSON.stringify(payloadTempt.paymentMethod) ||
       perPage !== payloadTempt.limit
     ) {
       setPages(1);
@@ -71,17 +74,20 @@ function Report() {
       setCurrentPage(1);
       payloadTempt = { ...bodyParams };
     }
-  
+
     try {
       const res = await apiPaymentHistory(header, bodyParams);
-  
+
       // console.log("res:", res);
 
-      if (res.data.message === "Invalid JWT Token" || res.data.message === "Expired JWT Token") {
+      if (
+        res.data.message === "Invalid JWT Token" ||
+        res.data.message === "Expired JWT Token"
+      ) {
         isLoading(false);
         Swal.fire({
           icon: "error",
-          text:  `${res.data.message}`,
+          text: `${res.data.message}`,
           confirmButtonColor: "#3d5889",
         }).then((result) => {
           if (result.isConfirmed) {
@@ -110,6 +116,7 @@ function Report() {
             ...prevData,
             ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
           ]);
+          setResponse(res.data);
           setPages((prevPages) => prevPages + 1);
           await doPaymentHistory(page + 1);
         } else {
@@ -123,15 +130,45 @@ function Report() {
     }
   };
 
-    
   useEffect(() => {
     // Reset page to 1 when startDate, endDate, or petugas changes
     setCurrentPage(1);
   }, [startDate, endDate, petugas]);
 
   // console.log("nilai currentPage:", currentPage);
-  
 
+  useEffect(() => {
+    const city = JSON.parse(localStorage.getItem("user"));
+    const officeCity = city?.organization?.officeCity;
+
+    let dataPetugas = [];
+
+    if (officeCity === "DENPASAR") {
+      dataPetugas = dataPetugasDenpasar.petugas;
+    } else  if (officeCity === "JAKARTA") {
+      dataPetugas = dataPetugasJakarta.petugas; 
+    }
+    //ceck jumlah data petugas
+    console.log("dataPetugas:", dataPetugas);
+    const options = dataPetugas.map((petugas) => ({
+      value: petugas.id,
+      label: petugas.username,
+    }));
+    setPetugasOptions(options);
+
+    // axios
+    //   .get("http://localhost:3000/petugas")
+    //   .then((response) => {
+    //     const options = response.data.map((petugas) => ({
+    //       value: petugas.id,
+    //       label: petugas.username,
+    //     }));
+    //     setPetugasOptions(options);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching petugas data:", error);
+    //   });
+  }, []);
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
@@ -140,22 +177,20 @@ function Report() {
   const startIndex = (currentPage - 1) * perPage;
 
   const pageCount = data.length / 10;
-
   const generatePDF = () => {
     const pdf = new jsPDF();
-
+  
     const fontSize = 10;
-
-
+  
     const currentDate = new Date();
     const formattedDate = `${currentDate.toLocaleDateString(
       "en-GB"
     )} ${currentDate.toLocaleTimeString("en-US", { hour12: true })}`;
-
+  
     pdf.setFontSize(fontSize);
-
-    pdf.text(`Reconsiliation Date: ${startDate} -  ${endDate} `, 16, 20);
-
+  
+    pdf.text(`Reconciliation Date: ${startDate} - ${endDate}`, 16, 20);
+  
     const itemHeaders = [
       "No",
       "Date",
@@ -183,20 +218,29 @@ function Report() {
         currency: "IDR",
       }).format(item.billed_price),
     ]);
-
+  
+    const totalPayment = response.length > 0 ? response[0].payment_summary.total : 0;
+  
+    const totalRow = ["", "", "", "", "", "", "", "", "TOTAL:", new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    }).format(totalPayment)];
+  
+    const tableY = pdf.autoTable.previous.finalY + 10; // Get the final Y position of the table
+  
     pdf.autoTable({
       head: [itemHeaders],
-      body: itemRows,
+      body: [...itemRows, totalRow],
       startY: 30,
       styles: {
-        fontSize: 6,
+        fontSize: 5,
       },
     });
-
-    const filename = `${formattedDate}`.replace(/\s+/g, "_");
-
-    pdf.save(`${filename}.pdf`);
+  
+    pdf.save(`${formattedDate}.pdf`);
   };
+
+  
   const storage = JSON.parse(localStorage.getItem("user"));
   const name = storage.fullName;
 
@@ -235,7 +279,7 @@ function Report() {
         <form action="#" method="POST" className="form-filter">
           <label htmlFor="tanggalAwal">Tanggal Awal</label>
           <input
-            type="date"
+            type="datetime-local"
             name="tanggalAwal"
             id="tanggalAwal"
             value={startDate}
@@ -244,7 +288,7 @@ function Report() {
 
           <label htmlFor="tanggalAkhir">Tanggal Akhir</label>
           <input
-            type="date"
+            type="datetime-local"
             name="tanggalAkhir"
             id="tanggalAkhir"
             value={endDate}
@@ -252,13 +296,60 @@ function Report() {
           />
 
           <label htmlFor="petugas">Petugas</label>
-          <input
+          <div className="select-petugas">
+            <Select
+              id="petugas"
+              value={
+                petugas
+                  ? petugasOptions.find((option) => option.value === petugas)
+                  : ""
+              }
+              onChange={(selectedOption) => setPetugas([selectedOption.label])}
+              options={petugasOptions}
+              className="basic-single"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+          </div>
+
+          {/* <select
+            name="petugas"
+            id="petugas"
+            value={petugas}
+            onChange={(e) => setPetugas(e.target.value)}
+          >
+            <option value="">Pilih Petugas</option>
+            {petugasOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select> */}
+          {/* <input
             type="text"
             name="petugas"
             id="petugas"
             value={petugas}
             onChange={(e) => setPetugas([e.target.value])}
-          />
+          /> */}
 
           <label htmlFor="payment">Tipe</label>
           <Select
@@ -300,7 +391,7 @@ function Report() {
           </div>
         ) : (
           <>
-            <Table data={data} page={currentPage} />
+            <Table data={data} response={response} page={currentPage} />
             <div className="table-footer">
               <Pagination
                 onPageChange={handlePageClick}

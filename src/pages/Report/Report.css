@@ -23,7 +23,7 @@
 /* Apply styles to each label and input pair */
 .form-filter input {
   margin-right: 6%; /* Add some spacing between label-input pairs */
-
+  
   height: 30px;
   outline: none; /* Remove focus border */
   padding: 0 10px; /* Add some padding */
@@ -95,6 +95,11 @@
   display: inline-block;
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
+}
+
+.select-petugas {
+  width: 17%;
+  margin-right: 6%;
 }
 
 .table-header {
