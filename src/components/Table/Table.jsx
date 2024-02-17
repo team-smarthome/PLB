@@ -21,6 +21,7 @@ const Table = ({ data, page, response }) => {
       <thead>
         <tr>
           <th>No</th>
+          <th>Tanggal</th>
           <th>Register Number</th>
           <th>Nama</th>
           <th>No Passport</th>
@@ -35,6 +36,7 @@ const Table = ({ data, page, response }) => {
         {slicedData.map((item, index) => (
           <tr key={index}>
             <td>{startIndex + index + 1}</td>
+            <td>{item.timestamp}</td>
             <td>{item.register_number}</td>
             <td>{item.full_name}</td>
             <td>{item.passport_number}</td>
@@ -55,7 +57,7 @@ const Table = ({ data, page, response }) => {
       {isLastPage && (
       <tfoot>
         <tr>
-          <td colSpan="8">Total Payment</td>
+          <td colSpan="9">Total Payment</td>
           <td>
             {new Intl.NumberFormat("id-ID", {
               style: "currency",
