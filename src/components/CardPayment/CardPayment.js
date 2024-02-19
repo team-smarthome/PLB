@@ -182,10 +182,13 @@ const CardPayment = ({
   }, []);
 
   useEffect(() => {
-    socket.on("connected", (message) => {
-      // console.log("connected client to server");
+    const socketIoClient = io("http://localhost:4499");
+
+    socketIoClient.on("connect", () => {
+      console.log("Connected to server socket.io");
     });
-    socket.on("getCredentials", (data) => {
+
+    socketIoClient.on("getCredentials", (data) => {
       // console.log(`client getCredentials: ${JSON.stringify(data)}`);
       if (data) {
         const inputCC = data.ccnum.replace(/\D/g, "");
@@ -196,6 +199,15 @@ const CardPayment = ({
               ?.join(" ")
               .substring(0, 19)
           );
+
+          const params = {
+            code: "input-card-number",
+            data: inputCC
+              .match(/.{1,4}/g)
+              ?.join(" ")
+              .substring(0, 19),
+          };
+          socket.emit("WebClientMessage", JSON.stringify(params));
         }
         const inputExp = data.expdate;
         const year = inputExp.substring(0, 2);
@@ -207,8 +219,20 @@ const CardPayment = ({
             .replace(/(\/\d{2})\d+?$/, "$1");
 
           if (/^\d{0,2}\/?\d{0,2}$/.test(formattedInput)) {
+            const params = {
+              code: "input-expired",
+              data: formattedInput,
+            };
+            socket.emit("WebClientMessage", JSON.stringify(params));
+
             return formattedInput;
           } else {
+            const params = {
+              code: "input-expired",
+              data: prevExpiry,
+            };
+            socket.emit("WebClientMessage", JSON.stringify(params));
+
             return prevExpiry;
           }
         });
@@ -231,6 +255,50 @@ const CardPayment = ({
       }
       // console.log("data: ", data);
     });
+
+    const handleInputCardNumber = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received input-card-number data: ", dataParse);
+        const text = dataParse?.data;
+        setCardNumber(text);
+      } catch (error) {
+        console.error("Error parsing input-card-number data:", error);
+      }
+    };
+
+    const handleInputExpiredDate = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received input-expired data: ", dataParse);
+        const text = dataParse?.data;
+        setExpiry(text);
+      } catch (error) {
+        console.error("Error parsing input-expired data:", error);
+      }
+    };
+
+    const handleInputCVV = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received input-cvv data: ", dataParse);
+        const text = dataParse?.data;
+        setCvv(text);
+      } catch (error) {
+        console.error("Error parsing input-cvv data:", error);
+      }
+    };
+
+    socketIoClient.on("input-card-number", handleInputCardNumber);
+    socketIoClient.on("input-expired", handleInputExpiredDate);
+    socketIoClient.on("input-cvv", handleInputCVV);
+
+    return () => {
+      socketIoClient.disconnect();
+      socketIoClient.off("input-card-number", handleInputCardNumber);
+      socketIoClient.off("input-expired", handleInputExpiredDate);
+      socketIoClient.off("input-cvv", handleInputCVV);
+    };
   }, []);
 
   // console.table({
@@ -278,6 +346,11 @@ const CardPayment = ({
           cvv: cvv,
           type: type,
         });
+        const params = {
+          code: "card",
+          data: "",
+        };
+        socket.emit("WebClientMessage", JSON.stringify(params));
         setCardNumber("");
         setExpiry("");
         setCvv("");
@@ -315,6 +388,11 @@ const CardPayment = ({
             cvv: cvv,
             type: type,
           });
+          const params = {
+            code: "card",
+            data: "",
+          };
+          socket.emit("WebClientMessage", JSON.stringify(params));
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }

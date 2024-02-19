@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import dataKodePos from "../../utils/dataKodePos";
 import { Label } from "flowbite-react";
 import Select from "react-select";
+import io from "socket.io-client";
 
 const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -154,7 +155,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   };
 
   const handleButtonClickPostalCode = () => {
-
     if (!selectedKabupaten) {
       setTitleWarning("Please select your city!");
       setPostalCodeWarning(true);
@@ -169,8 +169,76 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         titleFooter: "Payment",
       });
     }
-
   };
+
+  useEffect(() => {
+    // Start Connect to Server Socket.IO
+    const socket_IO = io("http://localhost:4499");
+
+    socket_IO.on("connect", () => {
+      console.log("Connected to server socket.io");
+    });
+
+    socket_IO.on("disconnect", () => {
+      console.log("Disconnected from server socket.io");
+    });
+
+    const handleInputEmail = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        // console.log("Received input-email data: ", dataParse);
+        const textEmail = dataParse.data;
+        setEmail(textEmail);
+        setEmailWarning(false);
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        setIsValidEmail(emailRegex.test(textEmail));
+      } catch (error) {
+        console.error("Error parsing input-email data:", error);
+      }
+    };
+
+    const handleInputEmailConfirm = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        // console.log("Received input-email-confirm data: ", dataParse);
+        const textEmail = dataParse.data;
+        setEmailConfirmation(textEmail);
+        setEmailConfirmWarning(false);
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        setIsValidEmailConfirmation(emailRegex.test(textEmail));
+      } catch (error) {
+        console.error("Error parsing input-email-confirm data:", error);
+      }
+    };
+
+    const handleSubmitEmail = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received submit-email data: ", dataParse);
+
+        sendDataToInput({
+          statusCardBox: "emailSucces",
+          emailUser: email,
+          capturedImage: capturedImage,
+          titleHeader: "Apply VOA",
+          titleFooter: "Next Step",
+        });
+      } catch (error) {
+        console.error("Error parsing submit-email data:", error);
+      }
+    };
+
+    socket_IO.on("input-email", handleInputEmail);
+    socket_IO.on("input-email-confirm", handleInputEmailConfirm);
+    socket_IO.on("submit-email", handleSubmitEmail);
+
+    return () => {
+      socket_IO.disconnect();
+      socket_IO.off("input-email", handleInputEmail);
+      socket_IO.off("input-email-confirm", handleInputEmailConfirm);
+      socket_IO.off("submit-email", handleSubmitEmail);
+    };
+  }, [capturedImage, email, sendDataToInput]);
 
   useEffect(() => {
     // Cari data kode pos berdasarkan kabupaten yang dipilih
@@ -201,6 +269,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 type="text"
                 name="email"
                 placeholder="Email"
+                value={email}
                 onChange={handleEmailChange}
               />
             </div>
@@ -211,6 +280,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 type="text"
                 name="email-confirmation"
                 placeholder="Email Confirmation"
+                value={emailConfirmation}
                 onChange={handleEmailConfirmationChange}
               />
             </div>
@@ -230,9 +300,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
       case "postalCode":
         return (
           <>
-            <h1 className="card-title" style={{
-              marginBottom: "8%"
-            }}>Please Input Your City</h1>
+            <h1
+              className="card-title"
+              style={{
+                marginBottom: "8%",
+              }}
+            >
+              Please Input Your City
+            </h1>
             <div className="input-postal-code">
               <Select
                 value={selectedKabupaten}
@@ -241,31 +316,31 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 className="basic-single"
                 classNamePrefix="select"
                 styles={{
-                container: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "50vh",
-                  maxHeight: "30px",
-                  borderRadius: "500px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                  
-                  marginBottom: "15%",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-              }}
+                  container: (provided) => ({
+                    ...provided,
+                    flex: 1,
+                    width: "50vh",
+                    maxHeight: "30px",
+                    borderRadius: "500px",
+                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                    fontFamily: "Roboto, Arial, sans-serif",
+
+                    marginBottom: "15%",
+                  }),
+                  valueContainer: (provided) => ({
+                    ...provided,
+                    flex: 1,
+                    width: "100%",
+                  }),
+                  control: (provided) => ({
+                    ...provided,
+                    flex: 1,
+                    width: "100%",
+                  }),
+                }}
               />
             </div>
-            <div className="input-email" style={{marginBottom: "4%"}}>
+            <div className="input-email" style={{ marginBottom: "4%" }}>
               <input
                 type="text"
                 name="postal-code"
@@ -275,9 +350,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 disabled
               />
             </div>
-            {postalCodeWarning && (
-              <div className="warning">{titleWarning}</div>
-            )}
+            {postalCodeWarning && <div className="warning">{titleWarning}</div>}
             <button
               type="button"
               className="ok-button"

@@ -11,6 +11,7 @@ import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
+const socket_IO = io("http://localhost:4499");
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -154,7 +155,8 @@ const Apply = () => {
 
           // const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
           const currentYear = new Date().getFullYear();
-          const adjustedYear = year < currentYear - 2000 ? 2000 + year : 1900 + year;
+          const adjustedYear =
+            year < currentYear - 2000 ? 2000 + year : 1900 + year;
 
           const formattedDate = new Date(adjustedYear, month - 1, day + 1)
             .toISOString()
@@ -232,6 +234,7 @@ const Apply = () => {
     // localStorage.setItem("deviceId", deviceId);
     // localStorage.setItem("jenisDeviceId", jenisDeviceId);
     // const cardNumberPetugas = "1101320000001255";
+    // setCardNumberPetugas(cardNumberPetugas);
     //===== END TESTING TANPA ALAT =====//
 
     const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
@@ -353,12 +356,9 @@ const Apply = () => {
       }
     } else {
       // console.log("testing else akhir");
-
       // =================== START TESTING TANPA ALAT ===================//
-
       // const dataHardCodePaspor = dataPasporUser;
       // const dataHarCodePasporImg = dataPasporImg;
-
       // let fullName =
       //   dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
       // const [day, month, year] = dataHardCodePaspor.birthDate
@@ -367,31 +367,24 @@ const Apply = () => {
       // const [day1, month1, year1] = dataHardCodePaspor.expiryDate
       //   .split("-")
       //   .map(Number);
-
       // const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
-
       // const formattedDate = new Date(adjustedYear, month - 1, day + 1)
       //   .toISOString()
       //   .split("T")[0];
       // const expiryDate = new Date(year1, month1 - 1, day1 + 1)
       //   .toISOString()
       //   .split("T")[0];
-
       // dataHardCodePaspor.fullName = fullName;
       // dataHardCodePaspor.formattedBirthDate = formattedDate;
       // dataHardCodePaspor.formattedExpiryDate = expiryDate;
-
       // setDataPrimaryPassport(dataHardCodePaspor);
       // setDataPhotoPassport(dataHarCodePasporImg);
-
       // setCardStatus("success");
       // setTimeout(() => {
       //   setCardStatus("checkData");
       // }, 2000);
-
       // setIsEnableStep(true);
       // setIsEnableBack(true);
-
       // =================== END TESTING TANPA ALAT ===================//
     }
   }, [receiveTempData, passportUser, passportImage]);
@@ -428,7 +421,6 @@ const Apply = () => {
       return;
     }
 
-
     if (isEnableBack) {
       if (cardPaymentProps.isPaymentCredit || cardPaymentProps.isPaymentCash) {
         setCardPaymentProps({
@@ -448,17 +440,22 @@ const Apply = () => {
           cvv: "",
           type: "",
         });
+        const params = {
+          code: "default",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
       } else if (cardStatus === "iddle") {
         navigate("/home");
-      } else if (cardStatus === "lookCamera" ) {
+      } else if (cardStatus === "lookCamera") {
         setTabStatus(1);
-        setCardStatus("checkData")
-      } else if (cardStatus === "postalCode" ) {
+        setCardStatus("checkData");
+      } else if (cardStatus === "postalCode") {
         setTabStatus(3);
         setCardStatus("inputEmail");
       } else if (cardStatus === "takePhotoSucces") {
         setTabStatus(1);
-        setCardStatus("checkData")
+        setCardStatus("checkData");
       }
     }
   };
@@ -476,13 +473,17 @@ const Apply = () => {
         setCardStatus("lookCamera");
         setTabStatus(2);
       } else if (cardStatus === "takePhotoSucces") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setCardStatus("inputEmail");
         setTabStatus(3);
       } else if (cardStatus === "emailSucces") {
         setCardStatus("postalCode");
         setTabStatus(4);
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
-        // console.log("sharedData: ", sharedData);
         setCardStatus("goPayment");
         setTitleHeader("Payment");
       } else if (titleFooter === "Next Print") {
@@ -926,17 +927,17 @@ const Apply = () => {
         }, 5000);
       } else if (meesageConfirm === "Failed when request payment pg") {
         setDisabled(false);
-          setCardPaymentProps({
-            isWaiting: false,
-            isCreditCard: false,
-            isPaymentCredit: false,
-            isPaymentCash: false,
-            isPrinted: false,
-            isSuccess: false,
-            isFailed: false,
-            isPhoto: false,
-            isDoRetake: false,
-          });
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPhoto: false,
+          isDoRetake: false,
+        });
       } else if (
         meesageConfirm === "Passport is not active for at least 6 months."
       ) {
