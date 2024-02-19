@@ -226,21 +226,21 @@ const Apply = () => {
 
   useEffect(() => {
     //===== START TESTING TANPA ALAT =====//
-    // let airportId = "CGK";
-    // let deviceId = "01320000001255";
-    // let jenisDeviceId = "01";
+    let airportId = "CGK";
+    let deviceId = "01320000001255";
+    let jenisDeviceId = "01";
 
-    // localStorage.setItem("airportId", airportId);
-    // localStorage.setItem("deviceId", deviceId);
-    // localStorage.setItem("jenisDeviceId", jenisDeviceId);
-    // const cardNumberPetugas = "1101320000001255";
-    // setCardNumberPetugas(cardNumberPetugas);
+    localStorage.setItem("airportId", airportId);
+    localStorage.setItem("deviceId", deviceId);
+    localStorage.setItem("jenisDeviceId", jenisDeviceId);
+    const cardNumberPetugas = "1101320000001255";
+    setCardNumberPetugas(cardNumberPetugas);
     //===== END TESTING TANPA ALAT =====//
 
-    const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
-    if (cardNumberPetugas) {
-      setCardNumberPetugas(cardNumberPetugas);
-    }
+    // const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
+    // if (cardNumberPetugas) {
+    //   setCardNumberPetugas(cardNumberPetugas);
+    // }
   }, []);
 
   // useEffect(() => {
@@ -265,14 +265,14 @@ const Apply = () => {
   //   };
   // }, []);
 
-  useEffect(() => {
-    //Start Connect to Server Websocket
-    connectWebSocket();
+  // useEffect(() => {
+  //   //Start Connect to Server Websocket
+  //   connectWebSocket();
 
-    return () => {
-      closeWebSocket();
-    };
-  }, []);
+  //   return () => {
+  //     closeWebSocket();
+  //   };
+  // }, []);
 
   useEffect(() => {
     // console.log("tahap nol");
@@ -356,35 +356,45 @@ const Apply = () => {
       }
     } else {
       // console.log("testing else akhir");
+
       // =================== START TESTING TANPA ALAT ===================//
-      // const dataHardCodePaspor = dataPasporUser;
-      // const dataHarCodePasporImg = dataPasporImg;
-      // let fullName =
-      //   dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
-      // const [day, month, year] = dataHardCodePaspor.birthDate
-      //   .split("-")
-      //   .map(Number);
-      // const [day1, month1, year1] = dataHardCodePaspor.expiryDate
-      //   .split("-")
-      //   .map(Number);
-      // const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
-      // const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-      //   .toISOString()
-      //   .split("T")[0];
-      // const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-      //   .toISOString()
-      //   .split("T")[0];
-      // dataHardCodePaspor.fullName = fullName;
-      // dataHardCodePaspor.formattedBirthDate = formattedDate;
-      // dataHardCodePaspor.formattedExpiryDate = expiryDate;
-      // setDataPrimaryPassport(dataHardCodePaspor);
-      // setDataPhotoPassport(dataHarCodePasporImg);
-      // setCardStatus("success");
-      // setTimeout(() => {
-      //   setCardStatus("checkData");
-      // }, 2000);
-      // setIsEnableStep(true);
-      // setIsEnableBack(true);
+
+      const dataHardCodePaspor = dataPasporUser;
+      const dataHarCodePasporImg = dataPasporImg;
+
+      let fullName =
+        dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
+      const [day, month, year] = dataHardCodePaspor.birthDate
+        .split("-")
+        .map(Number);
+      const [day1, month1, year1] = dataHardCodePaspor.expiryDate
+        .split("-")
+        .map(Number);
+
+      const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+
+      const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+        .toISOString()
+        .split("T")[0];
+      const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+        .toISOString()
+        .split("T")[0];
+
+      dataHardCodePaspor.fullName = fullName;
+      dataHardCodePaspor.formattedBirthDate = formattedDate;
+      dataHardCodePaspor.formattedExpiryDate = expiryDate;
+
+      setDataPrimaryPassport(dataHardCodePaspor);
+      setDataPhotoPassport(dataHarCodePasporImg);
+
+      setCardStatus("success");
+      setTimeout(() => {
+        setCardStatus("checkData");
+      }, 2000);
+
+      setIsEnableStep(true);
+      setIsEnableBack(true);
+
       // =================== END TESTING TANPA ALAT ===================//
     }
   }, [receiveTempData, passportUser, passportImage]);
