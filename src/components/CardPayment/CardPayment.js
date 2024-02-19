@@ -15,7 +15,7 @@ import axios from "axios";
 import { Toast } from "../Toast/Toast";
 import Webcam from "react-webcam";
 import Select from "react-select";
-import { url_dev2, url_dev3 } from "../../services/env";
+import { url_dev } from "../../services/env";
 
 const socket = io("http://localhost:4499");
 
@@ -154,7 +154,7 @@ const CardPayment = ({
 
   useEffect(() => {
     axios
-      .get(`${url_dev2}TypeCard.php`)
+      .get(`${url_dev}TypeCard.php`)
       .then((res) => {
         const responseData = res.data;
 
@@ -703,7 +703,7 @@ const CardPayment = ({
   const handleLogin = async (username, password) => {
     try {
       isLoading(true);
-      const response = await axios.post(`${url_dev2}Login.php`, {
+      const response = await axios.post(`${url_dev}Login.php`, {
         username,
         password,
       });
@@ -714,7 +714,7 @@ const CardPayment = ({
         response.data.status === "success"
       ) {
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-        const userProfile = await axios.get(`${url_dev2}ProfileMe.php`, {
+        const userProfile = await axios.get(`${url_dev}ProfileMe.php`, {
           headers: {
             Authorization: `Bearer ${response.data.JwtToken.token}`,
           },
@@ -725,14 +725,20 @@ const CardPayment = ({
           userProfile.data.price !== null &&
           userProfile.data.api !== null
         ) {
-          if (userProfile.data.api.key === localStorage.getItem("key") && userProfile.data.api.token === localStorage.getItem("token")) {
+          if (
+            userProfile.data.api.key === localStorage.getItem("key") &&
+            userProfile.data.api.token === localStorage.getItem("token")
+          ) {
             localStorage.setItem("key", userProfile.data.api.key);
             localStorage.setItem("token", userProfile.data.api.token);
             localStorage.setItem(
               "user",
               JSON.stringify(userProfile.data.user_data)
             );
-            localStorage.setItem("price", JSON.stringify(userProfile.data.price));
+            localStorage.setItem(
+              "price",
+              JSON.stringify(userProfile.data.price)
+            );
             sendDataUpdatePayment({
               isConfirm: false,
               isFailed: false,
@@ -748,7 +754,10 @@ const CardPayment = ({
               type: type,
             });
             handleSubmitKICASH();
-          } else if ( userProfile.data.api.key !== localStorage.getItem("key") && userProfile.data.api.token !== localStorage.getItem("token")) {
+          } else if (
+            userProfile.data.api.key !== localStorage.getItem("key") &&
+            userProfile.data.api.token !== localStorage.getItem("token")
+          ) {
             isLoading(false);
             Swal.fire({
               icon: "error",
@@ -784,7 +793,10 @@ const CardPayment = ({
             title: "Failed to Payment",
           });
         }
-      } else if (response.data.status === "error" || response.data.message === "Login failed") {
+      } else if (
+        response.data.status === "error" ||
+        response.data.message === "Login failed"
+      ) {
         isLoading(false);
         Swal.fire({
           icon: "error",

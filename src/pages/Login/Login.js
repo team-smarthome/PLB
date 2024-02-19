@@ -5,7 +5,6 @@ import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
 import { url_dev } from "../../services/env";
-import { url_dev2 } from "../../services/env";
 // import { Spinner } from "flowbite-react";
 
 const Login = () => {
@@ -82,7 +81,7 @@ const Login = () => {
     }
     try {
       isLoading(true);
-      const response = await axios.post(`${url_dev2}Login.php`, {
+      const response = await axios.post(`${url_dev}Login.php`, {
         username,
         password,
       });
@@ -94,7 +93,7 @@ const Login = () => {
       ) {
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
 
-        const userProfile = await axios.get(`${url_dev2}ProfileMe.php`, {
+        const userProfile = await axios.get(`${url_dev}ProfileMe.php`, {
           headers: {
             Authorization: `Bearer ${response.data.JwtToken.token}`,
           },
