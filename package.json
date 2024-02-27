@@ -19,6 +19,7 @@
     "hexify": "^1.0.4",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.1",
+    "mrz": "^4.0.0",
     "node-tlv": "^1.5.14",
     "npm": "^10.2.5",
     "qrcode.react": "^3.1.0",

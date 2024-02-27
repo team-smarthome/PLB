@@ -356,45 +356,35 @@ const Apply = () => {
       }
     } else {
       // console.log("testing else akhir");
-
       // =================== START TESTING TANPA ALAT ===================//
-
-      const dataHardCodePaspor = dataPasporUser;
-      const dataHarCodePasporImg = dataPasporImg;
-
-      let fullName =
-        dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
-      const [day, month, year] = dataHardCodePaspor.birthDate
-        .split("-")
-        .map(Number);
-      const [day1, month1, year1] = dataHardCodePaspor.expiryDate
-        .split("-")
-        .map(Number);
-
-      const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
-
-      const formattedDate = new Date(adjustedYear, month - 1, day + 1)
-        .toISOString()
-        .split("T")[0];
-      const expiryDate = new Date(year1, month1 - 1, day1 + 1)
-        .toISOString()
-        .split("T")[0];
-
-      dataHardCodePaspor.fullName = fullName;
-      dataHardCodePaspor.formattedBirthDate = formattedDate;
-      dataHardCodePaspor.formattedExpiryDate = expiryDate;
-
-      setDataPrimaryPassport(dataHardCodePaspor);
-      setDataPhotoPassport(dataHarCodePasporImg);
-
-      setCardStatus("success");
-      setTimeout(() => {
-        setCardStatus("checkData");
-      }, 2000);
-
-      setIsEnableStep(true);
-      setIsEnableBack(true);
-
+      // const dataHardCodePaspor = dataPasporUser;
+      // const dataHarCodePasporImg = dataPasporImg;
+      // let fullName =
+      //   dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
+      // const [day, month, year] = dataHardCodePaspor.birthDate
+      //   .split("-")
+      //   .map(Number);
+      // const [day1, month1, year1] = dataHardCodePaspor.expiryDate
+      //   .split("-")
+      //   .map(Number);
+      // const adjustedYear = year < 50 ? 2000 + year : 1900 + year;
+      // const formattedDate = new Date(adjustedYear, month - 1, day + 1)
+      //   .toISOString()
+      //   .split("T")[0];
+      // const expiryDate = new Date(year1, month1 - 1, day1 + 1)
+      //   .toISOString()
+      //   .split("T")[0];
+      // dataHardCodePaspor.fullName = fullName;
+      // dataHardCodePaspor.formattedBirthDate = formattedDate;
+      // dataHardCodePaspor.formattedExpiryDate = expiryDate;
+      // setDataPrimaryPassport(dataHardCodePaspor);
+      // setDataPhotoPassport(dataHarCodePasporImg);
+      // setCardStatus("success");
+      // setTimeout(() => {
+      //   setCardStatus("checkData");
+      // }, 2000);
+      // setIsEnableStep(true);
+      // setIsEnableBack(true);
       // =================== END TESTING TANPA ALAT ===================//
     }
   }, [receiveTempData, passportUser, passportImage]);
