@@ -8,14 +8,16 @@ import Gambar3 from "../../assets/images/image-3.svg";
 import Gambar4 from "../../assets/images/image-4.svg";
 import Gambar6 from "../../assets/images/image-6.svg";
 import Gambar7 from "../../assets/images/image-7.svg";
+import Face from "../../assets/images/face2.svg";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import dataKodePos from "../../utils/dataKodePos";
 import { Label } from "flowbite-react";
 import Select from "react-select";
 import io from "socket.io-client";
+const parse = require("mrz").parse;
 
-const CardStatus = ({ statusCardBox, sendDataToInput }) => {
+const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [email, setEmail] = useState(null);
   const [emailConfirmation, setEmailConfirmation] = useState(null);
@@ -30,6 +32,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const navigate = useNavigate();
   const [selectedKabupaten, setSelectedKabupaten] = useState(null);
   const [kodePos, setKodePos] = useState("");
+  // const [connected, setConnected] = useState(true);
 
   const kabupatenOptions = dataKodePos.data.map((item) => ({
     value: item.kabupaten,
@@ -80,16 +83,42 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   };
 
   const capture = () => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    setCapturedImage(imageSrc);
-
     sendDataToInput({
-      statusCardBox: "takePhotoSucces",
-      capturedImage: imageSrc,
+      statusCardBox: "waiting",
+      capturedImage: null,
       emailUser: null,
       titleHeader: "Apply VOA",
       titleFooter: "Next Step",
+    })
+    const socket = io('http://localhost:4499');
+
+    socket.on('connect', () => {
+      // setConnected(true);
+      console.log('Terhubung ke server');
     });
+
+    socket.on('snapshot_data', (data) => {
+      console.log('base:', data.base64);
+      const imageSrc = `data:image/jpeg;base64,${data.base64}`;
+      console.log('imageSrc:', imageSrc);
+      setCapturedImage(imageSrc);
+  
+      sendDataToInput({
+        statusCardBox: "takePhotoSucces",
+        capturedImage: imageSrc,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+        statusImage: false
+      });
+      console.log("Captured Image:", capturedImage);
+    });
+    const params = {
+      code: "take-snapshot",
+      data: "",
+    };
+    socket.emit("WebClientMessage", JSON.stringify(params));
+
   };
 
   const doRetake = () => {
@@ -174,10 +203,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   useEffect(() => {
     // Start Connect to Server Socket.IO
     const socket_IO = io("http://localhost:4499");
-
     socket_IO.on("connect", () => {
       console.log("Connected to server socket.io");
     });
+    
 
     socket_IO.on("disconnect", () => {
       console.log("Disconnected from server socket.io");
@@ -210,6 +239,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         console.error("Error parsing input-email-confirm data:", error);
       }
     };
+    
 
     const handleSubmitEmail = (data) => {
       try {
@@ -240,6 +270,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
     };
   }, [capturedImage, email, sendDataToInput]);
 
+  // useEffect(() => {
+  //   if (!connected) {
+  //     sendDataToInput({
+  //       statusCardBox: "notconnectCamera",
+  //       emailUser: null,
+  //       capturedImage: null,
+  //       titleHeader: "Apply VOA",
+  //       titleFooter: "Next Step",
+  //     });
+  //   }
+  // }, [connected, sendDataToInput]);
+
   useEffect(() => {
     // Cari data kode pos berdasarkan kabupaten yang dipilih
     if (selectedKabupaten) {
@@ -256,6 +298,44 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   useEffect(() => {
     handleTokenExpiration();
   }, [capturedImage, doRetake, email, emailConfirmation]);
+
+  useEffect(() => {
+    console.log('capturedImage berubah:', capturedImage);
+  }, [capturedImage]);
+
+  const [inputValue, setInputValue] = useState("PMKORPARK<<JIEUN<<<<<<<<<<<<<<<<<<<<<<<<<<<<\nM472233993KOR8812049F30092442932311V18365920");
+  let mrz = ["PMKORPARK<<JIEUN<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "M472233993KOR8812049F30092442932311V18365920"];
+
+  const handleScanedArea = (event) => {
+    let text = event.target.value;
+    if (text.length > 44) {
+      const firstPart = text.substring(0, 44).replace(/\s/g, "");
+      const secondPart = text.substring(44).replace(/\s/g, "");
+      text = firstPart + "\n" + secondPart;
+      mrz = ["PMKORPARK<<JIEUN<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "M472233993KOR8812049F30092442932311V18365920"];
+    }
+    setInputValue(mrz);
+  };
+
+
+  const [checksum, setCheckSum] = useState(false);
+  const handleButtonClickScaned = () => {
+    console.log("inputValue: ", inputValue);
+    if (mrz[0].length > 44 || mrz[1].length > 44) {
+      setCheckSum(true);
+    } else if (mrz[0].length === 0 || mrz[1].length === 0) {
+      setCheckSum(true);
+    }
+    try {
+      const mrzParsed = parse(mrz);
+      console.log("mrz: ", mrzParsed.fields);
+
+      sendDataToParent2(mrzParsed.fields);
+      setCheckSum(false);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   const renderCardContent = () => {
     switch (statusCardBox) {
@@ -384,7 +464,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         return (
           <>
             <h1 className="card-title">Please look at the camera</h1>
-            <div className="webcam-container">
+            <div>
+          <img src={Face} alt="" className="card-image" style={{backgroundColor: "", margin: 0, width: "150px", height: "150px"}} />
+            </div>
+            {/* <div className="webcam-container">
               <Webcam
                 className="webcam"
                 audio={false}
@@ -400,7 +483,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 }}
               />
               <div className="bounding-box"></div>
-            </div>
+            </div> */}
             <button onClick={capture} className="ok-button">
               Take a face photo
             </button>
@@ -441,7 +524,21 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 </React.Fragment>
               ))}
             </h1>
-            <img src={imageSource} alt="" className="card-image" />
+            {/* <img src={imageSource} alt="" className="card-image" /> */}
+            <textarea
+              className="areaScan"
+              autoFocus
+              onChange={handleScanedArea}
+              value={inputValue}
+            ></textarea>
+            {checksum && (
+              <span style={{ color: "red", marginTop: "2%" }}>
+                Can not empty or Please Re-Scan the Passport
+              </span>
+            )}
+            <button className="ok-button" onClick={handleButtonClickScaned}>
+              Confirm
+            </button>
           </>
         );
     }
@@ -468,6 +565,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
       case "postalCodeSucces":
         return Gambar2;
       case "errorConnection":
+      return Gambar1;
+      case "notconnectCamera":
         return Gambar1;
       default:
         return Gambar1;
@@ -477,7 +576,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const getStatusHeaderText = () => {
     switch (statusCardBox) {
       case "iddle":
-        return ["Please input your passport", "photo page into the reader"];
+        return ["Please Scan your passport"];
       case "success":
         return ["Passport has successfully", "scanned"];
       case "errorchecksum":
@@ -502,6 +601,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
         return ["Connecting Device", "Please wait..."];
       case "errorWebsocket":
         return ["Error Connecting Device", "Device connection failed"];
+      case "notconnectCamera":
+        return ["Device Camera is not connected", "Please check the device"];
       default:
         return [];
     }

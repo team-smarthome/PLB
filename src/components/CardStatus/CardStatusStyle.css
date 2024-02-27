@@ -5,6 +5,13 @@ html {
   height: 100%;
 }
 
+.areaScan {
+  width: 75%;
+  height: 50%;
+  font-size: 22px;
+  text-align: center;
+}
+
 .card-status {
   display: flex;
   margin-left: -20px;

@@ -22,6 +22,7 @@ const BodyContent = ({
   setShareDataPaymentProps,
   dataNumberPermohonan,
   FailedMessage,
+  sendDataToParent1
 }) => {
   const [sharedData, setSharedData] = useState({
     passportData: null,
@@ -47,6 +48,10 @@ const BodyContent = ({
     setTitleHeader(titleHeader);
     setTitleFooter(titleFooter);
     setCardStatus(statusCardBox);
+  };
+
+  const receiveDataFromChild = (data) => {
+    sendDataToParent1(data); // Send data to Component1
   };
 
 
@@ -127,6 +132,7 @@ const BodyContent = ({
               <CardStatus
                 statusCardBox={cardStatus}
                 sendDataToInput={handleDataFromCardStatus}
+                sendDataToParent2={receiveDataFromChild}
               />
             </div>
           </>

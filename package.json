@@ -19,6 +19,7 @@
     "hexify": "^1.0.4",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.1",
+    "mrz": "^4.0.0",
     "node-tlv": "^1.5.14",
     "npm": "^10.2.5",
     "qrcode.react": "^3.1.0",
@@ -33,7 +34,7 @@
     "react-webcam": "^7.2.0",
     "smartcard": "^1.0.46",
     "socket.io": "^4.7.2",
-    "socket.io-client": "^4.7.2",
+    "socket.io-client": "^4.7.4",
     "sweetalert2": "^11.10.1",
     "web-vitals": "^2.1.4"
   },

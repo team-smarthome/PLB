@@ -72,8 +72,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
       setOptionNegara(dataNationality);
   
       const dataGender = [
-        { value: "Male", label: "MALE" },
-        { value: "Female", label: "FEMALE" },
+        { value: "male", label: "MALE" },
+        { value: "female", label: "FEMALE" },
       ];
   
       
@@ -98,15 +98,38 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   
         setFormData((prevData) => ({
           ...prevData,
-          passport_number: sharedData.passportData.docNumber || "",
-          full_name: sharedData.passportData.fullName || "",
-          date_of_birth: sharedData.passportData.formattedBirthDate || "",
-          nationality:
-            filteredNationality.length > 0 ? filteredNationality[0] : "",
-          expiry_date: sharedData.passportData.formattedExpiryDate || "",
-          paspor_type: sharedData.passportData.docType || "",
+          passport_number: sharedData.passportData.documentNumber || "",
+          full_name: sharedData.passportData.firstName + " " + sharedData.passportData.lastName || "",
+          date_of_birth: convertBirthDate(sharedData.passportData.birthDate) || "",
+          nationality: filteredNationality.length > 0 ? filteredNationality[0] : "",
+          expiry_date: convertExpiryDate(sharedData.passportData.expirationDate) || "",
+          passport_type: (sharedData.passportData.documentCode === "PM" ? "Passport" : sharedData.passportData.documentCode) || "",
         }));
+        
+        function convertExpiryDate(expirationDate) {
+          if (!expirationDate) return "";
+          
+          const day = parseInt(expirationDate.substring(0, 2));
+          const month = parseInt(expirationDate.substring(2, 4)) - 1; // Kurangi 1 karena bulan dimulai dari 0
+          const year = 2000 + parseInt(expirationDate.substring(4, 6));
+          
+          const expiryDate = new Date(year, month, day).toISOString().split("T")[0];
+          return expiryDate;
+        }
+        
+        function convertBirthDate(birthDate) {
+          if (!birthDate) return "";
+          
+          const day = parseInt(birthDate.substring(0, 2));
+          const month = parseInt(birthDate.substring(2, 4)) - 1; // Kurangi 1 karena bulan dimulai dari 0
+          const year = 2000 + parseInt(birthDate.substring(4, 6));
+          
+          const formattedBirthDate = new Date(year, month, day).toISOString().split("T")[0];
+          return formattedBirthDate;
+        }
       }
+
+
   
       setFormData((prevData) => ({
         ...prevData,
@@ -121,6 +144,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
 
   }, [sharedData]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -467,9 +491,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="text"
-              name="docType"
+              name="passport_type"
               id="paspor_type"
-              value={formdata.paspor_type}
+              value={formdata.passport_type}
               onChange={handleInputChange}
               disabled={
                 cardStatus === "checkData" ? !isCheckedPasporType : true
