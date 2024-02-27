@@ -15,8 +15,6 @@ import { Label } from "flowbite-react";
 import Select from "react-select";
 import io from "socket.io-client";
 
-const parse = require("mrz").parse;
-
 const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [email, setEmail] = useState(null);
@@ -259,37 +257,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
     handleTokenExpiration();
   }, [capturedImage, doRetake, email, emailConfirmation]);
 
-  const [inputValue, setInputValue] = useState("");
-  let mrz = ["", ""];
-
-  const handleScanedArea = (event) => {
-    let text = event.target.value;
-    if (text.length > 44) {
-      const firstPart = text.substring(0, 44).replace(/\s/g, "");
-      const secondPart = text.substring(44).replace(/\s/g, "");
-      text = firstPart + "\n" + secondPart;
-      mrz = [firstPart, secondPart];
-    }
-    setInputValue(text);
-  };
-
-  const [checksum, setCheckSum] = useState(false);
-  const handleButtonClickScaned = () => {
-    console.log("inputValue: ", inputValue);
-    if (mrz[0].length > 44 || mrz[1].length > 44) {
-      setCheckSum(true);
-    } else if (mrz[0].length === 0 || mrz[1].length === 0) {
-      setCheckSum(true);
-    }
-    try {
-      const mrzParsed = parse(mrz);
-      console.log("mrz: ", mrzParsed);
-      setCheckSum(false);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
   const renderCardContent = () => {
     switch (statusCardBox) {
       case "inputEmail":
@@ -474,21 +441,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
                 </React.Fragment>
               ))}
             </h1>
-            {/* <img src={imageSource} alt="" className="card-image" /> */}
-            <textarea
-              className="areaScan"
-              autoFocus
-              onChange={handleScanedArea}
-              value={inputValue}
-            ></textarea>
-            {checksum && (
-              <span style={{ color: "red", marginTop: "2%" }}>
-                Can not empty or Please Re-Scan the Passport
-              </span>
-            )}
-            <button className="ok-button" onClick={handleButtonClickScaned}>
-              Confirm
-            </button>
+            <img src={imageSource} alt="" className="card-image" />
           </>
         );
     }
@@ -524,7 +477,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput }) => {
   const getStatusHeaderText = () => {
     switch (statusCardBox) {
       case "iddle":
-        return ["Please scan your passport"];
+        return ["Please input your passport", "photo page into the reader"];
       case "success":
         return ["Passport has successfully", "scanned"];
       case "errorchecksum":

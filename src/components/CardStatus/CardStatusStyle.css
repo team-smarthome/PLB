@@ -191,21 +191,3 @@ p {
     opacity: 0;
   }
 }
-
-.areaScan {
-  width: 75%;
-  height: 30%;
-  font-size: 22px;
-  text-align: center;
-}
-
-.scanConfirm {
-  background-color: #fbaf17;
-  color: white;
-  padding: 18px 30px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 2%;
-  font-size: 16px;
-}

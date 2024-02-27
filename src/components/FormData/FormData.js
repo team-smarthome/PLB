@@ -3,8 +3,6 @@ import Select from "react-select";
 import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
-import Swal from "sweetalert2";
-const parse = require("mrz").parse;
 
 const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   // passportNumber
@@ -58,7 +56,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     email: "",
   };
   const [formdata, setFormData] = useState(initialFormData);
-
+  
   useEffect(() => {
     // console.log("test shared data", sharedData.passportData);
 
@@ -70,33 +68,34 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         value: negara.id_negara,
         label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
       }));
-
+  
       setOptionNegara(dataNationality);
-
+  
       const dataGender = [
         { value: "Male", label: "MALE" },
         { value: "Female", label: "FEMALE" },
       ];
-
+  
+      
       setOptionGender(dataGender);
-
+  
       if (sharedData.passportData) {
         const filteredNationality = dataNationality.filter(
           (negara) => negara.value === sharedData.passportData.nationality
         );
-
+  
         // gender
         if (sharedData.passportData) {
           const filteredGender = dataGender.filter(
             (sex) => sex.value === sharedData.passportData.sex
           );
-
+  
           setFormData((prevData) => ({
             ...prevData,
             sex: filteredGender.length > 0 ? filteredGender[0] : "",
           }));
         }
-
+  
         setFormData((prevData) => ({
           ...prevData,
           passport_number: sharedData.passportData.docNumber || "",
@@ -108,17 +107,19 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           paspor_type: sharedData.passportData.docType || "",
         }));
       }
-
+  
       setFormData((prevData) => ({
         ...prevData,
         photo: sharedData.photoFace || "",
       }));
-
+  
       setFormData((prevData) => ({
         ...prevData,
         email: sharedData.email || "",
       }));
     }
+
+
   }, [sharedData]);
 
   const handleInputChange = (e) => {
@@ -186,54 +187,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   };
-
-  // let MRZ = ["", ""];
-  // const handleScan = () => {
-  //   Swal.fire({
-  //     title: "Scan The Passport",
-  //     input: "textarea",
-  //     inputLabel: "MRZ Scan",
-  //     allowEnterKey: false,
-  //     width: "35%",
-  //     confirmButtonColor: "#fbaf17",
-  //     confirmButtonText: "Confirm",
-  //     didOpen: () => {
-  //       const input = Swal.getInput();
-  //       input.addEventListener("input", () => {
-  //         let text = input.value;
-  //         if (text.length > 44) {
-  //           const firstPart = text.substring(0, 44).replace(/\s/g, "");
-  //           const secondPart = text.substring(44).replace(/\s/g, "");
-  //           console.log(firstPart, "\n", secondPart);
-  //           input.value = firstPart + "\n" + secondPart;
-  //           MRZ = [firstPart, secondPart];
-  //         }
-  //       });
-  //     },
-  //   }).then(() => {
-  //     const scanedData = parse(MRZ);
-  //     console.log(scanedData);
-  //     const dataNationality = dataNegara.data.map((negara) => ({
-  //       value: negara.id_negara,
-  //       label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
-  //     }));
-  //     const filteredNationality = dataNationality.filter(
-  //       (negara) => negara.value === scanedData.fields.nationality
-  //     );
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       passport_number: scanedData.fields.documentNumber || "",
-  //       full_name:
-  //         scanedData.fields.firstName + " " + scanedData.fields.lastName || "",
-  //       date_of_birth: scanedData.fields.birthDate || "",
-  //       nationality:
-  //         filteredNationality.length > 0 ? filteredNationality[0] : "",
-  //       expiry_date: scanedData.fields.expirationDate || "",
-  //       paspor_type: scanedData.fields.documentCode || "",
-  //     }));
-  //     console.log("formData: ", formdata);
-  //   });
-  // };
 
   return (
     <div className="container-form">
@@ -573,12 +526,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             />
           </div>
         </div>
-
-        {/* <div className="form-group" style={{ justifyContent: "center" }}>
-          <button className="scan" onClick={handleScan}>
-            Scan
-          </button>
-        </div> */}
       </form>
     </div>
   );
