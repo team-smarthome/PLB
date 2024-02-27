@@ -98,14 +98,15 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   
         setFormData((prevData) => ({
           ...prevData,
-          passport_number: sharedData.passportData.documentNumber || "",
-          full_name: sharedData.passportData.firstName + " " + sharedData.passportData.lastName || "",
+          passport_number: sharedData.passportData.docNumber || "",
+          full_name: sharedData.passportData.fullName || "",
           date_of_birth: convertBirthDate(sharedData.passportData.birthDate) || "",
-          nationality: filteredNationality.length > 0 ? filteredNationality[0] : "",
+          nationality:
+            filteredNationality.length > 0 ? filteredNationality[0] : "",
           expiry_date: convertExpiryDate(sharedData.passportData.expirationDate) || "",
-          passport_type: (sharedData.passportData.documentCode === "PM" ? "Passport" : sharedData.passportData.documentCode) || "",
+          paspor_type: sharedData.passportData.docType || "",
         }));
-        
+
         function convertExpiryDate(expirationDate) {
           if (!expirationDate) return "";
           
@@ -127,9 +128,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           const formattedBirthDate = new Date(year, month, day).toISOString().split("T")[0];
           return formattedBirthDate;
         }
+
       }
 
-
+      
   
       setFormData((prevData) => ({
         ...prevData,
@@ -144,7 +146,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
 
   }, [sharedData]);
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -491,9 +492,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
             <input
               type="text"
-              name="passport_type"
+              name="docType"
               id="paspor_type"
-              value={formdata.passport_type}
+              value={formdata.paspor_type}
               onChange={handleInputChange}
               disabled={
                 cardStatus === "checkData" ? !isCheckedPasporType : true

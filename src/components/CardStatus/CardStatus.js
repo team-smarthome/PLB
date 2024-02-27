@@ -303,8 +303,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
     console.log('capturedImage berubah:', capturedImage);
   }, [capturedImage]);
 
-  const [inputValue, setInputValue] = useState("PMKORPARK<<JIEUN<<<<<<<<<<<<<<<<<<<<<<<<<<<<\nM472233993KOR8812049F30092442932311V18365920");
-  let mrz = ["PMKORPARK<<JIEUN<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "M472233993KOR8812049F30092442932311V18365920"];
+  const [inputValue, setInputValue] = useState("");
+  let mrz = ["", ""];
 
   const handleScanedArea = (event) => {
     let text = event.target.value;
@@ -312,13 +312,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
       const firstPart = text.substring(0, 44).replace(/\s/g, "");
       const secondPart = text.substring(44).replace(/\s/g, "");
       text = firstPart + "\n" + secondPart;
-      mrz = ["PMKORPARK<<JIEUN<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "M472233993KOR8812049F30092442932311V18365920"];
+      mrz = [firstPart, secondPart];
     }
-    setInputValue(mrz);
+    setInputValue(text);
   };
 
 
   const [checksum, setCheckSum] = useState(false);
+
   const handleButtonClickScaned = () => {
     console.log("inputValue: ", inputValue);
     if (mrz[0].length > 44 || mrz[1].length > 44) {
@@ -329,13 +330,32 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
     try {
       const mrzParsed = parse(mrz);
       console.log("mrz: ", mrzParsed.fields);
-
       sendDataToParent2(mrzParsed.fields);
       setCheckSum(false);
     } catch (error) {
       console.log(error.message);
     }
   };
+  
+
+  // const handleButtonClickScaned = () => {
+  //   console.log("inputValue: ", inputValue);
+  //   if (mrz[0].length > 44 || mrz[1].length > 44) {
+  //     setCheckSum(true);
+  //   } else if (mrz[0].length === 0 || mrz[1].length === 0) {
+  //     setCheckSum(true);
+  //   }
+  //   try {
+  //     const mrzParsed = parse(mrz);
+  //     console.log("mrz: ", mrzParsed.fields);
+  //     sendDataToParent2(mrzParsed.fields);
+  //     setCheckSum(false);
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+
+
 
   const renderCardContent = () => {
     switch (statusCardBox) {

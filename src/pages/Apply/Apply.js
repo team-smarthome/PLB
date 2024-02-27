@@ -79,13 +79,71 @@ const Apply = () => {
 
 
   const receiveDataFromChild = (data) => {
+    console.log("data", data);
+  
+    const newDataPassport = {
+      docType: data.documentCode,
+      issuingState: data.issuingState,
+      surName: data.lastName,
+      foreName: data.firstName,
+      docNumber: data.documentNumber,
+      documentNumberCheckDigit: data.documentNumberCheckDigit,
+      nationality: data.nationality,
+      birthDate: data.birthDate, // Ubah format tanggal lahir
+      birthDateCheckDigit: data.birthDateCheckDigit,
+      sex: data.sex,
+      expirationDate: data.expirationDate,
+      expirationDateCheckDigit: data.expirationDateCheckDigit,
+      personalNumber: data.personalNumber,
+      personalNumberCheckDigit: data.personalNumberCheckDigit,
+      compositeCheckDigit: data.compositeCheckDigit
+    };
+  
+    console.log("newDataPassport", newDataPassport);
+  
     // Handle received data
-    console.log("Received data from child:", data);
-    setDataPrimaryPassport(data);
+    const dataHardCodePaspor = newDataPassport;
+  
+    let fullName =
+      dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
+  
+    dataHardCodePaspor.fullName = fullName;
+    dataHardCodePaspor.formattedBirthDate = data.birthDate;
+    dataHardCodePaspor.formattedExpiryDate = data.expirationDate;
+  
+    console.log("dataHardCodePaspor", newDataPassport);
+  
+    setDataPrimaryPassport(dataHardCodePaspor);
   };
+  
+  // Fungsi untuk mengonversi tanggal kadaluarsa
+  // function convertExpiryDate(expirationDate) {
+  //   if (!expirationDate) return "";
+  
+  //   const day = parseInt(expirationDate.substring(0, 2));
+  //   const month = parseInt(expirationDate.substring(2, 4)) - 1; // Kurangi 1 karena bulan dimulai dari 0
+  //   const year = 2000 + parseInt(expirationDate.substring(4, 6));
+  
+  //   const expiryDate = new Date(year, month, day).toISOString().split("T")[0];
+  //   return expiryDate;
+  // }
+  
+  // Fungsi untuk mengonversi tanggal lahir
+  // function convertBirthDate(birthDate) {
+  //   if (!birthDate) return "";
+  
+  //   const day = parseInt(birthDate.substring(0, 2));
+  //   const month = parseInt(birthDate.substring(2, 4)) - 1; // Kurangi 1 karena bulan dimulai dari 0
+  //   const year = 2000 + parseInt(birthDate.substring(4, 6));
+  
+  //   const formattedBirthDate = new Date(year, month, day).toISOString().split("T")[0];
+  //   return formattedBirthDate;
+  // }
+  
 
 
   useEffect(() => {
+    console.log("dataPrimaryPassport", dataPrimaryPassport);
     if(dataPrimaryPassport) {
       setCardStatus("checkData");
       setIsEnableStep(true);
@@ -254,7 +312,8 @@ const Apply = () => {
     // setCardNumberPetugas(cardNumberPetugas);
     //===== END TESTING TANPA ALAT =====//
 
-    const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
+    // const cardNumberPetugas = "11" + localStorage.getItem("deviceId");
+        const cardNumberPetugas = "1101320000001255";
     if (cardNumberPetugas) {
       setCardNumberPetugas(cardNumberPetugas);
     }
@@ -570,7 +629,17 @@ const Apply = () => {
 
   useEffect(() => {
     if (statusPaymentCredit) {
-      doSaveRequestVoaPayment(sharedData);
+      setCardPaymentProps({
+        isCreditCard: false,
+        isPaymentCredit: false,
+        isPaymentCash: false,
+        isPrinted: true,
+        isSuccess: false,
+        isWaiting: false,
+        isFailed: false,
+        isPhoto: false,
+        isDoRetake: false,
+      })
     }
   }, [statusPaymentCredit]);
 
@@ -584,9 +653,12 @@ const Apply = () => {
     // console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
     const key = localStorage.getItem("key");
-    const devicedId = localStorage.getItem("deviceId");
-    const airportId = localStorage.getItem("airportId");
-    const jenisDeviceId = localStorage.getItem("jenisDeviceId");
+    // const devicedId = localStorage.getItem("deviceId");
+    // const airportId = localStorage.getItem("airportId");
+    // const jenisDeviceId = localStorage.getItem("jenisDeviceId");
+    const devicedId = "01320000001255";
+    const airportId = "CGK";
+    const jenisDeviceId = "01";
 
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
