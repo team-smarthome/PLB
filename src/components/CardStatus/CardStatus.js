@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Webcam from "react-webcam";
 import "./CardStatusStyle.css";
-
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
 import Gambar3 from "../../assets/images/image-3.svg";
@@ -12,12 +10,12 @@ import Face from "../../assets/images/face2.svg";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import dataKodePos from "../../utils/dataKodePos";
-import { Label } from "flowbite-react";
 import Select from "react-select";
 import io from "socket.io-client";
+import { Toast } from "../Toast/Toast";
 const parse = require("mrz").parse;
 
-const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
+const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [email, setEmail] = useState(null);
   const [emailConfirmation, setEmailConfirmation] = useState(null);
@@ -27,12 +25,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
   const [emailConfirmWarning, setEmailConfirmWarning] = useState(false);
   const [postalCodeWarning, setPostalCodeWarning] = useState(false);
   const [emailWarning, setEmailWarning] = useState(false);
-  const webcamRef = useRef(null);
   const [titleWarning, setTitleWarning] = useState("");
   const navigate = useNavigate();
   const [selectedKabupaten, setSelectedKabupaten] = useState(null);
   const [kodePos, setKodePos] = useState("");
-  // const [connected, setConnected] = useState(true);
 
   const kabupatenOptions = dataKodePos.data.map((item) => ({
     value: item.kabupaten,
@@ -42,7 +38,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
   const checkAndHandleTokenExpiration = () => {
     const jwtToken = localStorage.getItem("JwtToken");
     if (!jwtToken) {
-      // Token is not present, consider the user as not authenticated
       return false;
     }
 
@@ -65,7 +60,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
         text: "Expired JWT Token",
         confirmButtonColor: "#3d5889",
       }).then((result) => {
-        // If the user clicks "OK", clear localStorage
         if (result.isConfirmed) {
           navigate("/");
           localStorage.removeItem("user");
@@ -83,42 +77,54 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
   };
 
   const capture = () => {
-    sendDataToInput({
-      statusCardBox: "waiting",
-      capturedImage: null,
-      emailUser: null,
-      titleHeader: "Apply VOA",
-      titleFooter: "Next Step",
-    })
-    const socket = io('http://localhost:4499');
+    const socket = io("http://localhost:4499");
 
-    socket.on('connect', () => {
-      // setConnected(true);
-      console.log('Terhubung ke server');
+    socket.on("connect", () => {
+      sendDataToInput({
+        statusCardBox: "waiting",
+        capturedImage: null,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+      });
+      console.log("Terhubung ke server");
     });
-
-    socket.on('snapshot_data', (data) => {
-      console.log('base:', data.base64);
+    socket.on("snapshot_data", (data) => {
+      console.log("base:", data.base64);
       const imageSrc = `data:image/jpeg;base64,${data.base64}`;
-      console.log('imageSrc:', imageSrc);
+      console.log("imageSrc:", imageSrc);
       setCapturedImage(imageSrc);
-  
+
       sendDataToInput({
         statusCardBox: "takePhotoSucces",
         capturedImage: imageSrc,
         emailUser: null,
         titleHeader: "Apply VOA",
         titleFooter: "Next Step",
-        statusImage: false
+        statusImage: false,
       });
       console.log("Captured Image:", capturedImage);
     });
+
+    socket.on("gagal_snapshot", (data) => {
+      Toast.fire({
+        icon: "error",
+        title: "Failed to take photo",
+      });
+      sendDataToInput({
+        statusCardBox: "lookCamera",
+        capturedImage: null,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+      });
+    });
+
     const params = {
       code: "take-snapshot",
       data: "",
     };
     socket.emit("WebClientMessage", JSON.stringify(params));
-
   };
 
   const doRetake = () => {
@@ -148,6 +154,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
   };
 
   const handleOkButtonClick = () => {
+    sendDataToInput({
+      statusCardBox: "emailSucces",
+      emailUser: email,
+      capturedImage: capturedImage,
+      titleHeader: "Apply VOA",
+      titleFooter: "Next Step",
+    });
     if (!email) {
       setTitleWarning("Please enter your email address!");
       setEmailWarning(true);
@@ -206,7 +219,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
     socket_IO.on("connect", () => {
       console.log("Connected to server socket.io");
     });
-    
 
     socket_IO.on("disconnect", () => {
       console.log("Disconnected from server socket.io");
@@ -239,20 +251,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
         console.error("Error parsing input-email-confirm data:", error);
       }
     };
-    
 
     const handleSubmitEmail = (data) => {
       try {
         const dataParse = JSON.parse(data);
         console.log("Received submit-email data: ", dataParse);
-
-        sendDataToInput({
-          statusCardBox: "emailSucces",
-          emailUser: email,
-          capturedImage: capturedImage,
-          titleHeader: "Apply VOA",
-          titleFooter: "Next Step",
-        });
       } catch (error) {
         console.error("Error parsing submit-email data:", error);
       }
@@ -269,18 +272,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
       socket_IO.off("submit-email", handleSubmitEmail);
     };
   }, [capturedImage, email, sendDataToInput]);
-
-  // useEffect(() => {
-  //   if (!connected) {
-  //     sendDataToInput({
-  //       statusCardBox: "notconnectCamera",
-  //       emailUser: null,
-  //       capturedImage: null,
-  //       titleHeader: "Apply VOA",
-  //       titleFooter: "Next Step",
-  //     });
-  //   }
-  // }, [connected, sendDataToInput]);
 
   useEffect(() => {
     // Cari data kode pos berdasarkan kabupaten yang dipilih
@@ -300,7 +291,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
   }, [capturedImage, doRetake, email, emailConfirmation]);
 
   useEffect(() => {
-    console.log('capturedImage berubah:', capturedImage);
+    console.log("capturedImage berubah:", capturedImage);
   }, [capturedImage]);
 
   const [inputValue, setInputValue] = useState("");
@@ -316,7 +307,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
     }
     setInputValue(text);
   };
-
 
   const [checksum, setCheckSum] = useState(false);
 
@@ -336,26 +326,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
       console.log(error.message);
     }
   };
-  
-
-  // const handleButtonClickScaned = () => {
-  //   console.log("inputValue: ", inputValue);
-  //   if (mrz[0].length > 44 || mrz[1].length > 44) {
-  //     setCheckSum(true);
-  //   } else if (mrz[0].length === 0 || mrz[1].length === 0) {
-  //     setCheckSum(true);
-  //   }
-  //   try {
-  //     const mrzParsed = parse(mrz);
-  //     console.log("mrz: ", mrzParsed.fields);
-  //     sendDataToParent2(mrzParsed.fields);
-  //     setCheckSum(false);
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-
-
 
   const renderCardContent = () => {
     switch (statusCardBox) {
@@ -485,25 +455,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
           <>
             <h1 className="card-title">Please look at the camera</h1>
             <div>
-          <img src={Face} alt="" className="card-image" style={{backgroundColor: "", margin: 0, width: "150px", height: "150px"}} />
-            </div>
-            {/* <div className="webcam-container">
-              <Webcam
-                className="webcam"
-                audio={false}
-                ref={webcamRef}
-                mirrored={true}
-                screenshotFormat="image/jpeg"
-                width={120}
-                height={220}
-                videoConstraints={{
-                  width: { min: 120 },
-                  height: { min: 220 },
-                  aspectRatio: 0.6666666667,
+              <img
+                src={Face}
+                alt=""
+                className="card-image"
+                style={{
+                  backgroundColor: "",
+                  margin: 0,
+                  width: "150px",
+                  height: "150px",
                 }}
               />
-              <div className="bounding-box"></div>
-            </div> */}
+            </div>
             <button onClick={capture} className="ok-button">
               Take a face photo
             </button>
@@ -531,8 +494,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
             )}
           </>
         );
-
-      default:
+      case "emailSucces":
         const imageSource = getImageSource();
         return (
           <>
@@ -544,7 +506,35 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
                 </React.Fragment>
               ))}
             </h1>
-            {/* <img src={imageSource} alt="" className="card-image" /> */}
+            <img src={imageSource} alt="" className="card-image" />
+          </>
+        );
+      case "postalCodeSucces":
+        return (
+          <>
+            <h1 className="card-title">
+              {getStatusHeaderText().map((text, index) => (
+                <React.Fragment key={index}>
+                  {text}
+                  <br />
+                </React.Fragment>
+              ))}
+            </h1>
+            <img src={Gambar2} alt="" className="card-image" />
+          </>
+        );
+
+      default:
+        return (
+          <>
+            <h1 className="card-title">
+              {getStatusHeaderText().map((text, index) => (
+                <React.Fragment key={index}>
+                  {text}
+                  <br />
+                </React.Fragment>
+              ))}
+            </h1>
             <textarea
               className="areaScan"
               autoFocus
@@ -585,7 +575,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2}) => {
       case "postalCodeSucces":
         return Gambar2;
       case "errorConnection":
-      return Gambar1;
+        return Gambar1;
       case "notconnectCamera":
         return Gambar1;
       default:

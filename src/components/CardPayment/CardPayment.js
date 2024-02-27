@@ -15,7 +15,7 @@ import axios from "axios";
 import { Toast } from "../Toast/Toast";
 import Webcam from "react-webcam";
 import Select from "react-select";
-import { url_devel } from "../../services/env";
+import { url_dev } from "../../services/env";
 
 const socket = io("http://localhost:4499");
 
@@ -59,9 +59,8 @@ const CardPayment = ({
   const [failedMessage, setFailedMessage] = useState(
     "Network / Card error / declined dll"
   );
-  const [number, setNumber] = useState("Z1A012002");
-  const [receipt, setReceipt] = useState("XA0188090");
-  const [url, setUrl] = useState("");
+  const [number, setNumber] = useState("");
+  const [receipt, setReceipt] = useState("");
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
 
   //price
@@ -72,11 +71,9 @@ const CardPayment = ({
   const formattedNumber = (num) =>
     parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
 
-  const numericValue = parseFloat(500000);
+  const numericValue = parseFloat(value);
   const numericFee = parseFloat(fee);
   const numericFeeCash = parseFloat(fee_cash);
-
-  const formattedFees = formattedNumber(numericFee);
   const formattedFee = formattedNumber(fee);
   const formattedFeeCash = formattedNumber(numericFeeCash);
   const formattedValue = formattedNumber(numericValue);
@@ -84,12 +81,11 @@ const CardPayment = ({
   const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
 
   //cardNumberPetugass
-  const cardNumberPetugass = "11" + localStorage.getItem("deviceId");
+  const cardNumberPetugass = "1101320000001255";
 
   const capture = () => {
     const imageSrc = webcamRef.current.getScreenshot();
     setCapturedImages(imageSrc);
-
     sendDataPhotoPayment({
       isDoRetake: true,
       isPhoto: false,
@@ -108,13 +104,51 @@ const CardPayment = ({
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
+  const checkAndHandleTokenExpiration = () => {
+    const jwtToken = localStorage.getItem("JwtToken");
+    if (!jwtToken) {
+      return false;
+    }
 
+    const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
+    const expirationTime = decodedToken.exp * 1000;
+    const now = Date.now();
+    const isExpired = now > expirationTime;
+
+    return !isExpired;
+  };
 
   // Contoh penggunaan di tempat lain
+  const handleTokenExpiration = () => {
+    const isTokenValid = checkAndHandleTokenExpiration();
+
+    if (!isTokenValid) {
+      // Token has expired, handle the expiration here
+      Swal.fire({
+        icon: "error",
+        text: "Expired JWT Token",
+        confirmButtonColor: "#3d5889",
+      }).then((result) => {
+        // If the user clicks "OK", clear localStorage
+        if (result.isConfirmed) {
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+          localStorage.removeItem("jenisDeviceId");
+          localStorage.removeItem("deviceId");
+          localStorage.removeItem("airportId");
+          localStorage.removeItem("price");
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     axios
-      .get(`${url_devel}TypeCard.php`)
+      .get(`${url_dev}TypeCard.php`)
       .then((res) => {
         const responseData = res.data;
 
@@ -142,11 +176,13 @@ const CardPayment = ({
   }, []);
 
   useEffect(() => {
-    socket.on("connected", (message) => {
-      // console.log("connected client to server");
+    const socketIoClient = io("http://localhost:4499");
+
+    socketIoClient.on("connect", () => {
+      console.log("Connected to server socket.io");
     });
-    socket.on("getCredentials", (data) => {
-      // console.log(`client getCredentials: ${JSON.stringify(data)}`);
+
+    socketIoClient.on("getCredentials", (data) => {
       if (data) {
         const inputCC = data.ccnum.replace(/\D/g, "");
         if (inputCC.length <= 16) {
@@ -156,6 +192,15 @@ const CardPayment = ({
               ?.join(" ")
               .substring(0, 19)
           );
+
+          const params = {
+            code: "input-card-number",
+            data: inputCC
+              .match(/.{1,4}/g)
+              ?.join(" ")
+              .substring(0, 19),
+          };
+          socket.emit("WebClientMessage", JSON.stringify(params));
         }
         const inputExp = data.expdate;
         const year = inputExp.substring(0, 2);
@@ -167,8 +212,20 @@ const CardPayment = ({
             .replace(/(\/\d{2})\d+?$/, "$1");
 
           if (/^\d{0,2}\/?\d{0,2}$/.test(formattedInput)) {
+            const params = {
+              code: "input-expired",
+              data: formattedInput,
+            };
+            socket.emit("WebClientMessage", JSON.stringify(params));
+
             return formattedInput;
           } else {
+            const params = {
+              code: "input-expired",
+              data: prevExpiry,
+            };
+            socket.emit("WebClientMessage", JSON.stringify(params));
+
             return prevExpiry;
           }
         });
@@ -183,30 +240,57 @@ const CardPayment = ({
             ? "MASTERCARD"
             : cleanedType;
         setType(finalType);
-        // console.log("inputType: ", inputType);
 
         if (data.cardtype === "" || data.cardtype !== "") {
           setIsCheckedType(true);
         }
       }
-      // console.log("data: ", data);
     });
-  }, []);
 
-  // console.table({
-  //   isCreditCard,
-  //   isPaymentCredit,
-  //   isPaymentCash,
-  //   isWaiting,
-  //   isFailed,
-  //   isPrinted,
-  //   isSuccess,
-  //   paymentMethod,
-  //   cardNumber,
-  //   expiry,
-  //   cvv,
-  //   type,
-  // });
+    const handleInputCardNumber = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received input-card-number data: ", dataParse);
+        const text = dataParse?.data;
+        setCardNumber(text);
+      } catch (error) {
+        console.error("Error parsing input-card-number data:", error);
+      }
+    };
+
+    const handleInputExpiredDate = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received input-expired data: ", dataParse);
+        const text = dataParse?.data;
+        setExpiry(text);
+      } catch (error) {
+        console.error("Error parsing input-expired data:", error);
+      }
+    };
+
+    const handleInputCVV = (data) => {
+      try {
+        const dataParse = JSON.parse(data);
+        console.log("Received input-cvv data: ", dataParse);
+        const text = dataParse?.data;
+        setCvv(text);
+      } catch (error) {
+        console.error("Error parsing input-cvv data:", error);
+      }
+    };
+
+    socketIoClient.on("input-card-number", handleInputCardNumber);
+    socketIoClient.on("input-expired", handleInputExpiredDate);
+    socketIoClient.on("input-cvv", handleInputCVV);
+
+    return () => {
+      socketIoClient.disconnect();
+      socketIoClient.off("input-card-number", handleInputCardNumber);
+      socketIoClient.off("input-expired", handleInputExpiredDate);
+      socketIoClient.off("input-cvv", handleInputCVV);
+    };
+  }, []);
 
   useEffect(() => {
     // ini jika semua false
@@ -238,6 +322,11 @@ const CardPayment = ({
           cvv: cvv,
           type: type,
         });
+        const params = {
+          code: "card",
+          data: "",
+        };
+        socket.emit("WebClientMessage", JSON.stringify(params));
         setCardNumber("");
         setExpiry("");
         setCvv("");
@@ -275,6 +364,11 @@ const CardPayment = ({
             cvv: cvv,
             type: type,
           });
+          const params = {
+            code: "card",
+            data: "",
+          };
+          socket.emit("WebClientMessage", JSON.stringify(params));
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
@@ -301,7 +395,6 @@ const CardPayment = ({
   ]);
 
   useEffect(() => {
-    // ini jika isPrinted true
     setDataPasporUser(dataUser);
     setDataPermohonanUser(dataNumberPermohonan);
     if (
@@ -313,10 +406,8 @@ const CardPayment = ({
       !isPaymentCash &&
       !isCreditCard
     ) {
-      // console.log("dataPermohonanUser: ", dataPermohonanUser);
       setNumber(dataPermohonanUser?.visa_number ?? "");
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
-      setUrl(dataPermohonanUser?.form_url ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -410,7 +501,7 @@ const CardPayment = ({
 
   useEffect(() => {
     if (seconds === 0) {
-      
+      navigate("/home");
     }
   }, [navigate, seconds]);
 
@@ -465,8 +556,8 @@ const CardPayment = ({
   };
 
   const handlePaymentCredit = () => {
+    handleTokenExpiration();
     setPaymentMethod("KIOSK");
-    // console.log("berhasil");
     sendDataUpdatePayment({
       isWaiting: false,
       isFailed: false,
@@ -485,6 +576,7 @@ const CardPayment = ({
   };
 
   const handlePaymentCash = () => {
+    handleTokenExpiration();
     setIsCheckedType(false);
     setPaymentMethod("KICASH");
     setExpiry("00/00");
@@ -513,7 +605,7 @@ const CardPayment = ({
   };
 
   const handleBackHome = () => {
-    // navigate("/home");
+    navigate("/home");
   };
 
   const handleConfirm = () => {
@@ -522,6 +614,7 @@ const CardPayment = ({
   };
 
   const handleSubmit = (e) => {
+    handleTokenExpiration();
     e.preventDefault();
 
     if (cardNumber === "") {
@@ -535,15 +628,67 @@ const CardPayment = ({
       setCvvWarning(false);
       setCardNumberWarning(false);
       setExpiryWarning(false);
-      handlePrint();
+      Swal.fire({
+        title: "Are you sure want to Pay?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#3D5889",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const card_data = {
+            cc_no: cardNumber,
+            cc_exp: expiry,
+            cvv: cvv,
+            type: type,
+          };
+
+          const bill_data = {
+            billing_id: "",
+            amount: "",
+            currency: "",
+          };
+
+          const user_data = {
+            pass_no: dataPasporUser.passportData.docNumber,
+            pass_name: dataPasporUser.passportData.fullName,
+            country: dataPasporUser.passportData.nationality,
+          };
+
+          const dataParam = {
+            card_data: { ...card_data },
+            bill_data: { ...bill_data },
+            user_data: { ...user_data },
+          };
+
+          console.log("dataParam: ", dataParam);
+          sendDataUpdatePayment({
+            isWaiting: false,
+            isConfirm: false,
+            isFailed: false,
+            isPrinted: false,
+            isSuccess: false,
+            isPhoto: false,
+            isDoRetake: false,
+            paymentMethod: paymentMethod,
+            cardNumber: cardNumber,
+            expiry: expiry,
+            cvv: cvv,
+            type: type,
+          });
+
+          const newStatusPaymentCreditCard = !statusPaymentCredit;
+          onStatusChange(newStatusPaymentCreditCard);
+        }
+      });
     }
   };
 
   const handleSubmitKICASH = () => {
+    handleTokenExpiration();
     isLoading(false);
-    // console.log("dataPasporUser1: ", dataPasporUser);
-    // e.preventDefault();
-    // console.log("dataPasporUser2: ", dataPasporUser);
     setCardNumber(cardNumberPetugass);
     if (cardNumber === "") {
       setCardNumberWarning(true);
@@ -582,7 +727,7 @@ const CardPayment = ({
         user_data: { ...user_data },
       };
 
-      // console.log("dataParam: ", dataParam);
+      console.log("dataParam: ", dataParam);
       sendDataUpdatePayment({
         isWaiting: false,
         isConfirm: false,
@@ -605,7 +750,7 @@ const CardPayment = ({
   const handleLogin = async (username, password) => {
     try {
       isLoading(true);
-      const response = await axios.post(`${url_devel}Login.php`, {
+      const response = await axios.post(`${url_dev}Login.php`, {
         username,
         password,
       });
@@ -616,7 +761,7 @@ const CardPayment = ({
         response.data.status === "success"
       ) {
         localStorage.setItem("JwtToken", response.data.JwtToken.token);
-        const userProfile = await axios.get(`${url_devel}ProfileMe.php`, {
+        const userProfile = await axios.get(`${url_dev}ProfileMe.php`, {
           headers: {
             Authorization: `Bearer ${response.data.JwtToken.token}`,
           },
@@ -737,7 +882,7 @@ const CardPayment = ({
       } else {
         Toast.fire({
           icon: "error",
-          title: "Failed to Login",
+          title: "VPN connection is interrupted",
         });
       }
       sendDataUpdatePayment({
@@ -760,8 +905,58 @@ const CardPayment = ({
   };
 
   const handleSubmitCash = (e) => {
+    // handlePrint();
     e.preventDefault();
-    handlePrint();
+
+    Swal.fire({
+      title: "Are you sure want to Pay?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3D5889",
+      cancelButtonColor: "#d33",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Login",
+          html:
+            '<input id="swal-input1" class="swal2-input" placeholder="UserName">' +
+            '<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonText: "Submit",
+          confirmButtonColor: "#3D5889",
+          cancelButtonText: "Cancel",
+          cancelButtonColor: "#d33",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const username = document.getElementById("swal-input1").value;
+            const password = document.getElementById("swal-input2").value;
+
+            // Lakukan sesuatu dengan email dan password yang diambil
+
+            if (username && password) {
+              sendDataUpdatePayment({
+                isConfirm: false,
+                isFailed: false,
+                isPrinted: false,
+                isSuccess: false,
+                isWaiting: true,
+                paymentMethod: paymentMethod,
+                cardNumber: cardNumber,
+                expiry: expiry,
+                cvv: cvv,
+                type: type,
+              });
+              handleLogin(username, password);
+            } else {
+              Swal.fire("Please enter username and password");
+            }
+          }
+        });
+      }
+    });
   };
 
   return (
@@ -859,13 +1054,13 @@ const CardPayment = ({
                   </div>
                   <div className="amount-price">
                     <div className="amount-box1">
-                      <input type="text" value={`Rp. 500.000`} />
+                      <input type="text" value={`Rp. ${formattedValue}`} />
                     </div>
                     <div className="amount-box2">
-                      <input type="text" value={`Rp. 19.500`} />
+                      <input type="text" value={`Rp. ${formattedFee}`} />
                     </div>
                     <div className="amount-box3">
-                      <input type="text" value={`Rp. 519.000`} />
+                      <input type="text" value={`Rp. ${formattedTotal}`} />
                     </div>
                   </div>
                 </div>
@@ -972,13 +1167,13 @@ const CardPayment = ({
                   </div>
                   <div className="amount-price">
                     <div className="amount-box1">
-                      <input type="text" value={`Rp. 500.000`} />
+                      <input type="text" value={`Rp. ${formattedValue}`} />
                     </div>
                     <div className="amount-box2">
-                      <input type="text" value={`Rp. ${0}`} />
+                      <input type="text" value={`Rp. ${formattedFeeCash}`} />
                     </div>
                     <div className="amount-box3">
-                      <input type="text" value={`Rp. 500.000`} />
+                      <input type="text" value={`Rp. ${formattedTotalCash}`} />
                     </div>
                   </div>
                 </div>

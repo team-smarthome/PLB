@@ -56,10 +56,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     email: "",
   };
   const [formdata, setFormData] = useState(initialFormData);
-  
-  useEffect(() => {
-    // console.log("test shared data", sharedData.passportData);
 
+  useEffect(() => {
     if (sharedData.passportData === null) {
       // console.log("test shared data null");
       setFormData(initialFormData);
@@ -68,83 +66,58 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         value: negara.id_negara,
         label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
       }));
-  
+
       setOptionNegara(dataNationality);
-  
+
       const dataGender = [
         { value: "male", label: "MALE" },
         { value: "female", label: "FEMALE" },
       ];
-  
-      
+
       setOptionGender(dataGender);
-  
+
       if (sharedData.passportData) {
         const filteredNationality = dataNationality.filter(
           (negara) => negara.value === sharedData.passportData.nationality
         );
-  
+
         // gender
         if (sharedData.passportData) {
           const filteredGender = dataGender.filter(
             (sex) => sex.value === sharedData.passportData.sex
           );
-  
+
           setFormData((prevData) => ({
             ...prevData,
             sex: filteredGender.length > 0 ? filteredGender[0] : "",
           }));
         }
-  
+
         setFormData((prevData) => ({
           ...prevData,
           passport_number: sharedData.passportData.docNumber || "",
           full_name: sharedData.passportData.fullName || "",
-          date_of_birth: convertBirthDate(sharedData.passportData.birthDate) || "",
+          date_of_birth: sharedData.passportData.formattedBirthDate || "",
           nationality:
             filteredNationality.length > 0 ? filteredNationality[0] : "",
-          expiry_date: convertExpiryDate(sharedData.passportData.expirationDate) || "",
-          paspor_type: sharedData.passportData.docType || "",
+          expiry_date: sharedData.passportData.formattedExpiryDate || "",
+          passport_type:
+            (sharedData.passportData.docType === "P" || "PM"
+              ? "PASSPORT"
+              : sharedData.passportData.docType) || "",
         }));
-
-        function convertExpiryDate(expirationDate) {
-          if (!expirationDate) return "";
-          
-          const day = parseInt(expirationDate.substring(0, 2));
-          const month = parseInt(expirationDate.substring(2, 4)) - 1; // Kurangi 1 karena bulan dimulai dari 0
-          const year = 2000 + parseInt(expirationDate.substring(4, 6));
-          
-          const expiryDate = new Date(year, month, day).toISOString().split("T")[0];
-          return expiryDate;
-        }
-        
-        function convertBirthDate(birthDate) {
-          if (!birthDate) return "";
-          
-          const day = parseInt(birthDate.substring(0, 2));
-          const month = parseInt(birthDate.substring(2, 4)) - 1; // Kurangi 1 karena bulan dimulai dari 0
-          const year = 2000 + parseInt(birthDate.substring(4, 6));
-          
-          const formattedBirthDate = new Date(year, month, day).toISOString().split("T")[0];
-          return formattedBirthDate;
-        }
-
       }
 
-      
-  
       setFormData((prevData) => ({
         ...prevData,
         photo: sharedData.photoFace || "",
       }));
-  
+
       setFormData((prevData) => ({
         ...prevData,
         email: sharedData.email || "",
       }));
     }
-
-
   }, [sharedData]);
 
   const handleInputChange = (e) => {
@@ -162,8 +135,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         [name]: value,
       },
     }));
-    // console.log(sharedData);
-    // console.log(formdata);
   };
 
   const handleImageClick = (type) => {
@@ -192,7 +163,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
 
   const handleSelectChange = (selectedOption, fieldName) => {
-    // console.log(selectedOption);
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: selectedOption,
@@ -205,8 +175,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         [fieldName]: selectedOption.value,
       },
     }));
-
-    // console.log(formdata);
   };
 
   const handleSubmit = async (e) => {
@@ -494,7 +462,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               type="text"
               name="docType"
               id="paspor_type"
-              value={formdata.paspor_type}
+              value={formdata.passport_type}
               onChange={handleInputChange}
               disabled={
                 cardStatus === "checkData" ? !isCheckedPasporType : true
