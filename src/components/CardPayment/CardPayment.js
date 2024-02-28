@@ -59,8 +59,8 @@ const CardPayment = ({
   const [failedMessage, setFailedMessage] = useState(
     "Network / Card error / declined dll"
   );
-  const [number, setNumber] = useState("");
-  const [receipt, setReceipt] = useState("");
+  const [number, setNumber] = useState("Z1A012002");
+  const [receipt, setReceipt] = useState("XA0188090");
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
 
   //price
