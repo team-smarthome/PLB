@@ -60,7 +60,7 @@ client.on("data", (data) => {
           action: "heartbeat",
           timestamp: getCurrentTimeInSeconds(),
           interval: 30,
-          local_ip: "192.168.1.7",
+          local_ip: "10.0.95.36",
         };
         console.log("request data", requestData);
         client.write(JSON.stringify(requestData));
@@ -160,7 +160,7 @@ const aidList = [
 
 async function kirimSnapshot(socket) {
   try {
-    const url = "http://192.168.1.5:6067/attendDevice/sendSnapshot";
+    const url = "http://10.0.95.34:6067/attendDevice/sendSnapshot";
     const requestBody = {
       deviceNo: "12321SS4BAHS",
     };
@@ -630,7 +630,7 @@ setupDevicesEvent(devices);
 io.on("connection", (socket) => {
   console.log("Client connected");
   socket.emit("client connected to server socket.io 4499");
-  socket.emit("isRequest", "DEFAULT");
+  socket.emit("isRequest", "EMAIL");
 
   socket.on("WebClientMessage", (data) => {
     // console.log("WebClientMessage Data: ", data);
