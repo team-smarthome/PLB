@@ -23,56 +23,7 @@ const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 
-const net = require("net");
 
-// Define the server details
-const serverHost = "127.0.0.1";
-const serverPort = 8888;
-
-const client = new net.Socket();
-
-function getCurrentTimeInSeconds() {
-  return Math.floor(Date.now() / 1000);
-}
-
-client.connect(serverPort, serverHost, () => {
-  console.log("Connected to server");
-
-  // Send data to the server
-  const requestData = {
-    deviceNo: "12321SS4AU9D",
-    action: "connect",
-    timestamp: getCurrentTimeInSeconds(),
-  };
-  console.log("request data", requestData);
-  client.write(JSON.stringify(requestData));
-});
-client.on("data", (data) => {
-  console.log("Received data from server:", data.toString("utf-8"));
-  const responseData = JSON.parse(data.toString("utf-8"));
-  if (responseData.message && responseData.message.code) {
-    const code = responseData.message.code;
-    switch (code) {
-      case "connect":
-        // Send data to the server
-        const requestData = {
-          // deviceNo: "12321SS4BAHS",
-          deviceNo: "12321SS4AU9D",
-          action: "heartbeat",
-          timestamp: getCurrentTimeInSeconds(),
-          interval: 30,
-          local_ip: "192.168.1.83",
-        };
-        console.log("request data", requestData);
-        client.write(JSON.stringify(requestData));
-        break;
-      default:
-        break;
-    }
-  } else {
-    console.log("Invalid response data:", responseData);
-  }
-});
 
 // Function to split AFL (Application File Locator) data into chunks
 function splitAFL(dataHex) {
@@ -99,142 +50,6 @@ const aidList = [
     value: "A000000065",
   },
 ];
-
-// async function kirimSnapshot(socket) {
-//   try {
-//     const url = "http://192.168.1.:6067/attendDevice/sendSnapshot";
-//     const requestBody = {
-//       deviceNo: "12321SS4BAHS",
-//     };
-//     const response = await axios.post(url, requestBody, {
-//       headers: {
-//         "Content-Type": "application/x-www-form-urlencoded",
-//       },
-//     });
-//     // console.log("Response:", response.data);
-
-//     if (response.data.message === "success") {
-//       setTimeout(() => {
-//         const directoryPath =
-//           "D:/transforme/E-VOA/new-device/camera-1/temp/12321SS4BAHS";
-//         const files = fs.readdirSync(directoryPath);
-//         let newestFile;
-//         let newestTime = 0;
-
-//         files.forEach((file) => {
-//           const filePath = path.join(directoryPath, file);
-//           const fileStat = fs.statSync(filePath);
-
-//           if (file.startsWith("F") && fileStat.mtimeMs > newestTime) {
-//             newestTime = fileStat.mtimeMs;
-//             newestFile = file;
-//           }
-//         });
-
-//         // Pastikan file ditemukan sebelum melanjutkan
-//         if (!newestFile) {
-//           console.log("Tidak ada file yang ditemukan.");
-//           return;
-//         }
-
-//         const imagePath = path.join(directoryPath, newestFile);
-
-//         // Baca file gambar dan ubah menjadi base64
-//         const imageBase64 = fs.readFileSync(imagePath, { encoding: "base64" });
-//         console.log("imageBase64: ", imageBase64);
-//         console.log("keluar kirimSnapshot");
-
-//         // Kirim base64 ke client
-//         socket.emit("snapshot_data", {
-//           base64: imageBase64,
-//           filename: newestFile,
-//         });
-//       }, 3000);
-//     }
-
-//     // Cari file gambar dengan awalan 'F' dan pilih yang terbaru
-//     console.log("Masuk kirimSnapshot");
-//   } catch (error) {
-//     console.error("Error:", error);
-//   }
-// }
-
-async function kirimSnapshot(socket) {
-  try {
-    console.log("Masuk kirimSnapshot WOIIII");
-    const url = "http://192.168.1.24:6067/attendDevice/sendSnapshot";
-    const requestBody = {
-      deviceNo: "12321SS4AU9D",
-    };
-    const response = await axios.post(url, requestBody, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    console.log("Response:", response.data); 
-
-    if (response.data.message === "success") {
-      setTimeout(() => {
-        const directoryPath =
-          "D:/transforme/E-VOA/new-device/camera-1/temp/12321SS4AU9D";
-          if (!fs.existsSync(directoryPath)) {
-            socket.emit("not-found-directory", {
-              "message": "directory-not-found"
-            });
-            console.log("Direktori tidak ditemukan.");
-            return;
-          }
-        const files = fs.readdirSync(directoryPath);
-        let newestFile;
-        let newestTime = 0;
-
-        files.forEach((file) => {
-          const filePath = path.join(directoryPath, file);
-          const fileStat = fs.statSync(filePath);
-
-          if (file.startsWith("F") && fileStat.mtimeMs > newestTime) {
-            newestTime = fileStat.mtimeMs;
-            newestFile = file;
-          }
-        });
-
-        if (!newestFile) {
-          // socket.emit("gagal_snapshot", {
-          //  "message": "no-image-found"
-          // });
-          kirimSnapshot(socket);
-          console.log("Tidak ada file yang ditemukan.");
-          return;
-        }
-
-        const imagePath = path.join(directoryPath, newestFile);
-        const imageBase64 = fs.readFileSync(imagePath, { encoding: "base64" });
-        console.log("imageBase64: ", imageBase64);
-        console.log("keluar kirimSnapshot");
-
-        socket.emit("snapshot_data", {
-          base64: imageBase64,
-          filename: newestFile,
-        });
-
-        // Hapus file setelah dikirimkan
-        fs.unlinkSync(imagePath);
-        console.log("File dihapus setelah berhasil dikirim.");
-
-      }, 2000);
-    } else {
-      socket.emit("gagal_snapshot", {
-        "message": "failed-to-take-snapshot"
-      });
-    }
-
-
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
 
 
 async function commandSelectPSE(application, card, data) {
@@ -668,10 +483,7 @@ io.on("connection", (socket) => {
         break;
       case "input-cvv":
         sendServertoClient("onMessage", JSON.stringify(dataParse));
-        break;
-      case "take-snapshot":
-        kirimSnapshot(socket);
-        break;
+        break;;
       default:
         sendServertoClient("isRequest", "DEFAULT");
     }
@@ -706,9 +518,6 @@ io.on("connection", (socket) => {
       case "input-cvv":
         sendServertoClient("input-cvv", JSON.stringify(dataParse));
         break;
-      case "take-snapshot":
-        kirimSnapshot(socket);
-        break;
       default:
     }
   });
@@ -741,6 +550,6 @@ function validateCreditCardNumber(ccNum) {
 }
 
 // Starting the server
-server.listen(449, () => {
+server.listen(4499, () => {
   console.log(`Server running on port 4499`);
 });

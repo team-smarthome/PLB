@@ -52,7 +52,7 @@ const CardPayment = ({
   const [cvv, setCvv] = useState("");
   const [type, setType] = useState("");
   const [isCheckedType, setIsCheckedType] = useState(false);
-  const [cvvWarning, setCvvWarning] = useState(false);
+  // const [cvvWarning, setCvvWarning] = useState(false);
   const [seconds, setSeconds] = useState(8);
   const [dataPasporUser, setDataPasporUser] = useState(null);
   const [dataPermohonanUser, setDataPermohonanUser] = useState(null);
@@ -493,11 +493,11 @@ const CardPayment = ({
     }
   }, [expiry]);
 
-  useEffect(() => {
-    if (cvv !== "") {
-      setCvvWarning(false);
-    }
-  }, [cvv]);
+  // useEffect(() => {
+  //   if (cvv !== "") {
+  //     setCvvWarning(false);
+  //   }
+  // }, [cvv]);
 
   useEffect(() => {
     if (seconds === 0) {
@@ -621,11 +621,9 @@ const CardPayment = ({
       setCardNumberWarning(true);
     } else if (expiry === "") {
       setExpiryWarning(true);
-    } else if (cvv === "") {
-      setCvvWarning(true);
     } else {
       // SweetAlert dialog and further actions
-      setCvvWarning(false);
+      // setCvvWarning(false);
       setCardNumberWarning(false);
       setExpiryWarning(false);
       Swal.fire({
@@ -641,7 +639,6 @@ const CardPayment = ({
           const card_data = {
             cc_no: cardNumber,
             cc_exp: expiry,
-            cvv: cvv,
             type: type,
           };
 
@@ -675,7 +672,6 @@ const CardPayment = ({
             paymentMethod: paymentMethod,
             cardNumber: cardNumber,
             expiry: expiry,
-            cvv: cvv,
             type: type,
           });
 
@@ -695,11 +691,11 @@ const CardPayment = ({
     } else if (expiry === "") {
       setExpiryWarning(true);
     } else if (cvv === "") {
-      setCvvWarning(true);
+      // setCvvWarning(true);
     } else if (cardNumber !== "" && cvv !== "" && expiry !== "") {
       setCardNumberWarning(false);
       setExpiryWarning(false);
-      setCvvWarning(false);
+      // setCvvWarning(false);
       const card_data = {
         cc_no: cardNumber,
         cc_exp: expiry,
@@ -903,61 +899,65 @@ const CardPayment = ({
       });
     }
   };
-
   const handleSubmitCash = (e) => {
-    // handlePrint();
     e.preventDefault();
-
-    Swal.fire({
-      title: "Are you sure want to Pay?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#3D5889",
-      cancelButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "Login",
-          html:
-            '<input id="swal-input1" class="swal2-input" placeholder="UserName">' +
-            '<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
-          focusConfirm: false,
-          showCancelButton: true,
-          confirmButtonText: "Submit",
-          confirmButtonColor: "#3D5889",
-          cancelButtonText: "Cancel",
-          cancelButtonColor: "#d33",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            const username = document.getElementById("swal-input1").value;
-            const password = document.getElementById("swal-input2").value;
-
-            // Lakukan sesuatu dengan email dan password yang diambil
-
-            if (username && password) {
-              sendDataUpdatePayment({
-                isConfirm: false,
-                isFailed: false,
-                isPrinted: false,
-                isSuccess: false,
-                isWaiting: true,
-                paymentMethod: paymentMethod,
-                cardNumber: cardNumber,
-                expiry: expiry,
-                cvv: cvv,
-                type: type,
-              });
-              handleLogin(username, password);
-            } else {
-              Swal.fire("Please enter username and password");
-            }
-          }
-        });
-      }
-    });
+    handlePrint();
   };
+
+  // const handleSubmitCash = (e) => {
+  //   // handlePrint();
+  //   e.preventDefault();
+
+  //   Swal.fire({
+  //     title: "Are you sure want to Pay?",
+  //     icon: "question",
+  //     showCancelButton: true,
+  //     confirmButtonText: "Yes",
+  //     cancelButtonText: "Cancel",
+  //     confirmButtonColor: "#3D5889",
+  //     cancelButtonColor: "#d33",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       Swal.fire({
+  //         title: "Login",
+  //         html:
+  //           '<input id="swal-input1" class="swal2-input" placeholder="UserName">' +
+  //           '<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+  //         focusConfirm: false,
+  //         showCancelButton: true,
+  //         confirmButtonText: "Submit",
+  //         confirmButtonColor: "#3D5889",
+  //         cancelButtonText: "Cancel",
+  //         cancelButtonColor: "#d33",
+  //       }).then((result) => {
+  //         if (result.isConfirmed) {
+  //           const username = document.getElementById("swal-input1").value;
+  //           const password = document.getElementById("swal-input2").value;
+
+  //           // Lakukan sesuatu dengan email dan password yang diambil
+
+  //           if (username && password) {
+  //             sendDataUpdatePayment({
+  //               isConfirm: false,
+  //               isFailed: false,
+  //               isPrinted: false,
+  //               isSuccess: false,
+  //               isWaiting: true,
+  //               paymentMethod: paymentMethod,
+  //               cardNumber: cardNumber,
+  //               expiry: expiry,
+  //               cvv: cvv,
+  //               type: type,
+  //             });
+  //             handleLogin(username, password);
+  //           } else {
+  //             Swal.fire("Please enter username and password");
+  //           }
+  //         }
+  //       });
+  //     }
+  //   });
+  // };
 
   return (
     <div className="card-status">
@@ -1068,7 +1068,7 @@ const CardPayment = ({
                   <div className="credit-card-payment3">
                     <p>Card Number</p>
                     <p>Expired</p>
-                    <p>CVV</p>
+                    {/* <p>CVV</p> */}
                   </div>
                   <div className="credit-card-payment4">
                     <div className="credit-card-value10">
@@ -1135,7 +1135,7 @@ const CardPayment = ({
                         <div className="warning">Please enter Expiry Card!</div>
                       )}
                     </div>
-                    <div className="credit-card-value3">
+                    {/* <div className="credit-card-value3">
                       <input
                         type="password"
                         value={cvv}
@@ -1144,7 +1144,7 @@ const CardPayment = ({
                       {cvvWarning && (
                         <div className="warning">Please enter cvv!</div>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 <div className="confirm-payment-credit">

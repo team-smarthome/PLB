@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./CardStatusStyle.css";
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -13,6 +13,8 @@ import dataKodePos from "../../utils/dataKodePos";
 import Select from "react-select";
 import io from "socket.io-client";
 import { Toast } from "../Toast/Toast";
+import ReactPlayer from "react-player";
+
 const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
@@ -29,6 +31,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const navigate = useNavigate();
   const [selectedKabupaten, setSelectedKabupaten] = useState(null);
   const [kodePos, setKodePos] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [mrz, setMrz] = useState(["", ""]);
+  // let mrz = [
+  //   "",
+  //   "",
+  // ];
+  const [refresh, setRefresh] = useState(false);
 
   const kabupatenOptions = dataKodePos.data.map((item) => ({
     value: item.kabupaten,
@@ -76,25 +85,86 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     }
   };
 
+  useEffect(() => {
+    const socket = io("http://localhost:4499");
+    socket.on("connect", () => {
+      if (socket.connected) {
+        console.log("Connected to server socket.io");
+      } else {
+        sendDataToInput({
+          statusCardBox: "lookCamera",
+          capturedImage: null,
+          emailUser: null,
+          titleHeader: "Apply VOA",
+          titleFooter: "Next Step",
+        });
+      }
+    });
+  }, [capturedImage]);
+
   const capture = () => {
     const socket = io("http://localhost:4499");
-
-    socket.on("connect", () => {
+    const params = {
+      code: "take-snapshot",
+      data: "",
+    };
+    socket.emit("WebClientMessage", JSON.stringify(params));
+    sendDataToInput({
+      statusCardBox: "waiting",
+      capturedImage: null,
+      emailUser: null,
+      titleHeader: "Apply VOA",
+      titleFooter: "Next Step",
+    });
+    let waitingTimeout = setTimeout(() => {
       sendDataToInput({
-        statusCardBox: "waiting",
+        statusCardBox: "lookCamera",
         capturedImage: null,
         emailUser: null,
         titleHeader: "Apply VOA",
         titleFooter: "Next Step",
       });
+      Toast.fire({
+        icon: "error",
+        title: "Tidak Dapat mendapatkan gambar",
+      });
+    }, 70000);
+    socket.on("client connected to server socket.io 4499", (data) => {
+      // clearTimeout(waitingTimeout);
+      // sendDataToInput({
+      //   statusCardBox: "waiting",
+      //   capturedImage: null,
+      //   emailUser: null,
+      //   titleHeader: "Apply VOA",
+      //   titleFooter: "Next Step",
+      // });
+    });
+
+    socket.on("connect", () => {
       console.log("Terhubung ke server");
     });
+
+    socket.on("not-found-directory", (data) => {
+      clearTimeout(waitingTimeout);
+      sendDataToInput({
+        statusCardBox: "lookCamera",
+        capturedImage: null,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+      });
+      Toast.fire({
+        icon: "error",
+        title: "Kesalahan Menentukan Direktori",
+      });
+    });
+
     socket.on("snapshot_data", (data) => {
+      clearTimeout(waitingTimeout);
       console.log("base:", data.base64);
       const imageSrc = `data:image/jpeg;base64,${data.base64}`;
       console.log("imageSrc:", imageSrc);
       setCapturedImage(imageSrc);
-
       sendDataToInput({
         statusCardBox: "takePhotoSucces",
         capturedImage: imageSrc,
@@ -107,24 +177,19 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     });
 
     socket.on("gagal_snapshot", (data) => {
-      Toast.fire({
-        icon: "error",
-        title: "Failed to take photo",
-      });
+      clearTimeout(waitingTimeout);
       sendDataToInput({
-        statusCardBox: "lookCamera",
+        statusCardBox: "checkData",
         capturedImage: null,
         emailUser: null,
         titleHeader: "Apply VOA",
         titleFooter: "Next Step",
       });
+      Toast.fire({
+        icon: "error",
+        title: "Tidak Dapat mendapatkan gambar",
+      });
     });
-
-    const params = {
-      code: "take-snapshot",
-      data: "",
-    };
-    socket.emit("WebClientMessage", JSON.stringify(params));
   };
 
   const doRetake = () => {
@@ -223,7 +288,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     socket_IO.on("disconnect", () => {
       console.log("Disconnected from server socket.io");
     });
-
     const handleInputEmail = (data) => {
       try {
         const dataParse = JSON.parse(data);
@@ -294,18 +358,21 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     console.log("capturedImage berubah:", capturedImage);
   }, [capturedImage]);
 
-  const [inputValue, setInputValue] = useState("");
-  let mrz = ["", ""];
-
   const handleScanedArea = (event) => {
-    let text = event.target.value;
-    if (text.length > 44) {
-      const firstPart = text.substring(0, 44).replace(/\s/g, "");
-      const secondPart = text.substring(44).replace(/\s/g, "");
-      text = firstPart + "\n" + secondPart;
-      mrz = [firstPart, secondPart];
-    }
-    setInputValue(text);
+      let text = event.target.value.replace(/\s/g, ''); 
+      console.log("text: ", text);
+      console.log("text.length: ", text.length); 
+      if (text.length > 88) {
+        text = text.substring(text.length - 88); // Ambil karakter ke-89 dan seterusnya
+      }
+      // mrz index ke 0 adalah 44 karakter pertama
+      // mrz index ke 1 adalah 44 karakter kedua
+      const mrzArray = [
+        text.substring(0, 44),
+        text.substring(44) // Sisanya diambil semua
+      ];
+      setMrz(mrzArray);
+      setInputValue(text);
   };
 
   const [checksum, setCheckSum] = useState(false);
@@ -454,8 +521,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         return (
           <>
             <h1 className="card-title">Please look at the camera</h1>
-            <div>
-              <img
+            <div style={{ height: "200px" }}>
+              {/*
+              <ReactPlayer
+                className="react-player"
+                url="http://192.168.1.24:8083/stream/pattern/channel/0/hls/live/index.m3u8"
+                width="100%"
+                height="100%"
+                playing={true}
+              />
+               */}
+              {/* <VideoFeed src="http://localhost:8083/stream/pattern/channel/0/hls/live/index.m3u8"/> */}
+              {/* <img
                 src={Face}
                 alt=""
                 className="card-image"
@@ -465,7 +542,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
                   width: "150px",
                   height: "150px",
                 }}
-              />
+              /> */}
             </div>
             <button onClick={capture} className="ok-button">
               Take a face photo
@@ -535,8 +612,17 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
                 </React.Fragment>
               ))}
             </h1>
+            {/* <div>
+              <input
+                style={{ height: "29vh", width: "100vh", top: "-10vh" }}
+                type="text"
+                onChange={handleScanedArea}
+                value={inputValue}
+              />
+            </div> */}
             <textarea
               className="areaScan"
+              // maxLength={89}
               autoFocus
               onChange={handleScanedArea}
               value={inputValue}

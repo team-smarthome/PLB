@@ -39,16 +39,14 @@ const Printer = ({
 
       </div>
 
-      <div className="wrappper-container" style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
-        <div className="h2-nol" style={{textAlign:"center"}}>
+      <div className="wrappper-container">
+        <div className="h2-nol">
           <h2>Visa Number</h2>
         </div>
-        <div className="h2-satu" style={{textAlign:"center", display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <div className="h2-satu">
           <h2>{dataNumberPermohonanPropsVisa}</h2>
         </div>
       </div>
-
-
       <div className="wrappper-container">
         <div className="qrcode">
           <QRCode className="qrcode-image" value={combinedValue} />

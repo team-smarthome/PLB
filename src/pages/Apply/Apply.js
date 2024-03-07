@@ -4,6 +4,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
 import { apiPaymentGateway } from "../../services/api";
+import dataPasporImg from "../../utils/dataPhotoPaspor";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
@@ -18,6 +19,7 @@ const Apply = () => {
   const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   // const [dataPhotoPassport] = useState(null);
+  const [dataPhotoPassport, setDataPhotoPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
   const [statusPaymentCredit, setStatusPaymentCredit] = useState(false);
@@ -94,6 +96,7 @@ const Apply = () => {
 
     // Handle received data
     const dataHardCodePaspor = newDataPassport;
+    // const dataHarCodePasporImg = dataPasporImg;
 
     let fullName =
       dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
@@ -114,7 +117,7 @@ const Apply = () => {
     setDataPrimaryPassport(dataHardCodePaspor);
     setCardStatus("checkData");
     setIsEnableStep(true);
-    setIsEnableBack(false);
+    setIsEnableBack(true);
   };
 
   const [receiveTempData, setRecievedTempData] = useState([]);
@@ -224,6 +227,10 @@ const Apply = () => {
       } else if (cardStatus === "takePhotoSucces") {
         setTabStatus(1);
         setCardStatus("checkData");
+      } else if (cardStatus === 'waiting') {
+        setTabStatus(1);
+        setCardStatus("checkData");
+      
       }
     }
   };
@@ -356,13 +363,14 @@ const Apply = () => {
       nationalityCode: sharedData.passportData.nationality,
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
+      photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       photoFace: sharedData.photoFace ? sharedData.photoFace : "",
       email: sharedData.email,
       postalCode: sharedData.postal_code,
       paymentMethod: shareDataPaymentProps.paymentMethod,
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
-      cvv: shareDataPaymentProps.cvv,
+      // cvv: shareDataPaymentProps.cvv,
       type:
         shareDataPaymentProps.type === "" ? null : shareDataPaymentProps.type,
       token: token,

@@ -40,7 +40,7 @@ client.connect(serverPort, serverHost, () => {
 
   // Send data to the server
   const requestData = {
-    deviceNo: "12321SS4AU9D",
+    deviceNo: "12321SS4BAHS",
     action: "connect",
     timestamp: getCurrentTimeInSeconds(),
   };
@@ -57,11 +57,11 @@ client.on("data", (data) => {
         // Send data to the server
         const requestData = {
           // deviceNo: "12321SS4BAHS",
-          deviceNo: "12321SS4AU9D",
+          deviceNo: "12321SS4BAHS",
           action: "heartbeat",
           timestamp: getCurrentTimeInSeconds(),
           interval: 30,
-          local_ip: "192.168.1.83",
+          local_ip: "192.168.1.23",
         };
         console.log("request data", requestData);
         client.write(JSON.stringify(requestData));
@@ -164,7 +164,7 @@ async function kirimSnapshot(socket) {
     console.log("Masuk kirimSnapshot WOIIII");
     const url = "http://192.168.1.24:6067/attendDevice/sendSnapshot";
     const requestBody = {
-      deviceNo: "12321SS4AU9D",
+      deviceNo: "12321SS4BAHS",
     };
     const response = await axios.post(url, requestBody, {
       headers: {
@@ -177,7 +177,7 @@ async function kirimSnapshot(socket) {
     if (response.data.message === "success") {
       setTimeout(() => {
         const directoryPath =
-          "D:/transforme/E-VOA/new-device/camera-1/temp/12321SS4AU9D";
+          "D:/transforme/E-VOA/new-device/camera-1/temp/12321SS4BAHS";
           if (!fs.existsSync(directoryPath)) {
             socket.emit("not-found-directory", {
               "message": "directory-not-found"
@@ -741,6 +741,6 @@ function validateCreditCardNumber(ccNum) {
 }
 
 // Starting the server
-server.listen(449, () => {
+server.listen(4498, () => {
   console.log(`Server running on port 4499`);
 });
