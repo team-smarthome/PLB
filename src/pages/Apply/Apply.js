@@ -222,15 +222,20 @@ const Apply = () => {
         setTabStatus(1);
         setCardStatus("checkData");
       } else if (cardStatus === "postalCode") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
+        setCardStatus("inputEmail");
         setTabStatus(3);
         setCardStatus("inputEmail");
       } else if (cardStatus === "takePhotoSucces") {
         setTabStatus(1);
         setCardStatus("checkData");
-      } else if (cardStatus === 'waiting') {
+      } else if (cardStatus === "waiting") {
         setTabStatus(1);
         setCardStatus("checkData");
-      
       }
     }
   };
@@ -245,6 +250,12 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
+        setCardStatus("inputEmail");
         setCardStatus("lookCamera");
         setTabStatus(2);
       } else if (cardStatus === "takePhotoSucces") {
@@ -292,13 +303,41 @@ const Apply = () => {
       } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
         // console.log("ini dijalankan");
         doSaveRequestVoaPayment(sharedData);
+      } else if (cardStatus === "iddle") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
+        setCardStatus("inputEmail");
       }
     }
   };
-
   useEffect(() => {
     if (cardStatus === "goPayment") {
       setIsEnableStep(false);
+    } else if (
+      cardStatus === "iddle" ||
+      cardStatus === "lookCamera" ||
+      cardStatus === "postalCode" ||
+      cardStatus === "takePhotoSucces" ||
+      cardStatus === "waiting"
+    ) {
+      socket_IO.on("deviceId", (deviceId) => {
+        console.log(deviceId);
+        localStorage.setItem("deviceId", deviceId);
+
+      });
+      socket_IO.on("jenisDeviceId", (jenisDeviceId) => {
+        console.log(jenisDeviceId);
+        localStorage.setItem("jenisDeviceId", jenisDeviceId);
+
+      });
+      socket_IO.on("airportId", (airportId) => {
+        console.log(airportId);
+        localStorage.setItem("airportId", airportId);
+
+      });
     }
   }, [cardStatus]);
 
@@ -318,18 +357,18 @@ const Apply = () => {
 
   useEffect(() => {
     if (statusPaymentCredit) {
-      // doSaveRequestVoaPayment(sharedData);
-      setCardPaymentProps({
-        isCreditCard: false,
-        isPaymentCredit: false,
-        isPaymentCash: false,
-        isPrinted: true,
-        isSuccess: false,
-        isWaiting: false,
-        isFailed: false,
-        isPhoto: false,
-        isDoRetake: false,
-      });
+      doSaveRequestVoaPayment(sharedData);
+      // setCardPaymentProps({
+      //   isCreditCard: false,
+      //   isPaymentCredit: false,
+      //   isPaymentCash: false,
+      //   isPrinted: true,
+      //   isSuccess: false,
+      //   isWaiting: false,
+      //   isFailed: false,
+      //   isPhoto: false,
+      //   isDoRetake: false,
+      // });
     }
   }, [statusPaymentCredit]);
 

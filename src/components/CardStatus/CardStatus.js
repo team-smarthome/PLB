@@ -86,7 +86,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:4499");
+    const socket = io("http://localhost:4498");
     socket.on("connect", () => {
       if (socket.connected) {
         console.log("Connected to server socket.io");
@@ -103,19 +103,22 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   }, [capturedImage]);
 
   const capture = () => {
-    const socket = io("http://localhost:4499");
+    const socket = io("http://localhost:4498");
     const params = {
       code: "take-snapshot",
       data: "",
     };
-    socket.emit("WebClientMessage", JSON.stringify(params));
-    sendDataToInput({
-      statusCardBox: "waiting",
-      capturedImage: null,
-      emailUser: null,
-      titleHeader: "Apply VOA",
-      titleFooter: "Next Step",
+    socket.on("client connected to server socket.io 4498", (data) => {
+      sendDataToInput({
+        statusCardBox: "waiting",
+        capturedImage: null,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+      });
     });
+    socket.emit("WebClientMessage", JSON.stringify(params));
+
     let waitingTimeout = setTimeout(() => {
       sendDataToInput({
         statusCardBox: "lookCamera",
@@ -129,16 +132,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         title: "Tidak Dapat mendapatkan gambar",
       });
     }, 70000);
-    socket.on("client connected to server socket.io 4499", (data) => {
-      // clearTimeout(waitingTimeout);
-      // sendDataToInput({
-      //   statusCardBox: "waiting",
-      //   capturedImage: null,
-      //   emailUser: null,
-      //   titleHeader: "Apply VOA",
-      //   titleFooter: "Next Step",
-      // });
-    });
 
     socket.on("connect", () => {
       console.log("Terhubung ke server");
@@ -219,13 +212,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   };
 
   const handleOkButtonClick = () => {
-    sendDataToInput({
-      statusCardBox: "emailSucces",
-      emailUser: email,
-      capturedImage: capturedImage,
-      titleHeader: "Apply VOA",
-      titleFooter: "Next Step",
-    });
     if (!email) {
       setTitleWarning("Please enter your email address!");
       setEmailWarning(true);
@@ -359,20 +345,20 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   }, [capturedImage]);
 
   const handleScanedArea = (event) => {
-      let text = event.target.value.replace(/\s/g, ''); 
-      console.log("text: ", text);
-      console.log("text.length: ", text.length); 
-      if (text.length > 88) {
-        text = text.substring(text.length - 88); // Ambil karakter ke-89 dan seterusnya
-      }
-      // mrz index ke 0 adalah 44 karakter pertama
-      // mrz index ke 1 adalah 44 karakter kedua
-      const mrzArray = [
-        text.substring(0, 44),
-        text.substring(44) // Sisanya diambil semua
-      ];
-      setMrz(mrzArray);
-      setInputValue(text);
+    let text = event.target.value.replace(/\s/g, "");
+    console.log("text: ", text);
+    console.log("text.length: ", text.length);
+    if (text.length > 88) {
+      text = text.substring(text.length - 88); // Ambil karakter ke-89 dan seterusnya
+    }
+    // mrz index ke 0 adalah 44 karakter pertama
+    // mrz index ke 1 adalah 44 karakter kedua
+    const mrzArray = [
+      text.substring(0, 44),
+      text.substring(44), // Sisanya diambil semua
+    ];
+    setMrz(mrzArray);
+    setInputValue(text);
   };
 
   const [checksum, setCheckSum] = useState(false);
@@ -522,15 +508,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
           <>
             <h1 className="card-title">Please look at the camera</h1>
             <div style={{ height: "200px" }}>
-              {/*
               <ReactPlayer
                 className="react-player"
-                url="http://192.168.1.24:8083/stream/pattern/channel/0/hls/live/index.m3u8"
+                url="http://localhost:8083/stream/pattern/channel/0/hls/live/index.m3u8"
                 width="100%"
                 height="100%"
                 playing={true}
               />
-               */}
+
               {/* <VideoFeed src="http://localhost:8083/stream/pattern/channel/0/hls/live/index.m3u8"/> */}
               {/* <img
                 src={Face}

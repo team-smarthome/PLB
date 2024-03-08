@@ -1,7 +1,6 @@
 const http = require("http");
 const socketIo = require("socket.io");
 
-
 // Create HTTP server and WebSocket server
 const server = http.createServer();
 const io = socketIo(server, {
@@ -53,7 +52,7 @@ client.on("data", (data) => {
           action: "heartbeat",
           timestamp: getCurrentTimeInSeconds(),
           interval: 30,
-          local_ip: "192.168.1.23",
+          local_ip: "192.168.1.6",
         };
         console.log("request data", requestData);
         client.write(JSON.stringify(requestData));
@@ -66,11 +65,10 @@ client.on("data", (data) => {
   }
 });
 
-
 async function kirimSnapshot(socket) {
   try {
     console.log("Masuk kirimSnapshot WOIIII");
-    const url = "http://192.168.1.24:6067/attendDevice/sendSnapshot";
+    const url = "http://192.168.1.4:6067/attendDevice/sendSnapshot";
     const requestBody = {
       deviceNo: "12321SS4BAHS",
     };
@@ -80,19 +78,19 @@ async function kirimSnapshot(socket) {
       },
     });
 
-    console.log("Response:", response.data); 
+    console.log("Response:", response.data);
 
     if (response.data.message === "success") {
       setTimeout(() => {
         const directoryPath =
           "D:/transforme/E-VOA/new-device/camera-1/temp/12321SS4BAHS";
-          if (!fs.existsSync(directoryPath)) {
-            socket.emit("not-found-directory", {
-              "message": "directory-not-found"
-            });
-            console.log("Direktori tidak ditemukan.");
-            return;
-          }
+        if (!fs.existsSync(directoryPath)) {
+          socket.emit("not-found-directory", {
+            message: "directory-not-found",
+          });
+          console.log("Direktori tidak ditemukan.");
+          return;
+        }
         const files = fs.readdirSync(directoryPath);
         let newestFile;
         let newestTime = 0;
@@ -129,26 +127,16 @@ async function kirimSnapshot(socket) {
         // Hapus file setelah dikirimkan
         fs.unlinkSync(imagePath);
         console.log("File dihapus setelah berhasil dikirim.");
-
-      }, 2000);
+      }, 3000);
     } else {
       socket.emit("gagal_snapshot", {
-        "message": "failed-to-take-snapshot"
+        message: "failed-to-take-snapshot",
       });
     }
-
-
   } catch (error) {
     console.error("Error:", error);
   }
 }
-
-
-
-
-
-
-
 
 io.on("connection", (socket) => {
   console.log("Client connected");
@@ -184,6 +172,6 @@ io.on("connection", (socket) => {
 });
 
 // Starting the server
-server.listen(4499, () => {
+server.listen(4498, () => {
   console.log(`Server running on port 4498`);
 });

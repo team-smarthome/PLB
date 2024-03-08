@@ -19,11 +19,6 @@ const io = socketIo(server, {
     allowedHeaders: ["Content-Type", "Authorization"],
   },
 });
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
-
-
 
 // Function to split AFL (Application File Locator) data into chunks
 function splitAFL(dataHex) {
@@ -461,6 +456,20 @@ setupDevicesEvent(devices);
 io.on("connection", (socket) => {
   console.log("Client connected");
   socket.emit("client connected to server socket.io 4499");
+  // const deviceVOA = {
+  //   devicedId: "01320000001255",
+  //   airportId: "CGK",
+  //   jenisDeviceId: "01"
+  // };
+  const deviceId = "01320000001255";
+  const airportId = "CGK";
+  const jenisDeviceId = "01";
+  
+  // socket.emit("device-voa", JSON.stringify(deviceVOA));
+  socket.emit("deviceId", JSON.stringify(deviceId));
+  socket.emit("jenisDeviceId", JSON.stringify(airportId));
+  socket.emit("airportId", JSON.stringify(jenisDeviceId));
+
   socket.emit("isRequest", "EMAIL");
 
   socket.on("WebClientMessage", (data) => {
@@ -472,18 +481,6 @@ io.on("connection", (socket) => {
       case "email":
         sendServertoClient("isRequest", "EMAIL");
         break;
-      case "card":
-        sendServertoClient("isRequest", "CARD");
-        break;
-      case "input-card-number":
-        sendServertoClient("onMessage", JSON.stringify(dataParse));
-        break;
-      case "input-expired":
-        sendServertoClient("onMessage", JSON.stringify(dataParse));
-        break;
-      case "input-cvv":
-        sendServertoClient("onMessage", JSON.stringify(dataParse));
-        break;;
       default:
         sendServertoClient("isRequest", "DEFAULT");
     }
@@ -498,25 +495,11 @@ io.on("connection", (socket) => {
         sendServertoClient("isRequest", "DEFAULT");
         sendServertoClient("submit-email", JSON.stringify(dataParse));
         break;
-      case "SUBMIT-CARD":
-        sendServertoClient("isRequest", "DEFAULT");
-        sendServertoClient("submit-card", JSON.stringify(dataParse));
-
-        break;
       case "input-email":
         sendServertoClient("input-email", JSON.stringify(dataParse));
         break;
       case "input-email-confirm":
         sendServertoClient("input-email-confirm", JSON.stringify(dataParse));
-        break;
-      case "input-card-number":
-        sendServertoClient("input-card-number", JSON.stringify(dataParse));
-        break;
-      case "input-expired":
-        sendServertoClient("input-expired", JSON.stringify(dataParse));
-        break;
-      case "input-cvv":
-        sendServertoClient("input-cvv", JSON.stringify(dataParse));
         break;
       default:
     }
