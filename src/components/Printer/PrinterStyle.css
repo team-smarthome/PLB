@@ -10,6 +10,7 @@
     
     */
     font-weight: bold;
+    margin-left: 2%;
 
     /* 
     ygn lama
@@ -30,7 +31,7 @@
     /* margin-left: -10mm; */
     /* margin-left: 0.1mm; */
     /* margin-right: 0.1mm; */
-    padding-right: 0.5vh;
+    /* padding-right: 0.5vh; */
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

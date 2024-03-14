@@ -6,6 +6,7 @@ import Home from "../pages/Home/Home";
 import SpvLogin from "../pages/SpvLogin/SpvLogin";
 import Report from "../pages/Report/Report";
 import Swal from "sweetalert2";
+import Information from "../pages/Information/Information";
 
 const isAuthenticated = () => {
   const jwtToken = localStorage.getItem("JwtToken");
@@ -60,6 +61,7 @@ const Routes = () => {
       <Route path="/report" element={<ProtectedRoute element={<Report />} />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
+      <Route path="/configuration" element={<ProtectedRoute element={<Information />} />} />
     </ReactRoutes>
   );
 };

@@ -33,12 +33,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const [kodePos, setKodePos] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [mrz, setMrz] = useState(["", ""]);
-  // let mrz = [
-  //   "",
-  //   "",
-  // ];
-  const [refresh, setRefresh] = useState(false);
-
   const kabupatenOptions = dataKodePos.data.map((item) => ({
     value: item.kabupaten,
     label: item.kabupaten,
@@ -131,7 +125,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         icon: "error",
         title: "Tidak Dapat mendapatkan gambar",
       });
-    }, 70000);
+    }, 4000);
 
     socket.on("connect", () => {
       console.log("Terhubung ke server");
@@ -359,6 +353,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     ];
     setMrz(mrzArray);
     setInputValue(text);
+    handleButtonClickScaned();
   };
 
   const [checksum, setCheckSum] = useState(false);
@@ -544,6 +539,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
                 <div className="box-image">
                   <img
+                    style={{ width: "80%", height: "80%" }}
                     src={capturedImage}
                     alt="Captured Image"
                     className="potrait-image"
@@ -585,6 +581,22 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
             <img src={Gambar2} alt="" className="card-image" />
           </>
         );
+      case "success":
+        return (
+          <>
+            <>
+              <h1 className="card-title">
+                {getStatusHeaderText().map((text, index) => (
+                  <React.Fragment key={index}>
+                    {text}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </h1>
+              <img src={Gambar2} alt="" className="card-image" />
+            </>
+          </>
+        );
 
       default:
         return (
@@ -612,14 +624,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
               onChange={handleScanedArea}
               value={inputValue}
             ></textarea>
-            {checksum && (
+            {/* {checksum && (
               <span style={{ color: "red", marginTop: "2%" }}>
                 Can not empty or Please Re-Scan the Passport
               </span>
-            )}
-            <button className="ok-button" onClick={handleButtonClickScaned}>
+            )} */}
+            {/* <button className="ok-button" onClick={handleButtonClickScaned}>
               Confirm
-            </button>
+            </button> */}
           </>
         );
     }

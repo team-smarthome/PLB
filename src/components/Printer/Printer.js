@@ -8,6 +8,7 @@ const Printer = ({
   dataNumberPermohonanPropsReceipt,
   printRefProps,
   dataPrice,
+  dataLokasi,
 }) => {
   // console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
   // console.log(
@@ -26,7 +27,7 @@ const Printer = ({
 
   const formattedTime = `${hour}:${minute}:${second}`;
   const formattedDate = `${day}/${month}/${year}`;
-  const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}, Price: ${dataPrice}`;
+  const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}, Price: ${dataPrice}, Lokasi: ${dataLokasi}, Date: ${formattedDate}, Time: ${formattedTime}`;
 
   return (
     <div className="container-print" ref={printRefProps}>
@@ -44,7 +45,7 @@ const Printer = ({
           <h2>Visa Number</h2>
         </div>
         <div className="h2-satu" style={{textAlign:"center", display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <h2>{dataNumberPermohonanPropsVisa}</h2>
+          <h2>Z1A012002</h2>
         </div>
       </div>
 
@@ -70,10 +71,10 @@ const Printer = ({
             <h2>Visa Receipt </h2>
           </div>
           <div className="header-h2">
-            <h2>{dataNumberPermohonanPropsReceipt}</h2>
+            <h2>XA0188090</h2>
           </div>
           <div>
-          <h2>CGK</h2>
+          <h2>{dataLokasi}</h2>
           </div>
         </div>
       </div>

@@ -9,9 +9,10 @@ import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
-const socket_IO = io("http://localhost:4499");
+
 
 const Apply = () => {
+  const socket_IO = io("http://localhost:4499");
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(false);
@@ -115,7 +116,10 @@ const Apply = () => {
     console.log("dataHardCodePaspor", newDataPassport);
 
     setDataPrimaryPassport(dataHardCodePaspor);
-    setCardStatus("checkData");
+    setCardStatus("success");
+    setTimeout(() => {
+      setCardStatus("checkData");
+    }, 1000);
     setIsEnableStep(true);
     setIsEnableBack(true);
   };
@@ -357,18 +361,18 @@ const Apply = () => {
 
   useEffect(() => {
     if (statusPaymentCredit) {
-      doSaveRequestVoaPayment(sharedData);
-      // setCardPaymentProps({
-      //   isCreditCard: false,
-      //   isPaymentCredit: false,
-      //   isPaymentCash: false,
-      //   isPrinted: true,
-      //   isSuccess: false,
-      //   isWaiting: false,
-      //   isFailed: false,
-      //   isPhoto: false,
-      //   isDoRetake: false,
-      // });
+      // doSaveRequestVoaPayment(sharedData);
+      setCardPaymentProps({
+        isCreditCard: false,
+        isPaymentCredit: false,
+        isPaymentCash: false,
+        isPrinted: true,
+        isSuccess: false,
+        isWaiting: false,
+        isFailed: false,
+        isPhoto: false,
+        isDoRetake: false,
+      });
     }
   }, [statusPaymentCredit]);
 

@@ -55,6 +55,26 @@ input {
   margin-right: 10px;
   margin-left: 10px;
 }
+
+.checkbox-container2 {
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  background-color: red;
+  border-radius: 7px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.checkbox-value2 {
+  width: 19px;
+  height: 19px;
+  border-radius: 2px;
+  background-color: #3dbb6f;
+}
+
+
+
 .checkbox-value {
   width: 17px;
   height: 17px;

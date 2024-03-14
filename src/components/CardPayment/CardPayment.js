@@ -62,6 +62,7 @@ const CardPayment = ({
   const [number, setNumber] = useState("Z1A012002");
   const [receipt, setReceipt] = useState("XA0188090");
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
+  const [printLokasi, setPrintLokasi] = useState("");
 
   //price
   const { fee, fee_cash, value } = JSON.parse(
@@ -70,6 +71,18 @@ const CardPayment = ({
 
   const formattedNumber = (num) =>
     parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
+
+
+    useEffect(() => {
+      const city = JSON.parse(localStorage.getItem("user"));
+      const officeCity = city?.organization?.officeCity;
+  
+      if (officeCity === "DENPASAR") {
+        setPrintLokasi("DPS");
+      } else  if (officeCity === "JAKARTA") {
+        setPrintLokasi("CGK");
+      }
+    }, []);
 
   const numericValue = parseFloat(value);
   const numericFee = parseFloat(fee);
@@ -1271,6 +1284,7 @@ const CardPayment = ({
         dataNumberPermohonanPropsReceipt={receipt}
         printRefProps={printRef}
         dataPrice={formattedValue}
+        dataLokasi={printLokasi}
       />
     </div>
   );

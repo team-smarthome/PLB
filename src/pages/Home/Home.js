@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
-import Logout from "../../assets/images/logout.png";
 import LogoutIcon from "../../assets/images/logoutnew.png";
 
 const Home = () => {
@@ -15,6 +14,7 @@ const Home = () => {
 
   const btnOnClick_Informasi = () => {
     // console.log("INFORMASI");
+    navigate("/configuration");
   };
 
   const handleLogout = async () => {
@@ -59,7 +59,7 @@ const Home = () => {
               <h2 className="text-apply">Apply</h2>
             </div>
             <div className="bg-information" onClick={btnOnClick_Informasi}>
-              <h2 className="text-information">Information</h2>
+              <h2 className="text-information">Configuration</h2>
             </div>
           </div>
         </div>
