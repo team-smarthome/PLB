@@ -47,7 +47,6 @@ const aidList = [
   },
 ];
 
-
 async function commandSelectPSE(application, card, data) {
   let response = await application.selectFile(data);
   return response;
@@ -467,7 +466,7 @@ io.on("connection", (socket) => {
   const deviceId = "01320000001255";
   const airportId = "CGK";
   const jenisDeviceId = "01";
-  
+
   // socket.emit("device-voa", JSON.stringify(deviceVOA));
   socket.emit("deviceId", JSON.stringify(deviceId));
   socket.emit("jenisDeviceId", JSON.stringify(airportId));
@@ -491,6 +490,18 @@ io.on("connection", (socket) => {
       case "email":
         sendServertoClient("isRequest", "EMAIL");
         break;
+      case "card":
+        sendServertoClient("isRequest", "CARD");
+        break;
+      case "input-card-number":
+        sendServertoClient("onMessage", JSON.stringify(dataParse));
+        break;
+      case "input-expired":
+        sendServertoClient("onMessage", JSON.stringify(dataParse));
+        break;
+      case "input-cvv":
+        sendServertoClient("onMessage", JSON.stringify(dataParse));
+        break;
       default:
         sendServertoClient("isRequest", "DEFAULT");
     }
@@ -510,6 +521,15 @@ io.on("connection", (socket) => {
         break;
       case "input-email-confirm":
         sendServertoClient("input-email-confirm", JSON.stringify(dataParse));
+        break;
+        case "input-card-number":
+        sendServertoClient("input-card-number", JSON.stringify(dataParse));
+        break;
+      case "input-expired":
+        sendServertoClient("input-expired", JSON.stringify(dataParse));
+        break;
+      case "input-cvv":
+        sendServertoClient("input-cvv", JSON.stringify(dataParse));
         break;
       default:
     }
@@ -548,40 +568,40 @@ server.listen(4499, () => {
 });
 
 function getWifiResults() {
-    const nets = networkInterfaces();
-    const results = Object.create(null);
-  
-    for (const name of Object.keys(nets)) {
-      for (const net of nets[name]) {
-        const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
-        if (net.family === familyV4Value && !net.internal) {
-          if (!results[name]) {
-            results[name] = [];
-          }
-          results[name].push(net.address);
+  const nets = networkInterfaces();
+  const results = Object.create(null);
+
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
+      if (net.family === familyV4Value && !net.internal) {
+        if (!results[name]) {
+          results[name] = [];
         }
+        results[name].push(net.address);
       }
     }
-  
-    const wifiResults = {};
-    let wifiFound = false;
-  
-    for (const name of Object.keys(results)) {
-      if (name.toLowerCase().includes("wi-fi")) {
-        const ipAddressV4 = results[name][0];
-        wifiResults.ipAddressV4 = ipAddressV4;
-        wifiFound = true;
-        break;
-      }
-    }
-  
-    if (!wifiFound) {
-      const ipAddressV4 = Object.values(results)
-        .flatMap((ipArray) => ipArray)
-        .find((ip) => ip.includes("192.168."));
-  
-      wifiResults.ipAddressV4 = ipAddressV4 || "No local IP found";
-    }
-  
-    return wifiResults;
   }
+
+  const wifiResults = {};
+  let wifiFound = false;
+
+  for (const name of Object.keys(results)) {
+    if (name.toLowerCase().includes("wi-fi")) {
+      const ipAddressV4 = results[name][0];
+      wifiResults.ipAddressV4 = ipAddressV4;
+      wifiFound = true;
+      break;
+    }
+  }
+
+  if (!wifiFound) {
+    const ipAddressV4 = Object.values(results)
+      .flatMap((ipArray) => ipArray)
+      .find((ip) => ip.includes("192.168."));
+
+    wifiResults.ipAddressV4 = ipAddressV4 || "No local IP found";
+  }
+
+  return wifiResults;
+}
