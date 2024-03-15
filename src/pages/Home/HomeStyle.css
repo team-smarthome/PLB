@@ -83,6 +83,10 @@ html {
   color: #fff;
 }
 
+.bg-information:hover {
+  cursor: pointer;
+}
+
 .bg-apply {
   background-color: #fbaf17;
   border-radius: 15px;

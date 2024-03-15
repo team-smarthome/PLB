@@ -37,7 +37,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     value: item.kabupaten,
     label: item.kabupaten,
   }));
-
+  const socket_IO = io("http://localhost:4499");
   const checkAndHandleTokenExpiration = () => {
     const jwtToken = localStorage.getItem("JwtToken");
     if (!jwtToken) {
@@ -258,16 +258,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     }
   };
 
+
+
   useEffect(() => {
     // Start Connect to Server Socket.IO
-    const socket_IO = io("http://localhost:4499");
+    // const socket_IO = io("http://localhost:4499");
     socket_IO.on("connect", () => {
       console.log("Connected to server socket.io");
     });
 
-    socket_IO.on("disconnect", () => {
-      console.log("Disconnected from server socket.io");
-    });
+    // socket_IO.on("disconnect", () => {
+    //   console.log("Disconnected from server socket.io");
+    // });
     const handleInputEmail = (data) => {
       try {
         const dataParse = JSON.parse(data);
@@ -332,7 +334,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
   useEffect(() => {
     handleTokenExpiration();
-  }, [capturedImage, doRetake, email, emailConfirmation]);
+  }, [capturedImage, doRetake, email, emailConfirmation, handleTokenExpiration]);
 
   useEffect(() => {
     console.log("capturedImage berubah:", capturedImage);
@@ -502,17 +504,17 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         return (
           <>
             <h1 className="card-title">Please look at the camera</h1>
-            <div style={{ height: "200px" }}>
-              <ReactPlayer
+            <div style={{ height: "180px" }}>
+              {/* <ReactPlayer
                 className="react-player"
                 url="http://localhost:8083/stream/pattern/channel/0/hls/live/index.m3u8"
                 width="100%"
                 height="100%"
                 playing={true}
-              />
+              /> */}
 
               {/* <VideoFeed src="http://localhost:8083/stream/pattern/channel/0/hls/live/index.m3u8"/> */}
-              {/* <img
+              <img
                 src={Face}
                 alt=""
                 className="card-image"
@@ -522,7 +524,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
                   width: "150px",
                   height: "150px",
                 }}
-              /> */}
+              />
             </div>
             <button onClick={capture} className="ok-button">
               Take a face photo
@@ -539,7 +541,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
                 <div className="box-image">
                   <img
-                    style={{ width: "80%", height: "80%" }}
+                    style={{ width: "80%", height: "70%" }}
                     src={capturedImage}
                     alt="Captured Image"
                     className="potrait-image"
@@ -609,29 +611,12 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
                 </React.Fragment>
               ))}
             </h1>
-            {/* <div>
-              <input
-                style={{ height: "29vh", width: "100vh", top: "-10vh" }}
-                type="text"
-                onChange={handleScanedArea}
-                value={inputValue}
-              />
-            </div> */}
             <textarea
               className="areaScan"
-              // maxLength={89}
               autoFocus
               onChange={handleScanedArea}
               value={inputValue}
             ></textarea>
-            {/* {checksum && (
-              <span style={{ color: "red", marginTop: "2%" }}>
-                Can not empty or Please Re-Scan the Passport
-              </span>
-            )} */}
-            {/* <button className="ok-button" onClick={handleButtonClickScaned}>
-              Confirm
-            </button> */}
           </>
         );
     }

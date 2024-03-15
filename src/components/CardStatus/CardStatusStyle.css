@@ -164,8 +164,8 @@ p {
 }
 
 .potrait-image {
-  max-width: 40%;
-height: auto;
+  max-width: 30%;
+  height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

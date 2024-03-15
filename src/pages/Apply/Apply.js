@@ -216,11 +216,16 @@ const Apply = () => {
           type: "",
         });
         const params = {
-          code: "default",
+          code: "email",
           data: "",
         };
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
       } else if (cardStatus === "iddle") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         navigate("/home");
       } else if (cardStatus === "lookCamera") {
         setTabStatus(1);
@@ -320,8 +325,30 @@ const Apply = () => {
   useEffect(() => {
     if (cardStatus === "goPayment") {
       setIsEnableStep(false);
+    } else if (cardStatus === "iddle") {
+      const params = {
+        code: "email",
+        data: "",
+      };
+      socket_IO.emit("WebClientMessage", JSON.stringify(params));
+      socket_IO.on("deviceId", (deviceId) => {
+        console.log(deviceId);
+        localStorage.setItem("deviceId", deviceId);
+
+      });
+      socket_IO.on("jenisDeviceId", (jenisDeviceId) => {
+        console.log(jenisDeviceId);
+        localStorage.setItem("jenisDeviceId", jenisDeviceId);
+
+      });
+      socket_IO.on("airportId", (airportId) => {
+        console.log(airportId);
+        localStorage.setItem("airportId", airportId);
+
+      });
     } else if (
-      cardStatus === "iddle" ||
+      cardStatus === "checkData" ||
+      cardStatus === "inputEmail" ||
       cardStatus === "lookCamera" ||
       cardStatus === "postalCode" ||
       cardStatus === "takePhotoSucces" ||
@@ -361,18 +388,18 @@ const Apply = () => {
 
   useEffect(() => {
     if (statusPaymentCredit) {
-      // doSaveRequestVoaPayment(sharedData);
-      setCardPaymentProps({
-        isCreditCard: false,
-        isPaymentCredit: false,
-        isPaymentCash: false,
-        isPrinted: true,
-        isSuccess: false,
-        isWaiting: false,
-        isFailed: false,
-        isPhoto: false,
-        isDoRetake: false,
-      });
+      doSaveRequestVoaPayment(sharedData);
+      // setCardPaymentProps({
+      //   isCreditCard: false,
+      //   isPaymentCredit: false,
+      //   isPaymentCash: false,
+      //   isPrinted: true,
+      //   isSuccess: false,
+      //   isWaiting: false,
+      //   isFailed: false,
+      //   isPhoto: false,
+      //   isDoRetake: false,
+      // });
     }
   }, [statusPaymentCredit]);
 
@@ -386,13 +413,9 @@ const Apply = () => {
     // console.log("doSaveRequestVoaPayment");
     const token = localStorage.getItem("token");
     const key = localStorage.getItem("key");
-    // const devicedId = localStorage.getItem("deviceId");
-    // const airportId = localStorage.getItem("airportId");
-    // const jenisDeviceId = localStorage.getItem("jenisDeviceId");
-    const devicedId = "01320000001255";
-    const airportId = "CGK";
-    const jenisDeviceId = "01";
-
+    const devicedId = localStorage.getItem("deviceId");
+    const airportId = localStorage.getItem("airportId");
+    const jenisDeviceId = localStorage.getItem("jenisDeviceId");
     const bearerToken = localStorage.getItem("JwtToken");
     const header = {
       Authorization: `Bearer ${bearerToken}`,
@@ -406,21 +429,21 @@ const Apply = () => {
       nationalityCode: sharedData.passportData.nationality,
       sex: sharedData.passportData.sex === "Male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
-      photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+      // photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       photoFace: sharedData.photoFace ? sharedData.photoFace : "",
       email: sharedData.email,
       postalCode: sharedData.postal_code,
       paymentMethod: shareDataPaymentProps.paymentMethod,
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
-      // cvv: shareDataPaymentProps.cvv,
+      cvv: shareDataPaymentProps.cvv,
       type:
         shareDataPaymentProps.type === "" ? null : shareDataPaymentProps.type,
       token: token,
       key: key,
-      deviceId: devicedId,
-      airportId: airportId,
-      jenisDeviceId: jenisDeviceId,
+      deviceId: devicedId.replace(/"/g, ""), 
+      airportId: airportId.replace(/"/g, ""), 
+      jenisDeviceId: jenisDeviceId.replace(/"/g, ""), 
     };
 
     setIsEnableStep(false);
@@ -464,6 +487,11 @@ const Apply = () => {
             isFailed: false,
             isPhoto: false,
           });
+          const params = {
+            code: "email",
+            data: "",
+          };
+          socket_IO.emit("WebClientMessage", JSON.stringify(params));
           setTimeout(() => {
             setStatusPaymentCredit(false);
             setRecievedTempData([]);
@@ -481,6 +509,11 @@ const Apply = () => {
         data.status === "Error" ||
         data.status === 400
       ) {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setStatusPaymentCredit(false);
         const messageError = data.message;
         setMessageConfirm(messageError);
@@ -704,6 +737,11 @@ const Apply = () => {
         isDoRetake: false,
       });
       setTimeout(() => {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setTitleFooter("Next Step");
         setTabStatus(1);
@@ -730,6 +768,11 @@ const Apply = () => {
   useEffect(() => {
     if (confirm) {
       if (meesageConfirm === "Passport is not from voa country.") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setCardStatus("errorVoa");
         setTitleFooter("Next Step");
@@ -755,6 +798,11 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else if (meesageConfirm === "Failed when request payment pg") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setCardPaymentProps({
           isWaiting: false,
@@ -770,6 +818,11 @@ const Apply = () => {
       } else if (
         meesageConfirm === "Passport is not active for at least 6 months."
       ) {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorBulan");
@@ -795,6 +848,11 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else if (meesageConfirm === "Passport is from danger country.") {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setTitleHeader("Apply VOA");
         setCardStatus("errorDanger");
@@ -824,6 +882,11 @@ const Apply = () => {
         meesageConfirm ===
           "Face on the passport doesn't match with captured image."
       ) {
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -843,6 +906,11 @@ const Apply = () => {
         meesageConfirm === "Expired JWT Token"
       ) {
         setTimeout(() => {
+          const params = {
+            code: "email",
+            data: "",
+          };
+          socket_IO.emit("WebClientMessage", JSON.stringify(params));
           setDisabled(false);
           setTitleFooter("Next Step");
           setTabStatus(1);
@@ -875,6 +943,11 @@ const Apply = () => {
         }, 5000);
       } else {
         // console.log("jalan gk ya??");
+        const params = {
+          code: "email",
+          data: "",
+        };
+        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setTabStatus(1);
         setTitleFooter("Next Step");
