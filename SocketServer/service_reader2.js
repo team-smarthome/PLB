@@ -455,7 +455,7 @@ setupDevicesEvent(devices);
 
 io.on("connection", (socket) => {
   let wifiResults = getWifiResults();
-  console.log("Client connected");
+  // console.log("Client connected");
   socket.emit("client connected to server socket.io 4499");
   socket.emit("getIpAddress", wifiResults);
   // const deviceVOA = {
@@ -464,7 +464,7 @@ io.on("connection", (socket) => {
   //   jenisDeviceId: "01"
   // };
   const deviceId = "01320000001255";
-  const airportId = "CGK";
+  const airportId = "DPS";
   const jenisDeviceId = "01";
 
   // socket.emit("device-voa", JSON.stringify(deviceVOA));
