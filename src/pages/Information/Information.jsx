@@ -541,13 +541,16 @@ const Information = () => {
         <div
           className="footer"
           style={{
+
             // backgroundColor: "red",
-            width: "100%",
+            width: "95%",
             height: "70px",
             display: "flex",
             flexDirection: "row",
             gap: "20px",
             paddingTop: "10px",
+            // paddingRight: "20px",
+            paddingLeft: "40px",
           }}
         >
           <div
@@ -561,7 +564,6 @@ const Information = () => {
               fontSize: "40px",
               fontWeight: "bold",
               color: "white",
-              borderRadius: "25px",
               cursor: hoverBackToApply ? "pointer" : "default",
             }}
             onMouseEnter={() => setHoverBackToApply(true)}
@@ -579,7 +581,6 @@ const Information = () => {
               fontSize: "30px",
               fontWeight: "bold",
               color: "white",
-              borderRadius: "25px",
               cursor:
                 hoverTestCardReader && statusCardReader === "ON"
                   ? "pointer"
@@ -605,7 +606,6 @@ const Information = () => {
               fontSize: "30px",
               fontWeight: "bold",
               color: "white",
-              borderRadius: "25px",
               cursor: hoverTestPrinter ? "pointer" : "default",
               backgroundColor: hoverTestPrinter ? "red" : "#3d5889",
             }}
@@ -625,7 +625,6 @@ const Information = () => {
               fontSize: "30px",
               fontWeight: "bold",
               color: "white",
-              borderRadius: "25px",
               cursor: hoverTestCamera ? "pointer" : "default",
               backgroundColor: hoverTestCamera ? "red" : "#3d5889",
             }}

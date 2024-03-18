@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./CardStatusStyle.css";
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -37,7 +37,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     value: item.kabupaten,
     label: item.kabupaten,
   }));
-  const socket_IO = io("http://localhost:4499");
+
+  const [isConnected, setIsConnected] = useState(false);
+
+  const socket_IO_4499 = useRef(null);
+  // const socket_IO = io("http://localhost:4499");
   const checkAndHandleTokenExpiration = () => {
     const jwtToken = localStorage.getItem("JwtToken");
     if (!jwtToken) {
@@ -259,65 +263,61 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   };
 
 
-
   useEffect(() => {
-    // Start Connect to Server Socket.IO
-    // const socket_IO = io("http://localhost:4499");
-    socket_IO.on("connect", () => {
-      console.log("Connected to server socket.io");
-    });
+    console.log("isConnected: ", isConnected);
+    if (!isConnected) {
+      socket_IO_4499.current = io("http://localhost:4499");
 
-    // socket_IO.on("disconnect", () => {
-    //   console.log("Disconnected from server socket.io");
-    // });
-    const handleInputEmail = (data) => {
-      try {
-        const dataParse = JSON.parse(data);
-        // console.log("Received input-email data: ", dataParse);
-        const textEmail = dataParse.data;
-        setEmail(textEmail);
-        setEmailWarning(false);
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        setIsValidEmail(emailRegex.test(textEmail));
-      } catch (error) {
-        console.error("Error parsing input-email data:", error);
-      }
-    };
+      socket_IO_4499.current.on("connect", () => {
+        console.log("Connected to server socket.io 4499");
+        setIsConnected(true);
+      });
 
-    const handleInputEmailConfirm = (data) => {
-      try {
-        const dataParse = JSON.parse(data);
-        // console.log("Received input-email-confirm data: ", dataParse);
-        const textEmail = dataParse.data;
-        setEmailConfirmation(textEmail);
-        setEmailConfirmWarning(false);
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        setIsValidEmailConfirmation(emailRegex.test(textEmail));
-      } catch (error) {
-        console.error("Error parsing input-email-confirm data:", error);
-      }
-    };
+      socket_IO_4499.current.on("disconnect", () => {
+        console.log("Disconnected from server socket.io");
+        setIsConnected(false);
+      });
 
-    const handleSubmitEmail = (data) => {
-      try {
-        const dataParse = JSON.parse(data);
-        console.log("Received submit-email data: ", dataParse);
-      } catch (error) {
-        console.error("Error parsing submit-email data:", error);
-      }
-    };
+      const handleInputEmail = (data) => {
+        try {
+          const dataParse = JSON.parse(data);
+          const textEmail = dataParse.data;
+          setEmail(textEmail);
+          setEmailWarning(false);
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          setIsValidEmail(emailRegex.test(textEmail));
+        } catch (error) {
+          console.error("Error parsing input-email data:", error);
+        }
+      };
 
-    socket_IO.on("input-email", handleInputEmail);
-    socket_IO.on("input-email-confirm", handleInputEmailConfirm);
-    socket_IO.on("submit-email", handleSubmitEmail);
+      const handleInputEmailConfirm = (data) => {
+        try {
+          const dataParse = JSON.parse(data);
+          const textEmail = dataParse.data;
+          setEmailConfirmation(textEmail);
+          setEmailConfirmWarning(false);
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          setIsValidEmailConfirmation(emailRegex.test(textEmail));
+        } catch (error) {
+          console.error("Error parsing input-email-confirm data:", error);
+        }
+      };
 
-    return () => {
-      socket_IO.disconnect();
-      socket_IO.off("input-email", handleInputEmail);
-      socket_IO.off("input-email-confirm", handleInputEmailConfirm);
-      socket_IO.off("submit-email", handleSubmitEmail);
-    };
-  }, [capturedImage, email, sendDataToInput]);
+      const handleSubmitEmail = (data) => {
+        try {
+          const dataParse = JSON.parse(data);
+          console.log("Received submit-email data: ", dataParse);
+        } catch (error) {
+          console.error("Error parsing submit-email data:", error);
+        }
+      };
+
+      socket_IO_4499.current.on("input-email", handleInputEmail);
+      socket_IO_4499.current.on("input-email-confirm", handleInputEmailConfirm);
+      socket_IO_4499.current.on("submit-email", handleSubmitEmail);
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     // Cari data kode pos berdasarkan kabupaten yang dipilih

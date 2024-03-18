@@ -94,7 +94,8 @@ const CardPayment = ({
   const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
 
   //cardNumberPetugass
-  const cardNumberPetugass = "1101320000001255";
+  const petugasNumber = localStorage.getItem("deviceId").replace(/"/g, "");
+  const cardNumberPetugass = "11" + petugasNumber;
 
   const capture = () => {
     const imageSrc = webcamRef.current.getScreenshot();

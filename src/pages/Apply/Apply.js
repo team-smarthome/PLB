@@ -19,8 +19,6 @@ const Apply = () => {
   const [tabStatus, setTabStatus] = useState(1);
   const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
-  // const [dataPhotoPassport] = useState(null);
-  const [dataPhotoPassport, setDataPhotoPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
   const [statusPaymentCredit, setStatusPaymentCredit] = useState(false);
@@ -33,25 +31,6 @@ const Apply = () => {
     "Network / Card error / declined dll"
   );
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
-
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
     isPaymentCredit: false,
@@ -74,7 +53,7 @@ const Apply = () => {
 
   const receiveDataFromChild = (data) => {
     console.log("data", data);
-
+  
     const newDataPassport = {
       docType: data.documentCode,
       issuingState: data.issuingState,
@@ -92,29 +71,40 @@ const Apply = () => {
       personalNumberCheckDigit: data.personalNumberCheckDigit,
       compositeCheckDigit: data.compositeCheckDigit,
     };
-
+  
     console.log("newDataPassport", newDataPassport);
-
+  
     // Handle received data
     const dataHardCodePaspor = newDataPassport;
-    // const dataHarCodePasporImg = dataPasporImg;
 
+    
     let fullName =
       dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
 
     dataHardCodePaspor.fullName = fullName;
-    const day = parseInt(dataHardCodePaspor.expiryDate.substring(0, 2));
-    const month = parseInt(dataHardCodePaspor.expiryDate.substring(2, 4)) - 1;
-    const year = 2000 + parseInt(dataHardCodePaspor.expiryDate.substring(4, 6));
-
-    const expiryDates = new Date(year, month, day).toISOString().split("T")[0];
-    const birthDates = new Date(year, month, day).toISOString().split("T")[0];
-
-    dataHardCodePaspor.formattedExpiryDate = expiryDates;
-    dataHardCodePaspor.formattedBirthDate = birthDates;
-
-    console.log("dataHardCodePaspor", newDataPassport);
-
+  
+    // Buat fungsi untuk mengonversi format tanggal
+    function formatDate(dateString) {
+      if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
+  
+      // Pisahkan tahun, bulan, dan tanggal dari string
+      var year = dateString.substring(0, 2);
+      var month = dateString.substring(2, 4);
+      var day = dateString.substring(4, 6);
+  
+      // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
+      year = (parseInt(year) < 50) ? "20" + year : "19" + year;
+  
+      // Kembalikan tanggal dalam format yang diinginkan
+      return year + "-" + month + "-" + day;
+    }
+  
+    // Terapkan format tanggal pada data paspor
+    dataHardCodePaspor.formattedExpiryDate = formatDate(dataHardCodePaspor.expiryDate);
+    dataHardCodePaspor.formattedBirthDate = formatDate(dataHardCodePaspor.birthDate);
+  
+    console.log("dataHardCodePaspor", dataHardCodePaspor);
+  
     setDataPrimaryPassport(dataHardCodePaspor);
     setCardStatus("success");
     setTimeout(() => {
@@ -123,6 +113,70 @@ const Apply = () => {
     setIsEnableStep(true);
     setIsEnableBack(true);
   };
+  
+
+  // const receiveDataFromChild = (data) => {
+  //   console.log("data", data);
+
+  //   const newDataPassport = {
+  //     docType: data.documentCode,
+  //     issuingState: data.issuingState,
+  //     surName: data.lastName,
+  //     foreName: data.firstName,
+  //     docNumber: data.documentNumber,
+  //     documentNumberCheckDigit: data.documentNumberCheckDigit,
+  //     nationality: data.nationality,
+  //     birthDate: data.birthDate,
+  //     birthDateCheckDigit: data.birthDateCheckDigit,
+  //     sex: data.sex,
+  //     expiryDate: data.expirationDate,
+  //     expirationDateCheckDigit: data.expirationDateCheckDigit,
+  //     personalNumber: data.personalNumber,
+  //     personalNumberCheckDigit: data.personalNumberCheckDigit,
+  //     compositeCheckDigit: data.compositeCheckDigit,
+  //   };
+
+  //   console.log("newDataPassport", newDataPassport);
+
+  //   // Handle received data
+  //   const dataHardCodePaspor = newDataPassport;
+  //   // const dataHarCodePasporImg = dataPasporImg;
+
+  //   let fullName =
+  //     dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
+
+  //   dataHardCodePaspor.fullName = fullName;
+
+  //   function formatDate(dateString) {
+  //     // Pisahkan tahun, bulan, dan tanggal dari string
+  //     var year = dateString.substring(0, 2);
+  //     var month = dateString.substring(2, 4);
+  //     var day = dateString.substring(4, 6);
+  
+  //     // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
+  //     year = (parseInt(year) < 50) ? "20" + year : "19" + year;
+  
+  //     // Kembalikan tanggal dalam format yang diinginkan
+  //     return year + "-" + month + "-" + day;
+  // }
+
+    
+  //   dataHardCodePaspor.formattedExpiryDate = formatDate(dataHardCodePaspor.expiryDate);
+  //   dataHardCodePaspor.formattedBirthDate = formatDate(dataHardCodePaspor.birthDate);
+    
+    
+    
+
+  //   console.log("dataHardCodePaspor", newDataPassport);
+
+  //   setDataPrimaryPassport(dataHardCodePaspor);
+  //   setCardStatus("success");
+  //   setTimeout(() => {
+  //     setCardStatus("checkData");
+  //   }, 1000);
+  //   setIsEnableStep(true);
+  //   setIsEnableBack(true);
+  // };
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   const checkAndHandleTokenExpiration = () => {
@@ -167,24 +221,17 @@ const Apply = () => {
     }
   };
 
-  useEffect(() => {
-    const cardNumberPetugas = "1101320000001255";
-    if (cardNumberPetugas) {
-      setCardNumberPetugas(cardNumberPetugas);
-    }
-  }, []);
+  const updateStatusPaymentCredit = (newstatusPaymentCredit) => {
+    setStatusPaymentCredit(newstatusPaymentCredit);
+  };
 
-  useEffect(() => {
-    if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
-      setIsEnableBack(true);
-    } else if (cardPaymentProps.isWaiting) {
-      setDisabled(true);
-    } else if (cardPaymentProps.isDoRetake) {
-      setIsEnableStep(true);
-    } else if (cardPaymentProps.isPhoto) {
-      setIsEnableStep(false);
-    }
-  }, [cardPaymentProps]);
+  const updateStatusConfirm = (newStatusConfirm) => {
+    setConfirm(newStatusConfirm);
+  };
+
+  const updateSharedData = (newSharedData) => {
+    setSharedData(newSharedData);
+  };
 
   const btnOnClick_Back = () => {
     if (!isOnline) {
@@ -215,11 +262,6 @@ const Apply = () => {
           cvv: "",
           type: "",
         });
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
       } else if (cardStatus === "iddle") {
         const params = {
           code: "email",
@@ -322,6 +364,49 @@ const Apply = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+
+  useEffect(() => {
+    const cardNumberPetugasFix = 11 + localStorage.getItem("cardNumberPetugas");
+    // Periksa apakah cardNumberPetugasFix adalah string sebelum melakukan replace
+    if (typeof cardNumberPetugasFix === 'string') {
+      const cardNumberPetugas = cardNumberPetugasFix.replace(/"/g, "");
+      setCardNumberPetugas(cardNumberPetugas);
+    }
+  }, []);
+  
+
+  useEffect(() => {
+    if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
+      setIsEnableBack(true);
+    } else if (cardPaymentProps.isWaiting) {
+      setDisabled(true);
+    } else if (cardPaymentProps.isDoRetake) {
+      setIsEnableStep(true);
+    } else if (cardPaymentProps.isPhoto) {
+      setIsEnableStep(false);
+    }
+  }, [cardPaymentProps]);
+
+
   useEffect(() => {
     if (cardStatus === "goPayment") {
       setIsEnableStep(false);
@@ -370,15 +455,9 @@ const Apply = () => {
 
       });
     }
-  }, [cardStatus]);
+  }, [cardStatus, socket_IO]);
 
-  const updateStatusPaymentCredit = (newstatusPaymentCredit) => {
-    setStatusPaymentCredit(newstatusPaymentCredit);
-  };
 
-  const updateStatusConfirm = (newStatusConfirm) => {
-    setConfirm(newStatusConfirm);
-  };
 
   useEffect(() => {
     if (receiveTempData.length > 2) {
@@ -386,28 +465,29 @@ const Apply = () => {
     }
   }, [receiveTempData]);
 
-  useEffect(() => {
-    if (statusPaymentCredit) {
-      doSaveRequestVoaPayment(sharedData);
-      // setCardPaymentProps({
-      //   isCreditCard: false,
-      //   isPaymentCredit: false,
-      //   isPaymentCash: false,
-      //   isPrinted: true,
-      //   isSuccess: false,
-      //   isWaiting: false,
-      //   isFailed: false,
-      //   isPhoto: false,
-      //   isDoRetake: false,
-      // });
-    }
-  }, [statusPaymentCredit]);
+
 
   useEffect(() => {
     if (cardPaymentProps.isPrinted) {
       setDisabled(true);
     }
   }, [cardPaymentProps]);
+
+  useEffect(() => {
+    if (statusPaymentCredit) {
+      // setCardPaymentProps({
+      //   isWaiting: false,
+      //   isCreditCard: false,
+      //   isPaymentCredit: false,
+      //   isPaymentCash: false,
+      //   isPrinted: true,
+      //   isSuccess: false,
+      //   isFailed: false,
+      //   isPhoto: false,
+      // });
+      doSaveRequestVoaPayment(sharedData);
+    }
+  }, [statusPaymentCredit]);
 
   const doSaveRequestVoaPayment = async (sharedData) => {
     // console.log("doSaveRequestVoaPayment");
@@ -971,11 +1051,9 @@ const Apply = () => {
         setConfirm(false);
       }
     }
-  }, [confirm]);
+  }, [confirm, meesageConfirm, navigate, socket_IO]);
 
-  const updateSharedData = (newSharedData) => {
-    setSharedData(newSharedData);
-  };
+
 
   return (
     <div className="background-apply-voa">
