@@ -635,6 +635,8 @@ const CardPayment = ({
       setCardNumberWarning(true);
     } else if (expiry === "") {
       setExpiryWarning(true);
+    } else if (cvv === "") {
+      setCvvWarning(true);
     } else {
       // SweetAlert dialog and further actions
       setCvvWarning(false);
@@ -653,6 +655,7 @@ const CardPayment = ({
           const card_data = {
             cc_no: cardNumber,
             cc_exp: expiry,
+            ccv: cvv,
             type: type,
           };
 
@@ -686,6 +689,7 @@ const CardPayment = ({
             paymentMethod: paymentMethod,
             cardNumber: cardNumber,
             expiry: expiry,
+            cvv: cvv,
             type: type,
           });
 
