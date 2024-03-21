@@ -129,7 +129,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         icon: "error",
         title: "Tidak Dapat mendapatkan gambar",
       });
-    }, 4000);
+    }, 10000);
 
     socket.on("connect", () => {
       console.log("Terhubung ke server");
