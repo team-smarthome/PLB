@@ -4,7 +4,7 @@ import Routes from "./routes/routes";
 
 const App = () => {
   return (
-    <Router basename="/molina-lte-new">
+    <Router basename="/molina-lte-v2">
       <Routes />
     </Router>
   );

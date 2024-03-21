@@ -24,7 +24,7 @@ const Information = () => {
   const [statusCamera, setStatusCamera] = useState("OFF");
   const [deviceNoCamera, setDeviceNoCamera] = useState("");
   const [hoverBackToApply, setHoverBackToApply] = useState(false);
-  const [hoverTestCardReader, setHoverTestCardReader] = useState(false);
+  // const [hoverTestCardReader, setHoverTestCardReader] = useState(false);
   const [hoverTestPrinter, setHoverTestPrinter] = useState(false);
   const [hoverTestCamera, setHoverTestCamera] = useState(false);
   const [cardNumber, setCardNumber] = useState("");
@@ -174,13 +174,6 @@ const Information = () => {
     setGambar("");
   };
 
-  const CardReader = () => {
-    // setTestCardReader(true);
-    setTestCardReader((prevState) => !prevState);
-    setLoading(false);
-    setSuccess(false);
-    setLookCamera(false);
-  };
 
   const btnOnClick_Apply = () => {
     navigate("/home");
@@ -570,31 +563,6 @@ const Information = () => {
             onMouseLeave={() => setHoverBackToApply(false)}
           >
             Back To Apply
-          </div>
-          <div
-            onClick={statusCardReader === "ON" ? CardReader : null}
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "30px",
-              fontWeight: "bold",
-              color: "white",
-              cursor:
-                hoverTestCardReader && statusCardReader === "ON"
-                  ? "pointer"
-                  : "default",
-              backgroundColor:
-                hoverTestCardReader && statusCardReader === "ON"
-                  ? "red"
-                  : "#3d5889",
-              opacity: statusCardReader === "OFF" ? 0.5 : 1,
-            }}
-            onMouseEnter={() => setHoverTestCardReader(true)}
-            onMouseLeave={() => setHoverTestCardReader(false)}
-          >
-            Test Card Reader
           </div>
           <div
             onClick={handlePrint}

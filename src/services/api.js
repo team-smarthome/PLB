@@ -15,7 +15,7 @@ export async function apiPaymentHistory(header, body) {
 }
 
 export async function apiPaymentGateway(header, body) {
-  const apiUrl = `${url_dev}ApplicationBank.php`;
+  const apiUrl = `${url_dev}ApplicationBank2.php`;
   const headers = header;
   const requestBody = body;
 
