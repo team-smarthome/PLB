@@ -91,6 +91,23 @@ const Apply = () => {
       var year = dateString.substring(0, 2);
       var month = dateString.substring(2, 4);
       var day = dateString.substring(4, 6);
+
+      const currentYear = new Date().getFullYear();
+
+      year = (parseInt(year) <= currentYear % 100) ? "20" + year : "19" + year;
+      
+  
+      // Kembalikan tanggal dalam format yang diinginkan
+      return year + "-" + month + "-" + day;
+    }
+
+    function formatDateExpiry(dateString) {
+      if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
+  
+      // Pisahkan tahun, bulan, dan tanggal dari string
+      var year = dateString.substring(0, 2);
+      var month = dateString.substring(2, 4);
+      var day = dateString.substring(4, 6);
   
       // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
       year = (parseInt(year) < 50) ? "20" + year : "19" + year;
@@ -100,7 +117,7 @@ const Apply = () => {
     }
   
     // Terapkan format tanggal pada data paspor
-    dataHardCodePaspor.formattedExpiryDate = formatDate(dataHardCodePaspor.expiryDate);
+    dataHardCodePaspor.formattedExpiryDate = formatDateExpiry(dataHardCodePaspor.expiryDate);
     dataHardCodePaspor.formattedBirthDate = formatDate(dataHardCodePaspor.birthDate);
   
     console.log("dataHardCodePaspor", dataHardCodePaspor);
@@ -114,69 +131,6 @@ const Apply = () => {
     setIsEnableBack(true);
   };
   
-
-  // const receiveDataFromChild = (data) => {
-  //   console.log("data", data);
-
-  //   const newDataPassport = {
-  //     docType: data.documentCode,
-  //     issuingState: data.issuingState,
-  //     surName: data.lastName,
-  //     foreName: data.firstName,
-  //     docNumber: data.documentNumber,
-  //     documentNumberCheckDigit: data.documentNumberCheckDigit,
-  //     nationality: data.nationality,
-  //     birthDate: data.birthDate,
-  //     birthDateCheckDigit: data.birthDateCheckDigit,
-  //     sex: data.sex,
-  //     expiryDate: data.expirationDate,
-  //     expirationDateCheckDigit: data.expirationDateCheckDigit,
-  //     personalNumber: data.personalNumber,
-  //     personalNumberCheckDigit: data.personalNumberCheckDigit,
-  //     compositeCheckDigit: data.compositeCheckDigit,
-  //   };
-
-  //   console.log("newDataPassport", newDataPassport);
-
-  //   // Handle received data
-  //   const dataHardCodePaspor = newDataPassport;
-  //   // const dataHarCodePasporImg = dataPasporImg;
-
-  //   let fullName =
-  //     dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
-
-  //   dataHardCodePaspor.fullName = fullName;
-
-  //   function formatDate(dateString) {
-  //     // Pisahkan tahun, bulan, dan tanggal dari string
-  //     var year = dateString.substring(0, 2);
-  //     var month = dateString.substring(2, 4);
-  //     var day = dateString.substring(4, 6);
-  
-  //     // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
-  //     year = (parseInt(year) < 50) ? "20" + year : "19" + year;
-  
-  //     // Kembalikan tanggal dalam format yang diinginkan
-  //     return year + "-" + month + "-" + day;
-  // }
-
-    
-  //   dataHardCodePaspor.formattedExpiryDate = formatDate(dataHardCodePaspor.expiryDate);
-  //   dataHardCodePaspor.formattedBirthDate = formatDate(dataHardCodePaspor.birthDate);
-    
-    
-    
-
-  //   console.log("dataHardCodePaspor", newDataPassport);
-
-  //   setDataPrimaryPassport(dataHardCodePaspor);
-  //   setCardStatus("success");
-  //   setTimeout(() => {
-  //     setCardStatus("checkData");
-  //   }, 1000);
-  //   setIsEnableStep(true);
-  //   setIsEnableBack(true);
-  // };
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   const checkAndHandleTokenExpiration = () => {
@@ -301,20 +255,10 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setCardStatus("inputEmail");
         setCardStatus("lookCamera");
         setTabStatus(2);
       } else if (cardStatus === "takePhotoSucces") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setCardStatus("inputEmail");
         setTabStatus(3);
       } else if (cardStatus === "emailSucces") {
@@ -507,7 +451,7 @@ const Apply = () => {
       fullName: sharedData.passportData.fullName,
       dateOfBirth: sharedData.passportData.formattedBirthDate,
       nationalityCode: sharedData.passportData.nationality,
-      sex: sharedData.passportData.sex === "Male" ? "M" : "F",
+      sex: sharedData.passportData.sex === "male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
       // photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       photoFace: sharedData.photoFace ? sharedData.photoFace : "",
@@ -528,6 +472,8 @@ const Apply = () => {
 
     setIsEnableStep(false);
 
+    console.log("bodyParam", bodyParam);
+
     try {
       setCardPaymentProps({
         isCreditCard: false,
@@ -542,7 +488,7 @@ const Apply = () => {
       });
       const res = await apiPaymentGateway(header, bodyParam);
       const data = res.data;
-      // console.log("data", data);
+      console.log("data", data);
       setDataPermohonan(data.data);
       if (data.code === 200 && data.message === "E-Voa created successfuly!") {
         setCardPaymentProps({

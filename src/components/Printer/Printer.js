@@ -9,6 +9,7 @@ const Printer = ({
   dataPrice,
   dataDate,
   dataTime,
+  dataLokasi,
 }) => {
   // console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
   // console.log(
@@ -62,6 +63,9 @@ const Printer = ({
           </div>
           <div className="header-h2">
             <h2>{dataNumberPermohonanPropsReceipt}</h2>
+          </div>
+          <div>
+          <h2>{dataLokasi}</h2>
           </div>
         </div>
       </div>

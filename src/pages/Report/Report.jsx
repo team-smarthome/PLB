@@ -140,35 +140,42 @@ function Report() {
   useEffect(() => {
     const city = JSON.parse(localStorage.getItem("user"));
     const officeCity = city?.organization?.officeCity;
+    const jwtToken = localStorage.getItem("JwtToken");
+      console.log("Bearer Token:", jwtToken);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("https://mbuvoa.imigrasi.go.id/molina-lte/api/Petugas.php", {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        });
+        let dataPetugas = [];
 
-    let dataPetugas = [];
-
-    if (officeCity === "DENPASAR") {
-      dataPetugas = dataPetugasDenpasar.petugas;
-    } else  if (officeCity === "JAKARTA") {
-      dataPetugas = dataPetugasJakarta.petugas; 
-    }
-    //ceck jumlah data petugas
-    console.log("dataPetugas:", dataPetugas);
-    const options = dataPetugas.map((petugas) => ({
-      value: petugas.id,
-      label: petugas.username,
-    }));
-    setPetugasOptions(options);
-
-    // axios
-    //   .get("http://localhost:3000/petugas")
-    //   .then((response) => {
-    //     const options = response.data.map((petugas) => ({
-    //       value: petugas.id,
-    //       label: petugas.username,
-    //     }));
-    //     setPetugasOptions(options);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error fetching petugas data:", error);
-    //   });
+        console.log("officeCity:", officeCity);
+        console.log("response:", response);
+  
+        if (officeCity === "DENPASAR") {
+          dataPetugas = response.data.dataPetugasDenpasar.petugas;
+          console.log("dataPetugas:", dataPetugas);
+        } else if (officeCity === "JAKARTA") {
+          dataPetugas = response.data.dataPetugasJakarta.petugas;
+        }
+  
+        const options = dataPetugas.map((petugas) => ({
+          value: petugas.id,
+          label: petugas.username,
+        }));
+        setPetugasOptions(options);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    // Call fetchData function when component mounts or officeCity changes
+    fetchData();
+  
   }, []);
+  
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
