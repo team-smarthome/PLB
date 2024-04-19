@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -9,9 +9,11 @@ import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
+import DataContext from "../../context/DataContext";
 
 
 const Apply = () => {
+  const { data } = useContext(DataContext);
   const socket_IO = io("http://localhost:4499");
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
@@ -53,7 +55,7 @@ const Apply = () => {
 
   const receiveDataFromChild = (data) => {
     console.log("data", data);
-  
+
     const newDataPassport = {
       docType: data.documentCode,
       issuingState: data.issuingState,
@@ -71,22 +73,22 @@ const Apply = () => {
       personalNumberCheckDigit: data.personalNumberCheckDigit,
       compositeCheckDigit: data.compositeCheckDigit,
     };
-  
+
     console.log("newDataPassport", newDataPassport);
-  
+
     // Handle received data
     const dataHardCodePaspor = newDataPassport;
 
-    
+
     let fullName =
       dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
 
     dataHardCodePaspor.fullName = fullName;
-  
+
     // Buat fungsi untuk mengonversi format tanggal
     function formatDate(dateString) {
       if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
-  
+
       // Pisahkan tahun, bulan, dan tanggal dari string
       var year = dateString.substring(0, 2);
       var month = dateString.substring(2, 4);
@@ -95,33 +97,33 @@ const Apply = () => {
       const currentYear = new Date().getFullYear();
 
       year = (parseInt(year) <= currentYear % 100) ? "20" + year : "19" + year;
-      
-  
+
+
       // Kembalikan tanggal dalam format yang diinginkan
       return year + "-" + month + "-" + day;
     }
 
     function formatDateExpiry(dateString) {
       if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
-  
+
       // Pisahkan tahun, bulan, dan tanggal dari string
       var year = dateString.substring(0, 2);
       var month = dateString.substring(2, 4);
       var day = dateString.substring(4, 6);
-  
+
       // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
       year = (parseInt(year) < 50) ? "20" + year : "19" + year;
-  
+
       // Kembalikan tanggal dalam format yang diinginkan
       return year + "-" + month + "-" + day;
     }
-  
+
     // Terapkan format tanggal pada data paspor
     dataHardCodePaspor.formattedExpiryDate = formatDateExpiry(dataHardCodePaspor.expiryDate);
     dataHardCodePaspor.formattedBirthDate = formatDate(dataHardCodePaspor.birthDate);
-  
+
     console.log("dataHardCodePaspor", dataHardCodePaspor);
-  
+
     setDataPrimaryPassport(dataHardCodePaspor);
     setCardStatus("success");
     setTimeout(() => {
@@ -130,7 +132,7 @@ const Apply = () => {
     setIsEnableStep(true);
     setIsEnableBack(true);
   };
-  
+
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   const checkAndHandleTokenExpiration = () => {
@@ -216,7 +218,7 @@ const Apply = () => {
           cvv: "",
           type: "",
         });
-      } else if (cardStatus === "iddle") {
+      } else if (cardStatus === "iddle" || cardStatus === "searchPassport") {
         const params = {
           code: "email",
           data: "",
@@ -258,6 +260,11 @@ const Apply = () => {
         setCardStatus("inputEmail");
         setCardStatus("lookCamera");
         setTabStatus(2);
+      } else if (cardStatus === "successSearch") {
+        setIsEnableStep(true);
+        setCardStatus("goPayment");
+        // setTitleHeader("Payment");
+
       } else if (cardStatus === "takePhotoSucces") {
         setCardStatus("inputEmail");
         setTabStatus(3);
@@ -327,6 +334,12 @@ const Apply = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (data) {
+      setIsEnableStep(true);
+    }
+  }, []);
+
 
   useEffect(() => {
     const cardNumberPetugasFix = 11 + localStorage.getItem("cardNumberPetugas");
@@ -336,7 +349,7 @@ const Apply = () => {
       setCardNumberPetugas(cardNumberPetugas);
     }
   }, []);
-  
+
 
   useEffect(() => {
     if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
@@ -353,6 +366,7 @@ const Apply = () => {
 
   useEffect(() => {
     if (cardStatus === "goPayment") {
+
       setIsEnableStep(false);
     } else if (cardStatus === "iddle") {
       const params = {
@@ -465,9 +479,9 @@ const Apply = () => {
         shareDataPaymentProps.type === "" ? null : shareDataPaymentProps.type,
       token: token,
       key: key,
-      deviceId: devicedId.replace(/"/g, ""), 
-      airportId: airportId.replace(/"/g, ""), 
-      jenisDeviceId: jenisDeviceId.replace(/"/g, ""), 
+      deviceId: devicedId.replace(/"/g, ""),
+      airportId: airportId.replace(/"/g, ""),
+      jenisDeviceId: jenisDeviceId.replace(/"/g, ""),
     };
 
     setIsEnableStep(false);
@@ -706,7 +720,7 @@ const Apply = () => {
           } else if (
             messageError === "Required field 'photoFace' is missing" ||
             messageError ===
-              "Face on the passport doesn't match with captured image."
+            "Face on the passport doesn't match with captured image."
           ) {
             setCardPaymentProps({
               isWaiting: false,
@@ -906,7 +920,7 @@ const Apply = () => {
       } else if (
         meesageConfirm === "Required field 'photoFace' is missing" ||
         meesageConfirm ===
-          "Face on the passport doesn't match with captured image."
+        "Face on the passport doesn't match with captured image."
       ) {
         const params = {
           code: "email",

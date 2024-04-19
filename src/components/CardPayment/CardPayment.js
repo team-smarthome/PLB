@@ -73,16 +73,16 @@ const CardPayment = ({
     parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
 
 
-    useEffect(() => {
-      const city = JSON.parse(localStorage.getItem("user"));
-      const officeCity = city?.organization?.officeCity;
-  
-      if (officeCity === "DENPASAR") {
-        setPrintLokasi("DPS");
-      } else  if (officeCity === "JAKARTA") {
-        setPrintLokasi("CGK");
-      }
-    }, []);
+  useEffect(() => {
+    const city = JSON.parse(localStorage.getItem("user"));
+    const officeCity = city?.organization?.officeCity;
+
+    if (officeCity === "DENPASAR") {
+      setPrintLokasi("DPS");
+    } else if (officeCity === "JAKARTA") {
+      setPrintLokasi("CGK");
+    }
+  }, []);
 
   const numericValue = parseFloat(value);
   const numericFee = parseFloat(fee);
@@ -251,8 +251,8 @@ const CardPayment = ({
           cleanedType === "Visa"
             ? "VISA"
             : cleanedType === "Mastercard"
-            ? "MASTERCARD"
-            : cleanedType;
+              ? "MASTERCARD"
+              : cleanedType;
         setType(finalType);
 
         if (data.cardtype === "" || data.cardtype !== "") {
@@ -1108,8 +1108,8 @@ const CardPayment = ({
                           value={
                             type
                               ? optionCreditTypes.find(
-                                  (option) => option.value === type
-                                )
+                                (option) => option.value === type
+                              )
                               : ""
                           }
                           onChange={(selectedOption) =>

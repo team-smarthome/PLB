@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./CardStatusStyle.css";
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -14,10 +14,12 @@ import Select from "react-select";
 import io from "socket.io-client";
 import { Toast } from "../Toast/Toast";
 import ReactPlayer from "react-player";
+import DataContext from "../../context/DataContext";
 
 const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
+  const { data } = useContext(DataContext);
   const [capturedImage, setCapturedImage] = useState(null);
   const [email, setEmail] = useState(null);
   const [emailConfirmation, setEmailConfirmation] = useState(null);
@@ -33,6 +35,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const [kodePos, setKodePos] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [mrz, setMrz] = useState(["", ""]);
+  const [statusSearch, setStatusSearch] = useState(false);
   const kabupatenOptions = dataKodePos.data.map((item) => ({
     value: item.kabupaten,
     label: item.kabupaten,
@@ -241,6 +244,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     }
   };
 
+
+  const handleSearchPassport = () => {
+    sendDataToInput({
+      statusCardBox: "successSearch",
+      emailUser: email,
+      capturedImage: capturedImage,
+      titleHeader: "Apply VOA",
+      titleFooter: "Payment",
+    });
+
+  }
+
   const handleKabupatenChange = (selectedOption) => {
     setSelectedKabupaten(selectedOption);
   };
@@ -262,6 +277,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     }
   };
 
+  useEffect(() => {
+    if (data) {
+      sendDataToInput({
+        statusCardBox: "searchPassport",
+        capturedImage: null,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+      });
+      console.log("DataStatus:", data);
+    }
+  }, []);
 
   useEffect(() => {
     console.log("isConnected: ", isConnected);
@@ -334,7 +361,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
   useEffect(() => {
     handleTokenExpiration();
-  }, [capturedImage, doRetake, email, emailConfirmation, handleTokenExpiration]);
+  }, [
+    capturedImage,
+    doRetake,
+    email,
+    emailConfirmation,
+    handleTokenExpiration,
+  ]);
 
   useEffect(() => {
     console.log("capturedImage berubah:", capturedImage);
@@ -411,6 +444,45 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
               type="button"
               className="ok-button"
               onClick={handleOkButtonClick}
+            >
+              OK
+            </button>
+          </>
+        );
+
+      case "searchPassport":
+        return (
+          <>
+            <h1 className="card-title py-4">Please Input Your Passport Data</h1>
+
+            <div className="input-email py-4">
+              <input
+                type="text"
+                name="email"
+                placeholder="Number Passport"
+                value={email}
+                onChange={handleEmailChange}
+              />
+            </div>
+            {emailWarning && <div className="warning">Please enter your Number Passport!</div>}
+
+            <div className="input-email py-4">
+              <input
+                style={{ marginTop: "5%" }}
+                type="text"
+                name="email-confirmation"
+                placeholder="Code of State"
+                value={emailConfirmation}
+                onChange={handleEmailConfirmationChange}
+              />
+            </div>
+            {emailConfirmWarning && (
+              <div className="warning">Please enter your code of state!</div>
+            )}
+            <button
+              type="button"
+              className="ok-button"
+              onClick={handleSearchPassport}
             >
               OK
             </button>
@@ -569,6 +641,20 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
             <img src={imageSource} alt="" className="card-image" />
           </>
         );
+      case "searchPassportSucces":
+        return (
+          <>
+            <h1 className="card-title">
+              {getStatusHeaderText().map((text, index) => (
+                <React.Fragment key={index}>
+                  {text}
+                  <br />
+                </React.Fragment>
+              ))}
+            </h1>
+            <img src={Gambar2} alt="" className="card-image" />
+          </>
+        );
       case "postalCodeSucces":
         return (
           <>
@@ -581,6 +667,22 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
               ))}
             </h1>
             <img src={Gambar2} alt="" className="card-image" />
+          </>
+        );
+      case "successSearch":
+        return (
+          <>
+            <>
+              <h1 className="card-title">
+
+                <React.Fragment>
+                  Success Get Passport Data
+                  <br />
+                </React.Fragment>
+
+              </h1>
+              <img src={Gambar2} alt="" className="card-image" />
+            </>
           </>
         );
       case "success":

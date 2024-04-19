@@ -1,21 +1,35 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import LogoutIcon from "../../assets/images/logoutnew.png";
-
+import DataContext from "../../context/DataContext";
 const Home = () => {
   const navigate = useNavigate();
+  const { setData } = useContext(DataContext);
 
   const btnOnClick_Apply = () => {
     navigate("/apply");
+    setData(false);
   };
 
   const btnOnClick_Informasi = () => {
     // console.log("INFORMASI");
     navigate("/configuration");
+    setData(false);
   };
+
+  const btnOnClick_Search_Passport = () => {
+    // console.log("INFORMASI");
+    navigate("/apply");
+    setData(true);
+  };
+
+
+
+
+
 
   const handleLogout = async () => {
     // Menampilkan konfirmasi alert ketika tombol logout diklik menggunakan SweetAlert2
@@ -58,8 +72,11 @@ const Home = () => {
             <div className="bg-apply" onClick={btnOnClick_Apply}>
               <h2 className="text-apply">Apply</h2>
             </div>
-            <div className="bg-information" onClick={btnOnClick_Informasi}>
+            <div className="bg-information h-full" onClick={btnOnClick_Informasi}>
               <h2 className="text-information">Configuration</h2>
+            </div>
+            <div className="bg-information" onClick={btnOnClick_Search_Passport}>
+              <h2 className="text-information">Search Passport</h2>
             </div>
           </div>
         </div>

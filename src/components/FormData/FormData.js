@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Select from "react-select";
 import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
+import DataContext from "../../context/DataContext";
 
 const FormData = ({ sharedData, setSharedData, cardStatus }) => {
+  const { data } = useContext(DataContext);
   // passportNumber
   const [isCheckedPassportNumber, setIsCheckedPassportNumber] = useState(false);
   // fullName
@@ -43,6 +45,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   // pasporType
   const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
     useState(true);
+  const [statusSearch, setStatusSearch] = useState(false);
 
   const initialFormData = {
     passport_number: "",
@@ -56,6 +59,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     email: "",
   };
   const [formdata, setFormData] = useState(initialFormData);
+  useEffect(() => {
+    if (data) {
+      setStatusSearch(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (sharedData.passportData === null) {
@@ -211,9 +219,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedPassportNumber ? "dimmed" : ""
-                  }`}
+                  className={`checklist-img ${!isCheckedPassportNumber ? "dimmed" : ""
+                    }`}
                   onClick={() => handleImageClick("passport_number")}
                 />
               </>
@@ -246,9 +253,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedFullName ? "dimmed" : ""
-                  }`}
+                  className={`checklist-img ${!isCheckedFullName ? "dimmed" : ""
+                    }`}
                   onClick={() => handleImageClick("full_name")}
                 />
               </>
@@ -282,9 +288,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedDateOfBirth ? "dimmed" : ""
-                  }`}
+                  className={`checklist-img ${!isCheckedDateOfBirth ? "dimmed" : ""
+                    }`}
                   onClick={() => handleImageClick("date_of_birth")}
                 />
               </>
@@ -343,9 +348,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedGender ? "dimmed" : ""
-                  }`}
+                  className={`checklist-img ${!isCheckedGender ? "dimmed" : ""
+                    }`}
                   onClick={() => handleImageClick("gender")}
                 />
               </>
@@ -406,9 +410,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedNationality ? "dimmed" : ""
-                  }`}
+                  className={`checklist-img ${!isCheckedNationality ? "dimmed" : ""
+                    }`}
                   onClick={() => handleImageClick("nationality")}
                 />
               </>
@@ -480,29 +483,32 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${
-                    !isCheckedPasporType ? "dimmed" : ""
-                  }`}
+                  className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                    }`}
                   onClick={() => handleImageClick("paspor_type")}
                 />
               </>
             ) : null}
           </div>
         </div>
-        <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="photo">Photo</label>
-            </div>
-            <div className="photo">
-              <div className="photo-box">
-                {formdata.photo !== null && formdata.photo !== "" ? (
-                  <img src={formdata.photo} alt="" />
-                ) : null}
+        {statusSearch ? null : (
+          <div className="form-group">
+            <div className="wrapper-form">
+              <div className="wrapper-input">
+                <label htmlFor="photo">Photo</label>
+              </div>
+              <div className="photo">
+                <div className="photo-box">
+                  {formdata.photo !== null && formdata.photo !== "" ? (
+                    <img src={formdata.photo} alt="" />
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+
 
         <div className="form-group">
           <div className="wrapper-form">
