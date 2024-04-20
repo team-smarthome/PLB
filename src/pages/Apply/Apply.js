@@ -491,7 +491,7 @@ const Apply = () => {
       // registerCode: sharedData.passportData.noRegister
       //   ? sharedData.passportData.noRegister : "",
       // photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : "",
+      photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       email: sharedData.email
         ? sharedData.email
         : sharedData.passportData.email,
