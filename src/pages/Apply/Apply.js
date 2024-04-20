@@ -80,10 +80,10 @@ const Apply = () => {
 
       setCardStatus("successSearch");
 
-      setTimeout(() => {
-        setCardStatus("successSearch");
+      // setTimeout(() => {
+      //   setCardStatus("successSearch");
 
-      }, 1000);
+      // }, 1000);
       setIsEnableStep(true);
       setIsEnableBack(true);
 

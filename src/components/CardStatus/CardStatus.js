@@ -306,13 +306,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         console.log("Data:", data);
         if (data.status === "Success" || data.status === "success") {
           sendDataToParent2(data.data);
-          sendDataToInput({
-            statusCardBox: "searchPassportSucces",
-            emailUser: email,
-            capturedImage: capturedImage,
-            titleHeader: "Apply VOA",
-            titleFooter: "Payment",
-          });
+          // sendDataToInput({
+          //   statusCardBox: "successSearch",
+          //   emailUser: email,
+          //   capturedImage: capturedImage,
+          //   titleHeader: "Apply VOA",
+          //   titleFooter: "Payment",
+          // });
         } else {
           sendDataToInput({
             statusCardBox: "notFoundPassport",
