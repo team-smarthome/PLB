@@ -265,6 +265,74 @@ function Report() {
     pdf.save(`${formattedDate}.pdf`);
   };
 
+  const generateExcel = () => {
+    const Excel = require("exceljs");
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet("Payment Report");
+
+    // Add column headers
+    const headers = [
+      "No",
+      "Date",
+      "Register No.",
+      "Full Name",
+      "Passport No.",
+      "Nationality",
+      "Visa Number",
+      "Receipt",
+      "Type",
+      "Billed Price",
+    ];
+    worksheet.addRow(headers);
+
+    // Add data rows
+    data.forEach((item, index) => {
+      const row = [
+        index + 1,
+        item.timestamp,
+        item.register_number,
+        item.full_name,
+        item.passport_number,
+        item.citizenship,
+        item.visa_number,
+        item.receipt,
+        item.payment_method,
+        item.billed_price.split(".")[0],
+      ];
+      worksheet.addRow(row);
+    });
+
+    // Calculate totalPayment
+    const totalPayment =
+      response.length > 0 ? response[0].payment_summary.total : 0;
+
+    // Add total row
+    const totalRow = ["", "", "", "", "", "", "", "", "TOTAL", totalPayment];
+    worksheet.addRow(totalRow);
+
+    // Save the workbook
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const filename = `Payment_Report_${startDate}_${endDate}.xlsx`;
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        // For IE
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+      } else {
+        // For other browsers
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    });
+  };
+
   const storage = JSON.parse(localStorage.getItem("user"));
   const name = storage.fullName;
 
@@ -399,13 +467,28 @@ function Report() {
               Home
             </button>
           </div>
-          <button
-            className="print-pdf"
-            disabled={data.length === 0 ? true : false}
-            onClick={() => generatePDF()}
+          <div
+            style={{
+              display: "flex",
+              gap: "2vh",
+              flexDirection: "row-reverse",
+            }}
           >
-            Cetak PDF
-          </button>
+            <button
+              className="print-pdf"
+              disabled={data.length === 0 ? true : false}
+              onClick={() => generatePDF()}
+            >
+              Cetak PDF
+            </button>
+            <button
+              className="print-excel"
+              disabled={data.length === 0 ? true : false}
+              onClick={() => generateExcel()}
+            >
+              Cetak Excel
+            </button>
+          </div>
         </div>
         {loading ? (
           <div className={"content-loading"}>

@@ -28,12 +28,15 @@ const BodyContent = ({
     passportData: null,
     photoFace: null,
     email: null,
+    city: null,
+    postal_code: null,
   });
 
   const handleDataFromCardStatus = ({
     statusCardBox,
     capturedImage,
     emailUser,
+    city,
     postalCode,
     titleHeader,
     titleFooter,
@@ -42,7 +45,8 @@ const BodyContent = ({
       ...prevData,
       photoFace: capturedImage,
       email: emailUser,
-      postal_code: postalCode
+      city: city,
+      postal_code: postalCode,
     }));
 
     setTitleHeader(titleHeader);

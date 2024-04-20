@@ -12,22 +12,29 @@
 
 .form-filter {
   display: flex;
-  flex-direction: row; /* Display items in a row */
-  align-items: center; /* Align items vertically in the center */
+  flex-direction: row;
+  /* Display items in a row */
+  align-items: center;
+  /* Align items vertically in the center */
   justify-content: space-evenly;
 }
+
 .header-combo {
   margin: 3% 4% 3% 4%;
 }
 
 /* Apply styles to each label and input pair */
 .form-filter input {
-  margin-right: 6%; /* Add some spacing between label-input pairs */
-  
+  margin-right: 6%;
+  /* Add some spacing between label-input pairs */
+
   height: 30px;
-  outline: none; /* Remove focus border */
-  padding: 0 10px; /* Add some padding */
-  font-size: 14px; /* Adjust font size */
+  outline: none;
+  /* Remove focus border */
+  padding: 0 10px;
+  /* Add some padding */
+  font-size: 14px;
+  /* Adjust font size */
 }
 
 #payment {
@@ -70,10 +77,12 @@
 
 .content-loading {
   margin-bottom: 9%;
-  background-color: white; /* Change background color to white */
+  background-color: white;
+  /* Change background color to white */
   opacity: 0.5;
   width: 100%;
-  height: 100%; /* Use 100% height to fill its parent */
+  height: 100%;
+  /* Use 100% height to fill its parent */
   display: flex;
   justify-items: center;
   background-size: cover;
@@ -104,14 +113,17 @@
 
 .table-header {
   display: flex;
-  justify-content: space-between; /* Align items to the far end (right) */
+  justify-content: space-between;
+  /* Align items to the far end (right) */
   align-items: center;
   margin-bottom: 3%;
 }
 
 .combo {
-  display: flex; /* Use flexbox to align items */
-  gap: 10px; /* Add some spacing between buttons */
+  display: flex;
+  /* Use flexbox to align items */
+  gap: 10px;
+  /* Add some spacing between buttons */
   align-items: center;
 }
 
@@ -148,15 +160,41 @@
   border-radius: 6px;
 }
 
-.print-pdf:disabled {
-  background-color: #ccc; /* Change the background color when disabled */
-  color: #999; /* Change the text color when disabled */
-  cursor: not-allowed; /* Change the cursor when disabled */
+.print-excel {
+  padding: 11px 20px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  background-color: #3dbb6f;
+  color: #fff;
+  border-radius: 6px;
 }
+
+.print-pdf:disabled {
+  background-color: #ccc;
+  /* Change the background color when disabled */
+  color: #999;
+  /* Change the text color when disabled */
+  cursor: not-allowed;
+  /* Change the cursor when disabled */
+}
+
+.print-excel:disabled {
+  background-color: #ccc;
+  /* Change the background color when disabled */
+  color: #999;
+  /* Change the text color when disabled */
+  cursor: not-allowed;
+  /* Change the cursor when disabled */
+}
+
+
 
 .table-footer {
   display: flex;
-  justify-content: flex-end; /* Align items to the far end (right) */
+  justify-content: flex-end;
+  /* Align items to the far end (right) */
   align-items: flex-end;
   margin-top: 2%;
   color: black;

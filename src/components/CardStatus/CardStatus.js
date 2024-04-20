@@ -38,6 +38,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const navigate = useNavigate();
   const [selectedKabupaten, setSelectedKabupaten] = useState(null);
   const [kodePos, setKodePos] = useState("");
+  const [kotaUser, setKotaUser] = useState("");
   const [optionNegara, setOptionNegara] = useState(null);
   const [codeOfState, setCodeOfState] = useState("");
 
@@ -306,13 +307,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         console.log("Data:", data);
         if (data.status === "Success" || data.status === "success") {
           sendDataToParent2(data.data);
-          // sendDataToInput({
-          //   statusCardBox: "successSearch",
-          //   emailUser: email,
-          //   capturedImage: capturedImage,
-          //   titleHeader: "Apply VOA",
-          //   titleFooter: "Payment",
-          // });
         } else {
           sendDataToInput({
             statusCardBox: "notFoundPassport",
@@ -402,6 +396,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         statusCardBox: "postalCodeSucces",
         emailUser: email,
         postalCode: kodePos,
+        city: kotaUser,
         capturedImage: capturedImage,
         titleHeader: "Apply VOA",
         titleFooter: "Payment",
@@ -474,6 +469,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
       if (selectedKabupatenData) {
         setKodePos(selectedKabupatenData.kode_pos);
+        setKotaUser(selectedKabupatenData.kabupaten);
       }
     }
   }, [selectedKabupaten]);
