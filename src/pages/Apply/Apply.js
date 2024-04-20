@@ -77,13 +77,7 @@ const Apply = () => {
         address: data.Address,
       };
       setDataPrimaryPassport(newDataSearchPassport);
-
       setCardStatus("successSearch");
-
-      setTimeout(() => {
-        setCardStatus("successSearch");
-
-      }, 1000);
       setIsEnableStep(true);
       setIsEnableBack(true);
 
