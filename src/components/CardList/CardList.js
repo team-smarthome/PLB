@@ -4,7 +4,7 @@ import DataContext from "../../context/DataContext";
 
 const CardList = ({ status }) => {
   const { data } = useContext(DataContext);
-  const [listData, setListData] = useState([]);
+  const [listData, setListData] = useState(["Scan Passport", "Take Photo", "Input Email", "Postal Code"]);
 
   useEffect(() => {
     if (data) {
@@ -18,7 +18,7 @@ const CardList = ({ status }) => {
         setListData(["Scan Passport", "Take Photo", "Input Email", "Postal Code"]);
       }
     }
-  }, []);
+  }, [status]);
 
   return (
     <ul className="card-list-container">

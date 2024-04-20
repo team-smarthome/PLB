@@ -57,6 +57,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     paspor_type: "",
     photo: "",
     email: "",
+    city: "",
+    postalCode: "",
+    address: "",
+    register_code: "",
   };
   const [formdata, setFormData] = useState(initialFormData);
   useEffect(() => {

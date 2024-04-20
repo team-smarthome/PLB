@@ -297,8 +297,8 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData") {
-        // setCardStatus("lookCamera");
-        setCardStatus("takePhotoSucces");
+        setCardStatus("lookCamera");
+        // setCardStatus("takePhotoSucces");
         setTabStatus(2);
       } else if (cardStatus === "successSearch") {
         setIsEnableStep(true);
@@ -505,7 +505,7 @@ const Apply = () => {
       // registerCode: sharedData.passportData.noRegister
       //   ? sharedData.passportData.noRegister : "",
       // photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
+      photoFace: sharedData.photoFace ? sharedData.photoFace : "",
       email: sharedData.email
         ? sharedData.email
         : sharedData.passportData.email,
