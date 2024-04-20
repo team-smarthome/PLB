@@ -160,9 +160,9 @@ const Apply = () => {
       setCardStatus("success");
       setTimeout(() => {
         setCardStatus("checkData");
+        setIsEnableStep(true);
+        setIsEnableBack(true);
       }, 1000);
-      setIsEnableStep(true);
-      setIsEnableBack(true);
     }
 
 
@@ -259,7 +259,7 @@ const Apply = () => {
         };
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
         navigate("/home");
-      } else if (cardStatus === "lookCamera") {
+      } else if (cardStatus === "inputEmail") {
         setTabStatus(1);
         setCardStatus("checkData");
       } else if (cardStatus === "postalCode") {
@@ -268,12 +268,8 @@ const Apply = () => {
           data: "",
         };
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
+        setTabStatus(2);
         setCardStatus("inputEmail");
-        setTabStatus(3);
-        setCardStatus("inputEmail");
-      } else if (cardStatus === "takePhotoSucces") {
-        setTabStatus(1);
-        setCardStatus("checkData");
       } else if (cardStatus === "waiting") {
         setTabStatus(1);
         setCardStatus("checkData");
@@ -291,19 +287,16 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData") {
-        setCardStatus("lookCamera");
+        setCardStatus("inputEmail");
         // setCardStatus("takePhotoSucces");
         setTabStatus(2);
       } else if (cardStatus === "successSearch") {
         setIsEnableStep(true);
         setCardStatus("goPayment");
         // setTitleHeader("Payment");
-      } else if (cardStatus === "takePhotoSucces") {
-        setCardStatus("inputEmail");
-        setTabStatus(3);
       } else if (cardStatus === "emailSucces") {
         setCardStatus("postalCode");
-        setTabStatus(4);
+        setTabStatus(3);
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
@@ -344,7 +337,6 @@ const Apply = () => {
           data: "",
         };
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
-        setCardStatus("inputEmail");
       }
     }
   };

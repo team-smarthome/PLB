@@ -4,10 +4,11 @@ import DataContext from "../../context/DataContext";
 
 const CardList = ({ status }) => {
   const { data } = useContext(DataContext);
-  const [listData, setListData] = useState(["Scan Passport", "Take Photo", "Input Email", "Postal Code"]);
+  const [listData, setListData] = useState(["Scan Passport", "Input Email", "Postal Code"]);
+  console.log("DataStatus", data);
 
   useEffect(() => {
-    if (data) {
+    if (data === "true") {
       setListData([]);
     } else {
       const dataCheck = localStorage.getItem("dataStatus");
@@ -15,7 +16,7 @@ const CardList = ({ status }) => {
         console.log("DataCheck", dataCheck);
         setListData([]);
       } else {
-        setListData(["Scan Passport", "Take Photo", "Input Email", "Postal Code"]);
+        setListData(["Scan Passport", "Input Email", "Postal Code"]);
       }
     }
   }, [status]);
