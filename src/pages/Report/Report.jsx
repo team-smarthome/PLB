@@ -9,7 +9,10 @@ import "jspdf-autotable";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { dataPetugasDenpasar, dataPetugasJakarta } from "../../utils/dataPetugas";
+import {
+  dataPetugasDenpasar,
+  dataPetugasJakarta,
+} from "../../utils/dataPetugas";
 
 function Report() {
   const navigate = useNavigate();
@@ -141,26 +144,31 @@ function Report() {
     const city = JSON.parse(localStorage.getItem("user"));
     const officeCity = city?.organization?.officeCity;
     const jwtToken = localStorage.getItem("JwtToken");
-      console.log("Bearer Token:", jwtToken);
+    console.log("Bearer Token:", jwtToken);
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://mbuvoa.imigrasi.go.id/molina-lte/api/Petugas.php", {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        });
+        const response = await axios.get(
+          "https://mbuvoa.imigrasi.go.id/molina-lte/api/Petugas.php",
+          {
+            headers: {
+              Authorization: `Bearer ${jwtToken}`,
+            },
+          }
+        );
         let dataPetugas = [];
+
+        console.log("Data_Petugas:", response.data);
 
         console.log("officeCity:", officeCity);
         console.log("response:", response);
-  
+
         if (officeCity === "DENPASAR") {
           dataPetugas = response.data.dataPetugasDenpasar.petugas;
           console.log("dataPetugas:", dataPetugas);
         } else if (officeCity === "JAKARTA") {
           dataPetugas = response.data.dataPetugasJakarta.petugas;
         }
-  
+
         const options = dataPetugas.map((petugas) => ({
           value: petugas.id,
           label: petugas.username,
@@ -170,12 +178,10 @@ function Report() {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     // Call fetchData function when component mounts or officeCity changes
     fetchData();
-  
   }, []);
-  
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
@@ -186,18 +192,18 @@ function Report() {
   const pageCount = data.length / 10;
   const generatePDF = () => {
     const pdf = new jsPDF();
-  
+
     const fontSize = 10;
-  
+
     const currentDate = new Date();
     const formattedDate = `${currentDate.toLocaleDateString(
       "en-GB"
     )} ${currentDate.toLocaleTimeString("en-US", { hour12: true })}`;
-  
+
     pdf.setFontSize(fontSize);
-  
+
     pdf.text(`Reconciliation Date: ${startDate} - ${endDate}`, 16, 20);
-  
+
     const itemHeaders = [
       "No",
       "Date",
@@ -225,16 +231,28 @@ function Report() {
         currency: "IDR",
       }).format(item.billed_price),
     ]);
-  
-    const totalPayment = response.length > 0 ? response[0].payment_summary.total : 0;
-  
-    const totalRow = ["", "", "", "", "", "", "", "", "TOTAL:", new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-    }).format(totalPayment)];
-  
+
+    const totalPayment =
+      response.length > 0 ? response[0].payment_summary.total : 0;
+
+    const totalRow = [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "TOTAL:",
+      new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(totalPayment),
+    ];
+
     const tableY = pdf.autoTable.previous.finalY + 10; // Get the final Y position of the table
-  
+
     pdf.autoTable({
       head: [itemHeaders],
       body: [...itemRows, totalRow],
@@ -243,11 +261,10 @@ function Report() {
         fontSize: 5,
       },
     });
-  
+
     pdf.save(`${formattedDate}.pdf`);
   };
 
-  
   const storage = JSON.parse(localStorage.getItem("user"));
   const name = storage.fullName;
 

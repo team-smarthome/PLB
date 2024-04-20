@@ -62,6 +62,13 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   useEffect(() => {
     if (data) {
       setStatusSearch(true);
+    } else {
+      const checkData = localStorage.getItem("dataStatus");
+      if (checkData === "true") {
+        setStatusSearch(true);
+      } else {
+        setStatusSearch(false);
+      }
     }
   }, []);
 
@@ -70,6 +77,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
       // console.log("test shared data null");
       setFormData(initialFormData);
     } else {
+      console.log("sharedData", sharedData.passportData);
       const dataNationality = dataNegara.data.map((negara) => ({
         value: negara.id_negara,
         label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
@@ -92,7 +100,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         // gender
         if (sharedData.passportData) {
           const filteredGender = dataGender.filter(
-            (sex) => sex.value === sharedData.passportData.sex
+            (sex) => sex.value === sharedData.passportData.sex || ""
           );
 
           setFormData((prevData) => ({
@@ -109,6 +117,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           nationality:
             filteredNationality.length > 0 ? filteredNationality[0] : "",
           expiry_date: sharedData.passportData.formattedExpiryDate || "",
+          email: sharedData.passportData.email || "",
+          register_code: sharedData.passportData.noRegister || "",
+          postalCode: sharedData.passportData.postal_code || "",
+          city: sharedData.passportData.city || "",
+          address: sharedData.passportData.address || "",
           passport_type:
             (sharedData.passportData.docType === "P" || "PM"
               ? "PASSPORT"
@@ -123,7 +136,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
       setFormData((prevData) => ({
         ...prevData,
-        email: sharedData.email || "",
+        email: sharedData.email || sharedData.passportData.email || "",
       }));
     }
   }, [sharedData]);
@@ -456,41 +469,45 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           </div>
         </div>
 
-        <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="paspor_type">Passport Type</label>
-            </div>
-            <input
-              type="text"
-              name="docType"
-              id="paspor_type"
-              value={formdata.passport_type}
-              onChange={handleInputChange}
-              disabled={
-                cardStatus === "checkData" ? !isCheckedPasporType : true
-              }
-              className="disabled-input"
-            />
+        {statusSearch ? null : (
+          <div className="form-group">
+            <div className="wrapper-form">
+              <div className="wrapper-input">
+                <label htmlFor="paspor_type">Passport Type</label>
+              </div>
+              <input
+                type="text"
+                name="docType"
+                id="paspor_type"
+                value={formdata.passport_type}
+                onChange={handleInputChange}
+                disabled={
+                  cardStatus === "checkData" ? !isCheckedPasporType : true
+                }
+                className="disabled-input"
+              />
 
-            {cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledPasporType && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("paspor_type")}
-                />
-              </>
-            ) : null}
+              {cardStatus === "checkData" ? (
+                <>
+                  <div className="checkbox-container">
+                    {isCommentDisabledPasporType && (
+                      <div className="checkbox-value"></div>
+                    )}
+                  </div>
+                  <img
+                    src={Checklist}
+                    alt="Checklist Icon"
+                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                      }`}
+                    onClick={() => handleImageClick("paspor_type")}
+                  />
+                </>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
+
+
         {statusSearch ? null : (
           <div className="form-group">
             <div className="wrapper-form">
@@ -508,8 +525,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           </div>
         )}
 
-
-
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
@@ -525,6 +540,163 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             />
           </div>
         </div>
+
+        {!statusSearch ? null : (
+          <div className="form-group">
+            <div className="wrapper-form">
+              <div className="wrapper-input">
+                <label htmlFor="paspor_type">City</label>
+              </div>
+              <input
+                type="text"
+                name="city"
+                id="city"
+                value={formdata.city}
+                onChange={handleInputChange}
+                disabled={
+                  cardStatus === "checkData" ? !isCheckedPasporType : true
+                }
+                className="disabled-input"
+              />
+
+              {cardStatus === "checkData" ? (
+                <>
+                  <div className="checkbox-container">
+                    {isCommentDisabledPasporType && (
+                      <div className="checkbox-value"></div>
+                    )}
+                  </div>
+                  <img
+                    src={Checklist}
+                    alt="Checklist Icon"
+                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                      }`}
+                    onClick={() => handleImageClick("paspor_type")}
+                  />
+                </>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+
+
+        {!statusSearch ? null : (
+          <div className="form-group">
+            <div className="wrapper-form">
+              <div className="wrapper-input">
+                <label htmlFor="paspor_type">Postal Code</label>
+              </div>
+              <input
+                type="text"
+                name="docType"
+                id="paspor_type"
+                value={formdata.postalCode}
+                onChange={handleInputChange}
+                disabled={
+                  cardStatus === "checkData" ? !isCheckedPasporType : true
+                }
+                className="disabled-input"
+              />
+
+              {cardStatus === "checkData" ? (
+                <>
+                  <div className="checkbox-container">
+                    {isCommentDisabledPasporType && (
+                      <div className="checkbox-value"></div>
+                    )}
+                  </div>
+                  <img
+                    src={Checklist}
+                    alt="Checklist Icon"
+                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                      }`}
+                    onClick={() => handleImageClick("paspor_type")}
+                  />
+                </>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {/* {!statusSearch ? null : (
+          <div className="form-group">
+            <div className="wrapper-form">
+              <div className="wrapper-input">
+                <label htmlFor="paspor_type">Address</label>
+              </div>
+              <input
+                type="text"
+                name="address"
+                id="address"
+                value={formdata.address}
+                onChange={handleInputChange}
+                disabled={
+                  cardStatus === "checkData" ? !isCheckedPasporType : true
+                }
+                className="disabled-input"
+              />
+
+              {cardStatus === "checkData" ? (
+                <>
+                  <div className="checkbox-container">
+                    {isCommentDisabledPasporType && (
+                      <div className="checkbox-value"></div>
+                    )}
+                  </div>
+                  <img
+                    src={Checklist}
+                    alt="Checklist Icon"
+                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                      }`}
+                    onClick={() => handleImageClick("paspor_type")}
+                  />
+                </>
+              ) : null}
+            </div>
+          </div>
+        )} */}
+        {!statusSearch ? null : (
+          <div className="form-group">
+            <div className="wrapper-form">
+              <div className="wrapper-input">
+                <label htmlFor="paspor_type">Register Number</label>
+              </div>
+              <input
+                type="text"
+                name="docType"
+                id="paspor_type"
+                value={formdata.register_code}
+                onChange={handleInputChange}
+                disabled={
+                  cardStatus === "checkData" ? !isCheckedPasporType : true
+                }
+                className="disabled-input"
+              />
+
+              {cardStatus === "checkData" ? (
+                <>
+                  <div className="checkbox-container">
+                    {isCommentDisabledPasporType && (
+                      <div className="checkbox-value"></div>
+                    )}
+                  </div>
+                  <img
+                    src={Checklist}
+                    alt="Checklist Icon"
+                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                      }`}
+                    onClick={() => handleImageClick("paspor_type")}
+                  />
+                </>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+
+
+
       </form>
     </div>
   );

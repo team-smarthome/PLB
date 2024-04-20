@@ -8,7 +8,7 @@ import { url_dev } from "../../services/env";
 import Printer from "../../components/Printer/Printer";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
-import Face from '../../assets/images/face.png'
+import Face from "../../assets/images/face.png";
 
 const Information = () => {
   const navigate = useNavigate();
@@ -174,7 +174,6 @@ const Information = () => {
     setGambar("");
   };
 
-
   const btnOnClick_Apply = () => {
     navigate("/home");
   };
@@ -261,14 +260,23 @@ const Information = () => {
                 <h1 className="card-title" style={{ paddingTop: "5%" }}>
                   Please look at the camera
                 </h1>
-                <div style={{ height: "280px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <img src={Face} alt="wajah"
+                <div
                   style={{
-                    width: "30%",
+                    height: "280px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                />
+                >
+                  <img
+                    src={Face}
+                    alt="wajah"
+                    style={{
+                      width: "30%",
+                    }}
+                  />
                 </div>
-          
+
                 <button
                   onClick={capture}
                   className="ok-button"
@@ -534,7 +542,6 @@ const Information = () => {
         <div
           className="footer"
           style={{
-
             // backgroundColor: "red",
             width: "95%",
             height: "70px",
@@ -609,6 +616,9 @@ const Information = () => {
         printRefProps={printRef}
         dataPrice="500.000"
         dataLokasi="TEST"
+        passportumber="A0B0C0D001"
+        passportName="Udin Samsul Arifin"
+        passportUrl="https://www.google.com"
       />
     </div>
   );

@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
-import { apiPaymentGateway } from "../../services/api";
+import { apiPaymentGateway, apiPaymentGatewaySearch } from "../../services/api";
 import dataPasporImg from "../../utils/dataPhotoPaspor";
 import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
 import DataContext from "../../context/DataContext";
-
+import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
 
 const Apply = () => {
   const { data } = useContext(DataContext);
@@ -19,7 +19,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(false);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("iddle");
+  const [cardStatus, setCardStatus] = useState("");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -33,6 +33,7 @@ const Apply = () => {
     "Network / Card error / declined dll"
   );
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const dataTrueorFalse = localStorage.getItem("dataStatus");
   const [cardPaymentProps, setCardPaymentProps] = useState({
     isCreditCard: false,
     isPaymentCredit: false,
@@ -54,85 +55,124 @@ const Apply = () => {
   });
 
   const receiveDataFromChild = (data) => {
-    console.log("data", data);
-
-    const newDataPassport = {
-      docType: data.documentCode,
-      issuingState: data.issuingState,
-      surName: data.lastName,
-      foreName: data.firstName,
-      docNumber: data.documentNumber,
-      documentNumberCheckDigit: data.documentNumberCheckDigit,
-      nationality: data.nationality,
-      birthDate: data.birthDate,
-      birthDateCheckDigit: data.birthDateCheckDigit,
-      sex: data.sex,
-      expiryDate: data.expirationDate,
-      expirationDateCheckDigit: data.expirationDateCheckDigit,
-      personalNumber: data.personalNumber,
-      personalNumberCheckDigit: data.personalNumberCheckDigit,
-      compositeCheckDigit: data.compositeCheckDigit,
+    console.log("dataFromChild", data);
+    const sexMapping = {
+      "M": "male",
+      "F": "female"
     };
 
-    console.log("newDataPassport", newDataPassport);
+    if (dataTrueorFalse === "true" || data === "true") {
+      const newDataSearchPassport = {
+        docNumber: data.PassportNumber,
+        formattedExpiryDate: data.ExpiredDate,
+        fullName: data.FullName,
+        formattedBirthDate: data.DateOfBirth,
+        nationality: data.NationalityCode,
+        sex: sexMapping[data.Sex],
+        issuingState: data.IssuingCountry,
+        noRegister: data.NoRegister,
+        email: data.Email,
+        postal_code: data.PostalCode,
+        city: data.City,
+        address: data.Address,
+      };
+      setDataPrimaryPassport(newDataSearchPassport);
 
-    // Handle received data
-    const dataHardCodePaspor = newDataPassport;
+      setCardStatus("successSearch");
 
+      setTimeout(() => {
+        setCardStatus("successSearch");
 
-    let fullName =
-      dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
+      }, 1000);
+      setIsEnableStep(true);
+      setIsEnableBack(true);
 
-    dataHardCodePaspor.fullName = fullName;
+    } else {
+      const newDataPassport = {
+        docType: data.documentCode,
+        issuingState: data.issuingState,
+        surName: data.lastName,
+        foreName: data.firstName,
+        docNumber: data.documentNumber,
+        documentNumberCheckDigit: data.documentNumberCheckDigit,
+        nationality: data.nationality,
+        birthDate: data.birthDate,
+        birthDateCheckDigit: data.birthDateCheckDigit,
+        sex: data.sex,
+        expiryDate: data.expirationDate,
+        expirationDateCheckDigit: data.expirationDateCheckDigit,
+        personalNumber: data.personalNumber,
+        personalNumberCheckDigit: data.personalNumberCheckDigit,
+        compositeCheckDigit: data.compositeCheckDigit,
+      };
 
-    // Buat fungsi untuk mengonversi format tanggal
-    function formatDate(dateString) {
-      if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
+      console.log("newDataPassport", newDataPassport);
 
-      // Pisahkan tahun, bulan, dan tanggal dari string
-      var year = dateString.substring(0, 2);
-      var month = dateString.substring(2, 4);
-      var day = dateString.substring(4, 6);
+      // Handle received data
+      const dataHardCodePaspor = newDataPassport;
 
-      const currentYear = new Date().getFullYear();
+      let fullName =
+        dataHardCodePaspor.foreName + " " + dataHardCodePaspor.surName;
 
-      year = (parseInt(year) <= currentYear % 100) ? "20" + year : "19" + year;
+      dataHardCodePaspor.fullName = fullName;
 
+      // Buat fungsi untuk mengonversi format tanggal
+      function formatDate(dateString) {
+        if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
 
-      // Kembalikan tanggal dalam format yang diinginkan
-      return year + "-" + month + "-" + day;
+        // Pisahkan tahun, bulan, dan tanggal dari string
+        var year = dateString.substring(0, 2);
+        var month = dateString.substring(2, 4);
+        var day = dateString.substring(4, 6);
+
+        const currentYear = new Date().getFullYear();
+
+        year = parseInt(year) <= currentYear % 100 ? "20" + year : "19" + year;
+
+        // Kembalikan tanggal dalam format yang diinginkan
+        return year + "-" + month + "-" + day;
+      }
+
+      function formatDateExpiry(dateString) {
+        if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
+
+        // Pisahkan tahun, bulan, dan tanggal dari string
+        var year = dateString.substring(0, 2);
+        var month = dateString.substring(2, 4);
+        var day = dateString.substring(4, 6);
+
+        // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
+        year = parseInt(year) < 50 ? "20" + year : "19" + year;
+
+        // Kembalikan tanggal dalam format yang diinginkan
+        return year + "-" + month + "-" + day;
+      }
+
+      // Terapkan format tanggal pada data paspor
+      dataHardCodePaspor.formattedExpiryDate = formatDateExpiry(
+        dataHardCodePaspor.expiryDate
+      );
+      dataHardCodePaspor.formattedBirthDate = formatDate(
+        dataHardCodePaspor.birthDate
+      );
+      dataHardCodePaspor.email = dataHardCodePaspor.email
+        ? dataHardCodePaspor.email
+        : "";
+
+      console.log("dataHardCodePaspor", dataHardCodePaspor);
+
+      setDataPrimaryPassport(dataHardCodePaspor);
+
+      setCardStatus("success");
+      setTimeout(() => {
+        setCardStatus("checkData");
+      }, 1000);
+      setIsEnableStep(true);
+      setIsEnableBack(true);
     }
 
-    function formatDateExpiry(dateString) {
-      if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
 
-      // Pisahkan tahun, bulan, dan tanggal dari string
-      var year = dateString.substring(0, 2);
-      var month = dateString.substring(2, 4);
-      var day = dateString.substring(4, 6);
-
-      // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
-      year = (parseInt(year) < 50) ? "20" + year : "19" + year;
-
-      // Kembalikan tanggal dalam format yang diinginkan
-      return year + "-" + month + "-" + day;
-    }
-
-    // Terapkan format tanggal pada data paspor
-    dataHardCodePaspor.formattedExpiryDate = formatDateExpiry(dataHardCodePaspor.expiryDate);
-    dataHardCodePaspor.formattedBirthDate = formatDate(dataHardCodePaspor.birthDate);
-
-    console.log("dataHardCodePaspor", dataHardCodePaspor);
-
-    setDataPrimaryPassport(dataHardCodePaspor);
-    setCardStatus("success");
-    setTimeout(() => {
-      setCardStatus("checkData");
-    }, 1000);
-    setIsEnableStep(true);
-    setIsEnableBack(true);
   };
-
 
   const [receiveTempData, setRecievedTempData] = useState([]);
   const checkAndHandleTokenExpiration = () => {
@@ -257,14 +297,13 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData") {
-        setCardStatus("inputEmail");
-        setCardStatus("lookCamera");
+        // setCardStatus("lookCamera");
+        setCardStatus("takePhotoSucces");
         setTabStatus(2);
       } else if (cardStatus === "successSearch") {
         setIsEnableStep(true);
         setCardStatus("goPayment");
         // setTitleHeader("Payment");
-
       } else if (cardStatus === "takePhotoSucces") {
         setCardStatus("inputEmail");
         setTabStatus(3);
@@ -336,20 +375,28 @@ const Apply = () => {
 
   useEffect(() => {
     if (data) {
-      setIsEnableStep(true);
+      console.log("true", data);
+      setCardStatus("searchPassport");
+    } else {
+      // const dataTrueorFalse = localStorage.getItem("dataStatus");
+      if (dataTrueorFalse === "true") {
+        setCardStatus("searchPassport");
+      } else {
+        setCardStatus("iddle");
+      }
+      // console.log("false", data);
+      // setCardStatus("iddle");
     }
   }, []);
-
 
   useEffect(() => {
     const cardNumberPetugasFix = 11 + localStorage.getItem("cardNumberPetugas");
     // Periksa apakah cardNumberPetugasFix adalah string sebelum melakukan replace
-    if (typeof cardNumberPetugasFix === 'string') {
+    if (typeof cardNumberPetugasFix === "string") {
       const cardNumberPetugas = cardNumberPetugasFix.replace(/"/g, "");
       setCardNumberPetugas(cardNumberPetugas);
     }
   }, []);
-
 
   useEffect(() => {
     if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
@@ -363,10 +410,8 @@ const Apply = () => {
     }
   }, [cardPaymentProps]);
 
-
   useEffect(() => {
     if (cardStatus === "goPayment") {
-
       setIsEnableStep(false);
     } else if (cardStatus === "iddle") {
       const params = {
@@ -377,17 +422,14 @@ const Apply = () => {
       socket_IO.on("deviceId", (deviceId) => {
         console.log(deviceId);
         localStorage.setItem("deviceId", deviceId);
-
       });
       socket_IO.on("jenisDeviceId", (jenisDeviceId) => {
         console.log(jenisDeviceId);
         localStorage.setItem("jenisDeviceId", jenisDeviceId);
-
       });
       socket_IO.on("airportId", (airportId) => {
         console.log(airportId);
         localStorage.setItem("airportId", airportId);
-
       });
     } else if (
       cardStatus === "checkData" ||
@@ -400,30 +442,23 @@ const Apply = () => {
       socket_IO.on("deviceId", (deviceId) => {
         console.log(deviceId);
         localStorage.setItem("deviceId", deviceId);
-
       });
       socket_IO.on("jenisDeviceId", (jenisDeviceId) => {
         console.log(jenisDeviceId);
         localStorage.setItem("jenisDeviceId", jenisDeviceId);
-
       });
       socket_IO.on("airportId", (airportId) => {
         console.log(airportId);
         localStorage.setItem("airportId", airportId);
-
       });
     }
   }, [cardStatus, socket_IO]);
-
-
 
   useEffect(() => {
     if (receiveTempData.length > 2) {
       setRecievedTempData([]);
     }
   }, [receiveTempData]);
-
-
 
   useEffect(() => {
     if (cardPaymentProps.isPrinted) {
@@ -467,10 +502,14 @@ const Apply = () => {
       nationalityCode: sharedData.passportData.nationality,
       sex: sharedData.passportData.sex === "male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
+      // registerCode: sharedData.passportData.noRegister
+      //   ? sharedData.passportData.noRegister : "",
       // photoPassport: `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : "",
-      email: sharedData.email,
-      postalCode: sharedData.postal_code,
+      photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPhotoPaspor.visibleImage}`,
+      email: sharedData.email
+        ? sharedData.email
+        : sharedData.passportData.email,
+      postalCode: sharedData.postal_code ? sharedData.postal_code : sharedData.passportData.postal_code,
       paymentMethod: shareDataPaymentProps.paymentMethod,
       cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
       cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
@@ -500,11 +539,16 @@ const Apply = () => {
         isPhoto: false,
         isDoRetake: false,
       });
-      const res = await apiPaymentGateway(header, bodyParam);
+      let res;
+      if (dataTrueorFalse === "true") {
+        res = await apiPaymentGatewaySearch(header, bodyParam);
+      } else {
+        res = await apiPaymentGateway(header, bodyParam);
+      }
       const data = res.data;
       console.log("data", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && data.message === "E-Voa created successfuly!") {
+      if (data.code === 200 && (data.message === "E-Voa created successfuly!" || data.message === "Application EVOA Onboarding Found!")) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -533,6 +577,7 @@ const Apply = () => {
           };
           socket_IO.emit("WebClientMessage", JSON.stringify(params));
           setTimeout(() => {
+            setSharedData(null);
             setStatusPaymentCredit(false);
             setRecievedTempData([]);
             setDataPrimaryPassport(null);
@@ -588,7 +633,11 @@ const Apply = () => {
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
-              setCardStatus("iddle");
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
@@ -612,7 +661,11 @@ const Apply = () => {
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
-              setCardStatus("iddle");
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
@@ -636,7 +689,11 @@ const Apply = () => {
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
-              setCardStatus("iddle");
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
@@ -661,7 +718,11 @@ const Apply = () => {
             });
             setTimeout(() => {
               setStatusPaymentCredit(false);
-              setCardStatus("iddle");
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
@@ -669,6 +730,12 @@ const Apply = () => {
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
             setTimeout(() => {
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
+              setDataPrimaryPassport(null);
               setDisabled(false);
               setCardPaymentProps({
                 isWaiting: false,
@@ -691,7 +758,11 @@ const Apply = () => {
               setTitleFooter("Next Step");
               setTabStatus(1);
               setStatusPaymentCredit(false);
-              setCardStatus("iddle");
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
@@ -745,7 +816,11 @@ const Apply = () => {
               setTitleFooter("Next Step");
               setTabStatus(1);
               setStatusPaymentCredit(false);
-              setCardStatus("iddle");
+              if (data === "true" || dataTrueorFalse === "true") {
+                setCardStatus("searchPassport");
+              } else {
+                setCardStatus("iddle");
+              }
               setRecievedTempData([]);
               setDataPrimaryPassport(null);
               setIsEnableBack(true);
@@ -763,6 +838,52 @@ const Apply = () => {
             }, 5000);
           }
         }, 5000);
+      } else if (data.message === "Unauthorized") {
+        setStatusPaymentCredit(false);
+        const messageError = data.message;
+        setMessageConfirm(messageError);
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: true,
+          isPhoto: false,
+          isDoRetake: false,
+        });
+        setTimeout(() => {
+          setDataPrimaryPassport(null);
+          setDisabled(false);
+          setTitleHeader("Apply VOA");
+          setTitleFooter("Next Step");
+          setTabStatus(1);
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: false,
+            isFailed: false,
+            isPhoto: false,
+            isDoRetake: false,
+          });
+          setTimeout(() => {
+            navigate("/home");
+            setStatusPaymentCredit(false);
+            if (data === "true" || dataTrueorFalse === "true") {
+              setCardStatus("searchPassport");
+            } else {
+              setCardStatus("iddle");
+            }
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
+            setIsEnableBack(true);
+          }, 5000);
+
+        }, 3000);
       }
     } catch (err) {
       setCardPaymentProps({
@@ -786,7 +907,11 @@ const Apply = () => {
         setTitleFooter("Next Step");
         setTabStatus(1);
         setStatusPaymentCredit(false);
-        setCardStatus("iddle");
+        if (data === "true" || dataTrueorFalse === "true") {
+          setCardStatus("searchPassport");
+        } else {
+          setCardStatus("iddle");
+        }
         setRecievedTempData([]);
         setDataPrimaryPassport(null);
         setIsEnableBack(true);
@@ -831,7 +956,11 @@ const Apply = () => {
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
-          setCardStatus("iddle");
+          if (data === "true" || dataTrueorFalse === "true") {
+            setCardStatus("searchPassport");
+          } else {
+            setCardStatus("iddle");
+          }
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -881,7 +1010,11 @@ const Apply = () => {
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
-          setCardStatus("iddle");
+          if (data === "true" || dataTrueorFalse === "true") {
+            setCardStatus("searchPassport");
+          } else {
+            setCardStatus("iddle");
+          }
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -911,7 +1044,11 @@ const Apply = () => {
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
-          setCardStatus("iddle");
+          if (data === "true" || dataTrueorFalse === "true") {
+            setCardStatus("searchPassport");
+          } else {
+            setCardStatus("iddle");
+          }
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -955,7 +1092,11 @@ const Apply = () => {
           setTitleFooter("Next Step");
           setTabStatus(1);
           setStatusPaymentCredit(false);
-          setCardStatus("iddle");
+          if (data === "true" || dataTrueorFalse === "true") {
+            setCardStatus("searchPassport");
+          } else {
+            setCardStatus("iddle");
+          }
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -993,7 +1134,11 @@ const Apply = () => {
         setTitleFooter("Next Step");
         setTitleHeader("Apply VOA");
         setStatusPaymentCredit(false);
-        setCardStatus("iddle");
+        if (data === "true" || dataTrueorFalse === "true") {
+          setCardStatus("searchPassport");
+        } else {
+          setCardStatus("iddle");
+        }
         setRecievedTempData([]);
         setDataPrimaryPassport(null);
         setIsEnableBack(true);
@@ -1012,8 +1157,6 @@ const Apply = () => {
       }
     }
   }, [confirm]);
-
-
 
   return (
     <div className="background-apply-voa">

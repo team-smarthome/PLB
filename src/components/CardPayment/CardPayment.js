@@ -60,6 +60,9 @@ const CardPayment = ({
     "Network / Card error / declined dll"
   );
   const [number, setNumber] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [passportName, setPassportName] = useState("");
+  const [passportUrl, setPassportUrl] = useState("");
   const [receipt, setReceipt] = useState("");
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
   const [printLokasi, setPrintLokasi] = useState("");
@@ -420,8 +423,12 @@ const CardPayment = ({
       !isPaymentCash &&
       !isCreditCard
     ) {
+
       setNumber(dataPermohonanUser?.visa_number ?? "");
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
+      setPassportNumber(dataPermohonanUser?.passport_number ?? "");
+      setPassportName(dataPermohonanUser?.name ?? "");
+      setPassportUrl(dataPermohonanUser?.url.replace(/\\/g, '') ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -1290,6 +1297,9 @@ const CardPayment = ({
         printRefProps={printRef}
         dataPrice={formattedValue}
         dataLokasi={printLokasi}
+        passportumber={passportNumber}
+        passportName={passportName}
+        passportUrl={passportUrl}
       />
     </div>
   );

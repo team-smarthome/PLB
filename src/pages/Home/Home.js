@@ -10,26 +10,24 @@ const Home = () => {
   const { setData } = useContext(DataContext);
 
   const btnOnClick_Apply = () => {
+    localStorage.setItem("dataStatus", false);
     navigate("/apply");
     setData(false);
   };
 
   const btnOnClick_Informasi = () => {
     // console.log("INFORMASI");
+    localStorage.setItem("dataStatus", false);
     navigate("/configuration");
     setData(false);
   };
 
   const btnOnClick_Search_Passport = () => {
     // console.log("INFORMASI");
+    localStorage.setItem("dataStatus", true);
     navigate("/apply");
     setData(true);
   };
-
-
-
-
-
 
   const handleLogout = async () => {
     // Menampilkan konfirmasi alert ketika tombol logout diklik menggunakan SweetAlert2
@@ -68,6 +66,71 @@ const Home = () => {
         <h1 className="title1">Welcome to</h1>
         <h1 className="title2">Visa on Arrival Application</h1>
         <div className="bg-apply-information">
+          <div style={{ display: "flex", gap: '6vh', paddingRight: '5vh', paddingLeft: '5vh' }}>
+
+            <div style={{
+              fontSize: "1.5em",
+              display: "flex",
+              flexDirection: "column",
+              flex: 2,
+              justifyContent: "center",
+              alignItems: "center",
+            }}>
+
+              <h2
+                onClick={btnOnClick_Apply}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "15px",
+                  textAlign: "center",
+                  width: "100%",
+                  backgroundColor: "#fbaf17",
+                  color: "white",
+                  paddingTop: "5vh",
+                  paddingBottom: "5vh",
+                  marginBottom: "-2vh",
+                }} >Apply</h2>
+
+
+
+              <h2 onClick={btnOnClick_Search_Passport} style={{
+                cursor: "pointer",
+                borderRadius: "15px",
+                textAlign: "center",
+                width: "100%",
+                paddingTop: "5vh",
+                paddingBottom: "5vh",
+                color: "white",
+                backgroundColor: "#0d004c",
+              }} >Search Passport</h2>
+
+
+            </div>
+
+
+            <div style={{
+              borderRadius: "15px",
+              marginTop: "5vh",
+              backgroundColor: "#3d5889",
+              flex: 1,
+              height: "37.5vh",
+            }}>
+              <div>
+                <h2 style={{
+                  cursor: "pointer",
+                  borderRadius: "15px",
+                  textAlign: "center",
+                  width: "100%",
+                  paddingTop: "13vh",
+                  paddingBottom: "5vh",
+                  color: "white",
+                  backgroundColor: "#3d5889",
+                }} onClick={btnOnClick_Informasi}>Configuration</h2>
+              </div>
+
+            </div>
+          </div>
+          {/* 
           <div className="grid-box-apply-information">
             <div className="bg-apply" onClick={btnOnClick_Apply}>
               <h2 className="text-apply">Apply</h2>
@@ -78,7 +141,7 @@ const Home = () => {
             <div className="bg-information" onClick={btnOnClick_Search_Passport}>
               <h2 className="text-information">Search Passport</h2>
             </div>
-          </div>
+          </div> */}
         </div>
         {JSON.parse(localStorage.getItem("user")).group.code.includes("SPV") ? (
           <div className="menuButton" onClick={() => navigate("/report")}>

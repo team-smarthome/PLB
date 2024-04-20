@@ -42,7 +42,7 @@ const BodyContent = ({
       ...prevData,
       photoFace: capturedImage,
       email: emailUser,
-      postal_code : postalCode
+      postal_code: postalCode
     }));
 
     setTitleHeader(titleHeader);
@@ -66,7 +66,7 @@ const BodyContent = ({
       isDoRetake,
       isPhoto,
     });
-    
+
     setSharedData((prevData) => ({
       ...prevData,
       photoFace: capturedImages,
@@ -118,6 +118,7 @@ const BodyContent = ({
 
   useEffect(() => {
     setSharedData({ passportData: dataPrimaryPassport });
+    console.log("dataPrimaryPassport", dataPrimaryPassport);
   }, [dataPrimaryPassport]);
 
   return (

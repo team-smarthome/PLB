@@ -10,6 +10,9 @@ const Printer = ({
   dataDate,
   dataTime,
   dataLokasi,
+  passportumber,
+  passportName,
+  passportUrl
 }) => {
   // console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
   // console.log(
@@ -30,12 +33,17 @@ const Printer = ({
   const formattedDate = `${day}/${month}/${year}`;
   const displayDate = dataDate || formattedDate;
   const displayTime = dataTime || formattedTime;
-  const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}, Price: ${dataPrice}`;
+  // const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}, Price: ${dataPrice},
+  // Date: ${displayDate}, Time: ${displayTime}, Lokasi: ${dataLokasi}, Passport Number: ${passportumber}, Name: ${passportName},
+  // For extend visit: ${passportUrl}
+  // `;
+  const combinedValue = `${passportUrl}`;
+
 
   return (
     <div className="container-print" ref={printRefProps}>
       <div className="wrappper-container">
-      <h2>Date : {displayDate}</h2>
+        <h2>Date : {displayDate}</h2>
         <h2>Time : {displayTime}</h2>
       </div>
       <div className="wrappper-container">
@@ -65,7 +73,16 @@ const Printer = ({
             <h2>{dataNumberPermohonanPropsReceipt}</h2>
           </div>
           <div>
-          <h2>{dataLokasi}</h2>
+            <h2>{dataLokasi}</h2>
+          </div>
+          <div className="header-h2">
+            <h2>Passport Number</h2>
+          </div>
+          <div className="header-h2">
+            <h2>{passportumber}</h2>
+          </div>
+          <div className="header-h2">
+            <h2 style={{ fontSize: "1em" }}>{passportName}</h2>
           </div>
         </div>
       </div>

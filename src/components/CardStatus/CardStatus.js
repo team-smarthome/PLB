@@ -15,6 +15,10 @@ import io from "socket.io-client";
 import { Toast } from "../Toast/Toast";
 import ReactPlayer from "react-player";
 import DataContext from "../../context/DataContext";
+import axios from "axios";
+import { url_dev } from "../../services/env";
+import dataNegara from "../../utils/dataNegara";
+import { apiVoaPayment } from "../../services/api";
 
 const parse = require("mrz").parse;
 
@@ -29,10 +33,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const [emailConfirmWarning, setEmailConfirmWarning] = useState(false);
   const [postalCodeWarning, setPostalCodeWarning] = useState(false);
   const [emailWarning, setEmailWarning] = useState(false);
+  const [NumberWarning, setNumberWarning] = useState(false);
   const [titleWarning, setTitleWarning] = useState("");
   const navigate = useNavigate();
   const [selectedKabupaten, setSelectedKabupaten] = useState(null);
   const [kodePos, setKodePos] = useState("");
+  const [optionNegara, setOptionNegara] = useState(null);
+  const [codeOfState, setCodeOfState] = useState("");
+
   const [inputValue, setInputValue] = useState("");
   const [mrz, setMrz] = useState(["", ""]);
   const [statusSearch, setStatusSearch] = useState(false);
@@ -41,6 +49,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     label: item.kabupaten,
   }));
 
+  const NegaraOptions = dataNegara.data.map((item) => ({
+    value: item.id_negara,
+    label: item.deskripsi_negara,
+  }));
+
+
+
+  const [numberPassport, setNumberPassport] = useState(null);
+  const [codeState, setCodeState] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
   const socket_IO_4499 = useRef(null);
@@ -85,6 +102,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       });
     }
   };
+
+
 
   useEffect(() => {
     const socket = io("http://localhost:4498");
@@ -212,6 +231,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     setIsValidEmailConfirmation(emailRegex.test(event.target.value));
   };
 
+  const handleNumberPassportChange = (event) => {
+    setNumberPassport(event.target.value);
+  }
+
+  const handleCodeStateChange = (event) => {
+    setCodeState(event.target.value);
+  }
+
   const handleOkButtonClick = () => {
     if (!email) {
       setTitleWarning("Please enter your email address!");
@@ -245,20 +272,125 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   };
 
 
-  const handleSearchPassport = () => {
-    sendDataToInput({
-      statusCardBox: "successSearch",
-      emailUser: email,
-      capturedImage: capturedImage,
-      titleHeader: "Apply VOA",
-      titleFooter: "Payment",
-    });
+  const handleSearchPassport = async () => {
+    if (!numberPassport) {
+      setNumberWarning(true);
+    } else {
+      const token = localStorage.getItem("token");
+      const key = localStorage.getItem("key");
+      const bearerToken = localStorage.getItem("JwtToken");
+      const header = {
+        Authorization: `Bearer ${bearerToken}`,
+        "Content-Type": "application/json",
+      };
+
+      const bodyParam = {
+        passportNumber: numberPassport,
+        nationalityCode: optionNegara.value,
+        token: token,
+        key: key,
+      };
+
+      sendDataToInput({
+        statusCardBox: "waiting",
+        capturedImage: null,
+        emailUser: null,
+        titleHeader: "Apply VOA",
+        titleFooter: "Next Step",
+      });
+
+      try {
+        const res = await apiVoaPayment(header, bodyParam);
+        console.log("Response:", res);
+        const data = res.data;
+        console.log("Data:", data);
+        if (data.status === "Success" || data.status === "success") {
+          sendDataToParent2(data.data);
+          sendDataToInput({
+            statusCardBox: "searchPassportSucces",
+            emailUser: email,
+            capturedImage: capturedImage,
+            titleHeader: "Apply VOA",
+            titleFooter: "Payment",
+          });
+        } else {
+          sendDataToInput({
+            statusCardBox: "notFoundPassport",
+            emailUser: email,
+            capturedImage: capturedImage,
+            titleHeader: "Apply VOA",
+            titleFooter: "Payment",
+          });
+          setTimeout(() => {
+            sendDataToInput({
+              statusCardBox: "searchPassport",
+              capturedImage: null,
+              emailUser: null,
+              titleHeader: "Apply VOA",
+              titleFooter: "Next Step",
+            });
+          }, 2000);
+        }
+
+        // await axios.post(`${url_dev}voaApplication.php`, {
+
+
+        // }).then((response) => {
+        //   console.log("Response:", response);
+        //   if (response.data.status === "success") {
+        //     sendDataToParent2(response.data.data);
+        //     sendDataToInput({
+        //       statusCardBox: "searchPassportSucces",
+        //       emailUser: email,
+        //       capturedImage: capturedImage,
+        //       titleHeader: "Apply VOA",
+        //       titleFooter: "Payment",
+        //     });
+        //   } else {
+        //     sendDataToInput({
+        //       statusCardBox: "errorVoa",
+        //       emailUser: email,
+        //       capturedImage: capturedImage,
+        //       titleHeader: "Apply VOA",
+        //       titleFooter: "Payment",
+        //     });
+        //   }
+
+        // });
+      } catch (error) {
+        console.log("Error:", error);
+        sendDataToInput({
+          statusCardBox: "errorConnection",
+          emailUser: email,
+          capturedImage: capturedImage,
+          titleHeader: "Apply VOA",
+          titleFooter: "Payment",
+        });
+
+      }
+    }
+
+    // sendDataToInput({
+    //   statusCardBox: "successSearch",
+    //   emailUser: email,
+    //   capturedImage: capturedImage,
+    //   titleHeader: "Apply VOA",
+    //   titleFooter: "Payment",
+    // });
 
   }
 
   const handleKabupatenChange = (selectedOption) => {
     setSelectedKabupaten(selectedOption);
   };
+
+
+  const handleCodeOfStateChange = (selectedOption) => {
+    setOptionNegara(selectedOption);
+
+  };
+
+
 
   const handleButtonClickPostalCode = () => {
     if (!selectedKabupaten) {
@@ -276,19 +408,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       });
     }
   };
-
-  useEffect(() => {
-    if (data) {
-      sendDataToInput({
-        statusCardBox: "searchPassport",
-        capturedImage: null,
-        emailUser: null,
-        titleHeader: "Apply VOA",
-        titleFooter: "Next Step",
-      });
-      console.log("DataStatus:", data);
-    }
-  }, []);
 
   useEffect(() => {
     console.log("isConnected: ", isConnected);
@@ -358,6 +477,22 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       }
     }
   }, [selectedKabupaten]);
+
+  useEffect(() => {
+    // Cari data kode pos berdasarkan kabupaten yang dipilih
+
+    if (optionNegara) {
+      const optionNegaraData = dataNegara.data.find(
+        (item) => item.id_negara === optionNegaraData.value
+      );
+
+      if (optionNegaraData) {
+        setCodeOfState(optionNegaraData.kode_pos);
+      }
+    }
+  }, []);
+
+  // useEffect(() => {}, [kodePos]);
 
   useEffect(() => {
     handleTokenExpiration();
@@ -453,29 +588,62 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       case "searchPassport":
         return (
           <>
-            <h1 className="card-title py-4">Please Input Your Passport Data</h1>
+            <h1 className="card-title py-4">Search Passport Number</h1>
 
             <div className="input-email py-4">
               <input
                 type="text"
-                name="email"
-                placeholder="Number Passport"
-                value={email}
-                onChange={handleEmailChange}
+                name="number-passport"
+                placeholder="Passport Number"
+                value={numberPassport}
+                onChange={handleNumberPassportChange}
               />
             </div>
-            {emailWarning && <div className="warning">Please enter your Number Passport!</div>}
+            {NumberWarning && <div className="warning">passport number cannot be empty</div>}
+            <div className="input-postal-code" style={{ marginTop: "5%" }}>
+              <Select
+                value={optionNegara}
+                onChange={handleCodeOfStateChange}
+                options={NegaraOptions}
+                placeholder="Select Nationality"
+                className="basic-single"
+                classNamePrefix="select"
+                styles={{
+                  container: (provided) => ({
+                    ...provided,
+                    flex: 1,
+                    width: "50vh",
+                    maxHeight: "30px",
+                    borderRadius: "500px",
+                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                    fontFamily: "Roboto, Arial, sans-serif",
 
-            <div className="input-email py-4">
+                    marginBottom: "15%",
+                  }),
+                  valueContainer: (provided) => ({
+                    ...provided,
+                    flex: 1,
+                    width: "100%",
+                  }),
+                  control: (provided) => ({
+                    ...provided,
+                    flex: 1,
+                    width: "100%",
+                  }),
+                }}
+              />
+            </div>
+
+            {/* <div className="input-email py-4">
               <input
                 style={{ marginTop: "5%" }}
                 type="text"
-                name="email-confirmation"
+                name="code-state"
                 placeholder="Code of State"
-                value={emailConfirmation}
-                onChange={handleEmailConfirmationChange}
+                value={codeState}
+                onChange={handleCodeStateChange}
               />
-            </div>
+            </div> */}
             {emailConfirmWarning && (
               <div className="warning">Please enter your code of state!</div>
             )}
@@ -569,6 +737,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         return (
           <>
             <h1 className="card-title check-data-title">Please wait...</h1>
+          </>
+        );
+
+      case "notFoundPassport":
+        return (
+          <>
+            <h1 className="card-title">Application Not Found</h1>
+            <img src={Gambar3} alt="" className="card-image" />
           </>
         );
 
@@ -736,6 +912,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       case "inputEmail":
       case "photoNotMatch":
       case "errorWebsocket":
+      case "notFoundPassport":
         return Gambar3;
       case "lookCamera":
         return Gambar6;
@@ -745,6 +922,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       case "postalCodeSucces":
         return Gambar2;
       case "errorConnection":
+
         return Gambar1;
       case "notconnectCamera":
         return Gambar1;
@@ -783,6 +961,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         return ["Error Connecting Device", "Device connection failed"];
       case "notconnectCamera":
         return ["Device Camera is not connected", "Please check the device"];
+      case "searchPassportSucces":
+        return ["Passport Data Successfully Found"];
+      case "notFoundPassport":
+        return ["Application Not Found"];
       default:
         return [];
     }

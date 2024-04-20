@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./CardListStyle.css";
+import DataContext from "../../context/DataContext";
 
 const CardList = ({ status }) => {
-  const listData = ["Scan Passport", "Take Photo", "Input Email", "Postal Code"];
+  const { data } = useContext(DataContext);
+  const [listData, setListData] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setListData([]);
+    } else {
+      const dataCheck = localStorage.getItem("dataStatus");
+      if (dataCheck === "true") {
+        console.log("DataCheck", dataCheck);
+        setListData([]);
+      } else {
+        setListData(["Scan Passport", "Take Photo", "Input Email", "Postal Code"]);
+      }
+    }
+  }, []);
 
   return (
     <ul className="card-list-container">
