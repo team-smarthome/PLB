@@ -716,12 +716,6 @@ const Apply = () => {
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
             setTimeout(() => {
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setDataPrimaryPassport(null);
               setDisabled(false);
               setCardPaymentProps({
                 isWaiting: false,
@@ -763,7 +757,6 @@ const Apply = () => {
                 isPhoto: false,
                 isDoRetake: false,
               });
-              navigate("/");
               localStorage.removeItem("user");
               localStorage.removeItem("JwtToken");
               localStorage.removeItem("cardNumberPetugas");
