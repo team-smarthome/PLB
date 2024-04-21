@@ -97,7 +97,7 @@ const CardPayment = ({
   const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
 
   //cardNumberPetugass
-  const petugasNumber = localStorage.getItem("deviceId").replace(/"/g, "");
+  const petugasNumber = localStorage.getItem("deviceId")?.replace(/"/g, "");
   const cardNumberPetugass = "11" + petugasNumber;
 
   const capture = () => {

@@ -532,9 +532,10 @@ const Apply = () => {
         res = await apiPaymentGateway(header, bodyParam);
       }
       const data = res.data;
-      console.log("data", data);
+      console.log("dataREsponse", res);
+      console.log("dataREsponse", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && (data.message === "E-Voa created successfuly!" || data.message === "Application EVOA Onboarding Found!")) {
+      if (data.code === 200) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -946,11 +947,6 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else if (meesageConfirm === "Failed when request payment pg") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setDisabled(false);
         setCardPaymentProps({
           isWaiting: false,
