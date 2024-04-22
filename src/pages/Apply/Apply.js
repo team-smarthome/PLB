@@ -588,6 +588,10 @@ const Apply = () => {
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setStatusPaymentCredit(false);
         const messageError = data.message;
+        console.log("dataError1", data);
+        console.log("dataError1", data.message);
+        console.log("dataError1", messageError);
+
         setMessageConfirm(messageError);
         setCardPaymentProps({
           isWaiting: false,
@@ -716,20 +720,20 @@ const Apply = () => {
               setTitleHeader("Apply VOA");
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
-            setTimeout(() => {
-              setDisabled(false);
-              setCardPaymentProps({
-                isWaiting: false,
-                isCreditCard: false,
-                isPaymentCredit: false,
-                isPaymentCash: false,
-                isPrinted: false,
-                isSuccess: false,
-                isFailed: false,
-                isPhoto: false,
-                isDoRetake: false,
-              });
-            }, 2000);
+            // setTimeout(() => {
+            setDisabled(false);
+            setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: false,
+              isSuccess: false,
+              isFailed: false,
+              isPhoto: false,
+              isDoRetake: false,
+            });
+            // }, 2000);
           } else if (
             messageError === "Invalid JWT Token" ||
             messageError === "Expired JWT Token"
@@ -817,7 +821,7 @@ const Apply = () => {
               });
             }, 5000);
           }
-        }, 5000);
+        }, 1000);
       } else if (data.message === "Unauthorized") {
         setStatusPaymentCredit(false);
         const messageError = data.message;
@@ -863,7 +867,7 @@ const Apply = () => {
             setIsEnableBack(true);
           }, 5000);
 
-        }, 3000);
+        }, 2000);
       }
     } catch (err) {
       setCardPaymentProps({
@@ -947,18 +951,20 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else if (meesageConfirm === "Failed when request payment pg") {
-        setDisabled(false);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
+        // setTimeout(() => {
+        //   setDisabled(false);
+        //   setCardPaymentProps({
+        //     isWaiting: false,
+        //     isCreditCard: false,
+        //     isPaymentCredit: false,
+        //     isPaymentCash: false,
+        //     isPrinted: false,
+        //     isSuccess: false,
+        //     isFailed: false,
+        //     isPhoto: false,
+        //     isDoRetake: false,
+        //   });
+        // }, 3000);
       } else if (
         meesageConfirm === "Passport is not active for at least 6 months."
       ) {
