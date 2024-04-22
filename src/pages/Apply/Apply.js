@@ -504,9 +504,9 @@ const Apply = () => {
         shareDataPaymentProps.type === "" ? null : shareDataPaymentProps.type,
       token: token,
       key: key,
-      deviceId: devicedId.replace(/"/g, ""),
-      airportId: airportId.replace(/"/g, ""),
-      jenisDeviceId: jenisDeviceId.replace(/"/g, ""),
+      deviceId: devicedId ? devicedId.replace(/"/g, "") : "",
+      airportId: airportId ? airportId.replace(/"/g, "") : "",
+      jenisDeviceId: jenisDeviceId ? jenisDeviceId.replace(/"/g, "") : "",
     };
 
     setIsEnableStep(false);
