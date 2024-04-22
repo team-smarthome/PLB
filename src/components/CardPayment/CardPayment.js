@@ -427,7 +427,7 @@ const CardPayment = ({
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       setPassportNumber(dataPermohonanUser?.passport_number ?? "");
       setPassportName(dataPermohonanUser?.name ?? "");
-      setPassportUrl(dataPermohonanUser?.url.replace(/\\/g, '') ?? "");
+      setPassportUrl(dataPermohonanUser?.url ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
