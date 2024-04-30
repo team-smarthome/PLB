@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "./HomeStyle.css";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
-import LogoutIcon from "../../assets/images/logoutnew.png";
+import LogoutIcon from "../../assets/images/logout.png";
 import DataContext from "../../context/DataContext";
+import ApplyIcons from '../../assets/images/apply-icons.png';
+import SearchPassport from '../../assets/images/search_passport.png';
+import PeopleSetting from '../../assets/images/people_setting.png';
+
 const Home = () => {
   const navigate = useNavigate();
   const { setData } = useContext(DataContext);
@@ -57,106 +61,44 @@ const Home = () => {
 
   return (
     <div className="bg-home">
-      <div className="content-home">
+      <div className="header-bg-home">
         <img
           src={icon_kemenkumham}
           alt="icon_kemenkumham"
           className="icon-image"
         />
-        <h1 className="title1">Welcome to</h1>
-        <h1 className="title2">Visa on Arrival Application</h1>
+      </div>
+      <div className="header-2-home">
+        <h1>Welcome to</h1>
+        <h1>Visa on Arrival Application</h1>
+      </div>
+
+      <div className="home-hero-style">
         <div className="bg-apply-information">
-          <div style={{ display: "flex", gap: '6vh', paddingRight: '5vh', paddingLeft: '5vh' }}>
-
-            <div style={{
-              fontSize: "1.5em",
-              display: "flex",
-              flexDirection: "column",
-              flex: 2,
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-
-              <h2
-                onClick={btnOnClick_Apply}
-                style={{
-                  cursor: "pointer",
-                  borderRadius: "15px",
-                  textAlign: "center",
-                  width: "100%",
-                  backgroundColor: "#fbaf17",
-                  color: "white",
-                  paddingTop: "5vh",
-                  paddingBottom: "5vh",
-                  marginBottom: "-2vh",
-                }} >Apply</h2>
-
-
-
-              <h2 onClick={btnOnClick_Search_Passport} style={{
-                cursor: "pointer",
-                borderRadius: "15px",
-                textAlign: "center",
-                width: "100%",
-                paddingTop: "5vh",
-                paddingBottom: "5vh",
-                color: "white",
-                backgroundColor: "#0d004c",
-              }} >Search Passport</h2>
-
-
+          <div className="div-kanan-apply">
+            <div className="div-kanan-atas-apply" onClick={btnOnClick_Apply}>
+              <img src={ApplyIcons} alt="apply-icons" />
+              Apply
             </div>
-
-
-            <div style={{
-              borderRadius: "15px",
-              marginTop: "5vh",
-              backgroundColor: "#3d5889",
-              flex: 1,
-              height: "37.5vh",
-            }}>
-              <div>
-                <h2 style={{
-                  cursor: "pointer",
-                  borderRadius: "15px",
-                  textAlign: "center",
-                  width: "100%",
-                  paddingTop: "13vh",
-                  paddingBottom: "5vh",
-                  color: "white",
-                  backgroundColor: "#3d5889",
-                }} onClick={btnOnClick_Informasi}>Configuration</h2>
-              </div>
-
+            <div className="div-kanan-bawah-apply" onClick={btnOnClick_Search_Passport}>
+              <img src={SearchPassport} alt="search_passport" />
+              Search Passport
             </div>
           </div>
-          {/* 
-          <div className="grid-box-apply-information">
-            <div className="bg-apply" onClick={btnOnClick_Apply}>
-              <h2 className="text-apply">Apply</h2>
-            </div>
-            <div className="bg-information h-full" onClick={btnOnClick_Informasi}>
-              <h2 className="text-information">Configuration</h2>
-            </div>
-            <div className="bg-information" onClick={btnOnClick_Search_Passport}>
-              <h2 className="text-information">Search Passport</h2>
-            </div>
-          </div> */}
+          <div className="div-kiri-apply" onClick={btnOnClick_Informasi}>
+            <img src={PeopleSetting} alt="people_setting" />
+            Configuration
+          </div>
         </div>
-        {JSON.parse(localStorage.getItem("user")).group.code.includes("SPV") ? (
-          <div className="menuButton" onClick={() => navigate("/report")}>
-            <div className="logout-text">
-              <p className="text-logout">Report</p>
-            </div>
-          </div>
-        ) : null}
-        <div className="logoutNew" onClick={handleLogout}>
-          <div className="logout-text">
-            <p className="text-logout">Logout</p>
-          </div>
-          <div className="logout-image">
-            <img src={LogoutIcon} alt="Logout" className="logout-icon" />
-          </div>
+      </div>
+
+      <div className="footer-bg-home">
+        <div className="logout-footer" onClick={handleLogout}>
+          <img
+            src={LogoutIcon}
+            alt="logout-icon"
+          />
+          Logout
         </div>
       </div>
     </div>
