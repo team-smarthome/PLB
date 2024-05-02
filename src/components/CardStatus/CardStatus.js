@@ -233,7 +233,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   };
 
   const handleNumberPassportChange = (event) => {
-    setNumberPassport(event.target.value);
+    // setNumberPassport(event.target.value);
+    setNumberPassport(event.target.value.toUpperCase());
   }
 
   const handleCodeStateChange = (event) => {
@@ -286,11 +287,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       };
 
       const bodyParam = {
-        passportNumber: numberPassport,
+        passportNumber: numberPassport.toUpperCase(),
         nationalityCode: optionNegara.value,
         token: token,
         key: key,
       };
+
+      console.log("bodyParamTest:", bodyParam);
 
       sendDataToInput({
         statusCardBox: "waiting",

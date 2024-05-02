@@ -132,6 +132,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -152,6 +153,21 @@
   font-size: 1rem;
   /* position: absolute; */
   color: black;
+}
+
+.maintenace_image {
+
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 125vh;
+  background-color: #ffffff;
+}
+
+.maintenace_image img {
+  margin-top: 2%;
+  /* width: 100%;
+  height: 80%; */
 }
 
 @media screen and (max-width: 462px) {
