@@ -8,6 +8,10 @@ import DataContext from "../../context/DataContext";
 import ApplyIcons from '../../assets/images/apply-icons.png';
 import SearchPassport from '../../assets/images/search_passport.png';
 import PeopleSetting from '../../assets/images/people_setting.png';
+import { FaWpforms } from "react-icons/fa";
+import { IoSearchSharp } from "react-icons/io5";
+import { TbSettingsCog } from "react-icons/tb";
+
 
 const Home = () => {
   const navigate = useNavigate();
@@ -77,16 +81,19 @@ const Home = () => {
         <div className="bg-apply-information">
           <div className="div-kanan-apply">
             <div className="div-kanan-atas-apply" onClick={btnOnClick_Apply}>
-              <img src={ApplyIcons} alt="apply-icons" />
+              {/* <img src={ApplyIcons} alt="apply-icons" /> */}
+              <FaWpforms size={60} />
               Apply
             </div>
             <div className="div-kanan-bawah-apply" onClick={btnOnClick_Search_Passport}>
-              <img src={SearchPassport} alt="search_passport" />
+              {/* <img src={SearchPassport} alt="search_passport" /> */}
+              <IoSearchSharp size={60} />
               Search Passport
             </div>
           </div>
           <div className="div-kiri-apply" onClick={btnOnClick_Informasi}>
-            <img src={PeopleSetting} alt="people_setting" />
+            {/* <img src={PeopleSetting} alt="people_setting" /> */}
+            <TbSettingsCog size={80} />
             Configuration
           </div>
         </div>
