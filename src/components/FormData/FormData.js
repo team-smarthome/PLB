@@ -5,6 +5,7 @@ import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
 import DataContext from "../../context/DataContext";
 
+
 const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   const { data } = useContext(DataContext);
   // passportNumber
@@ -24,6 +25,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
 
   const [optionNegara, setOptionNegara] = useState([]);
   const [optionGender, setOptionGender] = useState([]);
+  const [nilaiTrue, setNilaiTrue] = useState(false);
 
   // passportNumber
   const [isCommentDisabledPassportNumber, setIsCommentDisabledPassportNumber] =
@@ -66,11 +68,14 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   useEffect(() => {
     if (data) {
       setStatusSearch(true);
+      setNilaiTrue(true);
     } else {
       const checkData = localStorage.getItem("dataStatus");
       if (checkData === "true") {
+        setNilaiTrue(true);
         setStatusSearch(true);
       } else {
+        setNilaiTrue(false);
         setStatusSearch(false);
       }
     }
@@ -138,15 +143,19 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         photo: sharedData.photoFace || "",
       }));
 
+      // if (!nilaiTrue) {
       setFormData((prevData) => ({
         ...prevData,
-        city: sharedData.city || "",
+        city: sharedData.city || sharedData.passportData.city,
       }));
 
       setFormData((prevData) => ({
         ...prevData,
-        postalCode: sharedData.postal_code || "",
+        postalCode: sharedData.postal_code || sharedData.passportData.postal_code,
       }));
+      // }
+
+
 
       setFormData((prevData) => ({
         ...prevData,

@@ -532,9 +532,10 @@ const Apply = () => {
         res = await apiPaymentGateway(header, bodyParam);
       }
       const data = res.data;
-      console.log("data", data);
+      console.log("dataREsponse", res);
+      console.log("dataREsponse", data);
       setDataPermohonan(data.data);
-      if (data.code === 200 && (data.message === "E-Voa created successfuly!" || data.message === "Application EVOA Onboarding Found!")) {
+      if (data.code === 200) {
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -587,6 +588,10 @@ const Apply = () => {
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setStatusPaymentCredit(false);
         const messageError = data.message;
+        console.log("dataError1", data);
+        console.log("dataError1", data.message);
+        console.log("dataError1", messageError);
+
         setMessageConfirm(messageError);
         setCardPaymentProps({
           isWaiting: false,
@@ -715,26 +720,20 @@ const Apply = () => {
               setTitleHeader("Apply VOA");
             }, 5000);
           } else if (messageError === "Failed when request payment pg") {
-            setTimeout(() => {
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setDataPrimaryPassport(null);
-              setDisabled(false);
-              setCardPaymentProps({
-                isWaiting: false,
-                isCreditCard: false,
-                isPaymentCredit: false,
-                isPaymentCash: false,
-                isPrinted: false,
-                isSuccess: false,
-                isFailed: false,
-                isPhoto: false,
-                isDoRetake: false,
-              });
-            }, 2000);
+            // setTimeout(() => {
+            setDisabled(false);
+            setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: false,
+              isSuccess: false,
+              isFailed: false,
+              isPhoto: false,
+              isDoRetake: false,
+            });
+            // }, 2000);
           } else if (
             messageError === "Invalid JWT Token" ||
             messageError === "Expired JWT Token"
@@ -763,7 +762,6 @@ const Apply = () => {
                 isPhoto: false,
                 isDoRetake: false,
               });
-              navigate("/");
               localStorage.removeItem("user");
               localStorage.removeItem("JwtToken");
               localStorage.removeItem("cardNumberPetugas");
@@ -823,7 +821,7 @@ const Apply = () => {
               });
             }, 5000);
           }
-        }, 5000);
+        }, 1000);
       } else if (data.message === "Unauthorized") {
         setStatusPaymentCredit(false);
         const messageError = data.message;
@@ -869,7 +867,7 @@ const Apply = () => {
             setIsEnableBack(true);
           }, 5000);
 
-        }, 3000);
+        }, 2000);
       }
     } catch (err) {
       setCardPaymentProps({
@@ -953,23 +951,20 @@ const Apply = () => {
           setConfirm(false);
         }, 5000);
       } else if (meesageConfirm === "Failed when request payment pg") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
-        setDisabled(false);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
+        // setTimeout(() => {
+        //   setDisabled(false);
+        //   setCardPaymentProps({
+        //     isWaiting: false,
+        //     isCreditCard: false,
+        //     isPaymentCredit: false,
+        //     isPaymentCash: false,
+        //     isPrinted: false,
+        //     isSuccess: false,
+        //     isFailed: false,
+        //     isPhoto: false,
+        //     isDoRetake: false,
+        //   });
+        // }, 3000);
       } else if (
         meesageConfirm === "Passport is not active for at least 6 months."
       ) {

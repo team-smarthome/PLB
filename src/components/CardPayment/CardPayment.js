@@ -97,7 +97,7 @@ const CardPayment = ({
   const formattedTotalCash = formattedNumber(numericValue + numericFeeCash);
 
   //cardNumberPetugass
-  const petugasNumber = localStorage.getItem("deviceId").replace(/"/g, "");
+  const petugasNumber = localStorage.getItem("deviceId")?.replace(/"/g, "");
   const cardNumberPetugass = "11" + petugasNumber;
 
   const capture = () => {
@@ -310,7 +310,6 @@ const CardPayment = ({
   }, []);
 
   useEffect(() => {
-    // ini jika semua false
     if (paymentMethod && cardNumber !== "" && expiry !== "") {
       if (
         !isFailed &&
@@ -321,24 +320,24 @@ const CardPayment = ({
         !isPaymentCash &&
         !isPhoto &&
         !isDoRetake &&
-        isCreditCard
+        !isCreditCard
       ) {
-        sendDataUpdatePayment({
-          isCreditCard: false,
-          isWaiting: false,
-          isFailed: false,
-          isPrinted: false,
-          isSuccess: false,
-          isPaymentCredit: true,
-          isPaymentCash: false,
-          isPhoto: false,
-          isDoRetake: false,
-          paymentMethod: paymentMethod,
-          cardNumber: cardNumber,
-          expiry: expiry,
-          cvv: cvv,
-          type: type,
-        });
+        // sendDataUpdatePayment({
+        //   isCreditCard: false,
+        //   isWaiting: false,
+        //   isFailed: false,
+        //   isPrinted: false,
+        //   isSuccess: false,
+        //   isPaymentCredit: false,
+        //   isPaymentCash: false,
+        //   isPhoto: false,
+        //   isDoRetake: false,
+        //   paymentMethod: paymentMethod,
+        //   cardNumber: cardNumber,
+        //   expiry: expiry,
+        //   cvv: cvv,
+        //   type: type,
+        // });
         const params = {
           code: "card",
           data: "",
@@ -428,7 +427,7 @@ const CardPayment = ({
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       setPassportNumber(dataPermohonanUser?.passport_number ?? "");
       setPassportName(dataPermohonanUser?.name ?? "");
-      setPassportUrl(dataPermohonanUser?.url.replace(/\\/g, '') ?? "");
+      setPassportUrl(dataPermohonanUser?.url ?? "");
       handlePrint();
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
@@ -586,6 +585,7 @@ const CardPayment = ({
       isSuccess: false,
       isCreditCard: true,
       isPaymentCredit: false,
+      isPaymentCash: false,
       isPhoto: false,
       isDoRetake: false,
       paymentMethod: paymentMethod,
@@ -690,6 +690,9 @@ const CardPayment = ({
             isConfirm: false,
             isFailed: false,
             isPrinted: false,
+            isPaymentCash: false,
+            isPaymentCredit: false,
+            isCreditCard: false,
             isSuccess: false,
             isPhoto: false,
             isDoRetake: false,
@@ -815,6 +818,9 @@ const CardPayment = ({
               isWaiting: true,
               isPhoto: false,
               isDoRetake: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
               paymentMethod: paymentMethod,
               cardNumber: cardNumber,
               expiry: expiry,
@@ -968,6 +974,9 @@ const CardPayment = ({
                 isPrinted: false,
                 isSuccess: false,
                 isWaiting: true,
+                isPaymentCash: false,
+                isPaymentCredit: false,
+                isCreditCard: false,
                 paymentMethod: paymentMethod,
                 cardNumber: cardNumber,
                 expiry: expiry,

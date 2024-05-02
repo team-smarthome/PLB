@@ -62,6 +62,17 @@
   border: none;
   cursor: pointer;
   outline: none;
+  background-color: none;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.handle-sumbit-bg {
+  padding: 15px 40px;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+  outline: none;
   background-color: #3dbb6f;
   color: #fff;
   border-radius: 10px;
@@ -198,4 +209,8 @@
   align-items: flex-end;
   margin-top: 2%;
   color: black;
+}
+
+.date-picker {
+  /* width: 250px; */
 }

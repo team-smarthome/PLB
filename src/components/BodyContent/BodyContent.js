@@ -125,6 +125,13 @@ const BodyContent = ({
     console.log("dataPrimaryPassport", dataPrimaryPassport);
   }, [dataPrimaryPassport]);
 
+
+  //useEffect setCardPaymentProps 
+
+  useEffect(() => {
+    console.log("cardPaymentProps", cardPaymentProps);
+  }, [cardPaymentProps]);
+
   return (
     <div className="body-content">
       <div className="left-panel">

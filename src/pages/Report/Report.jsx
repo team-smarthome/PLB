@@ -9,6 +9,9 @@ import "jspdf-autotable";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 import {
   dataPetugasDenpasar,
   dataPetugasJakarta,
@@ -21,8 +24,12 @@ function Report() {
   const [data, setData] = useState([]);
   const [response, setResponse] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  // const [startDate, setStartDate] = useState(new Date());
+  // const [endDate, setEndDate] = useState(new Date());
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(currentDate);
+  const [mulaiDate, setMulaiDate] = useState(new Date());
+  const [selesaiDate, setSelesaiDate] = useState(new Date());
   const [petugas, setPetugas] = useState([]);
   const [pages, setPages] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
@@ -363,6 +370,38 @@ function Report() {
     }
   };
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  useEffect(() => {
+    setStartDate(formatDate(new Date()));
+    setEndDate(formatDate(new Date()));
+  }, []);
+
+  console.log("startDate:", startDate);
+
+  const handleChangeStartDate = (date) => {
+    setMulaiDate(date);
+    const formattedDate = formatDate(date);
+    console.log("Tanggal_dipilih:", formattedDate);
+    setStartDate(formattedDate);
+    console.log("startDateSatu:", startDate);
+  };
+
+  const handleChangeEndDate = (date) => {
+    setSelesaiDate(date);
+    const formattedDate = formatDate(date);
+    console.log("Tanggal_dipilih:", formattedDate);
+    setEndDate(formattedDate);
+  };
+
   return (
     <div className="body">
       <h1 className="">Welcome SPV, {name}</h1>
@@ -370,21 +409,26 @@ function Report() {
       <div className="header-combo">
         <form action="#" method="POST" className="form-filter">
           <label htmlFor="tanggalAwal">Tanggal Awal</label>
-          <input
-            type="datetime-local"
-            name="tanggalAwal"
-            id="tanggalAwal"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+
+          <DatePicker
+            selected={mulaiDate}
+            onChange={handleChangeStartDate}
+            showTimeSelect
+            timeFormat="HH:mm"
+            dateFormat="dd/MM/yyyy HH:mm"
+            className="date-picker"
+            timeIntervals={1}
           />
 
           <label htmlFor="tanggalAkhir">Tanggal Akhir</label>
-          <input
-            type="datetime-local"
-            name="tanggalAkhir"
-            id="tanggalAkhir"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+          <DatePicker
+            selected={selesaiDate}
+            onChange={handleChangeEndDate}
+            showTimeSelect
+            timeIntervals={1}
+            timeFormat="HH:mm"
+            dateFormat="dd/MM/yyyy HH:mm"
+            className="date-picker"
           />
 
           <label htmlFor="petugas">Petugas</label>
@@ -452,7 +496,12 @@ function Report() {
               setSelectedPaymentMethod(selectedOption)
             }
           />
-          <button type="button" onClick={() => doPaymentHistory(1)}>
+
+          <button
+            type="button"
+            className="handle-sumbit-bg"
+            onClick={() => doPaymentHistory(1)}
+          >
             Submit
           </button>
         </form>
