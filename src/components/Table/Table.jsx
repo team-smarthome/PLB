@@ -10,6 +10,7 @@ const Table = ({ data, page, response }) => {
     fee_cash: "0",
     value: "0.0000",
   };
+  const [printLokasi, setPrintLokasi] = useState("");
   const printRef = useRef();
   const [printData, setPrintData] = useState(null);
   const formattedNumber = (num) =>
@@ -28,6 +29,17 @@ const Table = ({ data, page, response }) => {
       handlePrint();
     }
   }, [printData, handlePrint]);
+
+  useEffect(() => {
+    const city = JSON.parse(localStorage.getItem("user"));
+    const officeCity = city?.organization?.officeCity;
+
+    if (officeCity === "DENPASAR") {
+      setPrintLokasi("DPS");
+    } else if (officeCity === "JAKARTA") {
+      setPrintLokasi("CGK");
+    }
+  }, []);
 
   // Check if data is not an array or is empty
   if (!Array.isArray(data) || data.length === 0) {
@@ -109,6 +121,9 @@ const Table = ({ data, page, response }) => {
         dataNumberPermohonanPropsVisa={printData ? printData.visa_number : ""}
         dataNumberPermohonanPropsReceipt={printData ? printData.receipt : ""}
         dataPrice={formattedValue}
+        dataLokasi={printLokasi}
+        passportumber={printData ? printData.passport_number : ""}
+        passportName={printData ? printData.full_name : ""}
         dataDate={printData ? printData.timestamp.split(" ")[0] : ""}
         dataTime={printData ? printData.timestamp.split(" ")[1] : ""}
       />

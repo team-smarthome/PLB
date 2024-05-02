@@ -13,6 +13,8 @@ import io from "socket.io-client";
 import { useReactToPrint } from "react-to-print";
 import Printer from "../../components/Printer/Printer";
 import { Toast } from "../../components/Toast/Toast";
+import axios from "axios";
+import { url_devel } from "../../services/env";
 
 const Information = () => {
   const [newWifiResults, setNewWifiResults] = useState("");
@@ -50,11 +52,16 @@ const Information = () => {
   };
 
   console.log("DataUserProfile", DataUser);
-  const handleSubmitChangePassword = (event) => {
+  const handleSubmitChangePassword = async (event) => {
     event.preventDefault();
     const oldPassword = event.target.oldPassword.value;
     const newPassword = event.target.newPassword.value;
     const confirmPassword = event.target.confirmPassword.value;
+    const dataSendToApi = {
+      email: dataUser.email,
+      password: oldPassword,
+      newPassword: newPassword,
+    }
 
     if (oldPassword === "") {
       setOldPasswordWarning(true);
@@ -79,6 +86,28 @@ const Information = () => {
       setOldPasswordWarning(false);
       setNewPasswordWarning(false);
       setConfirmPasswordWarning(false);
+    } else {
+      try {
+        const response = await axios.post(`${url_devel}ChangePassword.php`, dataSendToApi, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("JwtToken")}`,
+          },
+        });
+        if (response.data.status === "success") {
+          Toast.fire({
+            icon: "success",
+            title: "Change password success",
+          });
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: response.data.message,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+
+      }
     }
   };
 
