@@ -1078,7 +1078,7 @@ const CardPayment = ({
               <img src={InsertCard} alt="" className="card-image1" />
             </div>
           ) : isPaymentCredit ? (
-            <form className="payment-credit-cardCC" onSubmit={handleSubmit}>
+            <form className="payment-credit-cardCC" onSubmit={handleSubmit} autoComplete="off">
               <div>
                 <div className="credit-card-payment1">
                   <div className="amount">

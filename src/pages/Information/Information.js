@@ -178,30 +178,40 @@ const Information = () => {
                     },
                   }
                 );
+                console.log("responseChangePassword", (await response).data);
                 if ((await response).status === 200) {
-                  Toast.fire({
-                    icon: "success",
-                    title: "Change password success",
-                  });
-                  setIsWaiting(false);
-                  setIsSucces(true);
-                  setTimeout(() => {
-                    setIsSucces(false);
-                    navigate("/home");
-                    localStorage.removeItem("user");
-                    localStorage.removeItem("JwtToken");
-                    localStorage.removeItem("cardNumberPetugas");
-                    localStorage.removeItem("key");
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("jenisDeviceId");
-                    localStorage.removeItem("deviceId");
-                    localStorage.removeItem("airportId");
-                    localStorage.removeItem("price");
-                  }, 2000);
+                  if ((await response).data.message === "Unauthorized") {
+                    Toast.fire({
+                      icon: "error",
+                      title: `${(await response).data.message}!`,
+                    });
+                    setIsWaiting(false);
+                  } else {
+                    Toast.fire({
+                      icon: "success",
+                      title: "Change password success",
+                    });
+                    setIsWaiting(false);
+                    setIsSucces(true);
+                    setTimeout(() => {
+                      setIsSucces(false);
+                      navigate("/home");
+                      localStorage.removeItem("user");
+                      localStorage.removeItem("JwtToken");
+                      localStorage.removeItem("cardNumberPetugas");
+                      localStorage.removeItem("key");
+                      localStorage.removeItem("token");
+                      localStorage.removeItem("jenisDeviceId");
+                      localStorage.removeItem("deviceId");
+                      localStorage.removeItem("airportId");
+                      localStorage.removeItem("price");
+                    }, 2000);
+                  }
+
                 } else {
                   Toast.fire({
                     icon: "error",
-                    title: response.data.message,
+                    title: response.message,
                   });
                   setIsWaiting(false);
                 }
@@ -368,6 +378,7 @@ const Information = () => {
                       <form
                         onSubmit={handleSubmitChangePassword}
                         className="custom-form"
+                        autoComplete="off"
                       >
                         <h2 className="custom-heading">Change Password</h2>
                         <div className="custom-input-container">

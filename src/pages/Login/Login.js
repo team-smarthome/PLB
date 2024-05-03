@@ -220,7 +220,7 @@ const Login = () => {
             alt="icon_kemenkumham"
             className="icon-imagess"
           />
-          <form className="form-login" onSubmit={handleLogin}>
+          <form className="form-login" onSubmit={handleLogin} autoComplete="off">
             <h3> Login</h3>
             <label htmlFor="username">Username</label>
             <input
