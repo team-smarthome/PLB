@@ -16,6 +16,7 @@ import {
   dataPetugasDenpasar,
   dataPetugasJakarta,
 } from "../../utils/dataPetugas";
+import { url_dev } from "../../services/env";
 
 function Report() {
   const navigate = useNavigate();
@@ -44,6 +45,43 @@ function Report() {
   ];
 
   const [petugasOptions, setPetugasOptions] = useState([]);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     changeMaintenance();
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // const changeMaintenance = async () => {
+  //   try {
+  //     await axios.get(`${url_dev}Maintenance.php`).then((response) => {
+  //       console.log(response.data);
+  //       console.log(response.data.status);
+  //       console.log(response.data.maintenance);
+  //       if (
+  //         response.data.status === "successss" &&
+  //         response.data.maintenance === 1
+  //       ) {
+  //         console.log("Maintenance is active");
+  //         navigate("/");
+  //         localStorage.removeItem("user");
+  //         localStorage.removeItem("JwtToken");
+  //         localStorage.removeItem("cardNumberPetugas");
+  //         localStorage.removeItem("key");
+  //         localStorage.removeItem("token");
+  //         localStorage.removeItem("jenisDeviceId");
+  //         localStorage.removeItem("deviceId");
+  //         localStorage.removeItem("airportId");
+  //         localStorage.removeItem("price");
+  //       } else {
+  //         console.log("Maintenance is inactive");
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   let payloadTempt = {};
 
@@ -154,14 +192,11 @@ function Report() {
     console.log("Bearer Token:", jwtToken);
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "https://mbuvoa.imigrasi.go.id/molina-lte/api/Petugas.php",
-          {
-            headers: {
-              Authorization: `Bearer ${jwtToken}`,
-            },
-          }
-        );
+        const response = await axios.get(`${url_dev}Petugas.php`, {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        });
         let dataPetugas = [];
 
         console.log("Data_Petugas:", response.data);

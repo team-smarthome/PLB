@@ -6,7 +6,7 @@ import { DataProvider } from "./context/DataContext";
 const App = () => {
   return (
     <DataProvider>
-      <Router basename="/molina-lte-v3">
+      <Router>
         <Routes />
       </Router>
     </DataProvider>

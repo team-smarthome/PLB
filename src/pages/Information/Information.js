@@ -14,7 +14,7 @@ import { useReactToPrint } from "react-to-print";
 import Printer from "../../components/Printer/Printer";
 import { Toast } from "../../components/Toast/Toast";
 import axios from "axios";
-import { url_devel } from "../../services/env";
+import { url_dev, url_devel } from "../../services/env";
 import ImageSucces from "../../assets/images/image-2.svg"
 import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
@@ -34,6 +34,40 @@ const Information = () => {
   const [showOldPassword, setShowOldPassword] = useState(true);
   const [showNewPassword, setShowNewPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     changeMaintenance();
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // const changeMaintenance = async () => {
+  //   try {
+  //     await axios.get(`${url_dev}Maintenance.php`).then((response) => {
+  //       console.log(response.data);
+  //       console.log(response.data.status);
+  //       console.log(response.data.maintenance);
+  //       if (response.data.status === "success" && response.data.maintenance === 1) {
+  //         console.log("Maintenance is active");
+  //         navigate("/");
+  //         localStorage.removeItem("user");
+  //         localStorage.removeItem("JwtToken");
+  //         localStorage.removeItem("cardNumberPetugas");
+  //         localStorage.removeItem("key");
+  //         localStorage.removeItem("token");
+  //         localStorage.removeItem("jenisDeviceId");
+  //         localStorage.removeItem("deviceId");
+  //         localStorage.removeItem("airportId");
+  //         localStorage.removeItem("price");
+  //       } else {
+  //         console.log("Maintenance is inactive");
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   const handleShowOldPassword = () => {
     setShowOldPassword(!showOldPassword);

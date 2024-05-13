@@ -11,6 +11,8 @@ import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
 import DataContext from "../../context/DataContext";
 import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
+import { url_dev } from "../../services/env";
+import axios from "axios";
 
 const Apply = () => {
   const { data } = useContext(DataContext);
@@ -53,6 +55,41 @@ const Apply = () => {
     cvv: "",
     type: "",
   });
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     changeMaintenance();
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // const changeMaintenance = async () => {
+  //   try {
+  //     await axios.get(`${url_dev}Maintenance.php`).then((response) => {
+  //       console.log(response.data);
+  //       console.log(response.data.status);
+  //       console.log(response.data.maintenance);
+  //       if (response.data.status === "success" && response.data.maintenance === 1) {
+  //         console.log("Maintenance is active");
+  //         navigate("/");
+  //         localStorage.removeItem("user");
+  //         localStorage.removeItem("JwtToken");
+  //         localStorage.removeItem("cardNumberPetugas");
+  //         localStorage.removeItem("key");
+  //         localStorage.removeItem("token");
+  //         localStorage.removeItem("jenisDeviceId");
+  //         localStorage.removeItem("deviceId");
+  //         localStorage.removeItem("airportId");
+  //         localStorage.removeItem("price");
+  //       } else {
+  //         console.log("Maintenance is inactive");
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
 
   const receiveDataFromChild = (data) => {
     console.log("dataFromChild", data);

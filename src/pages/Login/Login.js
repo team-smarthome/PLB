@@ -21,30 +21,39 @@ const Login = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [maintenance, setMaintenance] = useState(false);
 
-  const handleMaintenance = async () => {
-    try {
-      await axios.get(`${url_dev}Maintenance.php`).then((response) => {
-        console.log(response.data);
-        console.log(response.data.status);
-        console.log(response.data.maintenance);
-        if (response.data.status === "success" && response.data.maintenance === 1) {
-          console.log("Maintenance is active");
-          setMaintenance(true);
-        } else {
-          console.log("Maintenance is inactive");
-          setMaintenance(false);
-        }
-      });
-    } catch (error) {
-      console.log(error);
-      setMaintenance(false);
-    }
-  }
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     handleMaintenance();
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // const handleMaintenance = async () => {
+  //   try {
+  //     await axios.get(`${url_dev}Maintenance.php`).then((response) => {
+  //       console.log(response.data);
+  //       console.log(response.data.status);
+  //       console.log(response.data.maintenance);
+  //       if (response.data.status === "success" && response.data.maintenance === 1) {
+  //         console.log("Maintenance is active");
+  //         setMaintenance(false);
+  //         //kirim ke localstorage
+  //       } else {
+  //         console.log("Maintenance is inactive");
+  //         setMaintenance(false);
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     setMaintenance(false);
+  //     localStorage.setItem("maintenance", false);
+  //   }
+  // }
 
 
 
   useEffect(() => {
-    handleMaintenance();
+    // handleMaintenance();
     const handleOnline = () => {
       setIsOnline(true);
     };
@@ -81,7 +90,7 @@ const Login = () => {
   //   return () => clearTimeout(timer);
   // }, [loading]);
 
-  const version = "3.0.4";
+  const version = "3.0.5";
 
   const isAuthenticated = () => {
     return localStorage.getItem("JwtToken") !== null;

@@ -106,105 +106,105 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
 
 
-  useEffect(() => {
-    const socket = io("http://localhost:4498");
-    socket.on("connect", () => {
-      if (socket.connected) {
-        console.log("Connected to server socket.io");
-      } else {
-        sendDataToInput({
-          statusCardBox: "lookCamera",
-          capturedImage: null,
-          emailUser: null,
-          titleHeader: "Apply VOA",
-          titleFooter: "Next Step",
-        });
-      }
-    });
-  }, [capturedImage]);
+  // useEffect(() => {
+  //   const socket = io("http://localhost:4498");
+  //   socket.on("connect", () => {
+  //     if (socket.connected) {
+  //       console.log("Connected to server socket.io");
+  //     } else {
+  //       sendDataToInput({
+  //         statusCardBox: "lookCamera",
+  //         capturedImage: null,
+  //         emailUser: null,
+  //         titleHeader: "Apply VOA",
+  //         titleFooter: "Next Step",
+  //       });
+  //     }
+  //   });
+  // }, [capturedImage]);
 
-  const capture = () => {
-    const socket = io("http://localhost:4498");
-    const params = {
-      code: "take-snapshot",
-      data: "",
-    };
-    socket.on("client connected to server socket.io 4498", (data) => {
-      sendDataToInput({
-        statusCardBox: "waiting",
-        capturedImage: null,
-        emailUser: null,
-        titleHeader: "Apply VOA",
-        titleFooter: "Next Step",
-      });
-    });
-    socket.emit("WebClientMessage", JSON.stringify(params));
+  // const capture = () => {
+  //   const socket = io("http://localhost:4498");
+  //   const params = {
+  //     code: "take-snapshot",
+  //     data: "",
+  //   };
+  //   socket.on("client connected to server socket.io 4498", (data) => {
+  //     sendDataToInput({
+  //       statusCardBox: "waiting",
+  //       capturedImage: null,
+  //       emailUser: null,
+  //       titleHeader: "Apply VOA",
+  //       titleFooter: "Next Step",
+  //     });
+  //   });
+  //   socket.emit("WebClientMessage", JSON.stringify(params));
 
-    let waitingTimeout = setTimeout(() => {
-      sendDataToInput({
-        statusCardBox: "lookCamera",
-        capturedImage: null,
-        emailUser: null,
-        titleHeader: "Apply VOA",
-        titleFooter: "Next Step",
-      });
-      Toast.fire({
-        icon: "error",
-        title: "Tidak Dapat mendapatkan gambar",
-      });
-    }, 10000);
+  //   let waitingTimeout = setTimeout(() => {
+  //     sendDataToInput({
+  //       statusCardBox: "lookCamera",
+  //       capturedImage: null,
+  //       emailUser: null,
+  //       titleHeader: "Apply VOA",
+  //       titleFooter: "Next Step",
+  //     });
+  //     Toast.fire({
+  //       icon: "error",
+  //       title: "Tidak Dapat mendapatkan gambar",
+  //     });
+  //   }, 10000);
 
-    socket.on("connect", () => {
-      console.log("Terhubung ke server");
-    });
+  //   socket.on("connect", () => {
+  //     console.log("Terhubung ke server");
+  //   });
 
-    socket.on("not-found-directory", (data) => {
-      clearTimeout(waitingTimeout);
-      sendDataToInput({
-        statusCardBox: "lookCamera",
-        capturedImage: null,
-        emailUser: null,
-        titleHeader: "Apply VOA",
-        titleFooter: "Next Step",
-      });
-      Toast.fire({
-        icon: "error",
-        title: "Kesalahan Menentukan Direktori",
-      });
-    });
+  //   socket.on("not-found-directory", (data) => {
+  //     clearTimeout(waitingTimeout);
+  //     sendDataToInput({
+  //       statusCardBox: "lookCamera",
+  //       capturedImage: null,
+  //       emailUser: null,
+  //       titleHeader: "Apply VOA",
+  //       titleFooter: "Next Step",
+  //     });
+  //     Toast.fire({
+  //       icon: "error",
+  //       title: "Kesalahan Menentukan Direktori",
+  //     });
+  //   });
 
-    socket.on("snapshot_data", (data) => {
-      clearTimeout(waitingTimeout);
-      console.log("base:", data.base64);
-      const imageSrc = `data:image/jpeg;base64,${data.base64}`;
-      console.log("imageSrc:", imageSrc);
-      setCapturedImage(imageSrc);
-      sendDataToInput({
-        statusCardBox: "takePhotoSucces",
-        capturedImage: imageSrc,
-        emailUser: null,
-        titleHeader: "Apply VOA",
-        titleFooter: "Next Step",
-        statusImage: false,
-      });
-      console.log("Captured Image:", capturedImage);
-    });
+  //   socket.on("snapshot_data", (data) => {
+  //     clearTimeout(waitingTimeout);
+  //     console.log("base:", data.base64);
+  //     const imageSrc = `data:image/jpeg;base64,${data.base64}`;
+  //     console.log("imageSrc:", imageSrc);
+  //     setCapturedImage(imageSrc);
+  //     sendDataToInput({
+  //       statusCardBox: "takePhotoSucces",
+  //       capturedImage: imageSrc,
+  //       emailUser: null,
+  //       titleHeader: "Apply VOA",
+  //       titleFooter: "Next Step",
+  //       statusImage: false,
+  //     });
+  //     console.log("Captured Image:", capturedImage);
+  //   });
 
-    socket.on("gagal_snapshot", (data) => {
-      clearTimeout(waitingTimeout);
-      sendDataToInput({
-        statusCardBox: "checkData",
-        capturedImage: null,
-        emailUser: null,
-        titleHeader: "Apply VOA",
-        titleFooter: "Next Step",
-      });
-      Toast.fire({
-        icon: "error",
-        title: "Tidak Dapat mendapatkan gambar",
-      });
-    });
-  };
+  //   socket.on("gagal_snapshot", (data) => {
+  //     clearTimeout(waitingTimeout);
+  //     sendDataToInput({
+  //       statusCardBox: "checkData",
+  //       capturedImage: null,
+  //       emailUser: null,
+  //       titleHeader: "Apply VOA",
+  //       titleFooter: "Next Step",
+  //     });
+  //     Toast.fire({
+  //       icon: "error",
+  //       title: "Tidak Dapat mendapatkan gambar",
+  //     });
+  //   });
+  // };
 
   const doRetake = () => {
     sendDataToInput({
@@ -773,7 +773,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
                 }}
               />
             </div>
-            <button onClick={capture} className="ok-button">
+            <button className="ok-button">
               Take a face photo
             </button>
           </>

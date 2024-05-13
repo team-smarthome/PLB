@@ -1,6 +1,9 @@
-export const url_dev = "https://mbuvoa.imigrasi.go.id/molina-lte/api/";
-export const url_production = "https://mbuvoa.imigrasi.go.id/molina-lte/api/";
-export const url_devel = "https://mbuvoa.imigrasi.go.id/molina-lte/api/";
+const currentOrigin = window.location.origin;
+console.log(currentOrigin, "urlsaatiniBoy");
+
+export const url_dev = `${currentOrigin}/api/`;
+export const url_production = `${currentOrigin}/api/`;
+export const url_devel = `${currentOrigin}/api/`;
 
 export const url_pg_sendbox =
   "https://sandbox.plink.co.id/PrismaGateway/events/voa/v1.0/payment";
