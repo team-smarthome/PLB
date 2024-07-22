@@ -1,5 +1,5 @@
-// const currentOrigin = window.location.origin;
-const currentOrigin = "https://molinalite.imigrasi.go.id";
+const currentOrigin = window.location.origin;
+// const currentOrigin = "https://molinalite.imigrasi.go.id";
 
 export const url_dev = `${currentOrigin}/api/`;
 export const url_production = `${currentOrigin}/api/`;
