@@ -12,7 +12,7 @@ export const DataProvider = ({ children }) => {
         setData(dataStatus);
     }, []);
 
-    console.log("DataSaatIni", data);
+    // console.log("DataSaatIni", data);
 
     return (
         <DataContext.Provider value={{ data, setData }}>

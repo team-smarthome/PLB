@@ -123,7 +123,7 @@ const Information = () => {
   const [isWaiting, setIsWaiting] = useState(false);
 
   const dataUser = JSON.parse(localStorage.getItem("user"));
-  console.log("DataUser", dataUser);
+  // console.log("DataUser", dataUser);
 
   const DataUser = {
     fullName: dataUser.fullName,
@@ -133,10 +133,10 @@ const Information = () => {
     position: dataUser.position,
   };
 
-  console.log("DataUserProfile", DataUser);
+  // console.log("DataUserProfile", DataUser);
 
   const handleSubmitChangePassword = async (event) => {
-    console.log("masukSini")
+    // console.log("masukSini")
     event.preventDefault();
     const oldPassword = event.target.oldPassword.value;
     const newPassword = event.target.newPassword.value;
@@ -164,7 +164,7 @@ const Information = () => {
       setOldPasswordWarning(false);
       setNewPasswordWarning(false);
       setConfirmPasswordWarning(false);
-      console.log("masukSini2")
+      // console.log("masukSini2")
       try {
         setIsWaiting(true);
         const responseLogin = await axios.post(`${url_devel}Login.php`, {
@@ -212,7 +212,7 @@ const Information = () => {
                     },
                   }
                 );
-                console.log("responseChangePassword", (await response).data);
+                // console.log("responseChangePassword", (await response).data);
                 if ((await response).status === 200) {
                   if ((await response).data.message === "Unauthorized") {
                     Toast.fire({
@@ -250,7 +250,7 @@ const Information = () => {
                   setIsWaiting(false);
                 }
               } catch (error) {
-                console.log("error", error);
+                // console.log("error", error);
                 Toast.fire({
                   icon: "error",
                   title: "Failed to Change Password",
@@ -298,7 +298,7 @@ const Information = () => {
         }
       } catch (error) {
         setIsWaiting(false);
-        console.log(error);
+        // console.log(error);
         Toast.fire({
           icon: "error",
           title: "Your old password is incorrect!",
@@ -336,7 +336,7 @@ const Information = () => {
   useEffect(() => {
     const socketIO = io("http://localhost:4499");
     socketIO.on("getIpAddress", (newWifiResults) => {
-      console.log("New IP address:", newWifiResults);
+      // console.log("New IP address:", newWifiResults);
       setNewWifiResults(newWifiResults.ipAddressV4);
     });
     return () => {

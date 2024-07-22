@@ -56,43 +56,43 @@ const Apply = () => {
     type: "",
   });
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     changeMaintenance();
-  //   }, 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      changeMaintenance();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  // const changeMaintenance = async () => {
-  //   try {
-  //     await axios.get(`${url_dev}Maintenance.php`).then((response) => {
-  //       console.log(response.data);
-  //       console.log(response.data.status);
-  //       console.log(response.data.maintenance);
-  //       if (response.data.status === "success" && response.data.maintenance === 1) {
-  //         console.log("Maintenance is active");
-  //         navigate("/");
-  //         localStorage.removeItem("user");
-  //         localStorage.removeItem("JwtToken");
-  //         localStorage.removeItem("cardNumberPetugas");
-  //         localStorage.removeItem("key");
-  //         localStorage.removeItem("token");
-  //         localStorage.removeItem("jenisDeviceId");
-  //         localStorage.removeItem("deviceId");
-  //         localStorage.removeItem("airportId");
-  //         localStorage.removeItem("price");
-  //       } else {
-  //         console.log("Maintenance is inactive");
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  const changeMaintenance = async () => {
+    try {
+      await axios.get(`${url_dev}Maintenance.php`).then((response) => {
+        // console.log(response.data);
+        // console.log(response.data.status);
+        // console.log(response.data.maintenance);
+        if (response.data.status === "success" && response.data.maintenance === 1) {
+          // console.log("Maintenance is active");
+          navigate("/");
+          localStorage.removeItem("user");
+          localStorage.removeItem("JwtToken");
+          localStorage.removeItem("cardNumberPetugas");
+          localStorage.removeItem("key");
+          localStorage.removeItem("token");
+          localStorage.removeItem("jenisDeviceId");
+          localStorage.removeItem("deviceId");
+          localStorage.removeItem("airportId");
+          localStorage.removeItem("price");
+        } else {
+          // console.log("Maintenance is inactive");
+        }
+      });
+    } catch (error) {
+      // console.log(error);
+    }
+  }
 
 
   const receiveDataFromChild = (data) => {
-    console.log("dataFromChild", data);
+    // console.log("dataFromChild", data);
     const sexMapping = {
       "M": "male",
       "F": "female"
@@ -137,7 +137,7 @@ const Apply = () => {
         compositeCheckDigit: data.compositeCheckDigit,
       };
 
-      console.log("newDataPassport", newDataPassport);
+      // console.log("newDataPassport", newDataPassport);
 
       // Handle received data
       const dataHardCodePaspor = newDataPassport;
@@ -190,7 +190,7 @@ const Apply = () => {
         ? dataHardCodePaspor.email
         : "";
 
-      console.log("dataHardCodePaspor", dataHardCodePaspor);
+      // console.log("dataHardCodePaspor", dataHardCodePaspor);
 
       setDataPrimaryPassport(dataHardCodePaspor);
 
@@ -398,7 +398,7 @@ const Apply = () => {
 
   useEffect(() => {
     if (data) {
-      console.log("true", data);
+      // console.log("true", data);
       setCardStatus("searchPassport");
     } else {
       // const dataTrueorFalse = localStorage.getItem("dataStatus");
@@ -443,15 +443,15 @@ const Apply = () => {
       };
       socket_IO.emit("WebClientMessage", JSON.stringify(params));
       socket_IO.on("deviceId", (deviceId) => {
-        console.log(deviceId);
+        // console.log(deviceId);
         localStorage.setItem("deviceId", deviceId);
       });
       socket_IO.on("jenisDeviceId", (jenisDeviceId) => {
-        console.log(jenisDeviceId);
+        // console.log(jenisDeviceId);
         localStorage.setItem("jenisDeviceId", jenisDeviceId);
       });
       socket_IO.on("airportId", (airportId) => {
-        console.log(airportId);
+        // console.log(airportId);
         localStorage.setItem("airportId", airportId);
       });
     } else if (
@@ -463,15 +463,15 @@ const Apply = () => {
       cardStatus === "waiting"
     ) {
       socket_IO.on("deviceId", (deviceId) => {
-        console.log(deviceId);
+        // console.log(deviceId);
         localStorage.setItem("deviceId", deviceId);
       });
       socket_IO.on("jenisDeviceId", (jenisDeviceId) => {
-        console.log(jenisDeviceId);
+        // console.log(jenisDeviceId);
         localStorage.setItem("jenisDeviceId", jenisDeviceId);
       });
       socket_IO.on("airportId", (airportId) => {
-        console.log(airportId);
+        // console.log(airportId);
         localStorage.setItem("airportId", airportId);
       });
     }
@@ -548,7 +548,7 @@ const Apply = () => {
 
     setIsEnableStep(false);
 
-    console.log("bodyParam", bodyParam);
+    // console.log("bodyParam", bodyParam);
 
     try {
       setCardPaymentProps({
@@ -569,8 +569,8 @@ const Apply = () => {
         res = await apiPaymentGateway(header, bodyParam);
       }
       const data = res.data;
-      console.log("dataREsponse", res);
-      console.log("dataREsponse", data);
+      // console.log("dataREsponse", res);
+      // console.log("dataREsponse", data);
       setDataPermohonan(data.data);
       if (data.code === 200) {
         setCardPaymentProps({
@@ -625,9 +625,9 @@ const Apply = () => {
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
         setStatusPaymentCredit(false);
         const messageError = data.message;
-        console.log("dataError1", data);
-        console.log("dataError1", data.message);
-        console.log("dataError1", messageError);
+        // console.log("dataError1", data);
+        // console.log("dataError1", data.message);
+        // console.log("dataError1", messageError);
 
         setMessageConfirm(messageError);
         setCardPaymentProps({

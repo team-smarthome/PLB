@@ -293,7 +293,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
         key: key,
       };
 
-      console.log("bodyParamTest:", bodyParam);
+      // console.log("bodyParamTest:", bodyParam);
 
       sendDataToInput({
         statusCardBox: "waiting",
@@ -305,9 +305,9 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
       try {
         const res = await apiVoaPayment(header, bodyParam);
-        console.log("Response:", res);
+        // console.log("Response:", res);
         const data = res.data;
-        console.log("Data:", data);
+        // console.log("Data:", data);
         if (data.status === "Success" || data.status === "success") {
           sendDataToParent2(data.data);
         } else {
@@ -355,7 +355,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
         // });
       } catch (error) {
-        console.log("Error:", error);
+        // console.log("Error:", error);
         sendDataToInput({
           statusCardBox: "errorConnection",
           emailUser: email,
@@ -408,17 +408,17 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   };
 
   useEffect(() => {
-    console.log("isConnected: ", isConnected);
+    // console.log("isConnected: ", isConnected);
     if (!isConnected) {
       socket_IO_4499.current = io("http://localhost:4499");
 
       socket_IO_4499.current.on("connect", () => {
-        console.log("Connected to server socket.io 4499");
+        // console.log("Connected to server socket.io 4499");
         setIsConnected(true);
       });
 
       socket_IO_4499.current.on("disconnect", () => {
-        console.log("Disconnected from server socket.io");
+        // console.log("Disconnected from server socket.io");
         setIsConnected(false);
       });
 
@@ -431,7 +431,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
           const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
           setIsValidEmail(emailRegex.test(textEmail));
         } catch (error) {
-          console.error("Error parsing input-email data:", error);
+          // console.error("Error parsing input-email data:", error);
         }
       };
 
@@ -451,7 +451,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
       const handleSubmitEmail = (data) => {
         try {
           const dataParse = JSON.parse(data);
-          console.log("Received submit-email data: ", dataParse);
+          // console.log("Received submit-email data: ", dataParse);
         } catch (error) {
           console.error("Error parsing submit-email data:", error);
         }
@@ -504,13 +504,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   ]);
 
   useEffect(() => {
-    console.log("capturedImage berubah:", capturedImage);
+    // console.log("capturedImage berubah:", capturedImage);
   }, [capturedImage]);
 
   const handleScanedArea = (event) => {
     let text = event.target.value.replace(/\s/g, "");
-    console.log("text: ", text);
-    console.log("text.length: ", text.length);
+    // console.log("text: ", text);
+    // console.log("text.length: ", text.length);
     if (text.length > 88) {
       text = text.substring(text.length - 88); // Ambil karakter ke-89 dan seterusnya
     }
@@ -528,7 +528,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
   const [checksum, setCheckSum] = useState(false);
 
   const handleButtonClickScaned = () => {
-    console.log("inputValue: ", inputValue);
+    // console.log("inputValue: ", inputValue);
     if (mrz[0].length > 44 || mrz[1].length > 44) {
       setCheckSum(true);
     } else if (mrz[0].length === 0 || mrz[1].length === 0) {
@@ -536,7 +536,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
     }
     try {
       const mrzParsed = parse(mrz);
-      console.log("mrz: ", mrzParsed.fields);
+      // console.log("mrz: ", mrzParsed.fields);
       sendDataToParent2(mrzParsed.fields);
       setCheckSum(false);
     } catch (error) {

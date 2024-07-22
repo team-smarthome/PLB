@@ -122,14 +122,14 @@ const BodyContent = ({
 
   useEffect(() => {
     setSharedData({ passportData: dataPrimaryPassport });
-    console.log("dataPrimaryPassport", dataPrimaryPassport);
+    // console.log("dataPrimaryPassport", dataPrimaryPassport);
   }, [dataPrimaryPassport]);
 
 
   //useEffect setCardPaymentProps 
 
   useEffect(() => {
-    console.log("cardPaymentProps", cardPaymentProps);
+    // console.log("cardPaymentProps", cardPaymentProps);
   }, [cardPaymentProps]);
 
   return (

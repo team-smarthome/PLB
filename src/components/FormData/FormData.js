@@ -86,7 +86,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
       // console.log("test shared data null");
       setFormData(initialFormData);
     } else {
-      console.log("sharedData", sharedData.passportData);
+      // console.log("sharedData", sharedData.passportData);
       const dataNationality = dataNegara.data.map((negara) => ({
         value: negara.id_negara,
         label: `${negara.id_negara} - ${negara.deskripsi_negara}`,

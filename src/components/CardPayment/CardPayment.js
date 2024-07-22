@@ -188,7 +188,7 @@ const CardPayment = ({
         }
       })
       .catch((error) => {
-        // console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error);
       });
   }, []);
 
@@ -196,7 +196,7 @@ const CardPayment = ({
     const socketIoClient = io("http://localhost:4499");
 
     socketIoClient.on("connect", () => {
-      console.log("Connected to server socket.io");
+      // console.log("Connected to server socket.io");
     });
 
     socketIoClient.on("getCredentials", (data) => {
@@ -267,7 +267,7 @@ const CardPayment = ({
     const handleInputCardNumber = (data) => {
       try {
         const dataParse = JSON.parse(data);
-        console.log("Received input-card-number data: ", dataParse);
+        // console.log("Received input-card-number data: ", dataParse);
         const text = dataParse?.data;
         setCardNumber(text);
       } catch (error) {
@@ -278,7 +278,7 @@ const CardPayment = ({
     const handleInputExpiredDate = (data) => {
       try {
         const dataParse = JSON.parse(data);
-        console.log("Received input-expired data: ", dataParse);
+        // console.log("Received input-expired data: ", dataParse);
         const text = dataParse?.data;
         setExpiry(text);
       } catch (error) {
@@ -289,7 +289,7 @@ const CardPayment = ({
     const handleInputCVV = (data) => {
       try {
         const dataParse = JSON.parse(data);
-        console.log("Received input-cvv data: ", dataParse);
+        // console.log("Received input-cvv data: ", dataParse);
         const text = dataParse?.data;
         setCvv(text);
       } catch (error) {
@@ -684,7 +684,7 @@ const CardPayment = ({
             user_data: { ...user_data },
           };
 
-          console.log("dataParam: ", dataParam);
+          // console.log("dataParam: ", dataParam);
           sendDataUpdatePayment({
             isWaiting: false,
             isConfirm: false,
@@ -751,7 +751,7 @@ const CardPayment = ({
         user_data: { ...user_data },
       };
 
-      console.log("dataParam: ", dataParam);
+      // console.log("dataParam: ", dataParam);
       sendDataUpdatePayment({
         isWaiting: false,
         isConfirm: false,
