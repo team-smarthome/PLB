@@ -201,8 +201,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
 
   const handleSubmit = async (e) => {
-    console.log("masukkesini")
-    console.log('Form_submitted:', formdata);
     e.preventDefault();
   };
 
@@ -221,12 +219,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.passport_number}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "iddle" ? !isCheckedPassportNumber : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedPassportNumber : true
               }
               className="disabled-input"
             />
 
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledPassportNumber && (
@@ -257,12 +255,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.register_code}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "iddle" ? !isCheckedRegisterCode : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedRegisterCode : true
               }
               className="disabled-input"
             />
 
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledRegisterCode && (
@@ -296,7 +294,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               className="disabled-input"
             />
 
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledFullName && (
@@ -327,11 +325,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.date_of_birth}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "iddle" ? !isCheckedDateOfBirth : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedDateOfBirth : true
               }
               className="disabled-input"
             />
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledDateOfBirth && (
@@ -365,7 +363,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "sex")
               }
-              isDisabled={cardStatus === "iddle" ? !isCheckedGender : true}
+              isDisabled={cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedGender : true}
               options={optionGender}
               className="basic-single"
               classNamePrefix="select"
@@ -391,7 +389,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 }),
               }}
             />
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledGender && (
@@ -426,7 +424,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 handleSelectChange(selectedOption, "nationality")
               }
               isDisabled={
-                cardStatus === "iddle" ? !isCheckedNationality : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedNationality : true
               }
               options={optionNegara}
               className="basic-single"
@@ -453,7 +451,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 }),
               }}
             />
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledNationality && (
@@ -484,11 +482,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.expiry_date}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "iddle" ? !isCheckedExpiryDate : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedExpiryDate : true
               }
               className="disabled-input"
             />
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledExpiryDate && (
@@ -521,11 +519,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.arrival_time}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "iddle" ? !isCheckedArrivalTime : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedArrivalTime : true
               }
               className="disabled-input"
             />
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledArrivalTime && (
@@ -557,12 +555,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.destination_location}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "iddle" ? !isCheckedDestinationLocation : true
+                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedDestinationLocation : true
               }
               className="disabled-input"
             />
 
-            {cardStatus === "iddle" ? (
+            {cardStatus === "iddle" || cardStatus === "checkData" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledDestinationLocation && (
@@ -596,7 +594,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             </div>
           </div>
         </div>
-        <button type="submit">Submit</button>
       </form>
     </div>
   );

@@ -20,6 +20,7 @@ import { url_dev } from "../../services/env";
 import dataNegara from "../../utils/dataNegara";
 import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
+import dataPasporImg from "../../utils/dataPhotoPaspor";
 
 const parse = require("mrz").parse;
 
@@ -109,14 +110,17 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
 	const handleTakePhoto = async () => {
 		console.log("masuktakephoto");
-		socket_IO_4000.emit("take_photo");
+		console.log("dataPasporImg", dataPasporImg?.visibleImage);
+		// socket_IO_4000.emit("take_photo");
+		setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
 		sendDataToInput({
-			statusCardBox: "waiting2",
-			capturedImage: null,
+			statusCardBox: "takePhotoSucces",
+			capturedImage: `data:image/jpeg;base64,${dataPasporImg?.visibleImage}`,
 			emailUser: email,
 			titleHeader: "Apply VOA",
 			titleFooter: "Next Step",
 		});
+
 		// socket_IO_4000.emit("stop_stream");
 	};
 
@@ -680,7 +684,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
               ) : (
                 <h1 className="card-title2 check-data-title">Please wait...</h1>
               )} */}
-						</div>
+						</div >
 						<button className="ok-button" onClick={handleTakePhoto}>
 							Take a face photo
 						</button>
