@@ -516,7 +516,7 @@ const Apply = () => {
         setCardStatus("errorVoa");
         setTitleFooter("Next Step");
         setTabStatus(1);
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -561,7 +561,7 @@ const Apply = () => {
           data: "",
         };
         setDisabled(false);
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setCardStatus("errorBulan");
         setTitleFooter("Next Step");
         setTabStatus(1);
@@ -592,7 +592,7 @@ const Apply = () => {
           data: "",
         };
         setDisabled(false);
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setCardStatus("errorDanger");
         setTitleFooter("Next Step");
         setTabStatus(1);
@@ -690,7 +690,7 @@ const Apply = () => {
         setDisabled(false);
         setTabStatus(1);
         setTitleFooter("Next Step");
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setStatusPaymentCredit(false);
 
         setCardStatus("iddle");
