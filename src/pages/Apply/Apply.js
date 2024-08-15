@@ -1,26 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
-import { apiPaymentGateway, apiPaymentGatewaySearch } from "../../services/api";
+import { useAtom } from "jotai";
 import dataPasporImg from "../../utils/dataPhotoPaspor";
-import io from "socket.io-client";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
-import DataContext from "../../context/DataContext";
-import dataPhotoPaspor from "../../utils/dataPhotoPaspor";
-import { url_dev } from "../../services/env";
-import axios from "axios";
 
 const Apply = () => {
-  const { data } = useContext(DataContext);
-  const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("");
+  const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -279,6 +271,16 @@ const Apply = () => {
     }
   };
 
+  function isEmptyOrNull(value) {
+    return value === "" || value === null;
+  }
+
+  // Function to check if an object has a specific property
+  function hasProperty(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+  }
+
+
   const btnOnClick_Step = () => {
     if (!isOnline) {
       Toast.fire({
@@ -291,23 +293,32 @@ const Apply = () => {
       if (cardStatus === "checkData" || cardStatus === "iddle") {
         const dataChecked = sharedData?.passportData;
         console.log("dataChecked", dataChecked);
-        switch (true) {
-          case dataChecked === null:
-          case dataChecked === "":
-            Swal.fire({
-              icon: "error",
-              title: "Data still empty",
-              text: "Please check your data",
-              confirmButtonColor: "#3d5889",
-            });
-            break;
-          case dataChecked.docNumber === "":
-          default:
-            setCardStatus("lookCamera");
-            setTabStatus(2);
-            break;
-        }
 
+        if (dataChecked === null || dataChecked === "") {
+          Swal.fire({
+            icon: "error",
+            title: "Data still empty",
+            text: "Please check your data",
+            confirmButtonColor: "#3d5889",
+          });
+        } else if (
+          isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
+          isEmptyOrNull(dataChecked.noRegister) || !hasProperty(dataChecked, "noRegister") ||
+          isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
+          isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
+          isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
+          isEmptyOrNull(dataChecked.nationality) || !hasProperty(dataChecked, "nationality")
+        ) {
+          Swal.fire({
+            icon: "error",
+            title: "Have empty data",
+            text: "Please check your data",
+            confirmButtonColor: "#3d5889",
+          });
+        } else {
+          setCardStatus("lookCamera");
+          setTabStatus(2);
+        }
 
       } else if (cardStatus === "successSearch") {
         setIsEnableStep(true);
@@ -381,19 +392,6 @@ const Apply = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (data) {
-      // console.log("true", data);
-      setCardStatus("searchPassport");
-    } else {
-      // const dataTrueorFalse = localStorage.getItem("dataStatus");
-      if (dataTrueorFalse === "true") {
-        setCardStatus("searchPassport");
-      } else {
-        setCardStatus("iddle");
-      }
-    }
-  }, []);
 
   useEffect(() => {
     const cardNumberPetugasFix = 11 + localStorage.getItem("cardNumberPetugas");
@@ -518,7 +516,7 @@ const Apply = () => {
         setCardStatus("errorVoa");
         setTitleFooter("Next Step");
         setTabStatus(1);
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setCardPaymentProps({
           isWaiting: false,
           isCreditCard: false,
@@ -532,11 +530,9 @@ const Apply = () => {
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
-          if (data === "true" || dataTrueorFalse === "true") {
-            setCardStatus("searchPassport");
-          } else {
-            setCardStatus("iddle");
-          }
+
+          setCardStatus("iddle");
+
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -565,7 +561,7 @@ const Apply = () => {
           data: "",
         };
         setDisabled(false);
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setCardStatus("errorBulan");
         setTitleFooter("Next Step");
         setTabStatus(1);
@@ -582,11 +578,9 @@ const Apply = () => {
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
-          if (data === "true" || dataTrueorFalse === "true") {
-            setCardStatus("searchPassport");
-          } else {
-            setCardStatus("iddle");
-          }
+
+          setCardStatus("iddle");
+
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -598,7 +592,7 @@ const Apply = () => {
           data: "",
         };
         setDisabled(false);
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setCardStatus("errorDanger");
         setTitleFooter("Next Step");
         setTabStatus(1);
@@ -615,11 +609,9 @@ const Apply = () => {
         });
         setTimeout(() => {
           setStatusPaymentCredit(false);
-          if (data === "true" || dataTrueorFalse === "true") {
-            setCardStatus("searchPassport");
-          } else {
-            setCardStatus("iddle");
-          }
+
+          setCardStatus("iddle");
+
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -661,11 +653,9 @@ const Apply = () => {
           setTitleFooter("Next Step");
           setTabStatus(1);
           setStatusPaymentCredit(false);
-          if (data === "true" || dataTrueorFalse === "true") {
-            setCardStatus("searchPassport");
-          } else {
-            setCardStatus("iddle");
-          }
+
+          setCardStatus("iddle");
+
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
           setIsEnableBack(true);
@@ -700,13 +690,11 @@ const Apply = () => {
         setDisabled(false);
         setTabStatus(1);
         setTitleFooter("Next Step");
-        setTitleHeader("Apply VOA");
+        setTitleHeader("Apply PLB");
         setStatusPaymentCredit(false);
-        if (data === "true" || dataTrueorFalse === "true") {
-          setCardStatus("searchPassport");
-        } else {
-          setCardStatus("iddle");
-        }
+
+        setCardStatus("iddle");
+
         setRecievedTempData([]);
         setDataPrimaryPassport(null);
         setIsEnableBack(true);
