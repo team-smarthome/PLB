@@ -46,52 +46,11 @@ const Information = () => {
 	const [capturedImageTest, setCapturedImageTest] = useState("");
 	const [succesCapture, setSuccesCapture] = useState(false);
 
-	// useEffect(() => {
-	//   const interval = setInterval(() => {
-	//     changeMaintenance();
-	//   }, 1000);
-	//   return () => clearInterval(interval);
-	// }, []);
-
-	// const changeMaintenance = async () => {
-	//   try {
-	//     await axios.get(`${url_dev}Maintenance.php`).then((response) => {
-	//       console.log(response.data);
-	//       console.log(response.data.status);
-	//       console.log(response.data.maintenance);
-	//       if (response.data.status === "success" && response.data.maintenance === 1) {
-	//         console.log("Maintenance is active");
-	//         navigate("/");
-	//         localStorage.removeItem("user");
-	//         localStorage.removeItem("JwtToken");
-	//         localStorage.removeItem("cardNumberPetugas");
-	//         localStorage.removeItem("key");
-	//         localStorage.removeItem("token");
-	//         localStorage.removeItem("jenisDeviceId");
-	//         localStorage.removeItem("deviceId");
-	//         localStorage.removeItem("airportId");
-	//         localStorage.removeItem("price");
-	//       } else {
-	//         console.log("Maintenance is inactive");
-	//       }
-	//     });
-	//   } catch (error) {
-	//     console.log(error);
-	//   }
-	// }
 
 	const handleTakePhoto = async () => {
 		console.log("handleTakenPhoto");
 		setLoading(true);
 		socket2_IO_4000.emit("take_photo");
-
-		// socket2_IO_4000.on("photo_taken", (imageBase64) => {
-		// 	setSuccesCapture(true);
-		// 	setCapturedImageTest(imageBase64);
-		// 	console.log("Image_path_received: ", imageBase64);
-		// 	setStreamKamera(false);
-		// 	socket2_IO_4000.emit("stop_stream");
-		// });
 	};
 
 	useEffect(() => {
@@ -105,12 +64,6 @@ const Information = () => {
 
 			socket2_IO_4000.emit("stop_stream");
 		});
-		// socket2_IO_4000.on("stream_camera", (stream_url) => {
-		// 	setUrlKamera(stream_url);
-		// 	setLoading(false);
-		// 	console.log("masuksiniKAMERASTREAM");
-		// 	console.log("data_url_stream", stream_url);
-		// });
 	}, [socket2_IO_4000]);
 
 	const handleShowOldPassword = () => {
@@ -124,13 +77,6 @@ const Information = () => {
 	const handleShowConfirmPassword = () => {
 		setShowConfirmPassword(!showConfirmPassword);
 	};
-	// const listConfiguration = [
-	//   "Profile",
-	//   "Change Password",
-	//   "IP Config",
-	//   "Test Camera",
-	//   "Test Printer",
-	// ];
 	const listConfiguration = [
 		{
 			name: "Profile",
@@ -454,17 +400,6 @@ const Information = () => {
 		}, 3000);
 	};
 
-	useEffect(() => {
-		const socketIO = io("http://localhost:4499");
-		socketIO.on("getIpAddress", (newWifiResults) => {
-			// console.log("New IP address:", newWifiResults);
-			setNewWifiResults(newWifiResults.ipAddressV4);
-			setStatusCardReader("ON");
-		});
-		return () => {
-			socketIO.disconnect();
-		};
-	}, []);
 
 	useEffect(() => {
 		const socketCamera = io("http://localhost:4000");

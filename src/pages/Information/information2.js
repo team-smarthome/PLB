@@ -69,17 +69,6 @@ const Information = () => {
             });
     }, []);
 
-    useEffect(() => {
-        const socketIO = io("http://localhost:4499");
-        socketIO.on("getIpAddress", (newWifiResults) => {
-            console.log("New IP address:", newWifiResults);
-            setNewWifiResults(newWifiResults.ipAddressV4);
-            setStatusCardReader("ON");
-        });
-        return () => {
-            socketIO.disconnect();
-        };
-    }, []);
 
     useEffect(() => {
         const socketCamera = io("http://localhost:4498");

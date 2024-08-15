@@ -64,10 +64,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 	const [codeState, setCodeState] = useState(null);
 	const [isConnected, setIsConnected] = useState(false);
 
-	const socket_IO_4499 = useRef(null);
 	const socket_IO_4000 = io("http://localhost:4000");
 
-	// const socket_IO = io("http://localhost:4499");
 	const checkAndHandleTokenExpiration = () => {
 		const jwtToken = localStorage.getItem("JwtToken");
 		if (!jwtToken) {
@@ -320,70 +318,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 			});
 		}
 	};
-
-	useEffect(() => {
-		// console.log("isConnected: ", isConnected);
-		if (!isConnected) {
-			socket_IO_4499.current = io("http://localhost:4499");
-
-			socket_IO_4499.current.on("connect", () => {
-				// console.log("Connected to server socket.io 4499");
-				setIsConnected(true);
-			});
-
-			socket_IO_4499.current.on("disconnect", () => {
-				// console.log("Disconnected from server socket.io");
-				setIsConnected(false);
-			});
-
-			const handleInputEmail = (data) => {
-				try {
-					const dataParse = JSON.parse(data);
-					const textEmail = dataParse.data;
-					setEmail(textEmail);
-					setEmailWarning(false);
-					const emailRegex =
-						/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-					setIsValidEmail(emailRegex.test(textEmail));
-				} catch (error) {
-					// console.error("Error parsing input-email data:", error);
-				}
-			};
-
-			const handleInputEmailConfirm = (data) => {
-				try {
-					const dataParse = JSON.parse(data);
-					const textEmail = dataParse.data;
-					setEmailConfirmation(textEmail);
-					setEmailConfirmWarning(false);
-					const emailRegex =
-						/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-					setIsValidEmailConfirmation(emailRegex.test(textEmail));
-				} catch (error) {
-					console.error(
-						"Error parsing input-email-confirm data:",
-						error
-					);
-				}
-			};
-
-			const handleSubmitEmail = (data) => {
-				try {
-					const dataParse = JSON.parse(data);
-					// console.log("Received submit-email data: ", dataParse);
-				} catch (error) {
-					console.error("Error parsing submit-email data:", error);
-				}
-			};
-
-			socket_IO_4499.current.on("input-email", handleInputEmail);
-			socket_IO_4499.current.on(
-				"input-email-confirm",
-				handleInputEmailConfirm
-			);
-			socket_IO_4499.current.on("submit-email", handleSubmitEmail);
-		}
-	}, [isConnected]);
 
 	useEffect(() => {
 		// Cari data kode pos berdasarkan kabupaten yang dipilih
@@ -912,7 +846,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 	const getStatusHeaderText = () => {
 		switch (statusCardBox) {
 			case "iddle":
-				return ["Please Scan your passport"];
+				return ["Scan your PLB passport"];
 			case "success":
 				return ["Passport has successfully", "scanned"];
 			case "errorchecksum":

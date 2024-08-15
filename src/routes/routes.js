@@ -49,24 +49,19 @@ const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? (
     element
   ) : (
-    <Navigate to="/" replace state={{ from: window.location.pathname }} />
+    <Navigate to="/home" replace state={{ from: window.location.pathname }} />
   );
 };
 
 const Routes = () => {
   return (
     <ReactRoutes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Home />} />
       <Route path="/menu" element={<SpvLogin />} />
       <Route path="/report" element={<Report />} />
       <Route path="/home" element={<Home />} />
       <Route path="/apply" element={<Apply />} />
       <Route path="/configuration" element={<Information />} />
-      {/* <Route path="/menu" element={<ProtectedRoute element={<SpvLogin />} />} />
-      <Route path="/report" element={<ProtectedRoute element={<Report />} />} />
-      <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
-      <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
-      <Route path="/configuration" element={<ProtectedRoute element={<Information />} />} /> */}
     </ReactRoutes>
   );
 };
