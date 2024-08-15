@@ -54,6 +54,16 @@ html {
   font-family: "Roboto", Arial, sans-serif;
 }
 
+.card-title2 {
+  font-size: 30px;
+  text-align: center;
+  color: #3d5889;
+  margin-top: 50px;
+  font-family: "Roboto",
+    Arial,
+    sans-serif;
+}
+
 p {
   text-align: center;
   justify-content: justify;
@@ -189,10 +199,12 @@ p {
 }
 
 @keyframes blink {
+
   0%,
   49% {
     opacity: 1;
   }
+
   50%,
   100% {
     opacity: 0;

@@ -137,30 +137,30 @@ const CardPayment = ({
 
   // Contoh penggunaan di tempat lain
   const handleTokenExpiration = () => {
-    const isTokenValid = checkAndHandleTokenExpiration();
+    // const isTokenValid = checkAndHandleTokenExpiration();
 
-    if (!isTokenValid) {
-      // Token has expired, handle the expiration here
-      Swal.fire({
-        icon: "error",
-        text: "Expired JWT Token",
-        confirmButtonColor: "#3d5889",
-      }).then((result) => {
-        // If the user clicks "OK", clear localStorage
-        if (result.isConfirmed) {
-          navigate("/");
-          localStorage.removeItem("user");
-          localStorage.removeItem("JwtToken");
-          localStorage.removeItem("cardNumberPetugas");
-          localStorage.removeItem("key");
-          localStorage.removeItem("token");
-          localStorage.removeItem("jenisDeviceId");
-          localStorage.removeItem("deviceId");
-          localStorage.removeItem("airportId");
-          localStorage.removeItem("price");
-        }
-      });
-    }
+    // if (!isTokenValid) {
+    //   // Token has expired, handle the expiration here
+    //   Swal.fire({
+    //     icon: "error",
+    //     text: "Expired JWT Token",
+    //     confirmButtonColor: "#3d5889",
+    //   }).then((result) => {
+    //     // If the user clicks "OK", clear localStorage
+    //     if (result.isConfirmed) {
+    //       // navigate("/");
+    //       localStorage.removeItem("user");
+    //       localStorage.removeItem("JwtToken");
+    //       localStorage.removeItem("cardNumberPetugas");
+    //       localStorage.removeItem("key");
+    //       localStorage.removeItem("token");
+    //       localStorage.removeItem("jenisDeviceId");
+    //       localStorage.removeItem("deviceId");
+    //       localStorage.removeItem("airportId");
+    //       localStorage.removeItem("price");
+    //     }
+    //   });
+    // }
   };
 
   useEffect(() => {

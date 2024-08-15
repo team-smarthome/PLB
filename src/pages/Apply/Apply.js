@@ -71,7 +71,7 @@ const Apply = () => {
         // console.log(response.data.maintenance);
         if (response.data.status === "success" && response.data.maintenance === 1) {
           // console.log("Maintenance is active");
-          navigate("/");
+          // navigate("/");
           localStorage.removeItem("user");
           localStorage.removeItem("JwtToken");
           localStorage.removeItem("cardNumberPetugas");
@@ -222,30 +222,30 @@ const Apply = () => {
 
   // Contoh penggunaan di tempat lain
   const handleTokenExpiration = () => {
-    const isTokenValid = checkAndHandleTokenExpiration();
+    // const isTokenValid = checkAndHandleTokenExpiration();
 
-    if (!isTokenValid) {
-      // Token has expired, handle the expiration here
-      Swal.fire({
-        icon: "error",
-        text: "Expired JWT Token",
-        confirmButtonColor: "#3d5889",
-      }).then((result) => {
-        // If the user clicks "OK", clear localStorage
-        if (result.isConfirmed) {
-          navigate("/");
-          localStorage.removeItem("user");
-          localStorage.removeItem("JwtToken");
-          localStorage.removeItem("cardNumberPetugas");
-          localStorage.removeItem("key");
-          localStorage.removeItem("token");
-          localStorage.removeItem("jenisDeviceId");
-          localStorage.removeItem("deviceId");
-          localStorage.removeItem("airportId");
-          localStorage.removeItem("price");
-        }
-      });
-    }
+    // if (!isTokenValid) {
+    //   // Token has expired, handle the expiration here
+    //   Swal.fire({
+    //     icon: "error",
+    //     text: "Expired JWT Token",
+    //     confirmButtonColor: "#3d5889",
+    //   }).then((result) => {
+    //     // If the user clicks "OK", clear localStorage
+    //     if (result.isConfirmed) {
+    //       // navigate("/");
+    //       localStorage.removeItem("user");
+    //       localStorage.removeItem("JwtToken");
+    //       localStorage.removeItem("cardNumberPetugas");
+    //       localStorage.removeItem("key");
+    //       localStorage.removeItem("token");
+    //       localStorage.removeItem("jenisDeviceId");
+    //       localStorage.removeItem("deviceId");
+    //       localStorage.removeItem("airportId");
+    //       localStorage.removeItem("price");
+    //     }
+    //   });
+    // }
   };
 
   const updateStatusPaymentCredit = (newstatusPaymentCredit) => {
@@ -295,7 +295,7 @@ const Apply = () => {
           data: "",
         };
         socket_IO.emit("WebClientMessage", JSON.stringify(params));
-        navigate("/home");
+        // navigate("/home");
       } else if (cardStatus === "inputEmail") {
         setTabStatus(1);
         setCardStatus("checkData");
@@ -332,8 +332,12 @@ const Apply = () => {
         setCardStatus("goPayment");
         // setTitleHeader("Payment");
       } else if (cardStatus === "emailSucces") {
-        setCardStatus("postalCode");
+        // setCardStatus("postalCode");
+        setCardStatus("lookCamera")
         setTabStatus(3);
+      } else if (cardStatus === "takePhotoSucces") {
+        setCardStatus("postalCode");
+        setTabStatus(4);
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
@@ -548,407 +552,407 @@ const Apply = () => {
 
     setIsEnableStep(false);
 
-    // console.log("bodyParam", bodyParam);
+    console.log("bodyParam", bodyParam);
 
-    try {
-      setCardPaymentProps({
-        isCreditCard: false,
-        isPaymentCredit: false,
-        isPaymentCash: false,
-        isWaiting: true,
-        isPrinted: false,
-        isSuccess: false,
-        isFailed: false,
-        isPhoto: false,
-        isDoRetake: false,
-      });
-      let res;
-      if (dataTrueorFalse === "true") {
-        res = await apiPaymentGatewaySearch(header, bodyParam);
-      } else {
-        res = await apiPaymentGateway(header, bodyParam);
-      }
-      const data = res.data;
-      // console.log("dataREsponse", res);
-      // console.log("dataREsponse", data);
-      setDataPermohonan(data.data);
-      if (data.code === 200) {
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: true,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-        });
-        setDisabled(true);
-        setTimeout(() => {
-          setCardPaymentProps({
-            isWaiting: false,
-            isCreditCard: false,
-            isPaymentCredit: false,
-            isPaymentCash: false,
-            isPrinted: false,
-            isSuccess: true,
-            isFailed: false,
-            isPhoto: false,
-          });
-          const params = {
-            code: "email",
-            data: "",
-          };
-          socket_IO.emit("WebClientMessage", JSON.stringify(params));
-          setTimeout(() => {
-            setSharedData(null);
-            setStatusPaymentCredit(false);
-            setRecievedTempData([]);
-            setDataPrimaryPassport(null);
-          }, 3000);
-        }, 3000);
-      } else if (
-        data.status === "Failed" ||
-        data.code === 500 ||
-        data.status === "failed" ||
-        data.status === 500 ||
-        data.code === 400 ||
-        data.code === 401 ||
-        data.status === "error" ||
-        data.status === "Error" ||
-        data.status === 400
-      ) {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
-        setStatusPaymentCredit(false);
-        const messageError = data.message;
-        // console.log("dataError1", data);
-        // console.log("dataError1", data.message);
-        // console.log("dataError1", messageError);
+    // try {
+    //   setCardPaymentProps({
+    //     isCreditCard: false,
+    //     isPaymentCredit: false,
+    //     isPaymentCash: false,
+    //     isWaiting: true,
+    //     isPrinted: false,
+    //     isSuccess: false,
+    //     isFailed: false,
+    //     isPhoto: false,
+    //     isDoRetake: false,
+    //   });
+    //   let res;
+    //   if (dataTrueorFalse === "true") {
+    //     res = await apiPaymentGatewaySearch(header, bodyParam);
+    //   } else {
+    //     res = await apiPaymentGateway(header, bodyParam);
+    //   }
+    //   const data = res.data;
+    //   // console.log("dataREsponse", res);
+    //   // console.log("dataREsponse", data);
+    //   setDataPermohonan(data.data);
+    //   if (data.code === 200) {
+    //     setCardPaymentProps({
+    //       isWaiting: false,
+    //       isCreditCard: false,
+    //       isPaymentCredit: false,
+    //       isPaymentCash: false,
+    //       isPrinted: true,
+    //       isSuccess: false,
+    //       isFailed: false,
+    //       isPhoto: false,
+    //     });
+    //     setDisabled(true);
+    //     setTimeout(() => {
+    //       setCardPaymentProps({
+    //         isWaiting: false,
+    //         isCreditCard: false,
+    //         isPaymentCredit: false,
+    //         isPaymentCash: false,
+    //         isPrinted: false,
+    //         isSuccess: true,
+    //         isFailed: false,
+    //         isPhoto: false,
+    //       });
+    //       const params = {
+    //         code: "email",
+    //         data: "",
+    //       };
+    //       socket_IO.emit("WebClientMessage", JSON.stringify(params));
+    //       setTimeout(() => {
+    //         setSharedData(null);
+    //         setStatusPaymentCredit(false);
+    //         setRecievedTempData([]);
+    //         setDataPrimaryPassport(null);
+    //       }, 3000);
+    //     }, 3000);
+    //   } else if (
+    //     data.status === "Failed" ||
+    //     data.code === 500 ||
+    //     data.status === "failed" ||
+    //     data.status === 500 ||
+    //     data.code === 400 ||
+    //     data.code === 401 ||
+    //     data.status === "error" ||
+    //     data.status === "Error" ||
+    //     data.status === 400
+    //   ) {
+    //     const params = {
+    //       code: "email",
+    //       data: "",
+    //     };
+    //     socket_IO.emit("WebClientMessage", JSON.stringify(params));
+    //     setStatusPaymentCredit(false);
+    //     const messageError = data.message;
+    //     // console.log("dataError1", data);
+    //     // console.log("dataError1", data.message);
+    //     // console.log("dataError1", messageError);
 
-        setMessageConfirm(messageError);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: true,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setTimeout(() => {
-          if (messageError === "Passport is not from voa country.") {
-            setDisabled(false);
-            setCardStatus("errorVoa");
-            setTitleFooter("Next Step");
-            setTabStatus(1);
-            setTitleHeader("Apply VOA");
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-              isPhoto: false,
-              isDoRetake: false,
-            });
-            setTimeout(() => {
-              setStatusPaymentCredit(false);
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-            }, 5000);
-          } else if (messageError === "Passport is not active for at least") {
-            setDisabled(false);
-            setTitleHeader("Apply VOA");
-            setCardStatus("errorBulan");
-            setTitleFooter("Next Step");
-            setTabStatus(1);
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-              isPhoto: false,
-              isDoRetake: false,
-            });
-            setTimeout(() => {
-              setStatusPaymentCredit(false);
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-            }, 5000);
-          } else if (messageError === "Passport is from danger country.") {
-            setDisabled(false);
-            setTitleHeader("Apply VOA");
-            setCardStatus("errorDanger");
-            setTitleFooter("Next Step");
-            setTabStatus(1);
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-              isPhoto: false,
-              isDoRetake: false,
-            });
-            setTimeout(() => {
-              setStatusPaymentCredit(false);
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-            }, 5000);
-          } else if (
-            messageError === "Passport is already had staypermit active."
-          ) {
-            setDisabled(false);
-            setCardStatus("errorIntal");
-            setTitleFooter("Next Step");
-            setTabStatus(1);
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-              isPhoto: false,
-              isDoRetake: false,
-            });
-            setTimeout(() => {
-              setStatusPaymentCredit(false);
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-              setTitleHeader("Apply VOA");
-            }, 5000);
-          } else if (messageError === "Failed when request payment pg") {
-            // setTimeout(() => {
-            setDisabled(false);
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-              isPhoto: false,
-              isDoRetake: false,
-            });
-            // }, 2000);
-          } else if (
-            messageError === "Invalid JWT Token" ||
-            messageError === "Expired JWT Token"
-          ) {
-            setTimeout(() => {
-              setDisabled(false);
-              setTitleFooter("Next Step");
-              setTabStatus(1);
-              setStatusPaymentCredit(false);
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-              setCardPaymentProps({
-                isWaiting: false,
-                isCreditCard: false,
-                isPaymentCredit: false,
-                isPaymentCash: false,
-                isPrinted: false,
-                isSuccess: false,
-                isFailed: false,
-                isPhoto: false,
-                isDoRetake: false,
-              });
-              localStorage.removeItem("user");
-              localStorage.removeItem("JwtToken");
-              localStorage.removeItem("cardNumberPetugas");
-              localStorage.removeItem("key");
-              localStorage.removeItem("token");
-              localStorage.removeItem("jenisDeviceId");
-              localStorage.removeItem("deviceId");
-              localStorage.removeItem("airportId");
-              localStorage.removeItem("price");
-            }, 5000);
-          } else if (
-            messageError === "Required field 'photoFace' is missing" ||
-            messageError ===
-            "Face on the passport doesn't match with captured image."
-          ) {
-            setCardPaymentProps({
-              isWaiting: false,
-              isCreditCard: false,
-              isPaymentCredit: false,
-              isPaymentCash: false,
-              isPrinted: false,
-              isSuccess: false,
-              isFailed: false,
-              isPhoto: true,
-              isDoRetake: false,
-            });
-            setIsEnableBack(false);
-            setIsEnableStep(false);
-            setDisabled(false);
+    //     setMessageConfirm(messageError);
+    //     setCardPaymentProps({
+    //       isWaiting: false,
+    //       isCreditCard: false,
+    //       isPaymentCredit: false,
+    //       isPaymentCash: false,
+    //       isPrinted: false,
+    //       isSuccess: false,
+    //       isFailed: true,
+    //       isPhoto: false,
+    //       isDoRetake: false,
+    //     });
+    //     setTimeout(() => {
+    //       if (messageError === "Passport is not from voa country.") {
+    //         setDisabled(false);
+    //         setCardStatus("errorVoa");
+    //         setTitleFooter("Next Step");
+    //         setTabStatus(1);
+    //         setTitleHeader("Apply VOA");
+    //         setCardPaymentProps({
+    //           isWaiting: false,
+    //           isCreditCard: false,
+    //           isPaymentCredit: false,
+    //           isPaymentCash: false,
+    //           isPrinted: false,
+    //           isSuccess: false,
+    //           isFailed: false,
+    //           isPhoto: false,
+    //           isDoRetake: false,
+    //         });
+    //         setTimeout(() => {
+    //           setStatusPaymentCredit(false);
+    //           if (data === "true" || dataTrueorFalse === "true") {
+    //             setCardStatus("searchPassport");
+    //           } else {
+    //             setCardStatus("iddle");
+    //           }
+    //           setRecievedTempData([]);
+    //           setDataPrimaryPassport(null);
+    //           setIsEnableBack(true);
+    //         }, 5000);
+    //       } else if (messageError === "Passport is not active for at least") {
+    //         setDisabled(false);
+    //         setTitleHeader("Apply VOA");
+    //         setCardStatus("errorBulan");
+    //         setTitleFooter("Next Step");
+    //         setTabStatus(1);
+    //         setCardPaymentProps({
+    //           isWaiting: false,
+    //           isCreditCard: false,
+    //           isPaymentCredit: false,
+    //           isPaymentCash: false,
+    //           isPrinted: false,
+    //           isSuccess: false,
+    //           isFailed: false,
+    //           isPhoto: false,
+    //           isDoRetake: false,
+    //         });
+    //         setTimeout(() => {
+    //           setStatusPaymentCredit(false);
+    //           if (data === "true" || dataTrueorFalse === "true") {
+    //             setCardStatus("searchPassport");
+    //           } else {
+    //             setCardStatus("iddle");
+    //           }
+    //           setRecievedTempData([]);
+    //           setDataPrimaryPassport(null);
+    //           setIsEnableBack(true);
+    //         }, 5000);
+    //       } else if (messageError === "Passport is from danger country.") {
+    //         setDisabled(false);
+    //         setTitleHeader("Apply VOA");
+    //         setCardStatus("errorDanger");
+    //         setTitleFooter("Next Step");
+    //         setTabStatus(1);
+    //         setCardPaymentProps({
+    //           isWaiting: false,
+    //           isCreditCard: false,
+    //           isPaymentCredit: false,
+    //           isPaymentCash: false,
+    //           isPrinted: false,
+    //           isSuccess: false,
+    //           isFailed: false,
+    //           isPhoto: false,
+    //           isDoRetake: false,
+    //         });
+    //         setTimeout(() => {
+    //           setStatusPaymentCredit(false);
+    //           if (data === "true" || dataTrueorFalse === "true") {
+    //             setCardStatus("searchPassport");
+    //           } else {
+    //             setCardStatus("iddle");
+    //           }
+    //           setRecievedTempData([]);
+    //           setDataPrimaryPassport(null);
+    //           setIsEnableBack(true);
+    //         }, 5000);
+    //       } else if (
+    //         messageError === "Passport is already had staypermit active."
+    //       ) {
+    //         setDisabled(false);
+    //         setCardStatus("errorIntal");
+    //         setTitleFooter("Next Step");
+    //         setTabStatus(1);
+    //         setCardPaymentProps({
+    //           isWaiting: false,
+    //           isCreditCard: false,
+    //           isPaymentCredit: false,
+    //           isPaymentCash: false,
+    //           isPrinted: false,
+    //           isSuccess: false,
+    //           isFailed: false,
+    //           isPhoto: false,
+    //           isDoRetake: false,
+    //         });
+    //         setTimeout(() => {
+    //           setStatusPaymentCredit(false);
+    //           if (data === "true" || dataTrueorFalse === "true") {
+    //             setCardStatus("searchPassport");
+    //           } else {
+    //             setCardStatus("iddle");
+    //           }
+    //           setRecievedTempData([]);
+    //           setDataPrimaryPassport(null);
+    //           setIsEnableBack(true);
+    //           setTitleHeader("Apply VOA");
+    //         }, 5000);
+    //       } else if (messageError === "Failed when request payment pg") {
+    //         // setTimeout(() => {
+    //         setDisabled(false);
+    //         setCardPaymentProps({
+    //           isWaiting: false,
+    //           isCreditCard: false,
+    //           isPaymentCredit: false,
+    //           isPaymentCash: false,
+    //           isPrinted: false,
+    //           isSuccess: false,
+    //           isFailed: false,
+    //           isPhoto: false,
+    //           isDoRetake: false,
+    //         });
+    //         // }, 2000);
+    //       } else if (
+    //         messageError === "Invalid JWT Token" ||
+    //         messageError === "Expired JWT Token"
+    //       ) {
+    //         setTimeout(() => {
+    //           setDisabled(false);
+    //           setTitleFooter("Next Step");
+    //           setTabStatus(1);
+    //           setStatusPaymentCredit(false);
+    //           if (data === "true" || dataTrueorFalse === "true") {
+    //             setCardStatus("searchPassport");
+    //           } else {
+    //             setCardStatus("iddle");
+    //           }
+    //           setRecievedTempData([]);
+    //           setDataPrimaryPassport(null);
+    //           setIsEnableBack(true);
+    //           setCardPaymentProps({
+    //             isWaiting: false,
+    //             isCreditCard: false,
+    //             isPaymentCredit: false,
+    //             isPaymentCash: false,
+    //             isPrinted: false,
+    //             isSuccess: false,
+    //             isFailed: false,
+    //             isPhoto: false,
+    //             isDoRetake: false,
+    //           });
+    //           localStorage.removeItem("user");
+    //           localStorage.removeItem("JwtToken");
+    //           localStorage.removeItem("cardNumberPetugas");
+    //           localStorage.removeItem("key");
+    //           localStorage.removeItem("token");
+    //           localStorage.removeItem("jenisDeviceId");
+    //           localStorage.removeItem("deviceId");
+    //           localStorage.removeItem("airportId");
+    //           localStorage.removeItem("price");
+    //         }, 5000);
+    //       } else if (
+    //         messageError === "Required field 'photoFace' is missing" ||
+    //         messageError ===
+    //         "Face on the passport doesn't match with captured image."
+    //       ) {
+    //         setCardPaymentProps({
+    //           isWaiting: false,
+    //           isCreditCard: false,
+    //           isPaymentCredit: false,
+    //           isPaymentCash: false,
+    //           isPrinted: false,
+    //           isSuccess: false,
+    //           isFailed: false,
+    //           isPhoto: true,
+    //           isDoRetake: false,
+    //         });
+    //         setIsEnableBack(false);
+    //         setIsEnableStep(false);
+    //         setDisabled(false);
 
-            //ubah nilai photoFace jadi null
-            sharedData.photoFace = "";
-          } else {
-            setTimeout(() => {
-              setDisabled(false);
-              setTitleFooter("Next Step");
-              setTabStatus(1);
-              setStatusPaymentCredit(false);
-              if (data === "true" || dataTrueorFalse === "true") {
-                setCardStatus("searchPassport");
-              } else {
-                setCardStatus("iddle");
-              }
-              setRecievedTempData([]);
-              setDataPrimaryPassport(null);
-              setIsEnableBack(true);
-              setCardPaymentProps({
-                isWaiting: false,
-                isCreditCard: false,
-                isPaymentCredit: false,
-                isPaymentCash: false,
-                isPrinted: false,
-                isSuccess: false,
-                isFailed: false,
-                isPhoto: false,
-                isDoRetake: false,
-              });
-            }, 5000);
-          }
-        }, 1000);
-      } else if (data.message === "Unauthorized") {
-        setStatusPaymentCredit(false);
-        const messageError = data.message;
-        setMessageConfirm(messageError);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: true,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setTimeout(() => {
-          setDataPrimaryPassport(null);
-          setDisabled(false);
-          setTitleHeader("Apply VOA");
-          setTitleFooter("Next Step");
-          setTabStatus(1);
-          setCardPaymentProps({
-            isWaiting: false,
-            isCreditCard: false,
-            isPaymentCredit: false,
-            isPaymentCash: false,
-            isPrinted: false,
-            isSuccess: false,
-            isFailed: false,
-            isPhoto: false,
-            isDoRetake: false,
-          });
-          setTimeout(() => {
-            navigate("/home");
-            setStatusPaymentCredit(false);
-            if (data === "true" || dataTrueorFalse === "true") {
-              setCardStatus("searchPassport");
-            } else {
-              setCardStatus("iddle");
-            }
-            setRecievedTempData([]);
-            setDataPrimaryPassport(null);
-            setIsEnableBack(true);
-          }, 5000);
+    //         //ubah nilai photoFace jadi null
+    //         sharedData.photoFace = "";
+    //       } else {
+    //         setTimeout(() => {
+    //           setDisabled(false);
+    //           setTitleFooter("Next Step");
+    //           setTabStatus(1);
+    //           setStatusPaymentCredit(false);
+    //           if (data === "true" || dataTrueorFalse === "true") {
+    //             setCardStatus("searchPassport");
+    //           } else {
+    //             setCardStatus("iddle");
+    //           }
+    //           setRecievedTempData([]);
+    //           setDataPrimaryPassport(null);
+    //           setIsEnableBack(true);
+    //           setCardPaymentProps({
+    //             isWaiting: false,
+    //             isCreditCard: false,
+    //             isPaymentCredit: false,
+    //             isPaymentCash: false,
+    //             isPrinted: false,
+    //             isSuccess: false,
+    //             isFailed: false,
+    //             isPhoto: false,
+    //             isDoRetake: false,
+    //           });
+    //         }, 5000);
+    //       }
+    //     }, 1000);
+    //   } else if (data.message === "Unauthorized") {
+    //     setStatusPaymentCredit(false);
+    //     const messageError = data.message;
+    //     setMessageConfirm(messageError);
+    //     setCardPaymentProps({
+    //       isWaiting: false,
+    //       isCreditCard: false,
+    //       isPaymentCredit: false,
+    //       isPaymentCash: false,
+    //       isPrinted: false,
+    //       isSuccess: false,
+    //       isFailed: true,
+    //       isPhoto: false,
+    //       isDoRetake: false,
+    //     });
+    //     setTimeout(() => {
+    //       setDataPrimaryPassport(null);
+    //       setDisabled(false);
+    //       setTitleHeader("Apply VOA");
+    //       setTitleFooter("Next Step");
+    //       setTabStatus(1);
+    //       setCardPaymentProps({
+    //         isWaiting: false,
+    //         isCreditCard: false,
+    //         isPaymentCredit: false,
+    //         isPaymentCash: false,
+    //         isPrinted: false,
+    //         isSuccess: false,
+    //         isFailed: false,
+    //         isPhoto: false,
+    //         isDoRetake: false,
+    //       });
+    //       setTimeout(() => {
+    //         navigate("/home");
+    //         setStatusPaymentCredit(false);
+    //         if (data === "true" || dataTrueorFalse === "true") {
+    //           setCardStatus("searchPassport");
+    //         } else {
+    //           setCardStatus("iddle");
+    //         }
+    //         setRecievedTempData([]);
+    //         setDataPrimaryPassport(null);
+    //         setIsEnableBack(true);
+    //       }, 5000);
 
-        }, 2000);
-      }
-    } catch (err) {
-      setCardPaymentProps({
-        isWaiting: false,
-        isCreditCard: false,
-        isPaymentCredit: false,
-        isPaymentCash: false,
-        isPrinted: false,
-        isSuccess: false,
-        isFailed: true,
-        isPhoto: false,
-        isDoRetake: false,
-      });
-      setTimeout(() => {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        socket_IO.emit("WebClientMessage", JSON.stringify(params));
-        setDisabled(false);
-        setTitleFooter("Next Step");
-        setTabStatus(1);
-        setStatusPaymentCredit(false);
-        if (data === "true" || dataTrueorFalse === "true") {
-          setCardStatus("searchPassport");
-        } else {
-          setCardStatus("iddle");
-        }
-        setRecievedTempData([]);
-        setDataPrimaryPassport(null);
-        setIsEnableBack(true);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-      }, 5000);
-    }
+    //     }, 2000);
+    //   }
+    // } catch (err) {
+    //   setCardPaymentProps({
+    //     isWaiting: false,
+    //     isCreditCard: false,
+    //     isPaymentCredit: false,
+    //     isPaymentCash: false,
+    //     isPrinted: false,
+    //     isSuccess: false,
+    //     isFailed: true,
+    //     isPhoto: false,
+    //     isDoRetake: false,
+    //   });
+    //   setTimeout(() => {
+    //     const params = {
+    //       code: "email",
+    //       data: "",
+    //     };
+    //     socket_IO.emit("WebClientMessage", JSON.stringify(params));
+    //     setDisabled(false);
+    //     setTitleFooter("Next Step");
+    //     setTabStatus(1);
+    //     setStatusPaymentCredit(false);
+    //     if (data === "true" || dataTrueorFalse === "true") {
+    //       setCardStatus("searchPassport");
+    //     } else {
+    //       setCardStatus("iddle");
+    //     }
+    //     setRecievedTempData([]);
+    //     setDataPrimaryPassport(null);
+    //     setIsEnableBack(true);
+    //     setCardPaymentProps({
+    //       isWaiting: false,
+    //       isCreditCard: false,
+    //       isPaymentCredit: false,
+    //       isPaymentCash: false,
+    //       isPrinted: false,
+    //       isSuccess: false,
+    //       isFailed: false,
+    //       isPhoto: false,
+    //       isDoRetake: false,
+    //     });
+    //   }, 5000);
+    // }
   };
 
   useEffect(() => {
@@ -1129,7 +1133,7 @@ const Apply = () => {
             isPhoto: false,
             isDoRetake: false,
           });
-          navigate("/");
+          // navigate("/");
           localStorage.removeItem("user");
           localStorage.removeItem("JwtToken");
           localStorage.removeItem("cardNumberPetugas");

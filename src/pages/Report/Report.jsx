@@ -114,7 +114,7 @@ function Report() {
       startDate !== payloadTempt.startDate ||
       endDate !== payloadTempt.endDate ||
       JSON.stringify(paymentMethodValue) !==
-        JSON.stringify(payloadTempt.paymentMethod) ||
+      JSON.stringify(payloadTempt.paymentMethod) ||
       perPage !== payloadTempt.limit
     ) {
       setPages(1);

@@ -10,7 +10,7 @@ html {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 6px;
 }
 
 .card-list-item {
@@ -22,10 +22,10 @@ html {
   height: 15px;
   background-color: #a3a9a5;
   width: 5%;
-  font-size: 25px;
+  font-size: 20px;
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
-  padding: 1.2rem;
+  padding: 1rem;
   color: #fff;
   border-radius: 18px;
   cursor: pointer;
@@ -39,11 +39,11 @@ html {
 .list-content {
   background-color: #a3a9a5;
   width: 100%;
-  font-size: 25px;
+  font-size: 20px;
   height: 15px;
   font-family: "Roboto", Arial, sans-serif;
   font-weight: bold;
-  padding: 1.2rem;
+  padding: 1rem;
   color: #fff;
   border-radius: 10px;
   cursor: pointer;
