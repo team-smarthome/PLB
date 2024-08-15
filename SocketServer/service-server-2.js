@@ -172,19 +172,19 @@ async function kirimSnapshot(socket) {
       },
     });
 
-    console.log("Response:", response.data); 
+    console.log("Response:", response.data);
 
     if (response.data.message === "success") {
       setTimeout(() => {
         const directoryPath =
           "D:/transforme/E-VOA/new-device/camera-1/temp/12321SS4BAHS";
-          if (!fs.existsSync(directoryPath)) {
-            socket.emit("not-found-directory", {
-              "message": "directory-not-found"
-            });
-            console.log("Direktori tidak ditemukan.");
-            return;
-          }
+        if (!fs.existsSync(directoryPath)) {
+          socket.emit("not-found-directory", {
+            "message": "directory-not-found"
+          });
+          console.log("Direktori tidak ditemukan.");
+          return;
+        }
         const files = fs.readdirSync(directoryPath);
         let newestFile;
         let newestTime = 0;
@@ -360,8 +360,7 @@ function setupDevicesEvent(devices) {
             .toString(16)
             .padStart(2, "0");
           console.log(
-            `[=] ${1}: ${substringChunk} ${
-              aflChunks[0]
+            `[=] ${1}: ${substringChunk} ${aflChunks[0]
             } SFI: ${updatedHexValue} P1: ${p1} P2: ${p2}`
           );
           let responseReadRecord = await commandReadRecord(application, card, [
@@ -457,8 +456,7 @@ function setupDevicesEvent(devices) {
             .toString(16)
             .padStart(2, "0");
           console.log(
-            `[=] ${1}: ${substringChunk} ${
-              aflChunks[1]
+            `[=] ${1}: ${substringChunk} ${aflChunks[1]
             } SFI: ${updatedHexValue} P1: ${p1} P2: ${p2}`
           );
 
@@ -601,8 +599,7 @@ function setupDevicesEvent(devices) {
               hexify.toByteArray(aidList[i].value)
             );
             console.info(
-              `SELECT APP WITH AID Response index: '${
-                aidList[i].value
+              `SELECT APP WITH AID Response index: '${aidList[i].value
               }' '${responseSelectAID.isOk()}' '${responseSelectAID}' '${responseSelectAID.meaning()}'`
             );
             if (responseSelectAID.isOk()) {

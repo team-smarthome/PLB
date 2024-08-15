@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
-import DataContext from "../../context/DataContext";
-
 
 const FormData = ({ sharedData, setSharedData, cardStatus }) => {
-  const { data } = useContext(DataContext);
-  // passportNumber
+  // PLB / BCP Number
   const [isCheckedPassportNumber, setIsCheckedPassportNumber] = useState(false);
+  //Registrasion Number
+  const [isCheckedRegisterCode, setIsCheckedRegisterCode] = useState(false);
   // fullName
   const [isCheckedFullName, setIsCheckedFullName] = useState(false);
   // dateOfBirth
@@ -20,15 +19,19 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   const [isCheckedNationality, setIsCheckedNationality] = useState(false);
   // expiryDate
   const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
-  // pasporType
-  const [isCheckedPasporType, setIsCheckedPasporType] = useState(false);
+  // arrivalTime
+  const [isCheckedArrivalTime, setIsCheckedArrivalTime] = useState(false);
+  // destinationLocation
+  const [isCheckedDestinationLocation, setIsCheckedDestinationLocation] = useState(false);
 
   const [optionNegara, setOptionNegara] = useState([]);
   const [optionGender, setOptionGender] = useState([]);
-  const [nilaiTrue, setNilaiTrue] = useState(false);
 
   // passportNumber
   const [isCommentDisabledPassportNumber, setIsCommentDisabledPassportNumber] =
+    useState(true);
+  //Registrasion Number
+  const [isCommentDisabledRegisterCode, setIsCommentDisabledRegisterCode] =
     useState(true);
   // fullName
   const [isCommentDisabledFullName, setIsCommentDisabledFullName] =
@@ -44,49 +47,32 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   // expiryDate
   const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
     useState(true);
-  // pasporType
-  const [isCommentDisabledPasporType, setIsCommentDisabledPasporType] =
+  // arrivalTime
+  const [isCommentDisabledArrivalTime, setIsCommentDisabledArrivalTime] =
     useState(true);
-  const [statusSearch, setStatusSearch] = useState(false);
+  // destinationLocation
+  const [isCommentDisabledDestinationLocation, setIsCommentDisabledDestinationLocation] =
+    useState(true);
 
   const initialFormData = {
     passport_number: "",
+    register_code: "",
     full_name: "",
     date_of_birth: "",
     sex: "",
     nationality: "",
     expiry_date: "",
-    paspor_type: "",
+    arrival_time: "",
+    destination_location: "",
     photo: "",
-    email: "",
-    city: "",
-    postalCode: "",
-    address: "",
-    register_code: "",
   };
+
   const [formdata, setFormData] = useState(initialFormData);
-  useEffect(() => {
-    if (data) {
-      setStatusSearch(true);
-      setNilaiTrue(true);
-    } else {
-      const checkData = localStorage.getItem("dataStatus");
-      if (checkData === "true") {
-        setNilaiTrue(true);
-        setStatusSearch(true);
-      } else {
-        setNilaiTrue(false);
-        setStatusSearch(false);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     if (sharedData.passportData === null) {
-      // console.log("test shared data null");
       setFormData(initialFormData);
     } else {
-      // console.log("sharedData", sharedData.passportData);
       const dataNationality = dataNegara.data.map((negara) => ({
         value: negara.id_negara,
         label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
@@ -121,20 +107,14 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         setFormData((prevData) => ({
           ...prevData,
           passport_number: sharedData.passportData.docNumber || "",
+          register_code: sharedData.passportData.noRegister || "",
           full_name: sharedData.passportData.fullName || "",
           date_of_birth: sharedData.passportData.formattedBirthDate || "",
           nationality:
             filteredNationality.length > 0 ? filteredNationality[0] : "",
           expiry_date: sharedData.passportData.formattedExpiryDate || "",
-          email: sharedData.passportData.email || "",
-          register_code: sharedData.passportData.noRegister || "",
-          postalCode: sharedData.passportData.postal_code || "",
-          city: sharedData.passportData.city || "",
-          address: sharedData.passportData.address || "",
-          passport_type:
-            (sharedData.passportData.docType === "P" || "PM"
-              ? "PASSPORT"
-              : sharedData.passportData.docType) || "",
+          arrival_time: sharedData.passportData.arrivalTime || "",
+          destination_location: sharedData.passportData.destinationLocation || "",
         }));
       }
 
@@ -142,31 +122,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         ...prevData,
         photo: sharedData.photoFace || "",
       }));
-
-      // if (!nilaiTrue) {
-      setFormData((prevData) => ({
-        ...prevData,
-        city: sharedData.city || sharedData.passportData.city,
-      }));
-
-      setFormData((prevData) => ({
-        ...prevData,
-        postalCode: sharedData.postal_code || sharedData.passportData.postal_code,
-      }));
-      // }
-
-
-
-      setFormData((prevData) => ({
-        ...prevData,
-        email: sharedData.email || sharedData.passportData.email || "",
-      }));
     }
   }, [sharedData]);
 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // console.log(name, value);
     setFormData({
       ...formdata,
       [name]: value,
@@ -182,27 +143,45 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
 
   const handleImageClick = (type) => {
-    if (type === "expiry_date") {
-      setIsCheckedExpiryDate(!isCheckedExpiryDate);
-      setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
-    } else if (type === "paspor_type") {
-      setIsCheckedPasporType(!isCheckedPasporType);
-      setIsCommentDisabledPasporType(!isCommentDisabledPasporType);
-    } else if (type === "nationality") {
-      setIsCheckedNationality(!isCheckedNationality);
-      setIsCommentDisabledNationality(!isCommentDisabledNationality);
-    } else if (type === "passport_number") {
-      setIsCheckedPassportNumber(!isCheckedPassportNumber);
-      setIsCommentDisabledPassportNumber(!isCommentDisabledPassportNumber);
-    } else if (type === "full_name") {
-      setIsCheckedFullName(!isCheckedFullName);
-      setIsCommentDisabledFullName(!isCommentDisabledFullName);
-    } else if (type === "date_of_birth") {
-      setIsCheckedDateOfBirth(!isCheckedDateOfBirth);
-      setIsCommentDisabledDateOfBirth(!isCommentDisabledDateOfBirth);
-    } else if (type === "gender") {
-      setIsCheckedGender(!isCheckedGender);
-      setIsCommentDisabledGender(!isCommentDisabledGender);
+    switch (type) {
+      case "passport_number":
+        setIsCheckedPassportNumber(!isCheckedPassportNumber);
+        setIsCommentDisabledPassportNumber(!isCommentDisabledPassportNumber);
+        break;
+      case "register_code":
+        setIsCheckedRegisterCode(!isCheckedRegisterCode);
+        setIsCommentDisabledRegisterCode(!isCommentDisabledRegisterCode);
+        break;
+      case "full_name":
+        setIsCheckedFullName(!isCheckedFullName);
+        setIsCommentDisabledFullName(!isCommentDisabledFullName);
+        break;
+      case "date_of_birth":
+        setIsCheckedDateOfBirth(!isCheckedDateOfBirth);
+        setIsCommentDisabledDateOfBirth(!isCommentDisabledDateOfBirth);
+        break;
+      case "gender":
+        setIsCheckedGender(!isCheckedGender);
+        setIsCommentDisabledGender(!isCommentDisabledGender);
+        break;
+      case "nationality":
+        setIsCheckedNationality(!isCheckedNationality);
+        setIsCommentDisabledNationality(!isCommentDisabledNationality);
+        break;
+      case "expiry_date":
+        setIsCheckedExpiryDate(!isCheckedExpiryDate);
+        setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
+        break;
+      case "arrival_time":
+        setIsCheckedArrivalTime(!isCheckedArrivalTime);
+        setIsCommentDisabledArrivalTime(!isCommentDisabledArrivalTime);
+        break;
+      case "destination_location":
+        setIsCheckedDestinationLocation(!isCheckedDestinationLocation);
+        setIsCommentDisabledDestinationLocation(!isCommentDisabledDestinationLocation);
+        break;
+      default:
+        break;
     }
   };
 
@@ -222,6 +201,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   };
 
   const handleSubmit = async (e) => {
+    console.log("masukkesini")
+    console.log('Form_submitted:', formdata);
     e.preventDefault();
   };
 
@@ -231,7 +212,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="passport_number">Passport Number</label>
+              <label htmlFor="passport_number">PLB / BCP Number</label>
             </div>
             <input
               type="text"
@@ -240,12 +221,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.passport_number}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "checkData" ? !isCheckedPassportNumber : true
+                cardStatus === "iddle" ? !isCheckedPassportNumber : true
               }
               className="disabled-input"
             />
 
-            {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledPassportNumber && (
@@ -267,6 +248,42 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
+              <label htmlFor="register_code">Registrasion Number</label>
+            </div>
+            <input
+              type="text"
+              name="noRegister"
+              id="register_code"
+              value={formdata.register_code}
+              onChange={handleInputChange}
+              disabled={
+                cardStatus === "iddle" ? !isCheckedRegisterCode : true
+              }
+              className="disabled-input"
+            />
+
+            {cardStatus === "iddle" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledRegisterCode && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  alt="Checklist Icon"
+                  className={`checklist-img ${!isCheckedRegisterCode ? "dimmed" : ""
+                    }`}
+                  onClick={() => handleImageClick("register_code")}
+                />
+              </>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
               <label htmlFor="full_name">Full Name</label>
             </div>
             <input
@@ -275,11 +292,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
-              disabled={cardStatus === "checkData" ? !isCheckedFullName : true}
+              disabled={cardStatus === "iddle" ? !isCheckedFullName : true}
               className="disabled-input"
             />
 
-            {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledFullName && (
@@ -310,11 +327,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.date_of_birth}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "checkData" ? !isCheckedDateOfBirth : true
+                cardStatus === "iddle" ? !isCheckedDateOfBirth : true
               }
               className="disabled-input"
             />
-            {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledDateOfBirth && (
@@ -348,7 +365,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "sex")
               }
-              isDisabled={cardStatus === "checkData" ? !isCheckedGender : true}
+              isDisabled={cardStatus === "iddle" ? !isCheckedGender : true}
               options={optionGender}
               className="basic-single"
               classNamePrefix="select"
@@ -374,7 +391,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 }),
               }}
             />
-            {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledGender && (
@@ -409,7 +426,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 handleSelectChange(selectedOption, "nationality")
               }
               isDisabled={
-                cardStatus === "checkData" ? !isCheckedNationality : true
+                cardStatus === "iddle" ? !isCheckedNationality : true
               }
               options={optionNegara}
               className="basic-single"
@@ -436,7 +453,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 }),
               }}
             />
-            {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledNationality && (
@@ -458,7 +475,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="expiry_date">Expiry Date</label>
+              <label htmlFor="expiry_date">Expired Date</label>
             </div>
             <input
               type="date"
@@ -467,11 +484,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               value={formdata.expiry_date}
               onChange={handleInputChange}
               disabled={
-                cardStatus === "checkData" ? !isCheckedExpiryDate : true
+                cardStatus === "iddle" ? !isCheckedExpiryDate : true
               }
               className="disabled-input"
             />
-            {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
                   {isCommentDisabledExpiryDate && (
@@ -492,198 +509,98 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           </div>
         </div>
 
-        {statusSearch ? null : (
-          <div className="form-group">
-            <div className="wrapper-form">
-              <div className="wrapper-input">
-                <label htmlFor="paspor_type">Passport Type</label>
-              </div>
-              <input
-                type="text"
-                name="docType"
-                id="paspor_type"
-                value={formdata.passport_type}
-                onChange={handleInputChange}
-                disabled={
-                  cardStatus === "checkData" ? !isCheckedPasporType : true
-                }
-                className="disabled-input"
-              />
-
-              {cardStatus === "checkData" ? (
-                <>
-                  <div className="checkbox-container">
-                    {isCommentDisabledPasporType && (
-                      <div className="checkbox-value"></div>
-                    )}
-                  </div>
-                  <img
-                    src={Checklist}
-                    alt="Checklist Icon"
-                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
-                      }`}
-                    onClick={() => handleImageClick("paspor_type")}
-                  />
-                </>
-              ) : null}
-            </div>
-          </div>
-        )}
-
-
-        {/* {statusSearch ? null : (
-          <div className="form-group">
-            <div className="wrapper-form">
-              <div className="wrapper-input">
-                <label htmlFor="photo">Photo</label>
-              </div>
-              <div className="photo">
-                <div className="photo-box">
-                  {formdata.photo !== null && formdata.photo !== "" ? (
-                    <img src={formdata.photo} alt="" />
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          </div>
-        )} */}
-
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="arrival_time">Arrival Time</label>
             </div>
             <input
-              type="text"
-              name="email"
-              id="email"
-              value={formdata.email}
-              disabled
+              type="date"
+              name="arrivalTime"
+              id="arrival_time"
+              value={formdata.arrival_time}
               onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="paspor_type">City</label>
-            </div>
-            <input
-              type="text"
-              name="city"
-              id="city"
-              value={formdata.city}
-              onChange={handleInputChange}
-              readOnly
+              disabled={
+                cardStatus === "iddle" ? !isCheckedArrivalTime : true
+              }
               className="disabled-input"
             />
-
-          </div>
-        </div>
-
-
-
-        <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="paspor_type">Postal Code</label>
-            </div>
-            <input
-              type="text"
-              name="docType"
-              id="paspor_type"
-              value={formdata.postalCode}
-              onChange={handleInputChange}
-              readOnly
-              className="disabled-input"
-            />
-
-            {/* {cardStatus === "checkData" ? (
+            {cardStatus === "iddle" ? (
               <>
                 <div className="checkbox-container">
-                  {isCommentDisabledPasporType && (
+                  {isCommentDisabledArrivalTime && (
+                    <div className="checkbox-value"></div>
+                  )}
+                </div>
+                <img
+                  src={Checklist}
+                  style={{
+                    cursor: "pointer",
+                    opacity: !isCheckedExpiryDate ? 0.5 : 1,
+                  }}
+                  onClick={() => handleImageClick("arrival_time")}
+                  alt="Checklist Icon"
+                />
+              </>
+            ) : null}
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="destination_location">Destination Location</label>
+            </div>
+            <input
+              type="text"
+              name="destinationLocation"
+              id="destination_location"
+              value={formdata.destination_location}
+              onChange={handleInputChange}
+              disabled={
+                cardStatus === "iddle" ? !isCheckedDestinationLocation : true
+              }
+              className="disabled-input"
+            />
+
+            {cardStatus === "iddle" ? (
+              <>
+                <div className="checkbox-container">
+                  {isCommentDisabledDestinationLocation && (
                     <div className="checkbox-value"></div>
                   )}
                 </div>
                 <img
                   src={Checklist}
                   alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
+                  className={`checklist-img ${!isCheckedDestinationLocation ? "dimmed" : ""
                     }`}
-                  onClick={() => handleImageClick("paspor_type")}
+                  onClick={() => handleImageClick("destination_location")}
                 />
               </>
-            ) : null} */}
+            ) : null}
           </div>
         </div>
 
-
-        {/* {!statusSearch ? null : (
-          <div className="form-group">
-            <div className="wrapper-form">
-              <div className="wrapper-input">
-                <label htmlFor="paspor_type">Address</label>
+        <div className="form-group">
+          <div className="wrapper-form">
+            <div className="wrapper-input">
+              <label htmlFor="photo">Pas Foto</label>
+            </div>
+            <div className="photo">
+              <div className="photo-box">
+                <img
+                  src={formdata.photo || ""}
+                  alt=""
+                />
               </div>
-              <input
-                type="text"
-                name="address"
-                id="address"
-                value={formdata.address}
-                onChange={handleInputChange}
-                disabled={
-                  cardStatus === "checkData" ? !isCheckedPasporType : true
-                }
-                className="disabled-input"
-              />
-
-              {cardStatus === "checkData" ? (
-                <>
-                  <div className="checkbox-container">
-                    {isCommentDisabledPasporType && (
-                      <div className="checkbox-value"></div>
-                    )}
-                  </div>
-                  <img
-                    src={Checklist}
-                    alt="Checklist Icon"
-                    className={`checklist-img ${!isCheckedPasporType ? "dimmed" : ""
-                      }`}
-                    onClick={() => handleImageClick("paspor_type")}
-                  />
-                </>
-              ) : null}
             </div>
           </div>
-        )} */}
-        {!statusSearch ? null : (
-          <div className="form-group">
-            <div className="wrapper-form">
-              <div className="wrapper-input">
-                <label htmlFor="paspor_type">Register Number</label>
-              </div>
-              <input
-                type="text"
-                name="docType"
-                id="paspor_type"
-                value={formdata.register_code}
-                onChange={handleInputChange}
-                disabled={
-                  cardStatus === "checkData" ? !isCheckedPasporType : true
-                }
-                className="disabled-input"
-              />
-
-            </div>
-          </div>
-        )}
-
-
-
-
+        </div>
+        <button type="submit">Submit</button>
       </form>
     </div>
   );
 };
+
 
 export default FormData;

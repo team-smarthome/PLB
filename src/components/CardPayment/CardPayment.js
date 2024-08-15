@@ -17,7 +17,6 @@ import Webcam from "react-webcam";
 import Select from "react-select";
 import { url_dev } from "../../services/env";
 
-const socket = io("http://localhost:4499");
 
 const CardPayment = ({
   onStatusChange,
@@ -192,122 +191,6 @@ const CardPayment = ({
       });
   }, []);
 
-  useEffect(() => {
-    const socketIoClient = io("http://localhost:4499");
-
-    socketIoClient.on("connect", () => {
-      // console.log("Connected to server socket.io");
-    });
-
-    socketIoClient.on("getCredentials", (data) => {
-      if (data) {
-        const inputCC = data.ccnum.replace(/\D/g, "");
-        if (inputCC.length <= 16) {
-          setCardNumber(
-            inputCC
-              .match(/.{1,4}/g)
-              ?.join(" ")
-              .substring(0, 19)
-          );
-
-          const params = {
-            code: "input-card-number",
-            data: inputCC
-              .match(/.{1,4}/g)
-              ?.join(" ")
-              .substring(0, 19),
-          };
-          socket.emit("WebClientMessage", JSON.stringify(params));
-        }
-        const inputExp = data.expdate;
-        const year = inputExp.substring(0, 2);
-        const month = inputExp.substring(2, 4);
-        const formatedDate = month + year;
-        setExpiry((prevExpiry) => {
-          const formattedInput = formatedDate
-            .replace(/(\d{2})(\d{0,2})/, "$1/$2")
-            .replace(/(\/\d{2})\d+?$/, "$1");
-
-          if (/^\d{0,2}\/?\d{0,2}$/.test(formattedInput)) {
-            const params = {
-              code: "input-expired",
-              data: formattedInput,
-            };
-            socket.emit("WebClientMessage", JSON.stringify(params));
-
-            return formattedInput;
-          } else {
-            const params = {
-              code: "input-expired",
-              data: prevExpiry,
-            };
-            socket.emit("WebClientMessage", JSON.stringify(params));
-
-            return prevExpiry;
-          }
-        });
-
-        const inputType = data.cardtype;
-        const capitalizedType = inputType.toLowerCase().toUpperCase();
-        const cleanedType = capitalizedType.replace("CREDIT", "").trim();
-        const finalType =
-          cleanedType === "Visa"
-            ? "VISA"
-            : cleanedType === "Mastercard"
-              ? "MASTERCARD"
-              : cleanedType;
-        setType(finalType);
-
-        if (data.cardtype === "" || data.cardtype !== "") {
-          setIsCheckedType(true);
-        }
-      }
-    });
-
-    const handleInputCardNumber = (data) => {
-      try {
-        const dataParse = JSON.parse(data);
-        // console.log("Received input-card-number data: ", dataParse);
-        const text = dataParse?.data;
-        setCardNumber(text);
-      } catch (error) {
-        console.error("Error parsing input-card-number data:", error);
-      }
-    };
-
-    const handleInputExpiredDate = (data) => {
-      try {
-        const dataParse = JSON.parse(data);
-        // console.log("Received input-expired data: ", dataParse);
-        const text = dataParse?.data;
-        setExpiry(text);
-      } catch (error) {
-        console.error("Error parsing input-expired data:", error);
-      }
-    };
-
-    const handleInputCVV = (data) => {
-      try {
-        const dataParse = JSON.parse(data);
-        // console.log("Received input-cvv data: ", dataParse);
-        const text = dataParse?.data;
-        setCvv(text);
-      } catch (error) {
-        console.error("Error parsing input-cvv data:", error);
-      }
-    };
-
-    socketIoClient.on("input-card-number", handleInputCardNumber);
-    socketIoClient.on("input-expired", handleInputExpiredDate);
-    socketIoClient.on("input-cvv", handleInputCVV);
-
-    return () => {
-      socketIoClient.disconnect();
-      socketIoClient.off("input-card-number", handleInputCardNumber);
-      socketIoClient.off("input-expired", handleInputExpiredDate);
-      socketIoClient.off("input-cvv", handleInputCVV);
-    };
-  }, []);
 
   useEffect(() => {
     if (paymentMethod && cardNumber !== "" && expiry !== "") {
@@ -322,27 +205,10 @@ const CardPayment = ({
         !isDoRetake &&
         !isCreditCard
       ) {
-        // sendDataUpdatePayment({
-        //   isCreditCard: false,
-        //   isWaiting: false,
-        //   isFailed: false,
-        //   isPrinted: false,
-        //   isSuccess: false,
-        //   isPaymentCredit: false,
-        //   isPaymentCash: false,
-        //   isPhoto: false,
-        //   isDoRetake: false,
-        //   paymentMethod: paymentMethod,
-        //   cardNumber: cardNumber,
-        //   expiry: expiry,
-        //   cvv: cvv,
-        //   type: type,
-        // });
         const params = {
           code: "card",
           data: "",
         };
-        socket.emit("WebClientMessage", JSON.stringify(params));
         setCardNumber("");
         setExpiry("");
         setCvv("");
@@ -384,7 +250,6 @@ const CardPayment = ({
             code: "card",
             data: "",
           };
-          socket.emit("WebClientMessage", JSON.stringify(params));
           setDataPasporUser(dataUser);
           setDataPermohonanUser(dataNumberPermohonan);
         }
