@@ -62,7 +62,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     sex: "",
     nationality: "",
     expiry_date: "",
-    arrival_time: "",
+    arrivaltime: new Date().toISOString().split('T')[0],
     destination_location: "",
     photo: "",
   };
@@ -113,7 +113,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           nationality:
             filteredNationality.length > 0 ? filteredNationality[0] : "",
           expiry_date: sharedData.passportData.formattedExpiryDate || "",
-          arrival_time: sharedData.passportData.arrivalTime || "",
+          arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
           destination_location: sharedData.passportData.destinationLocation || "",
         }));
       }
@@ -510,13 +510,13 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="arrival_time">Arrival Time</label>
+              <label htmlFor="arrivalTime">Arrival Time</label>
             </div>
             <input
               type="date"
               name="arrivalTime"
-              id="arrival_time"
-              value={formdata.arrival_time}
+              id="arrivalTime"
+              value={formdata.arrivalTime}
               onChange={handleInputChange}
               disabled={
                 cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedArrivalTime : true

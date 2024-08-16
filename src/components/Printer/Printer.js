@@ -1,4 +1,6 @@
-import React, { useRef, useState } from "react";
+import React from "react";
+import { useAtom } from "jotai";
+import { formData } from "../../utils/atomStates";
 import "./PrinterStyle.css";
 import QRCode from "qrcode.react";
 
@@ -14,12 +16,10 @@ const Printer = ({
   passportName,
   passportUrl
 }) => {
-  // console.log("dataNumberPermohonanPropsVisa", dataNumberPermohonanPropsVisa);
-  // console.log(
-  //   "dataNumberPermohonanPropsReceipt",
-  //   dataNumberPermohonanPropsReceipt
-  // );
+  const [data] = useAtom(formData);
   const tanggal = new Date();
+
+  console.log(data, "datatoPrinter");
 
   const day = String(tanggal.getDate()).padStart(2, "0");
   const month = String(tanggal.getMonth() + 1).padStart(2, "0");
@@ -33,10 +33,6 @@ const Printer = ({
   const formattedDate = `${day}/${month}/${year}`;
   const displayDate = dataDate || formattedDate;
   const displayTime = dataTime || formattedTime;
-  // const combinedValue = `Visa Number: ${dataNumberPermohonanPropsVisa}, Visa Receipt: ${dataNumberPermohonanPropsReceipt}, Price: ${dataPrice},
-  // Date: ${displayDate}, Time: ${displayTime}, Lokasi: ${dataLokasi}, Passport Number: ${passportumber}, Name: ${passportName},
-  // For extend visit: ${passportUrl}
-  // `;
   const combinedValue = `${passportUrl}`;
 
 
@@ -47,13 +43,8 @@ const Printer = ({
         <h2>Time : {displayTime}</h2>
       </div>
       <div className="wrappper-container">
-        <h2>IDR {dataPrice}</h2>
-
-      </div>
-
-      <div className="wrappper-container">
         <div className="h2-nol">
-          <h2>Visa Number</h2>
+          <h2>No Registrasion</h2>
         </div>
         <div className="h2-satu">
           <h2>{dataNumberPermohonanPropsVisa}</h2>
@@ -67,16 +58,10 @@ const Printer = ({
       <div className="wrappper-container">
         <div className="h2-dua">
           <div className="header-h2">
-            <h2>Visa Receipt </h2>
-          </div>
-          <div className="header-h2">
             <h2>{dataNumberPermohonanPropsReceipt}</h2>
           </div>
-          <div>
-            <h2>{dataLokasi}</h2>
-          </div>
           <div className="header-h2">
-            <h2>Passport Number</h2>
+            <h2>PLB Number</h2>
           </div>
           <div className="header-h2">
             <h2>{passportumber}</h2>
