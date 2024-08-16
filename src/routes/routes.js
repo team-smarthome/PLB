@@ -58,7 +58,7 @@ const Routes = () => {
     <ReactRoutes>
       <Route path="/" element={<Home />} />
       <Route path="/menu" element={<SpvLogin />} />
-      <Route path="/report" element={<Report />} />
+      <Route path="/history-log" element={<Report />} />
       <Route path="/home" element={<Home />} />
       <Route path="/apply" element={<Apply />} />
       <Route path="/configuration" element={<Information />} />

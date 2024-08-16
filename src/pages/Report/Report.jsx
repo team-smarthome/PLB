@@ -339,7 +339,7 @@ function Report() {
   };
 
   const storage = JSON.parse(localStorage.getItem("user"));
-  const name = storage.fullName;
+  const name = storage?.fullName;
 
   const handleLogout = async () => {
     // Menampilkan konfirmasi alert ketika tombol logout diklik menggunakan SweetAlert2
@@ -402,12 +402,10 @@ function Report() {
 
   return (
     <div className="body">
-      <h1 className="">Welcome SPV, {name}</h1>
-      <h1>Laporan Petugas</h1>
+      <h1>History Log</h1>
       <div className="header-combo">
         <form action="#" method="POST" className="form-filter">
           <label htmlFor="tanggalAwal">Tanggal Awal</label>
-
           <DatePicker
             selected={mulaiDate}
             onChange={handleChangeStartDate}
@@ -428,8 +426,7 @@ function Report() {
             dateFormat="dd/MM/yyyy HH:mm"
             className="date-picker"
           />
-
-          <label htmlFor="petugas">Petugas</label>
+          <label htmlFor="petugas">Nama</label>
           <div className="select-petugas">
             <Select
               id="petugas"
@@ -464,37 +461,40 @@ function Report() {
             />
           </div>
 
-          {/* <select
-            name="petugas"
-            id="petugas"
-            value={petugas}
-            onChange={(e) => setPetugas(e.target.value)}
-          >
-            <option value="">Pilih Petugas</option>
-            {petugasOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select> */}
-          {/* <input
-            type="text"
-            name="petugas"
-            id="petugas"
-            value={petugas}
-            onChange={(e) => setPetugas([e.target.value])}
-          /> */}
-
-          <label htmlFor="payment">Tipe</label>
-          <Select
-            id="payment"
-            options={options}
-            value={selectedPaymentMethod}
-            onChange={(selectedOption) =>
-              setSelectedPaymentMethod(selectedOption)
-            }
-          />
-
+          <label htmlFor="petugas">Nomor PLB</label>
+          <div className="select-petugas">
+            <Select
+              id="petugas"
+              value={
+                petugas
+                  ? petugasOptions.find((option) => option.value === petugas)
+                  : ""
+              }
+              onChange={(selectedOption) => setPetugas([selectedOption.label])}
+              options={petugasOptions}
+              className="basic-single"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+          </div>
           <button
             type="button"
             className="handle-sumbit-bg"
@@ -507,9 +507,9 @@ function Report() {
       <div className="content">
         <div className="table-header">
           <div className="combo">
-            <button className="report-logout" onClick={handleLogout}>
+            {/* <button className="report-logout" onClick={handleLogout}>
               Logout
-            </button>
+            </button> */}
             <button className="menu" onClick={() => navigate("/home")}>
               Home
             </button>
