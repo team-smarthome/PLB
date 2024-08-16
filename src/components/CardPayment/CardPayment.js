@@ -288,12 +288,13 @@ const CardPayment = ({
       !isCreditCard
     ) {
 
-      setNumber(dataPermohonanUser?.visa_number ?? "");
+      setNumber(dataPermohonanUser?.passportData?.noRegister ?? "");
       setReceipt(dataPermohonanUser?.visa_receipt ?? "");
-      setPassportNumber(dataPermohonanUser?.passport_number ?? "");
-      setPassportName(dataPermohonanUser?.name ?? "");
+      setPassportNumber(dataPermohonanUser?.passportData?.docNumber ?? "");
+      setPassportName(dataPermohonanUser?.passportData?.fullName ?? "");
       setPassportUrl(dataPermohonanUser?.url ?? "");
       handlePrint();
+      console.log("passportNumber: ", passportNumber);
       const timerPrintOut = setTimeout(() => {
         sendDataUpdatePayment({
           isCreditCard: false,
@@ -864,12 +865,12 @@ const CardPayment = ({
         <div className="inner-card">
           <h1 className="card-title">
             {isPrinted ? (
-              "Payment Success"
+              "Register Success"
             ) : isSuccess ? (
               <>
-                Your VOA has been issued
+                Your PLB has been issued
                 <br />
-                Please Check Your email
+                Please Wait for the receipt
               </>
             ) : isFailed ? (
               "Payment Failed"
@@ -906,12 +907,10 @@ const CardPayment = ({
               <img src={Success} alt="" className="card-image-issuccess1" />
               <div className="issusccess-register1">
                 <div className="issusccess-register2">
-                  <h3>Visa Number: </h3>
-                  <h3>Visa Receipt: </h3>
+                  <h3>Register Number: </h3>
                 </div>
                 <div className="issusccess-register2">
                   <h3>{number}</h3>
-                  <h3>{receipt}</h3>
                 </div>
               </div>
               <h4>Please capture this page when receipt not printed out</h4>

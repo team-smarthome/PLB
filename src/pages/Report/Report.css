@@ -4,6 +4,7 @@
   background-color: #3d5889;
   min-height: 125vh;
   overflow: hidden;
+  padding-top: 3%;
 }
 
 .body h1 {
@@ -119,7 +120,7 @@
 
 .select-petugas {
   width: 17%;
-  margin-right: 6%;
+  /* margin-right: 6%; */
 }
 
 .table-header {

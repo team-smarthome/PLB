@@ -18,7 +18,7 @@ const Home = () => {
   };
 
   const btnOnClick_Search_Passport = () => {
-    navigate("/log");
+    navigate("/history-log");
   };
 
 

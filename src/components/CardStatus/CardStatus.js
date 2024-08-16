@@ -117,7 +117,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 			statusCardBox: "takePhotoSucces",
 			capturedImage: `data:image/jpeg;base64,${dataPasporImg?.visibleImage}`,
 			emailUser: email,
-			titleHeader: "Apply VOA",
+			titleHeader: "Apply PLB",
 			titleFooter: "Next Step",
 		});
 
@@ -131,7 +131,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 			statusCardBox: "lookCamera",
 			capturedImage: null,
 			emailUser: email,
-			titleHeader: "Apply VOA",
+			titleHeader: "Apply PLB",
 			titleFooter: "Next Step",
 		});
 	};
@@ -150,7 +150,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				statusCardBox: "takePhotoSucces",
 				capturedImage: imageBase64,
 				emailUser: email,
-				titleHeader: "Apply VOA",
+				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
 			});
 		});
@@ -160,7 +160,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				statusCardBox: "lookCamera",
 				capturedImage: null,
 				emailUser: email,
-				titleHeader: "Apply VOA",
+				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
 			});
 		});
@@ -172,7 +172,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 			statusCardBox: "lookCamera",
 			capturedImage: null,
 			emailUser: email,
-			titleHeader: "Apply VOA",
+			titleHeader: "Apply PLB",
 			titleFooter: "Next Step",
 		});
 	};
@@ -224,7 +224,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				statusCardBox: "emailSucces",
 				emailUser: email,
 				capturedImage: capturedImage,
-				titleHeader: "Apply VOA",
+				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
 			});
 		}
@@ -255,7 +255,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				statusCardBox: "waiting",
 				capturedImage: null,
 				emailUser: null,
-				titleHeader: "Apply VOA",
+				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
 			});
 
@@ -271,7 +271,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 						statusCardBox: "notFoundPassport",
 						emailUser: email,
 						capturedImage: capturedImage,
-						titleHeader: "Apply VOA",
+						titleHeader: "Apply PLB",
 						titleFooter: "Payment",
 					});
 					setTimeout(() => {
@@ -279,7 +279,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 							statusCardBox: "searchPassport",
 							capturedImage: null,
 							emailUser: null,
-							titleHeader: "Apply VOA",
+							titleHeader: "Apply PLB",
 							titleFooter: "Next Step",
 						});
 					}, 2000);
@@ -290,7 +290,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 					statusCardBox: "errorConnection",
 					emailUser: email,
 					capturedImage: capturedImage,
-					titleHeader: "Apply VOA",
+					titleHeader: "Apply PLB",
 					titleFooter: "Payment",
 				});
 			}
@@ -317,7 +317,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				postalCode: kodePos,
 				city: kotaUser,
 				capturedImage: capturedImage,
-				titleHeader: "Apply VOA",
+				titleHeader: "Apply PLB",
 				titleFooter: "Payment",
 			});
 		}
@@ -859,7 +859,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 					"scanned. Please rescan",
 				];
 			case "errorVoa":
-				return ["Your Country is not eligible", "for Apply VOA"];
+				return ["Your Country is not eligible", "for Apply PLB"];
 			case "errorBulan":
 				return ["Your passport expires in less", "than 6 months"];
 			case "errorDanger":

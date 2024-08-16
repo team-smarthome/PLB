@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
@@ -7,8 +7,13 @@ import dataPasporImg from "../../utils/dataPhotoPaspor";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
+import { formData } from "../../utils/atomStates";
+import { useNavigate } from "react-router-dom";
+
 
 const Apply = () => {
+  const [, setFormData] = useAtom(formData);
+  const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
@@ -46,6 +51,7 @@ const Apply = () => {
     cvv: "",
     type: "",
   });
+
 
 
 
@@ -229,6 +235,7 @@ const Apply = () => {
     }
 
     if (isEnableBack) {
+      console.log("cardStatusSaatIni", cardStatus);
       if (cardPaymentProps.isPaymentCredit || cardPaymentProps.isPaymentCash) {
         handleTokenExpiration();
         setCardPaymentProps({
@@ -249,11 +256,7 @@ const Apply = () => {
           type: "",
         });
       } else if (cardStatus === "iddle" || cardStatus === "searchPassport") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        // navigate("/home");
+        navigate("/home");
       } else if (cardStatus === "lookCamera") {
         setTabStatus(1);
         setCardStatus("checkData");
@@ -291,6 +294,18 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData" || cardStatus === "iddle") {
+        // setCardStatus("goPayment");
+        // setCardPaymentProps({
+        //   isWaiting: false,
+        //   isCreditCard: false,
+        //   isPaymentCredit: false,
+        //   isPaymentCash: false,
+        //   isPrinted: true,
+        //   isSuccess: false,
+        //   isFailed: false,
+        //   isPyamentUrl: false,
+        //   isPhoto: false,
+        // });
         const dataChecked = sharedData?.passportData;
         console.log("dataChecked", dataChecked);
 
@@ -319,18 +334,22 @@ const Apply = () => {
           setCardStatus("lookCamera");
           setTabStatus(2);
         }
-
-      } else if (cardStatus === "successSearch") {
-        setIsEnableStep(true);
-        setCardStatus("goPayment");
-        // setTitleHeader("Payment");
-      } else if (cardStatus === "emailSucces") {
-        // setCardStatus("postalCode");
-        setCardStatus("lookCamera")
-        setTabStatus(3);
       } else if (cardStatus === "takePhotoSucces") {
-        setCardStatus("postalCode");
-        setTabStatus(4);
+        setFormData(sharedData);
+        setDataPermohonan(sharedData);
+        doSaveRequestVoaPayment(sharedData);
+        setCardStatus("goPayment");
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: true,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+          isPhoto: false,
+        });
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
@@ -446,58 +465,36 @@ const Apply = () => {
     }
   }, [cardPaymentProps]);
 
-  useEffect(() => {
-    if (statusPaymentCredit) {
-      // setCardPaymentProps({
-      //   isWaiting: false,
-      //   isCreditCard: false,
-      //   isPaymentCredit: false,
-      //   isPaymentCash: false,
-      //   isPrinted: true,
-      //   isSuccess: false,
-      //   isFailed: false,
-      //   isPhoto: false,
-      // });
-      doSaveRequestVoaPayment(sharedData);
-    }
-  }, [statusPaymentCredit]);
+  // useEffect(() => {
+  //   if (statusPaymentCredit) {
+  //     // setCardPaymentProps({
+  //     //   isWaiting: false,
+  //     //   isCreditCard: false,
+  //     //   isPaymentCredit: false,
+  //     //   isPaymentCash: false,
+  //     //   isPrinted: true,
+  //     //   isSuccess: false,
+  //     //   isFailed: false,
+  //     //   isPhoto: false,
+  //     // });
+  //     doSaveRequestVoaPayment(sharedData);
+  //   }
+  // }, [statusPaymentCredit]);
 
   const doSaveRequestVoaPayment = async (sharedData) => {
-    // console.log("doSaveRequestVoaPayment");
-    const token = localStorage.getItem("token");
-    const key = localStorage.getItem("key");
-    const devicedId = localStorage.getItem("deviceId");
-    const airportId = localStorage.getItem("airportId");
-    const jenisDeviceId = localStorage.getItem("jenisDeviceId");
-    const bearerToken = localStorage.getItem("JwtToken");
-    const header = {
-      Authorization: `Bearer ${bearerToken}`,
-      "Content-Type": "application/json",
-    };
     const bodyParam = {
       passportNumber: sharedData.passportData.docNumber,
+      registerNumber: sharedData.passportData.noRegister,
       expiredDate: sharedData.passportData.formattedExpiryDate,
       fullName: sharedData.passportData.fullName,
       dateOfBirth: sharedData.passportData.formattedBirthDate,
       nationalityCode: sharedData.passportData.nationality,
       sex: sharedData.passportData.sex === "male" ? "M" : "F",
       issuingCountry: sharedData.passportData.issuingState,
+      expiryDate: sharedData.passportData.formattedExpiryDate,
+      arrivalTime: sharedData.arrivalTime,
+      destinationLocation: sharedData.destinationLocation,
       photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      email: sharedData.email
-        ? sharedData.email
-        : sharedData.passportData.email,
-      postalCode: sharedData.postal_code ? sharedData.postal_code : sharedData.passportData.postal_code,
-      paymentMethod: shareDataPaymentProps.paymentMethod,
-      cc_no: shareDataPaymentProps.cardNumber.replace(/\s/g, ""),
-      cc_exp: shareDataPaymentProps.expiry.replace("/", ""),
-      cvv: shareDataPaymentProps.cvv,
-      type:
-        shareDataPaymentProps.type === "" ? null : shareDataPaymentProps.type,
-      token: token,
-      key: key,
-      deviceId: devicedId.replace(/"/g, ""),
-      airportId: airportId.replace(/"/g, ""),
-      jenisDeviceId: jenisDeviceId.replace(/"/g, ""),
     };
 
     setIsEnableStep(false);
