@@ -7,7 +7,7 @@ import Hero from "../../components/hero/Hero";
 const ScanPassport = () => {
   return (
     <div className="bg-scan-passport">
-      <Header title="Apply VOA" />
+      <Header title="Apply PLB" />
       <Hero />
       <Footer
         titleBack="Back"

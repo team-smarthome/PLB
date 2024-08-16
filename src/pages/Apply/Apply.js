@@ -8,9 +8,12 @@ import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
 import { formData } from "../../utils/atomStates";
+import { useNavigate } from "react-router-dom";
+
 
 const Apply = () => {
   const [, setFormData] = useAtom(formData);
+  const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
@@ -48,6 +51,7 @@ const Apply = () => {
     cvv: "",
     type: "",
   });
+
 
 
 
@@ -231,6 +235,7 @@ const Apply = () => {
     }
 
     if (isEnableBack) {
+      console.log("cardStatusSaatIni", cardStatus);
       if (cardPaymentProps.isPaymentCredit || cardPaymentProps.isPaymentCash) {
         handleTokenExpiration();
         setCardPaymentProps({
@@ -251,11 +256,7 @@ const Apply = () => {
           type: "",
         });
       } else if (cardStatus === "iddle" || cardStatus === "searchPassport") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        // navigate("/home");
+        navigate("/home");
       } else if (cardStatus === "lookCamera") {
         setTabStatus(1);
         setCardStatus("checkData");
@@ -293,6 +294,18 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData" || cardStatus === "iddle") {
+        // setCardStatus("goPayment");
+        // setCardPaymentProps({
+        //   isWaiting: false,
+        //   isCreditCard: false,
+        //   isPaymentCredit: false,
+        //   isPaymentCash: false,
+        //   isPrinted: true,
+        //   isSuccess: false,
+        //   isFailed: false,
+        //   isPyamentUrl: false,
+        //   isPhoto: false,
+        // });
         const dataChecked = sharedData?.passportData;
         console.log("dataChecked", dataChecked);
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAtom } from "jotai";
 import { formData } from "../../utils/atomStates";
 import "./PrinterStyle.css";
@@ -16,10 +16,12 @@ const Printer = ({
   passportName,
   passportUrl
 }) => {
-  const [data] = useAtom(formData);
+  const [datafromAtom] = useAtom(formData);
   const tanggal = new Date();
 
-  console.log(data, "datatoPrinter");
+  console.log(datafromAtom, "datatoPrinter");
+
+
 
   const day = String(tanggal.getDate()).padStart(2, "0");
   const month = String(tanggal.getMonth() + 1).padStart(2, "0");
@@ -33,7 +35,14 @@ const Printer = ({
   const formattedDate = `${day}/${month}/${year}`;
   const displayDate = dataDate || formattedDate;
   const displayTime = dataTime || formattedTime;
-  const combinedValue = `${passportUrl}`;
+  const qrData = {
+    fullname: datafromAtom?.passportData?.noRegister,
+    noRegister: datafromAtom?.passportData?.noRegister,
+    passportNumber: datafromAtom?.passportData?.passportNumber,
+
+    // Tambahkan data lain sesuai kebutuhan
+  };
+  const combinedValue = JSON.stringify(qrData);
 
 
   return (
@@ -46,10 +55,8 @@ const Printer = ({
         <div className="h2-nol">
           <h2>No Registrasion</h2>
         </div>
-        <div className="h2-satu">
-          <h2>{dataNumberPermohonanPropsVisa}</h2>
-        </div>
       </div>
+      <h2>{dataNumberPermohonanPropsVisa}</h2>
       <div className="wrappper-container">
         <div className="qrcode">
           <QRCode className="qrcode-image" value={combinedValue} />
@@ -57,9 +64,6 @@ const Printer = ({
       </div>
       <div className="wrappper-container">
         <div className="h2-dua">
-          <div className="header-h2">
-            <h2>{dataNumberPermohonanPropsReceipt}</h2>
-          </div>
           <div className="header-h2">
             <h2>PLB Number</h2>
           </div>
