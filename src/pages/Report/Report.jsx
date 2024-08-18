@@ -12,10 +12,6 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import {
-  dataPetugasDenpasar,
-  dataPetugasJakarta,
-} from "../../utils/dataPetugas";
 import { url_dev } from "../../services/env";
 
 function Report() {
@@ -25,8 +21,6 @@ function Report() {
   const [data, setData] = useState([]);
   const [response, setResponse] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  // const [startDate, setStartDate] = useState(new Date());
-  // const [endDate, setEndDate] = useState(new Date());
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(currentDate);
   const [mulaiDate, setMulaiDate] = useState(new Date());
@@ -89,64 +83,34 @@ function Report() {
     try {
       const res = await apiPaymentHistory(header, bodyParams);
 
-      // console.log("res:", res);
-
       if (
-        res.data.message === "Invalid JWT Token" ||
-        res.data.message === "Expired JWT Token"
+        Array.isArray(res.data) &&
+        res.data.length > 0 &&
+        res.data[0].status === "success" &&
+        res.data[0].data.length > 0
       ) {
         isLoading(false);
-        Swal.fire({
-          icon: "error",
-          text: `${res.data.message}`,
-          confirmButtonColor: "#3d5889",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            localStorage.removeItem("user");
-            localStorage.removeItem("JwtToken");
-            localStorage.removeItem("cardNumberPetugas");
-            localStorage.removeItem("key");
-            localStorage.removeItem("token");
-            localStorage.removeItem("jenisDeviceId");
-            localStorage.removeItem("deviceId");
-            localStorage.removeItem("airportId");
-            localStorage.removeItem("price");
-            navigate("/");
-          }
-        });
+        const dataRes = res.data && res.data[0];
+        setData((prevData) => [
+          ...prevData,
+          ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
+        ]);
+        setResponse(res.data);
+        setPages((prevPages) => prevPages + 1);
+        await doPaymentHistory(page + 1);
       } else {
-        if (
-          Array.isArray(res.data) &&
-          res.data.length > 0 &&
-          res.data[0].status === "success" &&
-          res.data[0].data.length > 0
-        ) {
-          isLoading(false);
-          const dataRes = res.data && res.data[0];
-          setData((prevData) => [
-            ...prevData,
-            ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
-          ]);
-          setResponse(res.data);
-          setPages((prevPages) => prevPages + 1);
-          await doPaymentHistory(page + 1);
-        } else {
-          setCurrentPage(1);
-        }
+        setCurrentPage(1);
       }
     } catch (error) {
-      // console.error("error:", error);
     } finally {
       isLoading(false);
     }
   };
 
   useEffect(() => {
-    // Reset page to 1 when startDate, endDate, or petugas changes
     setCurrentPage(1);
   }, [startDate, endDate, petugas]);
 
-  // console.log("nilai currentPage:", currentPage);
 
   useEffect(() => {
     const city = JSON.parse(localStorage.getItem("user"));
@@ -184,7 +148,6 @@ function Report() {
       }
     };
 
-    // Call fetchData function when component mounts or officeCity changes
     fetchData();
   }, []);
 
@@ -192,7 +155,6 @@ function Report() {
     setCurrentPage(selectedPage);
   };
 
-  const startIndex = (currentPage - 1) * perPage;
 
   const pageCount = data.length / 10;
   const generatePDF = () => {
@@ -256,7 +218,6 @@ function Report() {
       }).format(totalPayment),
     ];
 
-    const tableY = pdf.autoTable.previous.finalY + 10; // Get the final Y position of the table
 
     pdf.autoTable({
       head: [itemHeaders],
@@ -507,9 +468,6 @@ function Report() {
       <div className="content">
         <div className="table-header">
           <div className="combo">
-            {/* <button className="report-logout" onClick={handleLogout}>
-              Logout
-            </button> */}
             <button className="menu" onClick={() => navigate("/home")}>
               Home
             </button>
