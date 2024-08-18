@@ -46,7 +46,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
 	const [inputValue, setInputValue] = useState("");
 	const [mrz, setMrz] = useState(["", ""]);
-	const [statusSearch, setStatusSearch] = useState(false);
 	const kabupatenOptions = dataKodePos.data.map((item) => ({
 		value: item.kabupaten,
 		label: item.kabupaten,
@@ -62,71 +61,23 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 	const [streamKamera, setStreamKamera] = useState(false);
 
 	const [numberPassport, setNumberPassport] = useState(null);
-	const [codeState, setCodeState] = useState(null);
-	const [isConnected, setIsConnected] = useState(false);
 
 	const socket_IO_4000 = io("http://localhost:4000");
-
-	const checkAndHandleTokenExpiration = () => {
-		const jwtToken = localStorage.getItem("JwtToken");
-		if (!jwtToken) {
-			return false;
-		}
-
-		const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
-		const expirationTime = decodedToken.exp * 1000;
-		const now = Date.now();
-		const isExpired = now > expirationTime;
-
-		return !isExpired;
-	};
-
-	// Contoh penggunaan di tempat lain
-	const handleTokenExpiration = () => {
-		// const isTokenValid = checkAndHandleTokenExpiration();
-
-		// if (!isTokenValid) {
-		// 	// Token has expired, handle the expiration here
-		// 	Swal.fire({
-		// 		icon: "error",
-		// 		text: "Expired JWT Token",
-		// 		confirmButtonColor: "#3d5889",
-		// 	}).then((result) => {
-		// 		if (result.isConfirmed) {
-		// 			// navigate("/");
-		// 			localStorage.removeItem("user");
-		// 			localStorage.removeItem("JwtToken");
-		// 			localStorage.removeItem("cardNumberPetugas");
-		// 			localStorage.removeItem("key");
-		// 			localStorage.removeItem("token");
-		// 			localStorage.removeItem("jenisDeviceId");
-		// 			localStorage.removeItem("deviceId");
-		// 			localStorage.removeItem("airportId");
-		// 			localStorage.removeItem("price");
-		// 		}
-		// 	});
-		// }
-	};
+	const socket_IO_4001 = io("http://localhost:4001");
 
 	const handleTakePhoto = async () => {
-		console.log("masuktakephoto");
-		console.log("dataPasporImg", dataPasporImg?.visibleImage);
-		// socket_IO_4000.emit("take_photo");
-		setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
+		socket_IO_4000.emit("take_photo");
+		// setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
 		sendDataToInput({
 			statusCardBox: "takePhotoSucces",
-			capturedImage: `data:image/jpeg;base64,${dataPasporImg?.visibleImage}`,
-			emailUser: email,
+			capturedImage: null,
+			emailUser: null,
 			titleHeader: "Apply PLB",
 			titleFooter: "Next Step",
 		});
-
-		// socket_IO_4000.emit("stop_stream");
 	};
 
 	const handleReloadPhoto = () => {
-		// socket_IO_4000.emit("start_stream");
-		// socket_IO_4000.emit("reload_photo");
 		sendDataToInput({
 			statusCardBox: "lookCamera",
 			capturedImage: null,
@@ -137,19 +88,12 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 	};
 
 	useEffect(() => {
-		socket_IO_4000.on("stream_camera", (stream_url) => {
-			setUrlKamera(stream_url);
-			setStreamKamera(true);
-			console.log("masuksiniKAMERASTREAM");
-			console.log("urkamera", urlKamera);
-		});
 		socket_IO_4000.on("photo_taken", (imageBase64) => {
-			console.log("Image_path_received: ", imageBase64);
 			setCapturedImage(imageBase64);
 			sendDataToInput({
 				statusCardBox: "takePhotoSucces",
 				capturedImage: imageBase64,
-				emailUser: email,
+				emailUser: null,
 				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
 			});
@@ -159,12 +103,19 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 			sendDataToInput({
 				statusCardBox: "lookCamera",
 				capturedImage: null,
-				emailUser: email,
+				emailUser: null,
 				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
 			});
 		});
 	}, [socket_IO_4000]);
+
+	useEffect(() => {
+		socket_IO_4001.on("stream_camera", (stream_url) => {
+			setUrlKamera(stream_url);
+			setStreamKamera(true);
+		});
+	}, [socket_IO_4001])
 
 	const doRetake = () => {
 		// socket_IO_4000.emit("start_stream");
@@ -365,11 +316,9 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				socket_IO_4000.emit("start_stream");
 				break;
 			case "lookCamara":
-				socket_IO_4000.on("stream_camera", (stream_url) => {
+				socket_IO_4001.on("stream_camera", (stream_url) => {
 					setUrlKamera(stream_url);
 					setStreamKamera(true);
-					console.log("masuksiniKAMERASTREAM");
-					console.log("data_url_stream", stream_url);
 				});
 				break;
 			case "postalCode":
@@ -381,34 +330,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 		}
 	}, [statusCardBox]);
 
-	// useEffect(() => {}, [kodePos]);
-
-	useEffect(() => {
-		handleTokenExpiration();
-	}, [
-		capturedImage,
-		doRetake,
-		email,
-		emailConfirmation,
-		handleTokenExpiration,
-	]);
-
-	useEffect(() => {
-		// console.log("capturedImage berubah:", capturedImage);
-	}, [capturedImage]);
 
 	const handleScanedArea = (event) => {
 		let text = event.target.value.replace(/\s/g, "");
-		// console.log("text: ", text);
-		// console.log("text.length: ", text.length);
 		if (text.length > 88) {
-			text = text.substring(text.length - 88); // Ambil karakter ke-89 dan seterusnya
+			text = text.substring(text.length - 88);
 		}
-		// mrz index ke 0 adalah 44 karakter pertama
-		// mrz index ke 1 adalah 44 karakter kedua
 		const mrzArray = [
 			text.substring(0, 44),
-			text.substring(44), // Sisanya diambil semua
+			text.substring(44),
 		];
 		setMrz(mrzArray);
 		setInputValue(text);
@@ -672,7 +602,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 						</h1>
 						<div style={{ height: "180px" }}>
 							{/* <p>ini adalah {urlKamera}</p> */}
-							<VideoPlayer url={`http://localhost:8080/stream.m3u8`} />
+							<VideoPlayer url={urlKamera} />
 							{/* {streamKamera ? (
                 <ReactPlayer
                   className="react-player"

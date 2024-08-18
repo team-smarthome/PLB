@@ -66,15 +66,11 @@ const Table = ({ data, page, response }) => {
           <tr>
             <th>No</th>
             <th>Tanggal</th>
-            <th>Register Number</th>
+            <th>PLB Number</th>
             <th>Nama</th>
-            <th>No Passport</th>
-            <th>Kewarganegaraan</th>
-            <th>No VOA</th>
-            <th>No Receipt</th>
-            <th>Tipe Transaksi</th>
-            <th>Nominal</th>
-            <th>Action</th>
+            <th>Panoramic Capture</th>
+            <th>Similarity</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>

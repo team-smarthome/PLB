@@ -1,11 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import BackIcons from "../../assets/images/back-arrow.png";
 import "./InformationStyle.css";
-import ProfileIcons from "../../assets/images/profile_configuration.png";
-import ChangePasswordIcons from "../../assets/images/change_password.png";
-import IPConfigIcons from "../../assets/images/ip-address.png";
-import TestPrinterIcons from "../../assets/images/printer_configuration.png";
-import TestCameraIcons from "../../assets/images/camera_configuration.png";
 import Profile from "../../assets/images/avatar_image.png";
 import Face from "../../assets/images/face.png";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +9,7 @@ import { useReactToPrint } from "react-to-print";
 import Printer from "../../components/Printer/Printer";
 import { Toast } from "../../components/Toast/Toast";
 import axios from "axios";
-import { url_dev, url_devel } from "../../services/env";
+import { url_devel } from "../../services/env";
 import ImageSucces from "../../assets/images/image-2.svg";
 import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
@@ -22,7 +17,6 @@ import { TbNetwork } from "react-icons/tb";
 import { IoCameraOutline } from "react-icons/io5";
 import { BsPrinter } from "react-icons/bs";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
-import ReactPlayer from "react-player";
 import VideoPlayer from "../../components/VideoPlayer";
 
 const Information = () => {
@@ -370,6 +364,8 @@ const Information = () => {
 
 		const socket = io("http://localhost:4000");
 
+		const socket2 = io("http://localhost:4001");
+
 		// Create data object
 		const data = {
 			ipServerCamera: ipCamera,
@@ -377,6 +373,7 @@ const Information = () => {
 
 		// Emit data over socket
 		socket.emit("saveCameraData", data);
+		socket2.emit("saveCameraData", data);
 		setTimeout(() => {
 			window.location.reload();
 			// setStatusCamera("ON");
@@ -385,8 +382,7 @@ const Information = () => {
 
 	const startStream = () => {
 		setLoading(true);
-		console.log("masihmasilkesini");
-		const socketCamera = io("http://localhost:4000");
+		const socketCamera = io("http://localhost:4001");
 		socketCamera.on("stream_camera", (stream_url) => {
 			setUrlKamera(stream_url);
 			// setLoading(false);
@@ -402,14 +398,12 @@ const Information = () => {
 
 
 	useEffect(() => {
-		const socketCamera = io("http://localhost:4000");
+		const socketCamera = io("http://localhost:4001");
 		socketCamera.on("cameraDataToClient", (data) => {
-			console.log("cameraDataToClient:", data);
 			setIpCamera(data.ipServerCamera);
 			socketCamera.emit("stop_stream");
 		});
 		socketCamera.on("cameraStatus", (data) => {
-			console.log("cameraStatus:", data);
 			setStatusCamera(data.status);
 		});
 	}, []);
