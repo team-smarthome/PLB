@@ -18,6 +18,7 @@
     "hex2ascii": "^0.0.3",
     "hexify": "^1.0.4",
     "jotai": "^2.9.3",
+    "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.1",
     "mrz": "^4.0.0",

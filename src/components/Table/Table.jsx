@@ -4,21 +4,11 @@ import { IoMdPrint } from "react-icons/io";
 import { useReactToPrint } from "react-to-print";
 import Printer from "../Printer/Printer";
 
-const Table = ({ data, page, response }) => {
-  const { value } = JSON.parse(localStorage.getItem("price")) ?? {
-    fee: "0",
-    fee_cash: "0",
-    value: "0.0000",
-  };
-  const [printLokasi, setPrintLokasi] = useState("");
+const Table = ({ data, page }) => {
+  console.log(data, "dataTable");
+
   const printRef = useRef();
   const [printData, setPrintData] = useState(null);
-  const formattedNumber = (num) =>
-    parseInt(num).toLocaleString("id-ID", { minimumFractionDigits: 0 });
-
-  const numericValue = parseFloat(value);
-
-  const formattedValue = formattedNumber(numericValue);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -30,16 +20,6 @@ const Table = ({ data, page, response }) => {
     }
   }, [printData, handlePrint]);
 
-  useEffect(() => {
-    const city = JSON.parse(localStorage.getItem("user"));
-    const officeCity = city?.organization?.officeCity;
-
-    if (officeCity === "DENPASAR") {
-      setPrintLokasi("DPS");
-    } else if (officeCity === "JAKARTA") {
-      setPrintLokasi("CGK");
-    }
-  }, []);
 
   // Check if data is not an array or is empty
   if (!Array.isArray(data) || data.length === 0) {
@@ -59,6 +39,22 @@ const Table = ({ data, page, response }) => {
     setPrintData(item);
   };
 
+  const handleEpochToDate = (epoch) => {
+    const date = new Date(epoch * 1000);
+
+    // Format tanggal menjadi "dd-MM-yyyy HH:mm:ss"
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-indexed month
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    console.log(formattedDate, "dataConvert");
+    return formattedDate;
+  };
+
   return (
     <div>
       <table className="custom-table">
@@ -71,53 +67,39 @@ const Table = ({ data, page, response }) => {
             <th>Panoramic Capture</th>
             <th>Similarity</th>
             <th>Status</th>
+            <th>Print</th>
           </tr>
         </thead>
         <tbody>
           {slicedData.map((item, index) => (
             <tr key={index}>
               <td>{startIndex + index + 1}</td>
-              <td>{item.timestamp}</td>
-              <td>{item.register_number}</td>
-              <td>{item.full_name}</td>
-              <td>{item.passport_number}</td>
-              <td>{item.citizenship}</td>
-              <td>{item.visa_number}</td>
-              <td>{item.receipt}</td>
-              <td>{item.payment_method}</td>
+              <td>{handleEpochToDate(item.time)}</td>
+              <td>{item.personCode}</td>
+              <td>{item.name}</td>
               <td>
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(item.billed_price)}
+                <img
+                  src={`http://192.168.2.127/ofsimage/${item.images_info[0].img_path}`}
+                  alt="Panoramic Capture"
+                  width="80"
+                  height="80"
+                  style={{ borderRadius: "100%" }}
+                />
               </td>
+              <td>{item.images_info[0].similarity}</td>
+              <td>{item.passStatus === 5 ? "Success" : "Failed"}</td>
+
               <td>
                 <IoMdPrint onClick={() => handlePrintClick(item)} />
               </td>
             </tr>
           ))}
         </tbody>
-        {/* Total row */}
-        {isLastPage && (
-          <tfoot>
-            <tr>
-              <td colSpan="9">Total Payment</td>
-              <td>
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(response[0].payment_summary.total)}
-              </td>
-            </tr>
-          </tfoot>
-        )}
       </table>
       <Printer
         printRefProps={printRef}
         dataNumberPermohonanPropsVisa={printData ? printData.visa_number : ""}
         dataNumberPermohonanPropsReceipt={printData ? printData.receipt : ""}
-        dataPrice={formattedValue}
-        dataLokasi={printLokasi}
         passportumber={printData ? printData.passport_number : ""}
         passportName={printData ? printData.full_name : ""}
         dataDate={printData ? printData.timestamp.split(" ")[0] : ""}

@@ -9,10 +9,16 @@ import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
 import { formData } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
+import { imageToSend } from "../../utils/atomStates";
+import Cookies from 'js-cookie';
+import { apiPblAddFaceRec } from "../../services/api";
+import io from "socket.io-client";
 
 
 const Apply = () => {
+  const socket_IO = io("http://localhost:4000");
   const [, setFormData] = useAtom(formData);
+  const [image] = useAtom(imageToSend);
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
@@ -294,18 +300,6 @@ const Apply = () => {
     }
     if (isEnableStep) {
       if (cardStatus === "checkData" || cardStatus === "iddle") {
-        // setCardStatus("goPayment");
-        // setCardPaymentProps({
-        //   isWaiting: false,
-        //   isCreditCard: false,
-        //   isPaymentCredit: false,
-        //   isPaymentCash: false,
-        //   isPrinted: true,
-        //   isSuccess: false,
-        //   isFailed: false,
-        //   isPyamentUrl: false,
-        //   isPhoto: false,
-        // });
         const dataChecked = sharedData?.passportData;
         console.log("dataChecked", dataChecked);
 
@@ -340,11 +334,11 @@ const Apply = () => {
         doSaveRequestVoaPayment(sharedData);
         setCardStatus("goPayment");
         setCardPaymentProps({
-          isWaiting: false,
+          isWaiting: true,
           isCreditCard: false,
           isPaymentCredit: false,
           isPaymentCash: false,
-          isPrinted: true,
+          isPrinted: false,
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
@@ -411,6 +405,9 @@ const Apply = () => {
     };
   }, []);
 
+  //console.log nilai image dari atom
+  console.log("imageFromAtom", image);
+
 
   useEffect(() => {
     const cardNumberPetugasFix = 11 + localStorage.getItem("cardNumberPetugas");
@@ -420,6 +417,26 @@ const Apply = () => {
       setCardNumberPetugas(cardNumberPetugas);
     }
   }, []);
+
+  useEffect(() => {
+    socket_IO.on("responseSendDataUser", (data) => {
+      console.log("dataResponseSendDataUser", data);
+      if (data === "Successfully") {
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: true,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+          isPhoto: false,
+        });
+        setDisabled(true);
+      }
+    });
+  }, [socket_IO]);
 
   useEffect(() => {
     if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
@@ -465,21 +482,6 @@ const Apply = () => {
     }
   }, [cardPaymentProps]);
 
-  // useEffect(() => {
-  //   if (statusPaymentCredit) {
-  //     // setCardPaymentProps({
-  //     //   isWaiting: false,
-  //     //   isCreditCard: false,
-  //     //   isPaymentCredit: false,
-  //     //   isPaymentCash: false,
-  //     //   isPrinted: true,
-  //     //   isSuccess: false,
-  //     //   isFailed: false,
-  //     //   isPhoto: false,
-  //     // });
-  //     doSaveRequestVoaPayment(sharedData);
-  //   }
-  // }, [statusPaymentCredit]);
 
   const doSaveRequestVoaPayment = async (sharedData) => {
     const bodyParam = {
@@ -497,9 +499,38 @@ const Apply = () => {
       photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
     };
 
+    // console.log("apakahdapat", sharedData)
+
+    const FaceToken = Cookies.get('Face-Token');
+    const FaceUsername = Cookies.get('face-username');
+    const RoleID = Cookies.get('roleId');
+    const SideBarStatus = Cookies.get('sidebarStatus');
+    const Token = Cookies.get('token');
+
+    const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
+
+
+    const bodyParamsSendKamera = {
+      method: 1,
+      identityType: "1",
+      gender: sharedData.passportData.sex === "male" ? 1 : 0,
+      personId: sharedData.passportData.noRegister,
+      personNum: sharedData.passportData.docNumber,
+      name: sharedData.passportData.fullName,
+      identityData: image ? image : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+      effectiveStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+      validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
+      thirdpartyId: "",
+    }
+
+    socket_IO.emit("sendDataUser", { bodyParamsSendKamera, CookieSend });
+
+    console.log("nilaiBodyParamsSendKamera", bodyParamsSendKamera);
+
+
     setIsEnableStep(false);
 
-    console.log("bodyParam", bodyParam);
+    // console.log("bodyParam", bodyParam);
   };
 
   useEffect(() => {

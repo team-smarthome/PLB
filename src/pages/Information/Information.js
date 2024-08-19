@@ -93,17 +93,6 @@ const Information = () => {
 			icon: BsPrinter,
 		},
 	];
-	// const listIcons = [
-	//   FaRegUserCircle,
-	//   FaRegUserCircle,
-	//   FaRegUserCircle,
-	//   FaRegUserCircle,
-	//   FaRegUserCircle,
-	//   // ChangePasswordIcons,
-	//   // IPConfigIcons,
-	//   // TestCameraIcons,
-	//   // TestPrinterIcons,
-	// ];
 
 	const [currentTab, setCurrentTab] = useState(0);
 	const [isWaiting, setIsWaiting] = useState(false);

@@ -290,7 +290,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
-              disabled={cardStatus === "iddle" ? !isCheckedFullName : true}
+              disabled={cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedFullName : true}
               className="disabled-input"
             />
 

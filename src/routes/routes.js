@@ -56,7 +56,7 @@ const ProtectedRoute = ({ element }) => {
 const Routes = () => {
   return (
     <ReactRoutes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Login />} />
       <Route path="/menu" element={<SpvLogin />} />
       <Route path="/history-log" element={<Report />} />
       <Route path="/home" element={<Home />} />

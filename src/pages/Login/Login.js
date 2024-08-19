@@ -4,13 +4,14 @@ import "./LoginStyle.css";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
+import Cookies from 'js-cookie';
 import { url_dev } from "../../services/env";
 // import { Spinner } from "flowbite-react";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [sUserName, setUsername] = useState("");
+  const [sPassword, setPassword] = useState("");
   const navigate = useNavigate();
   const tooglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -42,105 +43,49 @@ const Login = () => {
   const version = "3.0.5";
 
   const isAuthenticated = () => {
-    return localStorage.getItem("JwtToken") !== null;
+    return Cookies.get('token') !== undefined;
   };
 
   if (isAuthenticated()) {
-    if (
-      JSON.parse(localStorage.getItem("user")).group.code.includes("ADM") ||
-      JSON.parse(localStorage.getItem("user")).group.code.includes("SPV")
-    ) {
-      return <Navigate to="/report" replace />;
-    }
     return <Navigate to="/home" replace />;
   }
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!isOnline) {
-      Toast.fire({
-        icon: "error",
-        title: "No Internet Connection",
-      });
-      return;
-    }
     try {
       isLoading(true);
-      const response = await axios.post(`${url_dev}Login.php`, {
-        username,
-        password,
+      const encodedPassword = btoa(sPassword);
+      const response = await axios.put(`http://192.168.2.127/cgi-bin/entry.cgi/system/login`, {
+        sUserName,
+        sPassword: encodedPassword,
       });
-
-      if (
-        response.data.JwtToken.token !== null &&
-        response.data.JwtToken.token !== "" &&
-        response.data.status === "success"
-      ) {
-        localStorage.setItem("JwtToken", response.data.JwtToken.token);
-
-        const userProfile = await axios.get(`${url_dev}ProfileMe.php`, {
-          headers: {
-            Authorization: `Bearer ${response.data.JwtToken.token}`,
-          },
-        });
-
-        // Check if userProfile.data.user_data is not null
-        if (
-          userProfile.data.user_data !== null &&
-          userProfile.data.price !== null &&
-          userProfile.data.api !== null
-        ) {
-          isLoading(false);
-          localStorage.setItem(
-            "user",
-            JSON.stringify(userProfile.data.user_data)
-          );
-          localStorage.setItem("price", JSON.stringify(userProfile.data.price));
-          localStorage.setItem("key", userProfile.data.api.key);
-          localStorage.setItem("token", userProfile.data.api.token);
-
-          const userInfo = JSON.parse(localStorage.getItem("user"));
-
-          if (
-            userInfo.group.code.includes("ADM") ||
-            userInfo.group.code.includes("SPV")
-          ) {
-            Toast.fire({
-              icon: "success",
-              title: "Welcome, Supervisor.",
-            });
-            navigate("/report");
-          } else {
-            Toast.fire({
-              icon: "success",
-              title: "Berhasil Masuk",
-            });
-            navigate("/home");
-          }
+      const dataRes = response.data;
+      console.log(response, "respinsehitapi");
+      let authUser = ""
+      if (dataRes.status.code === 200) {
+        isLoading(false);
+        if (dataRes.data.auth === 0) {
+          authUser = "admin";
         } else {
-          isLoading(false);
-          localStorage.removeItem("JwtToken");
-          Toast.fire({
-            icon: "error",
-            title: "Failed to Login",
-          });
+          authUser = "user";
         }
-      } else if (
-        response.data.status === "error" ||
-        response.data.message === "Login failed"
-      ) {
+        // Cookies.set('token', dataRes.data.token, { expires: 1, domain: '192.168.2.127' });
+        // Cookies.set('sidebarStatus', dataRes.data.status, { expires: 1, domain: '192.168.2.127' });
+        // Cookies.set('roleId', dataRes.data.auth, { expires: 1, domain: '192.168.2.127' });
+        // Cookies.set('face-username', authUser, { expires: 1, domain: '192.168.2.127' });
+        // Cookies.set('Face-Token', dataRes.data.token, { expires: 1, domain: '192.168.2.127' });
+
+
+        Cookies.set('token', dataRes.data.token, { expires: 1 });
+        Cookies.set('sidebarStatus', dataRes.data.status, { expires: 1 });
+        Cookies.set('roleId', dataRes.data.auth, { expires: 1 });
+        Cookies.set('face-username', authUser, { expires: 1 });
+        Cookies.set('Face-Token', dataRes.data.token, { expires: 1 });
         Toast.fire({
-          icon: "error",
-          title: "Username or Password is Wrong",
+          icon: "success",
+          title: "Berhasil Masuk",
         });
-        isLoading(false);
-      } else {
-        // Kondisi tambahan jika login tidak berhasil namun tidak ada pesan error yang sesuai
-        Toast.fire({
-          icon: "error",
-          title: "Failed to Login. Please try again.",
-        });
-        isLoading(false);
+        navigate("/home");
       }
     } catch (error) {
       isLoading(false);

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./Report.css";
 import Table from "../../components/Table/Table";
 import Pagination from "../../components/Pagination/Pagination";
-import { apiPaymentHistory } from "../../services/api";
 import Select from "react-select";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -11,27 +10,29 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import io from "socket.io-client";
 import { url_dev } from "../../services/env";
+import Cookies from 'js-cookie';
 
 function Report() {
+  const socket_IO = io("http://localhost:4000");
   const navigate = useNavigate();
   const [loading, isLoading] = useState(false);
   const currentDate = new Date(Date.now()).toISOString().split("T")[0];
   const [data, setData] = useState([]);
-  const [response, setResponse] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState(currentDate);
   const [endDate, setEndDate] = useState(currentDate);
   const [mulaiDate, setMulaiDate] = useState(new Date());
   const [selesaiDate, setSelesaiDate] = useState(new Date());
-  const [petugas, setPetugas] = useState([]);
+  const [petugas, setPetugas] = useState("");
+  const [nomorPassport, setNomorPassport] = useState("");
   const [pages, setPages] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
     value: ["KICASH", "KIOSK"],
     label: "ALL",
   });
-  const perPage = 20;
+  const perPage = 10;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
@@ -39,73 +40,64 @@ function Report() {
   ];
 
   const [petugasOptions, setPetugasOptions] = useState([]);
+  const [nomorPassportOptions, setNomorPassportOptions] = useState([]);
 
   let payloadTempt = {};
 
-  const doPaymentHistory = async (page) => {
-    isLoading(true);
+  useEffect(() => {
+    const FaceToken = Cookies.get('Face-Token');
+    const FaceUsername = Cookies.get('face-username');
+    const RoleID = Cookies.get('roleId');
+    const SideBarStatus = Cookies.get('sidebarStatus');
+    const Token = Cookies.get('token');
 
-    const bearerToken = localStorage.getItem("JwtToken");
-    const header = {
-      Authorization: `Bearer ${bearerToken}`,
-      "Content-Type": "application/json",
-    };
+    const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
+    socket_IO.emit("startFilterUser", { CookieSend });
+    socket_IO.on("responseGetDataUserFilter", (data) => {
+      const dataUser = data.map((item) => ({
+        label: item.name,
+        value: item.name
+      }));
+      setPetugasOptions(dataUser);
+      const dataPassport = data.map((item) => ({
+        label: item.personNum,
+        value: item.personNum
+      }));
+      console.log("dataPassport:", dataPassport);
+      setNomorPassportOptions(dataPassport);
+      console.log("responseGetDataUserFilter:", data);
+      // setData(data);
+    });
+  }, []);
 
-    let paymentMethodValue = [selectedPaymentMethod.value];
+  // useEffect(() => {
+  //   const FaceToken = Cookies.get('Face-Token');
+  //   const FaceUsername = Cookies.get('face-username');
+  //   const RoleID = Cookies.get('roleId');
+  //   const SideBarStatus = Cookies.get('sidebarStatus');
+  //   const Token = Cookies.get('token');
 
-    if (Array.isArray(selectedPaymentMethod.value)) {
-      paymentMethodValue = selectedPaymentMethod.value;
-    }
+  //   const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
+  //   const bodyParamsSendKamera = {
+  //     name: "",
+  //     beginTime: "-25200",
+  //     endTime: "1724086799",
+  //     type: "all",
+  //     gender: "all",
+  //     beginPosition: 0,
+  //     endPosition: 19,
+  //     limit: 20,
+  //     page: 1,
+  //     status: "all",
+  //     passState: 0,
+  //     passStatus: -1,
+  //     personCode: "",
+  //     minAge: 0,
+  //     maxAge: 100
+  //   }
+  //   socket_IO.emit("historyLog", { bodyParamsSendKamera, CookieSend });
+  // }, [])
 
-    const bodyParams = {
-      startDate: startDate,
-      endDate: endDate,
-      paymentMethod: paymentMethodValue,
-      username: petugas,
-      limit: perPage,
-      page,
-    };
-
-    // Menambahkan kondisi untuk memeriksa perubahan parameter
-    if (
-      startDate !== payloadTempt.startDate ||
-      endDate !== payloadTempt.endDate ||
-      JSON.stringify(paymentMethodValue) !==
-      JSON.stringify(payloadTempt.paymentMethod) ||
-      perPage !== payloadTempt.limit
-    ) {
-      setPages(1);
-      setData([]);
-      setCurrentPage(1);
-      payloadTempt = { ...bodyParams };
-    }
-
-    try {
-      const res = await apiPaymentHistory(header, bodyParams);
-
-      if (
-        Array.isArray(res.data) &&
-        res.data.length > 0 &&
-        res.data[0].status === "success" &&
-        res.data[0].data.length > 0
-      ) {
-        isLoading(false);
-        const dataRes = res.data && res.data[0];
-        setData((prevData) => [
-          ...prevData,
-          ...(dataRes && dataRes.status === "success" ? dataRes.data : []),
-        ]);
-        setResponse(res.data);
-        setPages((prevPages) => prevPages + 1);
-        await doPaymentHistory(page + 1);
-      } else {
-        setCurrentPage(1);
-      }
-    } catch (error) {
-    } finally {
-      isLoading(false);
-    }
-  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -155,8 +147,6 @@ function Report() {
     setCurrentPage(selectedPage);
   };
 
-
-  const pageCount = data.length / 10;
   const generatePDF = () => {
     const pdf = new jsPDF();
 
@@ -199,29 +189,10 @@ function Report() {
       }).format(item.billed_price),
     ]);
 
-    const totalPayment =
-      response.length > 0 ? response[0].payment_summary.total : 0;
-
-    const totalRow = [
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "TOTAL:",
-      new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      }).format(totalPayment),
-    ];
 
 
     pdf.autoTable({
       head: [itemHeaders],
-      body: [...itemRows, totalRow],
       startY: 30,
       styles: {
         fontSize: 5,
@@ -268,13 +239,7 @@ function Report() {
       worksheet.addRow(row);
     });
 
-    // Calculate totalPayment
-    const totalPayment =
-      response.length > 0 ? response[0].payment_summary.total : 0;
 
-    // Add total row
-    const totalRow = ["", "", "", "", "", "", "", "", "TOTAL", totalPayment];
-    worksheet.addRow(totalRow);
 
     // Save the workbook
     workbook.xlsx.writeBuffer().then((buffer) => {
@@ -340,8 +305,8 @@ function Report() {
   };
 
   useEffect(() => {
-    setStartDate(formatDate(new Date()));
-    setEndDate(formatDate(new Date()));
+    setStartDate(Math.floor(new Date(startDate).getTime() / 1000).toString());
+    setEndDate(Math.floor(new Date(endDate).getTime() / 1000).toString());
   }, []);
 
   console.log("startDate:", startDate);
@@ -349,17 +314,54 @@ function Report() {
   const handleChangeStartDate = (date) => {
     setMulaiDate(date);
     const formattedDate = formatDate(date);
-    console.log("Tanggal_dipilih:", formattedDate);
-    setStartDate(formattedDate);
-    console.log("startDateSatu:", startDate);
+    const epochDate = Math.floor(new Date(formattedDate).getTime() / 1000).toString();
+    console.log("Tanggal_dipilih:", epochDate);
+    setStartDate(epochDate);
   };
 
   const handleChangeEndDate = (date) => {
     setSelesaiDate(date);
     const formattedDate = formatDate(date);
-    console.log("Tanggal_dipilih:", formattedDate);
-    setEndDate(formattedDate);
+    const epochDateEnd = Math.floor(new Date(formattedDate).getTime() / 1000).toString();
+    console.log("Tanggal_dipilih:", epochDateEnd);
+    setEndDate(epochDateEnd);
   };
+
+  const handleSubmitFilter = async () => {
+    console.log("SubmitstartDate:", startDate);
+    console.log("SubmitendDate:", endDate);
+    console.log("Submitpetugas:", petugas);
+    console.log("SubmitnomorPassport:", nomorPassport);
+    const FaceToken = Cookies.get('Face-Token');
+    const FaceUsername = Cookies.get('face-username');
+    const RoleID = Cookies.get('roleId');
+    const SideBarStatus = Cookies.get('sidebarStatus');
+    const Token = Cookies.get('token');
+
+    const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
+    const bodyParamsSendFilter = {
+      name: petugas,
+      beginTime: startDate,
+      endTime: endDate,
+      type: "all",
+      gender: "all",
+      beginPosition: 0,
+      endPosition: 19,
+      limit: 20,
+      page: 1,
+      status: "all",
+      passState: 0,
+      passStatus: -1,
+      personCode: nomorPassport,
+      minAge: 0,
+      maxAge: 100
+    }
+    socket_IO.emit("historyLog", { bodyParamsSendFilter, CookieSend });
+    socket_IO.on("responseGetDataUser", (data) => {
+      console.log("responseGetDataUser:", data);
+      setData(data.matchList);
+    });
+  }
 
   return (
     <div className="body">
@@ -391,12 +393,8 @@ function Report() {
           <div className="select-petugas">
             <Select
               id="petugas"
-              value={
-                petugas
-                  ? petugasOptions.find((option) => option.value === petugas)
-                  : ""
-              }
-              onChange={(selectedOption) => setPetugas([selectedOption.label])}
+              value={petugas ? petugasOptions.find((option) => option.value === petugas) : null}
+              onChange={(selectedOption) => setPetugas(selectedOption.value)}
               options={petugasOptions}
               className="basic-single"
               styles={{
@@ -428,11 +426,11 @@ function Report() {
               id="petugas"
               value={
                 petugas
-                  ? petugasOptions.find((option) => option.value === petugas)
+                  ? nomorPassportOptions.find((option) => option.value === nomorPassport)
                   : ""
               }
-              onChange={(selectedOption) => setPetugas([selectedOption.label])}
-              options={petugasOptions}
+              onChange={(selectedOption) => setNomorPassport(selectedOption.label)}
+              options={nomorPassportOptions}
               className="basic-single"
               styles={{
                 container: (provided) => ({
@@ -459,7 +457,7 @@ function Report() {
           <button
             type="button"
             className="handle-sumbit-bg"
-            onClick={() => doPaymentHistory(1)}
+            onClick={handleSubmitFilter}
           >
             Submit
           </button>
@@ -503,11 +501,10 @@ function Report() {
           </div>
         ) : (
           <>
-            <Table data={data} response={response} page={currentPage} />
+            <Table data={data} page={currentPage} />
             <div className="table-footer">
               <Pagination
                 onPageChange={handlePageClick}
-                pageCount={pageCount}
               />
             </div>
           </>
