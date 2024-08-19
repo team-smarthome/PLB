@@ -52,3 +52,17 @@ export async function apiVoaPayment(header, body) {
     throw error;
   }
 }
+
+export async function apiPblAddFaceRec(header, body) {
+  console.log("Cookieapakahdapat", header);
+  const apiUrl = `${url_dev}cgi-bin/entry.cgi/event/person-info`;
+  const headers = header;
+  const requestBody = body;
+
+  try {
+    const response = await axios.post(apiUrl, requestBody, { headers });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

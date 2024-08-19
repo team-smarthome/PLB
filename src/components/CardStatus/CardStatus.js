@@ -21,10 +21,13 @@ import dataNegara from "../../utils/dataNegara";
 import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import dataPasporImg from "../../utils/dataPhotoPaspor";
+import { useAtom } from "jotai";
+import { imageToSend } from "../../utils/atomStates";
 
 const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
+	const [image, setImage] = useAtom(imageToSend);
 	const { data } = useContext(DataContext);
 	const [capturedImage, setCapturedImage] = useState(null);
 	const [email, setEmail] = useState(null);
@@ -98,6 +101,19 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 				titleFooter: "Next Step",
 			});
 		});
+		socket_IO_4000.on("photo_taken2", (imageBase642) => {
+			setImage(imageBase642);
+			console.log("apakahdapatimagenya", imageBase642)
+			sendDataToInput({
+				ambilImage: imageBase642,
+				statusCardBox: "takePhotoSucces",
+				capturedImage: capturedImage,
+				emailUser: null,
+				titleHeader: "Apply PLB",
+				titleFooter: "Next Step",
+			});
+		});
+
 		socket_IO_4000.on("error_photo", (error) => {
 			console.error("Error taking photo:", error);
 			sendDataToInput({

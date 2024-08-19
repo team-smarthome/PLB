@@ -26,6 +26,7 @@ const BodyContent = ({
 }) => {
   const [sharedData, setSharedData] = useState({
     passportData: null,
+    photoToSend: null,
     photoFace: null,
     email: null,
     city: null,
@@ -34,6 +35,7 @@ const BodyContent = ({
 
   const handleDataFromCardStatus = ({
     statusCardBox,
+    ambilImage,
     capturedImage,
     emailUser,
     city,
@@ -43,6 +45,7 @@ const BodyContent = ({
   }) => {
     setSharedData((prevData) => ({
       ...prevData,
+      photoToSend: ambilImage,
       photoFace: capturedImage,
       email: emailUser,
       city: city,
@@ -60,6 +63,7 @@ const BodyContent = ({
 
 
   const handleDataFormCardPaymentStatus = ({
+    ambilImages,
     capturedImages,
     isDoRetake,
     isPhoto,
@@ -74,6 +78,11 @@ const BodyContent = ({
     setSharedData((prevData) => ({
       ...prevData,
       photoFace: capturedImages,
+    }));
+
+    setSharedData((prevData) => ({
+      ...prevData,
+      photoToSend: ambilImages,
     }));
   };
 
