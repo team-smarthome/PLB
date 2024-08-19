@@ -27,8 +27,8 @@ const Table = ({ data, page }) => {
   }
 
   // Calculate the start and end indices based on the page parameter
-  const startIndex = (page - 1) * 10;
-  const endIndex = Math.min(startIndex + 10, data.length);
+  const startIndex = (page - 1) * 20;
+  const endIndex = Math.min(startIndex + 20, data.length);
 
   // Display only the data within the calculated indices
   const slicedData = data.slice(startIndex, endIndex);
