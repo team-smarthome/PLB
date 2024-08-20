@@ -3,11 +3,11 @@ import ReactPaginate from "react-paginate";
 import "./Pagination.css";
 
 const Pagination = ({ onPageChange, pageCount }) => {
- 
+
 
   return (
     <div>
-    <ReactPaginate
+      <ReactPaginate
         previousLabel={"previous"}
         nextLabel={"next"}
         breakLabel={"..."}
@@ -19,7 +19,7 @@ const Pagination = ({ onPageChange, pageCount }) => {
         containerClassName={"pagination"}
         subContainerClassName={"pages pagination"}
         activeClassName={"active"}
-    />
+      />
     </div>
   );
 };

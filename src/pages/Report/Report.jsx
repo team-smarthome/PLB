@@ -32,7 +32,7 @@ function Report() {
     value: ["KICASH", "KIOSK"],
     label: "ALL",
   });
-  const perPage = 10;
+  const perPage = 20;
   const options = [
     { value: "KICASH", label: "CASH" },
     { value: "KIOSK", label: "CC" },
@@ -66,7 +66,7 @@ function Report() {
       console.log("dataPassport:", dataPassport);
       setNomorPassportOptions(dataPassport);
       console.log("responseGetDataUserFilter:", data);
-      // setData(data);
+
     });
   }, []);
 
@@ -104,44 +104,6 @@ function Report() {
   }, [startDate, endDate, petugas]);
 
 
-  useEffect(() => {
-    const city = JSON.parse(localStorage.getItem("user"));
-    const officeCity = city?.organization?.officeCity;
-    const jwtToken = localStorage.getItem("JwtToken");
-    console.log("Bearer Token:", jwtToken);
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${url_dev}Petugas.php`, {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        });
-        let dataPetugas = [];
-
-        console.log("Data_Petugas:", response.data);
-
-        console.log("officeCity:", officeCity);
-        console.log("response:", response);
-
-        if (officeCity === "DENPASAR") {
-          dataPetugas = response.data.dataPetugasDenpasar.petugas;
-          console.log("dataPetugas:", dataPetugas);
-        } else if (officeCity === "JAKARTA") {
-          dataPetugas = response.data.dataPetugasJakarta.petugas;
-        }
-
-        const options = dataPetugas.map((petugas) => ({
-          value: petugas.id,
-          label: petugas.username,
-        }));
-        setPetugasOptions(options);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
@@ -360,6 +322,7 @@ function Report() {
     socket_IO.on("responseGetDataUser", (data) => {
       console.log("responseGetDataUser:", data);
       setData(data.matchList);
+      setPages(data.numOfMatches);
     });
   }
 
@@ -505,6 +468,7 @@ function Report() {
             <div className="table-footer">
               <Pagination
                 onPageChange={handlePageClick}
+                pageCount={Math.ceil(pages / perPage)}
               />
             </div>
           </>
