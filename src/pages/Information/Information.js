@@ -18,6 +18,8 @@ import { IoCameraOutline } from "react-icons/io5";
 import { BsPrinter } from "react-icons/bs";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import VideoPlayer from "../../components/VideoPlayer";
+import Table from "../../components/Table/Table2";
+import Cookies from 'js-cookie';
 
 const Information = () => {
 	const socket2_IO_4000 = io("http://localhost:4000");
@@ -39,6 +41,7 @@ const Information = () => {
 	const [loading, setLoading] = useState(false);
 	const [capturedImageTest, setCapturedImageTest] = useState("");
 	const [succesCapture, setSuccesCapture] = useState(false);
+	const [data, setData] = useState([]);
 
 
 	const handleTakePhoto = async () => {
@@ -46,6 +49,21 @@ const Information = () => {
 		setLoading(true);
 		socket2_IO_4000.emit("take_photo");
 	};
+
+	useEffect(() => {
+		const FaceToken = Cookies.get('Face-Token');
+		const FaceUsername = Cookies.get('face-username');
+		const RoleID = Cookies.get('roleId');
+		const SideBarStatus = Cookies.get('sidebarStatus');
+		const Token = Cookies.get('token');
+
+		const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
+		socket2_IO_4000.emit("startFilterUser", { CookieSend });
+		socket2_IO_4000.on("responseGetDataUserFilter", (data) => {
+			setData(data);
+			console.log("datayangdidapat", data);
+		});
+	}, []);
 
 	useEffect(() => {
 		socket2_IO_4000.on("photo_taken", (imageBase64) => {
@@ -73,7 +91,7 @@ const Information = () => {
 	};
 	const listConfiguration = [
 		{
-			name: "Profile",
+			name: "User",
 			icon: FaRegUserCircle,
 		},
 		{
@@ -374,9 +392,6 @@ const Information = () => {
 		const socketCamera = io("http://localhost:4001");
 		socketCamera.on("stream_camera", (stream_url) => {
 			setUrlKamera(stream_url);
-			// setLoading(false);
-			// console.log("masuksiniKAMERASTREAM");
-			// console.log("data_url_stream", stream_url);
 		});
 		socketCamera.emit("start_stream");
 		setTimeout(() => {
@@ -445,47 +460,8 @@ const Information = () => {
 								<>
 									{currentTab === 0 ? (
 										<>
-											<div className="profile_atas">
-												<img
-													src={Profile}
-													alt="profile_icons"
-												/>
-											</div>
 											<div className="kotak-profile">
-												<div className="profile-key">
-													<div className="profile-title">
-														Full Name
-													</div>
-													<div className="profile-title">
-														Email{" "}
-													</div>
-													<div className="profile-title">
-														Address
-													</div>
-													<div className="profile-title">
-														Office City
-													</div>
-													<div className="profile-title">
-														Position
-													</div>
-												</div>
-												<div className="profile-value">
-													<div className="profile-name">
-														: {DataUser.fullName}
-													</div>
-													<div className="profile-email">
-														: {DataUser.email}
-													</div>
-													<div className="profile-address">
-														: {DataUser.address}
-													</div>
-													<div className="profile-office-city">
-														: {DataUser.officeCity}
-													</div>
-													<div className="profile-position">
-														: {DataUser.position}
-													</div>
-												</div>
+												<Table data={data} />
 											</div>
 										</>
 									) : currentTab === 1 ? (

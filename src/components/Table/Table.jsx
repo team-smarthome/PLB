@@ -27,8 +27,8 @@ const Table = ({ data, page }) => {
   }
 
   // Calculate the start and end indices based on the page parameter
-  const startIndex = (page - 1) * 10;
-  const endIndex = Math.min(startIndex + 10, data.length);
+  const startIndex = (page - 1) * 20;
+  const endIndex = Math.min(startIndex + 20, data.length);
 
   // Display only the data within the calculated indices
   const slicedData = data.slice(startIndex, endIndex);
@@ -67,7 +67,6 @@ const Table = ({ data, page }) => {
             <th>Panoramic Capture</th>
             <th>Similarity</th>
             <th>Status</th>
-            <th>Print</th>
           </tr>
         </thead>
         <tbody>
@@ -87,24 +86,11 @@ const Table = ({ data, page }) => {
                 />
               </td>
               <td>{item.images_info[0].similarity}</td>
-              <td>{item.passStatus === 5 ? "Success" : "Failed"}</td>
-
-              <td>
-                <IoMdPrint onClick={() => handlePrintClick(item)} />
-              </td>
+              <td>{item.passStatus === 6 ? "Failed" : "Success"}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <Printer
-        printRefProps={printRef}
-        dataNumberPermohonanPropsVisa={printData ? printData.visa_number : ""}
-        dataNumberPermohonanPropsReceipt={printData ? printData.receipt : ""}
-        passportumber={printData ? printData.passport_number : ""}
-        passportName={printData ? printData.full_name : ""}
-        dataDate={printData ? printData.timestamp.split(" ")[0] : ""}
-        dataTime={printData ? printData.timestamp.split(" ")[1] : ""}
-      />
     </div>
   );
 };

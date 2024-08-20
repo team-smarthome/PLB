@@ -5,6 +5,9 @@ import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import { FaWpforms } from "react-icons/fa";
 import { IoSearchSharp } from "react-icons/io5";
 import { TbSettingsCog } from "react-icons/tb";
+import LogoutIcon from "../../assets/images/logout.png";
+import Swal from "sweetalert2";
+
 
 
 const Home = () => {
@@ -19,6 +22,34 @@ const Home = () => {
 
   const btnOnClick_Search_Passport = () => {
     navigate("/history-log");
+  };
+  const deleteAllCookies = () => {
+    const cookies = document.cookie.split(';');
+
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+    }
+  };
+
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure want to logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3D5889",
+    });
+
+    if (result.isConfirmed) {
+      navigate("/");
+      deleteAllCookies();
+
+    }
   };
 
 
@@ -53,6 +84,15 @@ const Home = () => {
             <TbSettingsCog size={80} />
             Configuration
           </div>
+        </div>
+      </div>
+      <div className="footer-bg-home">
+        <div className="logout-footer" onClick={handleLogout}>
+          <img
+            src={LogoutIcon}
+            alt="logout-icon"
+          />
+          Logout
         </div>
       </div>
 
