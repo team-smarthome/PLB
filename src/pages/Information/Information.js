@@ -20,6 +20,7 @@ import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import VideoPlayer from "../../components/VideoPlayer";
 import Table from "../../components/Table/Table2";
 import Cookies from 'js-cookie';
+import Select from "react-select";
 
 const Information = () => {
 	const socket2_IO_4000 = io("http://localhost:4000");
@@ -42,6 +43,9 @@ const Information = () => {
 	const [capturedImageTest, setCapturedImageTest] = useState("");
 	const [succesCapture, setSuccesCapture] = useState(false);
 	const [data, setData] = useState([]);
+	const [totalCameras, setTotalCameras] = useState(0);
+	const [selectedCamera, setSelectedCamera] = useState('');
+	const [cameraIPs, setCameraIPs] = useState([]);
 
 
 	const handleTakePhoto = async () => {
@@ -49,6 +53,38 @@ const Information = () => {
 		setLoading(true);
 		socket2_IO_4000.emit("take_photo");
 	};
+
+	const handleTotalCamerasChange = (selectedOption) => {
+		if (selectedOption) {
+			setTotalCameras(selectedOption.value);
+		} else {
+			setTotalCameras(0);
+			setSelectedCamera('');
+			setCameraIPs([]);
+		}
+	};
+
+	const cameraOptions = [...Array(totalCameras)].map((_, index) => ({
+		value: `Kamera ${index + 1}`,
+		label: `Kamera ${index + 1}`,
+	}));
+
+	const handleCameraSelect = (selectedOption) => {
+		setSelectedCamera(selectedOption ? selectedOption.value : '');
+	};
+
+	const handleIPChange = (e, cameraIndex) => {
+		const newCameraIPs = [...cameraIPs];
+		newCameraIPs[cameraIndex] = e.target.value;
+		setCameraIPs(newCameraIPs);
+	};
+
+	const optionCameras = [...Array(10)].map((_, index) => ({
+		value: index + 1,
+		label: `${index + 1} Kamera`,
+	}));
+
+	const selectedCameraIndex = parseInt(selectedCamera.split(' ')[1], 10) - 1;
 
 	useEffect(() => {
 		const FaceToken = Cookies.get('Face-Token');
@@ -375,16 +411,23 @@ const Information = () => {
 
 		// Create data object
 		const data = {
-			ipServerCamera: ipCamera,
+			ipServerPC: newWifiResults,
+			ipServerCamera: cameraIPs,
 		};
+
+		console.log("dataKonfigurasi", data);
+
+		// console.log("ipPC", newWifiResults)
+		// //console.log cameara ip
+		// console.log("camera_ip", cameraIPs);
 
 		// Emit data over socket
 		socket.emit("saveCameraData", data);
 		socket2.emit("saveCameraData", data);
-		setTimeout(() => {
-			window.location.reload();
-			// setStatusCamera("ON");
-		}, 2000);
+		// setTimeout(() => {
+		// 	window.location.reload();
+		// 	// setStatusCamera("ON");
+		// }, 2000);
 	};
 
 	const startStream = () => {
@@ -403,10 +446,10 @@ const Information = () => {
 
 	useEffect(() => {
 		const socketCamera = io("http://localhost:4001");
-		socketCamera.on("cameraDataToClient", (data) => {
-			setIpCamera(data.ipServerCamera);
-			socketCamera.emit("stop_stream");
-		});
+		// socketCamera.on("cameraDataToClient", (data) => {
+		// 	// setIpCamera(data.ipServerCamera);
+		// 	socketCamera.emit("stop_stream");
+		// });
 		socketCamera.on("cameraStatus", (data) => {
 			setStatusCamera(data.status);
 		});
@@ -716,83 +759,116 @@ const Information = () => {
 															id="ipServerPC"
 															className={
 																newWifiResults
-																	? "disabled-input"
+																	? ""
 																	: ""
 															}
 															value={
 																newWifiResults
 															}
-															readOnly
-														/>
-													</div>
-												</div>
-
-												<div className="form-group">
-													<div className="wrapper-form">
-														<div className="wrapper-input">
-															<label htmlFor="ip_server_camera">
-																IP Server Camera
-															</label>
-														</div>
-														<input
-															type="text"
-															name="ipServerCamera"
-															id="ipServerCamera"
-															className="disabled-input"
 															onChange={(e) =>
-																setIpCamera(
+																setNewWifiResults(
 																	e.target
 																		.value
 																)
 															}
-															value={ipCamera}
 														/>
 													</div>
 												</div>
-												<div className="form-group">
-													<div className="wrapper-form">
-														<div className="wrapper-input">
-															<label htmlFor="status_card_reader">
-																Status Card
-																Reader
-															</label>
+												<div>
+													<div className="form-group">
+														<div className="wrapper-form">
+															<div className="wrapper-input">
+																<label htmlFor="total_cameras">Jumlah Kamera</label>
+															</div>
+															<Select
+																id="totalCameras"
+																name="totalCameras"
+																value={optionCameras.find(
+																	(option) => option.value === totalCameras
+																)}
+																onChange={handleTotalCamerasChange}
+																options={optionCameras}
+																className="basic-single"
+																classNamePrefix="select"
+																styles={{
+																	container: (provided) => ({
+																		...provided,
+																		flex: 1,
+																		width: '100%',
+																		borderRadius: '10px',
+																		backgroundColor:
+																			'rgba(217, 217, 217, 0.75)',
+																		fontFamily: 'Roboto, Arial, sans-serif',
+																	}),
+																	valueContainer: (provided) => ({
+																		...provided,
+																		flex: 1,
+																		width: '100%',
+																	}),
+																	control: (provided) => ({
+																		...provided,
+																		flex: 1,
+																		width: '100%',
+																		backgroundColor:
+																			'rgba(217, 217, 217, 0.75)',
+																	}),
+																}}
+															/>
 														</div>
-														<input
-															type="text"
-															name="statusCardReader"
-															id="statusCardReader"
-															className="disabled-input"
-															readOnly
-															// onChange={(e) => setStatusCardReader(e.target.value)}
-															value={
-																statusCardReader
-															}
-														/>
 													</div>
-												</div>
 
-												<div className="form-group">
-													<div className="wrapper-form">
-														<div className="wrapper-input">
-															<label htmlFor="status_camera">
-																Status Camera
-															</label>
+													{totalCameras > 0 && (
+														<div className="form-group">
+															<div className="wrapper-form">
+																<div className="wrapper-input">
+																	<label htmlFor="status_card_reader">Pilih Kamera</label>
+																</div>
+																<Select
+																	id="statusCardReader"
+																	name="statusCardReader"
+																	classNamePrefix="select"
+																	options={cameraOptions}
+																	onChange={handleCameraSelect}
+																	value={cameraOptions.find(option => option.value === selectedCamera)}
+																	placeholder="-- Pilih Kamera --"
+																	styles={{
+																		container: (provided) => ({
+																			...provided,
+																			flex: 1,
+																			width: "100%",
+																			borderRadius: "10px",
+																			backgroundColor: "rgba(217, 217, 217, 0.75)",
+																			fontFamily: "Roboto, Arial, sans-serif",
+																		}),
+																		control: (provided) => ({
+																			...provided,
+																			backgroundColor: "rgba(217, 217, 217, 0.75)",
+																		}),
+																	}}
+																/>
+															</div>
 														</div>
-														<input
-															type="text"
-															name="statusCamera"
-															id="statusCamera"
-															className="disabled-input"
-															onChange={(e) =>
-																setStatusCamera(
-																	e.target
-																		.value
-																)
-															}
-															value={statusCamera}
-															readOnly
-														/>
-													</div>
+													)}
+
+													{selectedCamera && (
+														<div className="form-group">
+															<div className="wrapper-form">
+																<div className="wrapper-input">
+																	<label htmlFor="status_camera">
+																		Masukkan IP untuk {selectedCamera}
+																	</label>
+																</div>
+																<input
+																	type="text"
+																	name="statusCamera"
+																	id="statusCamera"
+																	className="disabled-input"
+																	onChange={(e) => handleIPChange(e, selectedCameraIndex)}
+																	value={cameraIPs[selectedCameraIndex] || ''}
+																/>
+															</div>
+														</div>
+													)}
 												</div>
 												<button
 													className="ok-button"
