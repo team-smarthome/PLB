@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
 import { formData } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
-import { imageToSend } from "../../utils/atomStates";
+import { imageToSend, cookiesData } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
 import { apiPblAddFaceRec } from "../../services/api";
 import io from "socket.io-client";
@@ -19,6 +19,7 @@ const Apply = () => {
   const socket_IO = io("http://localhost:4000");
   const [, setFormData] = useAtom(formData);
   const [image] = useAtom(imageToSend);
+  const [dataCookie] = useAtom(cookiesData);
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
@@ -49,7 +50,6 @@ const Apply = () => {
     isPhoto: false,
     isDoRetake: false,
   });
-
   const [shareDataPaymentProps, setShareDataPaymentProps] = useState({
     paymentMethod: "",
     cardNumber: "",
@@ -484,32 +484,6 @@ const Apply = () => {
 
 
   const doSaveRequestVoaPayment = async (sharedData) => {
-    const bodyParam = {
-      passportNumber: sharedData.passportData.docNumber,
-      registerNumber: sharedData.passportData.noRegister,
-      expiredDate: sharedData.passportData.formattedExpiryDate,
-      fullName: sharedData.passportData.fullName,
-      dateOfBirth: sharedData.passportData.formattedBirthDate,
-      nationalityCode: sharedData.passportData.nationality,
-      sex: sharedData.passportData.sex === "male" ? "M" : "F",
-      issuingCountry: sharedData.passportData.issuingState,
-      expiryDate: sharedData.passportData.formattedExpiryDate,
-      arrivalTime: sharedData.arrivalTime,
-      destinationLocation: sharedData.destinationLocation,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-    };
-
-    // console.log("apakahdapat", sharedData)
-
-    const FaceToken = Cookies.get('Face-Token');
-    const FaceUsername = Cookies.get('face-username');
-    const RoleID = Cookies.get('roleId');
-    const SideBarStatus = Cookies.get('sidebarStatus');
-    const Token = Cookies.get('token');
-
-    const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
-
-
     const bodyParamsSendKamera = {
       method: 1,
       identityType: "1",
@@ -530,7 +504,7 @@ const Apply = () => {
       thirdpartyId: "",
     }
 
-    socket_IO.emit("sendDataUser", { bodyParamsSendKamera, CookieSend });
+    socket_IO.emit("sendDataUser", { bodyParamsSendKamera });
 
     console.log("nilaiBodyParamsSendKamera", bodyParamsSendKamera);
 

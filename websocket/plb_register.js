@@ -1,9 +1,10 @@
-
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
 let ipCamera = [];
+let cookiesCamera = [];
 let ipServer = "";
+let remoteSocket; // Initialize remoteSocket as undefined
 const axios = require("axios");
 const ioClient = require("socket.io-client");
 
@@ -21,11 +22,6 @@ const server = http.createServer(function (request, response) {
     }
 });
 
-const remoteSocket = ioClient(`http://${ipServer}:4010`);
-remoteSocket.on("connect", () => {
-    console.log("Connected to remote WebSocket server on port 4010");
-});
-
 server.listen(webSocketsServerPort);
 console.log("Listening on port " + webSocketsServerPort);
 
@@ -37,7 +33,7 @@ const io = socketIo(server, {
 });
 
 const handleTakePhoto = async (socket) => {
-    console.log("Menjalnakn mengambil photo");
+    console.log("Menjalankan mengambil photo");
     try {
         const response = await axios.post(
             `http://${ipCamera[0]}:6002/mvfacial_terminal`,
@@ -69,7 +65,6 @@ const handleTakePhoto = async (socket) => {
             socket.emit("photo_taken2", imagePath);
             socket.emit("photo_taken", imageBase64);
             console.log("mengirim data ke frontend");
-            // console.log("Take_Photo_Response:", imageBase64);
         } else {
             console.error("cannot_take_photo");
             socket.emit("error_photo", "cannot_take_photo");
@@ -89,15 +84,21 @@ const handleTakePhoto = async (socket) => {
 };
 
 const handleSendDataUser = async (data) => {
+    console.log("Sending data to remote server", data.ipServerCamera);
     remoteSocket.emit("sendDataUserToServer", data);
 }
 
+const initializeRemoteSocket = () => {
+    remoteSocket = ioClient(`http://${ipServer}:4010`);
+    remoteSocket.on("connect", () => {
+        console.log("Connected to remote WebSocket server on port 4010");
+    });
 
-remoteSocket.on("responseSendDataUserFromServer", (data) => {
-    io.emit("responseSendDataUser", data);
-});
-
-
+    remoteSocket.on("responseSendDataUserFromServer", (data) => {
+        io.emit("responseSendDataUser", data);
+        console.log("responseSendDataUserFromServer", data);
+    });
+}
 
 io.on("connection", (socket) => {
     socket.emit("message", "Welcome to the RTSP to HLS stream");
@@ -105,8 +106,14 @@ io.on("connection", (socket) => {
     socket.on("saveCameraData", (data) => {
         ipCamera = data.ipServerCamera;
         ipServer = data.ipServerPC;
+        cookiesCamera = data.cookiesCamera;
         console.log("ipCamera", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
-    })
+
+        if (!remoteSocket) { // Check if remoteSocket has not been initialized
+            initializeRemoteSocket();
+        }
+    });
+
     socket.on("take_photo", () => {
         handleTakePhoto(socket);
     });
@@ -114,5 +121,4 @@ io.on("connection", (socket) => {
     socket.on("sendDataUser", (data) => {
         handleSendDataUser(data);
     });
-
 });

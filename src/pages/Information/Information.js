@@ -21,6 +21,9 @@ import VideoPlayer from "../../components/VideoPlayer";
 import Table from "../../components/Table/Table2";
 import Cookies from 'js-cookie';
 import Select from "react-select";
+import Swal from "sweetalert2";
+import { useAtom } from "jotai";
+import { cookiesData, ipDataCamera } from "../../utils/atomStates";
 
 const Information = () => {
 	const socket2_IO_4000 = io("http://localhost:4000");
@@ -46,7 +49,11 @@ const Information = () => {
 	const [totalCameras, setTotalCameras] = useState(0);
 	const [selectedCamera, setSelectedCamera] = useState('');
 	const [cameraIPs, setCameraIPs] = useState([]);
-
+	const [loginData, setLoginData] = useState(false);
+	const [loginDataArray1, setLoginDataArray1] = useState([]);
+	let loginDataArray = [];
+	const [dataCookiesnya, setDataCookiesnya] = useAtom(cookiesData);
+	const [dataIPCameranya, setDataIPCameranya] = useAtom(ipDataCamera);
 
 	const handleTakePhoto = async () => {
 		console.log("handleTakenPhoto");
@@ -397,38 +404,105 @@ const Information = () => {
 		navigate("/home");
 	};
 
-	const handleSubmit = (event) => {
-		console.log("MASUKKESINIMASE");
-		Toast.fire({
-			icon: "success",
-			title: "Data saved successfully",
-		});
-		event.preventDefault(); // Prevent default form submission behavior
-
-		const socket = io("http://localhost:4000");
-
-		const socket2 = io("http://localhost:4001");
-
-		// Create data object
-		const data = {
-			ipServerPC: newWifiResults,
-			ipServerCamera: cameraIPs,
-		};
-
-		console.log("dataKonfigurasi", data);
-
-		// console.log("ipPC", newWifiResults)
-		// //console.log cameara ip
-		// console.log("camera_ip", cameraIPs);
-
-		// Emit data over socket
-		socket.emit("saveCameraData", data);
-		socket2.emit("saveCameraData", data);
-		// setTimeout(() => {
-		// 	window.location.reload();
-		// 	// setStatusCamera("ON");
-		// }, 2000);
+	const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex, retryLogin) => {
+		try {
+			const encodedPassword = btoa(sPassword);
+			const response = await axios.put(`http://${ipCameraSet}/cgi-bin/entry.cgi/system/login`, {
+				sUserName,
+				sPassword: encodedPassword,
+			});
+			const dataRes = response.data;
+			let authUser = "";
+			console.log(dataRes, "respinsehitapi");
+			if (dataRes.status.code === 200) {
+				if (dataRes.data.auth === 0) {
+					authUser = "admin";
+				} else {
+					authUser = "user";
+				}
+				const loginData = `Face-Token=${dataRes.data.token}; face-username=${authUser}; roleId=${dataRes.data.auth}; sidebarStatus=${dataRes.data.status}; token=${dataRes.data.token}`;
+				loginDataArray[cameraIndex] = loginData;
+				if (loginDataArray.filter(data => data !== undefined).length === totalCameras) {
+					const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+					const data = {
+						ipServerPC: newWifiResults,
+						ipServerCamera: cameraIPs,
+						cookiesCamera: loginDataArray,
+					};
+					Toast.fire({
+						icon: "success",
+						title: "Data saved successfully",
+					});
+					socket2_IO_4000.emit("saveCameraData", data);
+					socket_server_4010.emit("saveCameraData", data);
+					setDataCookiesnya(loginDataArray);
+					setDataIPCameranya(cameraIPs);
+				}
+			} else {
+				Swal.fire(dataRes.status.message);
+				retryLogin(cameraIndex, sUserName);
+			}
+		} catch (error) {
+			Swal.fire("Failed to login");
+			retryLogin(cameraIndex, sUserName);
+		}
 	};
+
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		if (totalCameras > 0) {
+			const showLoginDialog = (index, callback, initialUsername = "") => {
+				Swal.fire({
+					title: `Login for Camera ${index + 1}`,
+					html:
+						`<input id="swal-input1" class="swal2-input" placeholder="UserName" value="${initialUsername}">` +
+						'<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+					focusConfirm: false,
+					showCancelButton: true,
+					confirmButtonText: "Submit",
+					confirmButtonColor: "#3D5889",
+					cancelButtonText: "Cancel",
+					cancelButtonColor: "#d33",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						const username = document.getElementById("swal-input1").value;
+						const password = document.getElementById("swal-input2").value;
+
+						if (username && password) {
+							callback(index, username, password);
+						} else {
+							Swal.fire("Please enter username and password");
+							showLoginDialog(index, callback, username);
+						}
+					}
+				});
+			};
+
+			const retryLogin = (cameraIndex, username) => {
+				showLoginDialog(cameraIndex, (index, sUserName, sPassword) => {
+					const ipCameraSet = cameraIPs[index];
+					handleLogin(sUserName, sPassword, ipCameraSet, index, retryLogin);
+				}, username);
+			};
+
+			const showLoginDialogs = (index = 0) => {
+				if (index < totalCameras) {
+					showLoginDialog(index, (cameraIndex, sUserName, sPassword) => {
+						const ipCameraSet = cameraIPs[cameraIndex];
+						handleLogin(sUserName, sPassword, ipCameraSet, cameraIndex, retryLogin);
+						showLoginDialogs(cameraIndex + 1);
+					});
+				}
+			};
+			showLoginDialogs();
+		} else {
+			Toast.fire({
+				icon: "error",
+				title: "Please select the number of cameras",
+			});
+		}
+	};
+
 
 	const startStream = () => {
 		setLoading(true);
@@ -464,6 +538,7 @@ const Information = () => {
 		}
 	}, [currentTab, handlePrint]);
 
+	console.log("loginDataArray1", loginDataArray1);
 	return (
 		<div className="bg-home">
 			<div className="bg-information-container">
