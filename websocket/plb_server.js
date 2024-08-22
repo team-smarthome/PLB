@@ -67,33 +67,33 @@ const handleSendDataToApi = async (socket, dataUser) => {
     }
 
     try {
-        const response = await axios.post(
-            `http://${ipServer}/plb-api/data_user_insert.php`,
-            dataTosendAPI,
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+        // const response = await axios.post(
+        //     `http://${ipServer}/plb-api/data_user_insert.php`,
+        //     dataTosendAPI,
+        //     {
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
 
-        if (response.data.status === "OK") {
-            const apiRequests = ipCamera.map((camera, index) => {
-                return axios.post(
-                    `http://${camera}/cgi-bin/entry.cgi/event/person-info`,
-                    dataUser?.bodyParamsSendKamera,
-                    {
-                        headers: {
-                            'Cookie': cookiesCamera[index],
-                            'Content-Type': 'application/json'
-                        }
+        // if (response.data.status === "OK") {
+        const apiRequests = ipCamera.map((camera, index) => {
+            return axios.post(
+                `http://${camera}/cgi-bin/entry.cgi/event/person-info`,
+                dataUser?.bodyParamsSendKamera,
+                {
+                    headers: {
+                        'Cookie': cookiesCamera[index],
+                        'Content-Type': 'application/json'
                     }
-                );
-            });
-            await Promise.all(apiRequests);
+                }
+            );
+        });
+        await Promise.all(apiRequests);
 
-            socket.emit("responseSendDataUserFromServer", "All requests to cameras were successful.");
-        }
+        socket.emit("responseSendDataUserFromServer", "Successfully");
+        // }
     } catch (error) {
         console.error('Error:', error);
         socket.emit("responseSendDataUserFromServer", "Failed to send data to all cameras.");
@@ -101,59 +101,14 @@ const handleSendDataToApi = async (socket, dataUser) => {
 };
 
 
-// const handleSendDataToApi = async (socket, dataUser) => {
-//     const dataTosendAPI = {
-//         no_passport: dataUser?.bodyParamsSendKamera?.personNum,
-//         no_register: dataUser?.bodyParamsSendKamera?.personId,
-//         name: dataUser?.bodyParamsSendKamera?.name,
-//         date_of_birth: dataUser?.bodyParamsSendKamera?.dateOfBirth,
-//         gender: dataUser?.bodyParamsSendKamera?.sex,
-//         nationality: dataUser?.bodyParamsSendKamera?.nationalityCode,
-//         expired_date: dataUser?.bodyParamsSendKamera?.expiryDate,
-//         arrival_time: dataUser?.bodyParamsSendKamera?.arrivalTime,
-//         destination_location: dataUser?.bodyParamsSendKamera?.destinationLocation,
-//         profile_image: dataUser?.bodyParamsSendKamera?.photoFace,
-//     }
-//     try {
-//         const response = await axios.post(
-//             `http://${ipServer}/plb-api/data_user_insert.php`,
-//             dataTosendAPI,
-//             {
-//                 headers: {
-//                     'Content-Type': 'application/json'
-//                 }
-//             }
-//         );
-//         if (response.data.status === "OK") {
-//             try {
-//                 const response = await axios.post(
-//                     `http://${ipCamera}/cgi-bin/entry.cgi/event/person-info`,
-//                     dataUser?.bodyParamsSendKamera,
-//                     {
-//                         headers: {
-//                             'Cookie': dataUser?.CookieSend,
-//                             'Content-Type': 'application/json'
-//                         }
-//                     }
-//                 );
-//                 socket.emit("responseSendDataUserFromServer", response.data.status.message);
-//             } catch (error) {
-//                 console.error('Error:', error);
-//             }
-//         }
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// };
-
-const handleGetDataFilter = async (socket, dataUser) => {
+const handleGetDataFilter = async (socket) => {
     try {
         const response = await axios.post(
-            `http://${ipCamera}/mdb/query`,
+            `http://${ipCamera[0]}/mdb/query`,
             { "name": "", "begin_time": "", "end_time": "", "query_type": 0, "offset": 0, "count": 100, "personCode": "", "page": 1, "limit": 100 },
             {
                 headers: {
-                    'Cookie': dataUser?.CookieSend,
+                    'Cookie': cookiesCamera[0],
                     'Content-Type': 'application/json'
                 }
             }
@@ -164,6 +119,35 @@ const handleGetDataFilter = async (socket, dataUser) => {
         }
     } catch (error) {
         console.error('Error:', error);
+    }
+}
+
+const handleDeleteDataUser = async (socket, dataUser) => {
+    try {
+        console.log("personID", dataUser.personId)
+        const apiRequests = ipCamera.map((camera, index) => {
+            return axios.post(
+                `http://${camera}/cgi-bin/entry.cgi/event/person-info-delete`,
+                {
+                    personId: dataUser?.personId
+                },
+                {
+                    headers: {
+                        'Cookie': cookiesCamera[index],
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+        });
+        await Promise.all(apiRequests);
+        // console.log("apakahmasukkesini")
+        handleGetDataFilter(socket)
+
+        // socket.emit("responseSendDataUserFromServer", "Successfully");
+
+    } catch (error) {
+        console.error('Error:', error);
+        // socket.emit("responseSendDataUserFromServer", "Failed to send data to all cameras.");
     }
 }
 
@@ -182,9 +166,14 @@ io.on("connection", (socket) => {
         handleGetDataRecords(socket, data);
     });
 
-    socket.on("startFilterUser", (data) => {
-        handleGetDataFilter(socket, data);
+    socket.on("startFilterUser", () => {
+        handleGetDataFilter(socket);
     });
+
+    socket.on("deleteDataUser", (data) => {
+
+        handleDeleteDataUser(socket, data)
+    })
 
     socket.on("sendDataUserToServer", (data) => {
         handleSendDataToApi(socket, data);

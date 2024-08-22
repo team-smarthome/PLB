@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "./Table.css";
 
-const Table2 = ({ data, page }) => {
+const Table2 = ({ data, page, onDelete }) => {
     console.log(data, "dataTableFromTable2");
 
     const printRef = useRef();
@@ -37,16 +37,30 @@ const Table2 = ({ data, page }) => {
         return formattedDate;
     };
 
+    const handleView = (item) => {
+    };
+
+    const handleUpdate = (item) => {
+    };
+
+    const handleDelete = (item) => {
+        if (onDelete) {
+            console.log("itemPersonID", item.personId)
+            onDelete(item.personId);
+        }
+    };
+
     return (
         <div>
             <table className="custom-table">
                 <thead>
                     <tr>
                         {/* <th>No</th> */}
-                        <th>Tanggal</th>
+                        <th>Date</th>
                         <th>PLB Number</th>
                         <th>No Register</th>
-                        <th>Nama</th>
+                        <th>Name</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,6 +72,16 @@ const Table2 = ({ data, page }) => {
                             <td>{item.personNum}</td>
                             <td>{item.personId}</td>
                             <td>{item.name}</td>
+                            <td>
+                                <div style={{
+                                    display: "flex",
+                                    gap: "10px"
+                                }}>
+                                    <button onClick={() => handleView(item)}>View</button>
+                                    <button onClick={() => handleUpdate(item)}>Update</button>
+                                    <button onClick={() => handleDelete(item)}>Delete</button>
+                                </div>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
