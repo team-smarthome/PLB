@@ -54,6 +54,149 @@ const Information = () => {
 	let loginDataArray = [];
 	const [dataCookiesnya, setDataCookiesnya] = useAtom(cookiesData);
 	const [dataIPCameranya, setDataIPCameranya] = useAtom(ipDataCamera);
+	const [currentTab, setCurrentTab] = useState(0);
+	const [isWaiting, setIsWaiting] = useState(false);
+	const listConfiguration = [
+		{
+			name: "User",
+			icon: FaRegUserCircle,
+		},
+		{
+			name: "Change Password",
+			icon: RiLockPasswordLine,
+		},
+		{
+			name: "IP Config",
+			icon: TbNetwork,
+		},
+		{
+			name: "Test Camera",
+			icon: IoCameraOutline,
+		},
+		{
+			name: "Test Printer",
+			icon: BsPrinter,
+		},
+	];
+
+	const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex) => {
+		console.log("LoginKamerake", cameraIndex, ipCameraSet)
+		try {
+			const encodedPassword = btoa(sPassword);
+			const response = await axios.put(`http://${ipCameraSet}/cgi-bin/entry.cgi/system/login`, {
+				sUserName,
+				sPassword: encodedPassword,
+			});
+			const dataRes = response.data;
+			let authUser = "";
+			console.log(dataRes, "responsehitapi");
+			if (dataRes.status.code === 200) {
+				if (dataRes.data.auth === 0) {
+					authUser = "admin";
+				} else {
+					authUser = "user";
+				}
+				const loginData = `Face-Token=${dataRes.data.token}; face-username=${authUser}; roleId=${dataRes.data.auth}; sidebarStatus=${dataRes.data.status}; token=${dataRes.data.token}`;
+				loginDataArray[cameraIndex] = loginData;
+
+				// Cek jika semua kamera sudah memiliki datanya
+				if (loginDataArray.filter(data => data !== undefined).length === totalCameras) {
+					const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+					const data = {
+						ipServerPC: newWifiResults,
+						ipServerCamera: cameraIPs,
+						cookiesCamera: loginDataArray,
+					};
+					Toast.fire({
+						icon: "success",
+						title: "Data berhasil disimpan",
+					});
+					socket2_IO_4000.emit("saveCameraData", data);
+					socket_server_4010.emit("saveCameraData", data);
+					setDataCookiesnya(loginDataArray);
+					setDataIPCameranya(cameraIPs);
+				}
+			} else {
+				Swal.fire(dataRes.status.message);
+			}
+		} catch (error) {
+			Swal.fire("Gagal login");
+		}
+	};
+
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		if (totalCameras > 0) {
+			const showLoginDialog = (callback, initialUsername = "") => {
+				Swal.fire({
+					title: `Login`,
+					html:
+						`<input id="swal-input1" class="swal2-input" placeholder="Username" value="${initialUsername}">` +
+						'<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+					focusConfirm: false,
+					showCancelButton: true,
+					confirmButtonText: "Kirim",
+					confirmButtonColor: "#3D5889",
+					cancelButtonText: "Batal",
+					cancelButtonColor: "#d33",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						const username = document.getElementById("swal-input1").value;
+						const password = document.getElementById("swal-input2").value;
+
+						if (username && password) {
+							callback(username, password);
+						} else {
+							Swal.fire("Harap masukkan username dan password");
+							showLoginDialog(callback, username);
+						}
+					}
+				});
+			};
+
+			const loginAllCameras = (sUserName, sPassword) => {
+				// Lakukan login untuk semua kamera
+				cameraIPs.forEach((ipCameraSet, index) => {
+					handleLogin(sUserName, sPassword, ipCameraSet, index);
+				});
+			};
+
+			// Tampilkan dialog login hanya sekali
+			showLoginDialog((sUserName, sPassword) => {
+
+				loginAllCameras(sUserName, sPassword);
+			});
+		} else {
+			Toast.fire({
+				icon: "error",
+				title: "Harap pilih jumlah kamera",
+			});
+		}
+	};
+
+	const handleDelete = async (personId) => {
+		console.log("personIDNYAINFORMATION")
+		if (newWifiResults) {
+			const websocketUser = io(`http://${newWifiResults}:4010`)
+			websocketUser.emit("deleteDataUser", personId)
+		};
+	}
+
+	useEffect(() => {
+		if (currentTab === 0) {
+			if (newWifiResults) {
+				const websocketUser = io(`http://${newWifiResults}:4010`)
+				websocketUser.emit("startFilterUser")
+				websocketUser.on("responseGetDataUserFilter", (data) => {
+					setData(data);
+					console.log("datayangdidapat", data);
+				});
+
+			} else {
+				// alert('IP server belum dimasukkan');
+			}
+		}
+	}, [currentTab]);
 
 	const handleTakePhoto = async () => {
 		console.log("handleTakenPhoto");
@@ -71,6 +214,12 @@ const Information = () => {
 		}
 	};
 
+	const handleIPChange = (e, cameraIndex) => {
+		const newCameraIPs = [...cameraIPs];
+		newCameraIPs[cameraIndex] = e.target.value;
+		setCameraIPs(newCameraIPs);
+	};
+
 	const cameraOptions = [...Array(totalCameras)].map((_, index) => ({
 		value: `Kamera ${index + 1}`,
 		label: `Kamera ${index + 1}`,
@@ -80,11 +229,7 @@ const Information = () => {
 		setSelectedCamera(selectedOption ? selectedOption.value : '');
 	};
 
-	const handleIPChange = (e, cameraIndex) => {
-		const newCameraIPs = [...cameraIPs];
-		newCameraIPs[cameraIndex] = e.target.value;
-		setCameraIPs(newCameraIPs);
-	};
+
 
 	const optionCameras = [...Array(10)].map((_, index) => ({
 		value: index + 1,
@@ -102,10 +247,10 @@ const Information = () => {
 
 		const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
 		socket2_IO_4000.emit("startFilterUser", { CookieSend });
-		socket2_IO_4000.on("responseGetDataUserFilter", (data) => {
-			setData(data);
-			console.log("datayangdidapat", data);
-		});
+		// socket2_IO_4000.on("responseGetDataUserFilter", (data) => {
+		// 	setData(data);
+		// 	console.log("datayangdidapat", data);
+		// });
 	}, []);
 
 	useEffect(() => {
@@ -131,251 +276,6 @@ const Information = () => {
 
 	const handleShowConfirmPassword = () => {
 		setShowConfirmPassword(!showConfirmPassword);
-	};
-	const listConfiguration = [
-		{
-			name: "User",
-			icon: FaRegUserCircle,
-		},
-		{
-			name: "Change Password",
-			icon: RiLockPasswordLine,
-		},
-		{
-			name: "IP Config",
-			icon: TbNetwork,
-		},
-		{
-			name: "Test Camera",
-			icon: IoCameraOutline,
-		},
-		{
-			name: "Test Printer",
-			icon: BsPrinter,
-		},
-	];
-
-	const [currentTab, setCurrentTab] = useState(0);
-	const [isWaiting, setIsWaiting] = useState(false);
-
-	const dataUser = JSON.parse(localStorage.getItem("user"));
-	// console.log("DataUser", dataUser);
-
-	const DataUser = {
-		fullName: dataUser?.fullName || "Test Petugas",
-		email: dataUser?.email || "testpetugas@gmail.com",
-		address: dataUser?.organization.officeName || "Test Office",
-		officeCity: dataUser?.organization.officeCity || "Test City",
-		position: dataUser?.position || "Test Position",
-	};
-
-	// console.log("DataUserProfile", DataUser);
-
-	const handleSubmitChangePassword = async (event) => {
-		// console.log("masukSini")
-		event.preventDefault();
-		const oldPassword = event.target.oldPassword.value;
-		const newPassword = event.target.newPassword.value;
-		const confirmPassword = event.target.confirmPassword.value;
-		const dataSendToApi = {
-			username: dataUser.username,
-			password: oldPassword,
-			newPassword: newPassword,
-		};
-		if (oldPassword === "") {
-			setOldPasswordWarning(true);
-		} else if (newPassword === "") {
-			setNewPasswordWarning(true);
-		} else if (confirmPassword === "") {
-			setConfirmPasswordWarning(true);
-		} else if (newPassword !== confirmPassword) {
-			setOldPasswordWarning(false);
-			setNewPasswordWarning(false);
-			setConfirmPasswordWarning(false);
-			Toast.fire({
-				icon: "error",
-				title: "New password and confirm password must be the same",
-			});
-		} else if (
-			oldPassword !== "" &&
-			newPassword !== "" &&
-			confirmPassword !== "" &&
-			newPassword === confirmPassword
-		) {
-			setOldPasswordWarning(false);
-			setNewPasswordWarning(false);
-			setConfirmPasswordWarning(false);
-			// console.log("masukSini2")
-			try {
-				setIsWaiting(true);
-				const responseLogin = await axios.post(
-					`${url_devel}Login.php`,
-					{
-						username: dataUser.username,
-						password: oldPassword,
-					}
-				);
-				if (
-					responseLogin.data.JwtToken.token !== null &&
-					responseLogin.data.JwtToken.token !== "" &&
-					responseLogin.data.status === "success"
-				) {
-					localStorage.setItem(
-						"JwtToken",
-						responseLogin.data.JwtToken.token
-					);
-					const userProfile = await axios.get(
-						`${url_devel}ProfileMe.php`,
-						{
-							headers: {
-								Authorization: `Bearer ${responseLogin.data.JwtToken.token}`,
-							},
-						}
-					);
-
-					if (
-						userProfile.data.user_data !== null &&
-						userProfile.data.price !== null &&
-						userProfile.data.api !== null
-					) {
-						if (
-							userProfile.data.api.key ===
-							localStorage.getItem("key") &&
-							userProfile.data.api.token ===
-							localStorage.getItem("token")
-						) {
-							localStorage.setItem(
-								"key",
-								userProfile.data.api.key
-							);
-							localStorage.setItem(
-								"token",
-								userProfile.data.api.token
-							);
-							localStorage.setItem(
-								"user",
-								JSON.stringify(userProfile.data.user_data)
-							);
-							localStorage.setItem(
-								"price",
-								JSON.stringify(userProfile.data.price)
-							);
-							try {
-								const response = axios.post(
-									`${url_devel}ChangePassword.php`,
-									dataSendToApi,
-									{
-										headers: {
-											Authorization: `Bearer ${localStorage.getItem(
-												"JwtToken"
-											)}`,
-										},
-									}
-								);
-								// console.log("responseChangePassword", (await response).data);
-								if ((await response).status === 200) {
-									if (
-										(await response).data.message ===
-										"Unauthorized"
-									) {
-										Toast.fire({
-											icon: "error",
-											title: `${(await response).data.message
-												}!`,
-										});
-										setIsWaiting(false);
-									} else {
-										Toast.fire({
-											icon: "success",
-											title: "Change password success",
-										});
-										setIsWaiting(false);
-										setIsSucces(true);
-										setTimeout(() => {
-											setIsSucces(false);
-											navigate("/home");
-											localStorage.removeItem("user");
-											localStorage.removeItem("JwtToken");
-											localStorage.removeItem(
-												"cardNumberPetugas"
-											);
-											localStorage.removeItem("key");
-											localStorage.removeItem("token");
-											localStorage.removeItem(
-												"jenisDeviceId"
-											);
-											localStorage.removeItem("deviceId");
-											localStorage.removeItem(
-												"airportId"
-											);
-											localStorage.removeItem("price");
-										}, 2000);
-									}
-								} else {
-									Toast.fire({
-										icon: "error",
-										title: response.message,
-									});
-									setIsWaiting(false);
-								}
-							} catch (error) {
-								// console.log("error", error);
-								Toast.fire({
-									icon: "error",
-									title: "Failed to Change Password",
-								});
-								setIsWaiting(false);
-							}
-						} else if (
-							userProfile.data.api.key !==
-							localStorage.getItem("key") &&
-							userProfile.data.api.token !==
-							localStorage.getItem("token")
-						) {
-							Toast.fire({
-								icon: "error",
-								title: "Please use the same account from the previous login",
-							});
-							setIsWaiting(false);
-						} else {
-							setIsWaiting(false);
-							Toast.fire({
-								icon: "error",
-								title: "Please use the same account from the previous login",
-							});
-						}
-					} else {
-						setIsWaiting(false);
-						Toast.fire({
-							icon: "error",
-							title: "Failed to Change Password",
-						});
-					}
-				} else if (
-					responseLogin.data.status === "error" ||
-					responseLogin.data.message === "Login failed"
-				) {
-					// setIsWaiting(false);
-					Toast.fire({
-						icon: "error",
-						title: "Please use the same account from the previous login",
-					});
-				} else {
-					setIsWaiting(false);
-					Toast.fire({
-						icon: "error",
-						title: "Username or Password Invalid!",
-					});
-				}
-			} catch (error) {
-				setIsWaiting(false);
-				// console.log(error);
-				Toast.fire({
-					icon: "error",
-					title: "Your old password is incorrect!",
-				});
-			}
-		}
 	};
 
 	const handleOldPasswordChange = (e) => {
@@ -404,106 +304,6 @@ const Information = () => {
 		navigate("/home");
 	};
 
-	const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex, retryLogin) => {
-		try {
-			const encodedPassword = btoa(sPassword);
-			const response = await axios.put(`http://${ipCameraSet}/cgi-bin/entry.cgi/system/login`, {
-				sUserName,
-				sPassword: encodedPassword,
-			});
-			const dataRes = response.data;
-			let authUser = "";
-			console.log(dataRes, "respinsehitapi");
-			if (dataRes.status.code === 200) {
-				if (dataRes.data.auth === 0) {
-					authUser = "admin";
-				} else {
-					authUser = "user";
-				}
-				const loginData = `Face-Token=${dataRes.data.token}; face-username=${authUser}; roleId=${dataRes.data.auth}; sidebarStatus=${dataRes.data.status}; token=${dataRes.data.token}`;
-				loginDataArray[cameraIndex] = loginData;
-				if (loginDataArray.filter(data => data !== undefined).length === totalCameras) {
-					const socket_server_4010 = io(`http://${newWifiResults}:4010`);
-					const data = {
-						ipServerPC: newWifiResults,
-						ipServerCamera: cameraIPs,
-						cookiesCamera: loginDataArray,
-					};
-					Toast.fire({
-						icon: "success",
-						title: "Data saved successfully",
-					});
-					socket2_IO_4000.emit("saveCameraData", data);
-					socket_server_4010.emit("saveCameraData", data);
-					setDataCookiesnya(loginDataArray);
-					setDataIPCameranya(cameraIPs);
-				}
-			} else {
-				Swal.fire(dataRes.status.message);
-				retryLogin(cameraIndex, sUserName);
-			}
-		} catch (error) {
-			Swal.fire("Failed to login");
-			retryLogin(cameraIndex, sUserName);
-		}
-	};
-
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		if (totalCameras > 0) {
-			const showLoginDialog = (index, callback, initialUsername = "") => {
-				Swal.fire({
-					title: `Login for Camera ${index + 1}`,
-					html:
-						`<input id="swal-input1" class="swal2-input" placeholder="UserName" value="${initialUsername}">` +
-						'<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
-					focusConfirm: false,
-					showCancelButton: true,
-					confirmButtonText: "Submit",
-					confirmButtonColor: "#3D5889",
-					cancelButtonText: "Cancel",
-					cancelButtonColor: "#d33",
-				}).then((result) => {
-					if (result.isConfirmed) {
-						const username = document.getElementById("swal-input1").value;
-						const password = document.getElementById("swal-input2").value;
-
-						if (username && password) {
-							callback(index, username, password);
-						} else {
-							Swal.fire("Please enter username and password");
-							showLoginDialog(index, callback, username);
-						}
-					}
-				});
-			};
-
-			const retryLogin = (cameraIndex, username) => {
-				showLoginDialog(cameraIndex, (index, sUserName, sPassword) => {
-					const ipCameraSet = cameraIPs[index];
-					handleLogin(sUserName, sPassword, ipCameraSet, index, retryLogin);
-				}, username);
-			};
-
-			const showLoginDialogs = (index = 0) => {
-				if (index < totalCameras) {
-					showLoginDialog(index, (cameraIndex, sUserName, sPassword) => {
-						const ipCameraSet = cameraIPs[cameraIndex];
-						handleLogin(sUserName, sPassword, ipCameraSet, cameraIndex, retryLogin);
-						showLoginDialogs(cameraIndex + 1);
-					});
-				}
-			};
-			showLoginDialogs();
-		} else {
-			Toast.fire({
-				icon: "error",
-				title: "Please select the number of cameras",
-			});
-		}
-	};
-
-
 	const startStream = () => {
 		setLoading(true);
 		const socketCamera = io("http://localhost:4001");
@@ -520,10 +320,6 @@ const Information = () => {
 
 	useEffect(() => {
 		const socketCamera = io("http://localhost:4001");
-		// socketCamera.on("cameraDataToClient", (data) => {
-		// 	// setIpCamera(data.ipServerCamera);
-		// 	socketCamera.emit("stop_stream");
-		// });
 		socketCamera.on("cameraStatus", (data) => {
 			setStatusCamera(data.status);
 		});
@@ -579,16 +375,13 @@ const Information = () => {
 									{currentTab === 0 ? (
 										<>
 											<div className="kotak-profile">
-												<Table data={data} />
+												<Table data={data} onDelete={handleDelete} />
 											</div>
 										</>
 									) : currentTab === 1 ? (
 										<>
 											<div className="custom-container">
 												<form
-													onSubmit={
-														handleSubmitChangePassword
-													}
 													className="custom-form"
 													autoComplete="off"
 												>

@@ -582,7 +582,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="photo">Pas Foto</label>
+              <label htmlFor="photo">Face</label>
             </div>
             <div className="photo">
               <div className="photo-box">
