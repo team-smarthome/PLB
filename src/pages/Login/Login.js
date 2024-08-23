@@ -55,20 +55,20 @@ const Login = () => {
     try {
       isLoading(true);
       const encodedPassword = btoa(sPassword);
-      const response = await axios.put(`http://192.168.2.127/cgi-bin/entry.cgi/system/login`, {
-        sUserName,
-        sPassword: encodedPassword,
+      const response = await axios.post(`http://192.168.2.143:8000/api/login`, {
+        name: sUserName,
+        password: sPassword,
       });
       const dataRes = response.data;
-      console.log(response, "respinsehitapi");
+      console.log(dataRes, "respinsehitapi");
       let authUser = ""
-      if (dataRes.status.code === 200) {
+      if (dataRes.status == 200) {
         isLoading(false);
-        if (dataRes.data.auth === 0) {
-          authUser = "admin";
-        } else {
-          authUser = "user";
-        }
+        // if (dataRes.data.auth === 0) {
+        //   authUser = "admin";
+        // } else {
+        //   authUser = "user";
+        // }
         // Cookies.set('token', dataRes.data.token, { expires: 1, domain: '192.168.2.127' });
         // Cookies.set('sidebarStatus', dataRes.data.status, { expires: 1, domain: '192.168.2.127' });
         // Cookies.set('roleId', dataRes.data.auth, { expires: 1, domain: '192.168.2.127' });
@@ -76,11 +76,8 @@ const Login = () => {
         // Cookies.set('Face-Token', dataRes.data.token, { expires: 1, domain: '192.168.2.127' });
 
 
-        Cookies.set('token', dataRes.data.token, { expires: 1 });
-        Cookies.set('sidebarStatus', dataRes.data.status, { expires: 1 });
-        Cookies.set('roleId', dataRes.data.auth, { expires: 1 });
-        Cookies.set('face-username', authUser, { expires: 1 });
-        Cookies.set('Face-Token', dataRes.data.token, { expires: 1 });
+        Cookies.set('token', dataRes.token, { expires: 1 });
+        Cookies.set('userdata', JSON.stringify(dataRes.user), { expires: 1 });
         Toast.fire({
           icon: "success",
           title: "Berhasil Masuk",
@@ -89,18 +86,13 @@ const Login = () => {
       }
     } catch (error) {
       isLoading(false);
-      localStorage.removeItem("JwtToken");
-      if (error.response && error.response.status === 401) {
-        Toast.fire({
-          icon: "error",
-          title: "Username or Password is Wrong",
-        });
-      } else {
-        Toast.fire({
-          icon: "error",
-          title: "VPN connection is interrupted",
-        });
-      }
+      // localStorage.removeItem("JwtToken");
+      // if (error.response && error.response.status === 401) {
+      //   Toast.fire({
+      //     icon: "error",
+      //     title: "Username or Password is Wrong",
+      //   });
+      // }
     }
   };
 
