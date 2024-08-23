@@ -2,24 +2,34 @@
     height: 100%;
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }
 
 .bg-configuration {
-    height: 80%;
-    width: 94%;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row-reverse;
-    gap: 2%;
+    /* gap: 2%; */
 
 }
 
 .configuration-kanan {
-    flex: 1.2;
+    flex: 0.2;
     display: flex;
     flex-direction: column;
-    gap: 5%;
+    /* gap: 5%;  */
+    transition: all 0.5s ease-in;
+}
+
+.configuration-kanan-open {
+    flex: 0.5;
+    display: flex;
+    flex-direction: column;
+    /* gap: 5%;  */
+    transition: all 0.5s ease-out;
+
 }
 
 .configuration-atas-kanan {
@@ -29,6 +39,17 @@
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
+}
+
+.configuration-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.configuration-header:hover {
+    background-color: #2feb7a;
 }
 
 .configuration-list {
@@ -54,6 +75,19 @@
     gap: 5%;
     display: flex;
     border: 1px solid white;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    height: 100%;
+}
+
+.configuration-list-item-open {
+    padding: 0% 30px;
+    background-color: none;
+    width: auto;
+    gap: 5%;
+    display: flex;
+    border: 1px solid white;
     justify-content: flex-start;
     color: white;
     font-weight: bold;
@@ -65,10 +99,14 @@
     align-items: center;
 }
 
+.configuration-list-item-open:hover {
+    background-color: #2feb7a;
+}
+
 .list-style {
     display: flex;
     align-items: center;
-    font-size: 1.5rem;
+    font-size: 1.2 rem;
 
 }
 
@@ -77,6 +115,20 @@
 }
 
 .configuration-bawah-kanan {
+    border: 5px solid white;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5%;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    padding: 0 7%;
+    background-color: #fbaf17;
+}
+
+.configuration-bawah-kanan-open {
     border: 5px solid white;
     flex: 1;
     display: flex;

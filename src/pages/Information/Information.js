@@ -14,14 +14,16 @@ import ImageSucces from "../../assets/images/image-2.svg";
 import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { TbNetwork } from "react-icons/tb";
-import { IoCameraOutline } from "react-icons/io5";
+import { IoCameraOutline, IoClose } from "react-icons/io5";
 import { BsPrinter } from "react-icons/bs";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { MdMenu } from "react-icons/md";
 import VideoPlayer from "../../components/VideoPlayer";
 import Table from "../../components/Table/Table2";
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Swal from "sweetalert2";
+
 import { useAtom } from "jotai";
 import { cookiesData, ipDataCamera } from "../../utils/atomStates";
 
@@ -56,6 +58,7 @@ const Information = () => {
 	const [dataIPCameranya, setDataIPCameranya] = useAtom(ipDataCamera);
 	const [currentTab, setCurrentTab] = useState(0);
 	const [isWaiting, setIsWaiting] = useState(false);
+	const [isOpen, setIsOpen] = useState(false)
 	const listConfiguration = [
 		{
 			name: "User",
@@ -175,7 +178,7 @@ const Information = () => {
 	};
 
 	const handleDelete = async (personId) => {
-		console.log("personIDNYAINFORMATION")
+		console.log("personIDNYAINFORMAS")
 		if (newWifiResults) {
 			const websocketUser = io(`http://${newWifiResults}:4010`)
 			websocketUser.emit("deleteDataUser", personId)
@@ -333,6 +336,13 @@ const Information = () => {
 			}, 2000);
 		}
 	}, [currentTab, handlePrint]);
+
+	const openSideBar = () => {
+		setIsOpen(true)
+	}
+	const closeSideBar = () => {
+		setIsOpen(false)
+	}
 
 	console.log("loginDataArray1", loginDataArray1);
 	return (
@@ -896,12 +906,27 @@ const Information = () => {
 						</div>
 					</div>
 
-					<div className="configuration-kanan">
+					<div className={isOpen ? "configuration-kanan-open" : "configuration-kanan"}>
 						<div className="configuration-atas-kanan">
 							<ul className="configuration-list">
+								{isOpen ?
+									<div className="configuration-header" onClick={closeSideBar}>
+										<IoClose
+											size={50}
+
+										/>
+									</div>
+									:
+									<div className="configuration-header" onClick={openSideBar}>
+										<MdMenu
+											size={50}
+
+										/>
+									</div>
+								}
 								{listConfiguration.map((list, index) => (
 									<li
-										className={`configuration-list-item ${currentTab === index
+										className={`${isOpen ? "configuration-list-item-open" : "configuration-list-item"} ${currentTab === index
 											? "isActived"
 											: ""
 											}`}
@@ -914,19 +939,19 @@ const Information = () => {
 												color="black"
 											/>
 										</div>
-										<div className="list-style">
+										{isOpen && <div className="list-style">
 											{list?.name}
-										</div>
+										</div>}
 									</li>
 								))}
 							</ul>
 						</div>
 						<div
-							className="configuration-bawah-kanan"
+							className={isOpen ? "configuration-bawah-kanan-open" : "configuration-bawah-kanan"}
 							onClick={handleBackToApply}
 						>
 							<img src={BackIcons} alt="back_icons" />
-							Back to Home
+							{isOpen && <span>Back to Home</span>}
 						</div>
 					</div>
 				</div>
