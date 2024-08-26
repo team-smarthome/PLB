@@ -3,7 +3,7 @@ const http = require("http");
 const socketIo = require("socket.io");
 let ipCamera = ['192.168.2.127'];
 let ipServer = "";
-let remoteSocket; // Initialize remoteSocket as undefined
+let remoteSocket;
 const axios = require("axios");
 const ioClient = require("socket.io-client");
 
@@ -46,8 +46,6 @@ const handleTakePhoto = async (socket) => {
                 },
             }
         );
-        console.log("responseDataTakePhoto", response.data)
-        console.log(response.data.result, "HASILRESULTNYA")
         if (response.data.result === "ok") {
             console.log("mendapatkan data image");
             const imagePath = response.data.params.image_path;
@@ -116,16 +114,13 @@ const initializeRemoteSocket = () => {
 }
 
 io.on("connection", (socket) => {
-    // console.log("Connected to WebSocket")
     socket.emit("message", "Welcome to the RTSP to HLS stream");
-    // handleTakePhoto(socket);
-
     socket.on("saveCameraData", (data) => {
         ipCamera = data.ipServerCamera;
         ipServer = data.ipServerPC;
         console.log("ipCamera", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
 
-        if (!remoteSocket) { // Check if remoteSocket has not been initialized
+        if (!remoteSocket) {
             initializeRemoteSocket();
         }
     });
