@@ -2,7 +2,6 @@ const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
 let ipCamera = ['192.168.2.127'];
-let cookiesCamera = [];
 let ipServer = "";
 let remoteSocket; // Initialize remoteSocket as undefined
 const axios = require("axios");
@@ -124,7 +123,6 @@ io.on("connection", (socket) => {
     socket.on("saveCameraData", (data) => {
         ipCamera = data.ipServerCamera;
         ipServer = data.ipServerPC;
-        cookiesCamera = data.cookiesCamera;
         console.log("ipCamera", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
 
         if (!remoteSocket) { // Check if remoteSocket has not been initialized
