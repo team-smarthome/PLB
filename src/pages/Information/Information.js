@@ -59,6 +59,9 @@ const Information = () => {
 	const [currentTab, setCurrentTab] = useState(0);
 	const [isWaiting, setIsWaiting] = useState(false);
 	const [isOpen, setIsOpen] = useState(false)
+	const [role, setRole] = useState(1)
+	const [dataUser, setDataUser] = useState({})
+	const [ipCameraRegister, setIpCameraRegister] = useState([])
 	const listConfiguration = [
 		{
 			name: "User",
@@ -129,51 +132,64 @@ const Information = () => {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		if (totalCameras > 0) {
-			const showLoginDialog = (callback, initialUsername = "") => {
-				Swal.fire({
-					title: `Login`,
-					html:
-						`<input id="swal-input1" class="swal2-input" placeholder="Username" value="${initialUsername}">` +
-						'<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
-					focusConfirm: false,
-					showCancelButton: true,
-					confirmButtonText: "Kirim",
-					confirmButtonColor: "#3D5889",
-					cancelButtonText: "Batal",
-					cancelButtonColor: "#d33",
-				}).then((result) => {
-					if (result.isConfirmed) {
-						const username = document.getElementById("swal-input1").value;
-						const password = document.getElementById("swal-input2").value;
+		if (dataUser.role == 1) {
+			if (totalCameras > 0) {
+				const showLoginDialog = (callback, initialUsername = "") => {
+					Swal.fire({
+						title: `Login`,
+						html:
+							`<input id="swal-input1" class="swal2-input" placeholder="Username" value="${initialUsername}">` +
+							'<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+						focusConfirm: false,
+						showCancelButton: true,
+						confirmButtonText: "Kirim",
+						confirmButtonColor: "#3D5889",
+						cancelButtonText: "Batal",
+						cancelButtonColor: "#d33",
+					}).then((result) => {
+						if (result.isConfirmed) {
+							const username = document.getElementById("swal-input1").value;
+							const password = document.getElementById("swal-input2").value;
 
-						if (username && password) {
-							callback(username, password);
-						} else {
-							Swal.fire("Harap masukkan username dan password");
-							showLoginDialog(callback, username);
+							if (username && password) {
+								callback(username, password);
+							} else {
+								Swal.fire("Harap masukkan username dan password");
+								showLoginDialog(callback, username);
+							}
 						}
-					}
+					});
+				};
+
+				const loginAllCameras = (sUserName, sPassword) => {
+					// Lakukan login untuk semua kamera
+					cameraIPs.forEach((ipCameraSet, index) => {
+						handleLogin(sUserName, sPassword, ipCameraSet, index);
+					});
+				};
+
+				// Tampilkan dialog login hanya sekali
+				showLoginDialog((sUserName, sPassword) => {
+
+					loginAllCameras(sUserName, sPassword);
 				});
-			};
-
-			const loginAllCameras = (sUserName, sPassword) => {
-				// Lakukan login untuk semua kamera
-				cameraIPs.forEach((ipCameraSet, index) => {
-					handleLogin(sUserName, sPassword, ipCameraSet, index);
+			} else {
+				Toast.fire({
+					icon: "error",
+					title: "Harap pilih jumlah kamera",
 				});
-			};
-
-			// Tampilkan dialog login hanya sekali
-			showLoginDialog((sUserName, sPassword) => {
-
-				loginAllCameras(sUserName, sPassword);
-			});
+			}
 		} else {
+			const data = {
+				ipServerPC: newWifiResults,
+				ipServerCamera: ipCameraRegister,
+				cookiesCamera: loginDataArray,
+			};
 			Toast.fire({
-				icon: "error",
-				title: "Harap pilih jumlah kamera",
+				icon: "success",
+				title: "Data berhasil disimpan",
 			});
+			socket2_IO_4000.emit("saveCameraData", data);
 		}
 	};
 
@@ -242,6 +258,7 @@ const Information = () => {
 	const selectedCameraIndex = parseInt(selectedCamera.split(' ')[1], 10) - 1;
 
 	useEffect(() => {
+		const getUserdata = Cookies.get('userdata');
 		const FaceToken = Cookies.get('Face-Token');
 		const FaceUsername = Cookies.get('face-username');
 		const RoleID = Cookies.get('roleId');
@@ -254,6 +271,7 @@ const Information = () => {
 		// 	setData(data);
 		// 	console.log("datayangdidapat", data);
 		// });
+		setDataUser(JSON.parse(getUserdata))
 	}, []);
 
 	useEffect(() => {
@@ -652,102 +670,131 @@ const Information = () => {
 														/>
 													</div>
 												</div>
-												<div>
-													<div className="form-group">
-														<div className="wrapper-form">
-															<div className="wrapper-input">
-																<label htmlFor="total_cameras">Jumlah Kamera</label>
-															</div>
-															<Select
-																id="totalCameras"
-																name="totalCameras"
-																value={optionCameras.find(
-																	(option) => option.value === totalCameras
-																)}
-																onChange={handleTotalCamerasChange}
-																options={optionCameras}
-																className="basic-single"
-																classNamePrefix="select"
-																styles={{
-																	container: (provided) => ({
-																		...provided,
-																		flex: 1,
-																		width: '100%',
-																		borderRadius: '10px',
-																		backgroundColor:
-																			'rgba(217, 217, 217, 0.75)',
-																		fontFamily: 'Roboto, Arial, sans-serif',
-																	}),
-																	valueContainer: (provided) => ({
-																		...provided,
-																		flex: 1,
-																		width: '100%',
-																	}),
-																	control: (provided) => ({
-																		...provided,
-																		flex: 1,
-																		width: '100%',
-																		backgroundColor:
-																			'rgba(217, 217, 217, 0.75)',
-																	}),
-																}}
-															/>
-														</div>
-													</div>
-
-													{totalCameras > 0 && (
+												{dataUser.role == 1 ?
+													<div>
 														<div className="form-group">
 															<div className="wrapper-form">
 																<div className="wrapper-input">
-																	<label htmlFor="status_card_reader">Pilih Kamera</label>
+																	<label htmlFor="total_cameras">Jumlah Kamera</label>
 																</div>
 																<Select
-																	id="statusCardReader"
-																	name="statusCardReader"
+																	id="totalCameras"
+																	name="totalCameras"
+																	value={optionCameras.find(
+																		(option) => option.value === totalCameras
+																	)}
+																	onChange={handleTotalCamerasChange}
+																	options={optionCameras}
+																	className="basic-single"
 																	classNamePrefix="select"
-																	options={cameraOptions}
-																	onChange={handleCameraSelect}
-																	value={cameraOptions.find(option => option.value === selectedCamera)}
-																	placeholder="-- Pilih Kamera --"
 																	styles={{
 																		container: (provided) => ({
 																			...provided,
 																			flex: 1,
-																			width: "100%",
-																			borderRadius: "10px",
-																			backgroundColor: "rgba(217, 217, 217, 0.75)",
-																			fontFamily: "Roboto, Arial, sans-serif",
+																			width: '100%',
+																			borderRadius: '10px',
+																			backgroundColor:
+																				'rgba(217, 217, 217, 0.75)',
+																			fontFamily: 'Roboto, Arial, sans-serif',
+																		}),
+																		valueContainer: (provided) => ({
+																			...provided,
+																			flex: 1,
+																			width: '100%',
 																		}),
 																		control: (provided) => ({
 																			...provided,
-																			backgroundColor: "rgba(217, 217, 217, 0.75)",
+																			flex: 1,
+																			width: '100%',
+																			backgroundColor:
+																				'rgba(217, 217, 217, 0.75)',
 																		}),
 																	}}
 																/>
 															</div>
 														</div>
-													)}
 
-													{selectedCamera && (
-														<div className="form-group">
-															<div className="wrapper-form">
-																<div className="wrapper-input">
-																	<label htmlFor="status_camera">
-																		Masukkan IP untuk {selectedCamera}
-																	</label>
+														{totalCameras > 0 && (
+															<div className="form-group">
+																<div className="wrapper-form">
+																	<div className="wrapper-input">
+																		<label htmlFor="status_card_reader">Pilih Kamera</label>
+																	</div>
+																	<Select
+																		id="statusCardReader"
+																		name="statusCardReader"
+																		classNamePrefix="select"
+																		options={cameraOptions}
+																		onChange={handleCameraSelect}
+																		value={cameraOptions.find(option => option.value === selectedCamera)}
+																		placeholder="-- Pilih Kamera --"
+																		styles={{
+																			container: (provided) => ({
+																				...provided,
+																				flex: 1,
+																				width: "100%",
+																				borderRadius: "10px",
+																				backgroundColor: "rgba(217, 217, 217, 0.75)",
+																				fontFamily: "Roboto, Arial, sans-serif",
+																			}),
+																			control: (provided) => ({
+																				...provided,
+																				backgroundColor: "rgba(217, 217, 217, 0.75)",
+																			}),
+																		}}
+																	/>
 																</div>
-																<input
-																	type="text"
-																	name="statusCamera"
-																	id="statusCamera"
-																	className="disabled-input"
-																	onChange={(e) => handleIPChange(e, selectedCameraIndex)}
-																	value={cameraIPs[selectedCameraIndex] || ''}
-																/>
 															</div>
+														)}
+
+														{selectedCamera && (
+															<div className="form-group">
+																<div className="wrapper-form">
+																	<div className="wrapper-input">
+																		<label htmlFor="status_camera">
+																			Masukkan IP untuk {selectedCamera}
+																		</label>
+																	</div>
+																	<input
+																		type="text"
+																		name="statusCamera"
+																		id="statusCamera"
+																		className="disabled-input"
+																		onChange={(e) => handleIPChange(e, selectedCameraIndex)}
+																		value={cameraIPs[selectedCameraIndex] || ''}
+																	/>
+																</div>
+															</div>
+														)}
+													</div> :
+													<div className="wrapper-form">
+														<div className="wrapper-input">
+															<label htmlFor="ip_server_camera">
+																IP Server Camera
+															</label>
 														</div>
-													)}
-												</div>
+														<input
+															type="text"
+															name="ipServerCamera"
+															id="ipServerCamera"
+															className={
+																newWifiResults
+																	? ""
+																	: ""
+															}
+															value={
+																ipCameraRegister
+															}
+															onChange={(e) =>
+																setIpCameraRegister([...ipCameraRegister,
+																e.target
+																	.value]
+																)
+															}
+														/>
+													</div>
+
+												}
 												<button
 													className="ok-button"
 													style={{ width: "100%" }}
