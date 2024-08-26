@@ -72,7 +72,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 		socket_IO_4000.emit("take_photo");
 		// setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
 		sendDataToInput({
-			statusCardBox: "takePhotoSucces",
+			statusCardBox: "waiting2",
 			capturedImage: null,
 			emailUser: null,
 			titleHeader: "Apply PLB",
