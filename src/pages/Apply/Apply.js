@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import BodyContent from "../../components/BodyContent/BodyContent";
@@ -7,7 +7,7 @@ import dataPasporImg from "../../utils/dataPhotoPaspor";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
-import { formData } from "../../utils/atomStates";
+import { formData, resultDataScan } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend, cookiesData } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
@@ -16,6 +16,7 @@ import io from "socket.io-client";
 
 
 const Apply = () => {
+  const socketRef = useRef(null);
   const socket_IO = io("http://localhost:4000");
   const [, setFormData] = useAtom(formData);
   const [image] = useAtom(imageToSend);
@@ -57,7 +58,10 @@ const Apply = () => {
     cvv: "",
     type: "",
   });
+  const [dataScan, setDataScan] = useState()
+  const [isConnected, setIsConnected] = useState(false);
 
+  let isCloseTimeoutSet = false;
 
 
 
@@ -191,6 +195,110 @@ const Apply = () => {
     return !isExpired;
   };
 
+  const decodeBase64ToImage = (base64String) => {
+    // Split the Base64 string to remove the content type prefix (e.g., 'data:image/png;base64,')
+    // const base64Data = base64String.split(',')[1];
+    if (base64String) {
+      // Decode the Base64 string to a binary string
+      const binaryString = atob(base64String);
+
+      // Create a Uint8Array to hold the binary data
+      const binaryData = new Uint8Array(binaryString.length);
+
+      // Convert binary string to a byte array
+      for (let i = 0; i < binaryString.length; i++) {
+        binaryData[i] = binaryString.charCodeAt(i);
+      }
+
+      // Create a Blob object from the binary data
+      const blob = new Blob([binaryData], { type: 'image/png' }); // Adjust the MIME type if needed
+
+      return URL.createObjectURL(blob);
+    }
+  };
+  const connectWebSocket = (ipAddress, socket_IO) => {
+    const socketURL = `ws://localhost:4488`;
+    socketRef.current = new WebSocket(socketURL);
+
+    socketRef.current.onopen = () => {
+      console.log("WebSocket connection opened");
+      isCloseTimeoutSet = false;
+      setCardStatus("iddle"); // Start in 'iddle' state after connection opens
+      setIsConnected(true);
+    };
+
+    socketRef.current.onmessage = (event) => {
+      try {
+        const dataJson = JSON.parse(event.data);
+        console.log("Received data from server websocket:", dataJson);
+
+        // Only attempt to decode if `dataJson.uvImage` exists
+        if (dataJson.visibleImage) {
+          setResDataScan(decodeBase64ToImage(dataJson.visibleImage));
+        }
+
+        switch (dataJson.msgType) {
+          case "passportData":
+            break;
+          case "visibleImage":
+            setRecievedTempData((previous) => [...previous, dataJson]);
+            break;
+          case "DeviceController":
+            const { airportId, deviceId, jenisDeviceId } = dataJson;
+            localStorage.setItem("airportId", airportId);
+            localStorage.setItem("deviceId", deviceId);
+            localStorage.setItem("jenisDeviceId", jenisDeviceId);
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error("Failed to parse WebSocket message data:", error);
+      }
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("WebSocket connection closed");
+      setIsConnected(false);
+      setCardStatus("errorConnection");
+
+      // Close handling and reconnection logic
+      if (!isCloseTimeoutSet) {
+        setCardStatus("errorWebsocket");
+        setTimeout(() => {
+          isCloseTimeoutSet = true;
+        }, 3000);
+      } else {
+        // Attempt to reconnect or notify server
+        if (socket_IO) {
+          socket_IO.emit("clientData", "re-newIpAddress");
+        } else {
+          console.warn("socket_IO is undefined.");
+        }
+      }
+    };
+
+    socketRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setCardStatus("errorConnection");
+      setIsConnected(false);
+    };
+  };
+
+  const closeWebSocket = () => {
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+  };
+
+  useEffect(() => {
+    connectWebSocket(null, socket_IO); // Ensure to pass `socket_IO` properly
+
+    return () => {
+      closeWebSocket();
+    };
+  }, []);
+
   // Contoh penggunaan di tempat lain
   const handleTokenExpiration = () => {
     // const isTokenValid = checkAndHandleTokenExpiration();
@@ -230,8 +338,9 @@ const Apply = () => {
   const updateSharedData = (newSharedData) => {
     setSharedData(newSharedData);
   };
-
+  const [resDataScan, setResDataScan] = useAtom(resultDataScan)
   const btnOnClick_Back = () => {
+    setResDataScan("")
     if (!isOnline) {
       Toast.fire({
         icon: "error",
@@ -334,11 +443,11 @@ const Apply = () => {
         doSaveRequestVoaPayment(sharedData);
         setCardStatus("goPayment");
         setCardPaymentProps({
-          isWaiting: true,
+          isWaiting: false,
           isCreditCard: false,
           isPaymentCredit: false,
           isPaymentCash: false,
-          isPrinted: false,
+          isPrinted: true,
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
@@ -746,6 +855,7 @@ const Apply = () => {
         dataNumberPermohonan={dataPermohonan}
         FailedMessage={meesageConfirm}
         sendDataToParent1={receiveDataFromChild}
+        dataScan={dataScan}
       />
       <Footer
         titleBack="Back"
