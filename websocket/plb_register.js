@@ -1,7 +1,7 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = ['192.168.2.171'];
+let ipCamera = [];
 let ipServer = "";
 let remoteSocket;
 const axios = require("axios");
@@ -41,16 +41,20 @@ const handleTakePhoto = async (socket) => {
                 jsonrpc: "2.0",
                 method: "collect_start_sync",
                 params: {
-                    show_ui: 0,
+                    show_ui: 1,
                     time_out: 10,
                 },
             }
         );
         if (response.data.result === "ok") {
-            console.log("mendapatkan data image");
+            const stop = await axios.post(`http://${ipCamera[0]}:6002/mvfacial_terminal`, {
+                id: 1,
+                jsonrpc: "2.0",
+                method: "collect_cancel",
+                params: null,
+            });
             const imagePath = response.data.params.image_path;
             const imageUrl = `http://${ipCamera[0]}:80${imagePath}`;
-
             // Fetch image from the URL
             const imageResponse = await axios.get(imageUrl, {
                 responseType: "arraybuffer",
@@ -60,14 +64,6 @@ const handleTakePhoto = async (socket) => {
                 "binary"
             ).toString("base64");
             const imageBase64 = `data:image/jpeg;base64,${base64Image}`;
-
-
-            const stop = await axios.post(`http://${ipCamera[0]}:6002/mvfacial_terminal`, {
-                id: 1,
-                jsonrpc: "2.0",
-                method: "collect_cancel",
-                params: null,
-            });
             if (stop.data.result === 'ok') {
                 socket.emit("photo_taken2", imagePath);
                 socket.emit("photo_taken", imageBase64);
@@ -78,7 +74,6 @@ const handleTakePhoto = async (socket) => {
                 console.log("mengirim data ke frontend");
                 console.log("gagal")
             }
-
         } else {
             console.error("cannot_take_photo");
             socket.emit("error_photo", "cannot_take_photo");

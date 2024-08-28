@@ -444,11 +444,11 @@ const Apply = () => {
         doSaveRequestVoaPayment(sharedData);
         setCardStatus("goPayment");
         setCardPaymentProps({
-          isWaiting: false,
+          isWaiting: true,
           isCreditCard: false,
           isPaymentCredit: false,
           isPaymentCash: false,
-          isPrinted: true,
+          isPrinted: false,
           isSuccess: false,
           isFailed: false,
           isPyamentUrl: false,
