@@ -22,11 +22,11 @@ import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import dataPasporImg from "../../utils/dataPhotoPaspor";
 import { useAtom } from "jotai";
-import { imageToSend } from "../../utils/atomStates";
+import { imageToSend, resultDataScan } from "../../utils/atomStates";
 
 const parse = require("mrz").parse;
 
-const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
+const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
 	const { data } = useContext(DataContext);
 	const [capturedImage, setCapturedImage] = useState(null);
@@ -53,7 +53,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 		value: item.kabupaten,
 		label: item.kabupaten,
 	}));
-
+	const [resDataScan, setResDataScan] = useAtom(resultDataScan)
+	// console.log(resDataScan, "resDataScan")
 	const NegaraOptions = dataNegara.data.map((item) => ({
 		value: item.id_negara,
 		label: item.deskripsi_negara,
@@ -65,10 +66,16 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 
 	const [numberPassport, setNumberPassport] = useState(null);
 
-	const socket_IO_4000 = io("http://localhost:4000");
+	// const socket_IO_4000 = io("http://localhost:4000");
+	const socket_IO_4000 = io("http://localhost:4000", {
+		reconnection: true,
+		reconnectionAttempts: 5,
+		reconnectionDelay: 1000,
+	});
 	const socket_IO_4001 = io("http://localhost:4001");
 
 	const handleTakePhoto = async () => {
+		console.log("masukkesini")
 		socket_IO_4000.emit("take_photo");
 		// setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
 		sendDataToInput({
@@ -752,12 +759,20 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 								</React.Fragment>
 							))}
 						</h1>
-						<textarea
+						{/* <textarea
 							className="areaScan"
 							autoFocus
 							onChange={handleScanedArea}
 							value={inputValue}
-						></textarea>
+						></textarea> */}
+						{resDataScan && (
+							<img
+								src={resDataScan}
+								alt="image"
+								width={550}
+								height={350}
+							/>
+						)}
 					</>
 				);
 		}

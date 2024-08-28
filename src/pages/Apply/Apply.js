@@ -341,6 +341,7 @@ const Apply = () => {
   const [resDataScan, setResDataScan] = useAtom(resultDataScan)
   const btnOnClick_Back = () => {
     setResDataScan("")
+    navigate('/home')
     if (!isOnline) {
       Toast.fire({
         icon: "error",

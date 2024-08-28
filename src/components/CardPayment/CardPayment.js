@@ -16,6 +16,8 @@ import { Toast } from "../Toast/Toast";
 import Webcam from "react-webcam";
 import Select from "react-select";
 import { url_dev } from "../../services/env";
+import { resultDataScan } from "../../utils/atomStates";
+import { useAtom } from "jotai";
 
 
 const CardPayment = ({
@@ -65,6 +67,7 @@ const CardPayment = ({
   const [receipt, setReceipt] = useState("");
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
   const [printLokasi, setPrintLokasi] = useState("");
+  const [resDataScan, setResDataScan] = useAtom(resultDataScan)
 
   //price
   const { fee, fee_cash, value } = JSON.parse(
@@ -387,6 +390,7 @@ const CardPayment = ({
 
   useEffect(() => {
     if (seconds === 0) {
+      setResDataScan("")
       navigate("/home");
     }
   }, [navigate, seconds]);

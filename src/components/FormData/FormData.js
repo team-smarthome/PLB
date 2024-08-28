@@ -218,28 +218,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="passport_number"
               value={formdata.passport_number}
               onChange={handleInputChange}
-              disabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedPassportNumber : true
-              }
               className="disabled-input"
             />
-
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledPassportNumber && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedPassportNumber ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("passport_number")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -254,28 +234,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="register_code"
               value={formdata.register_code}
               onChange={handleInputChange}
-              disabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedRegisterCode : true
-              }
               className="disabled-input"
             />
-
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledRegisterCode && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedRegisterCode ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("register_code")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -290,26 +250,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="full_name"
               value={formdata.full_name}
               onChange={handleInputChange}
-              disabled={cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedFullName : true}
               className="disabled-input"
             />
-
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledFullName && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedFullName ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("full_name")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -324,27 +266,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="date_of_birth"
               value={formdata.date_of_birth}
               onChange={handleInputChange}
-              disabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedDateOfBirth : true
-              }
               className="disabled-input"
             />
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledDateOfBirth && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedDateOfBirth ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("date_of_birth")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -363,7 +286,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "sex")
               }
-              isDisabled={cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedGender : true}
               options={optionGender}
               className="basic-single"
               classNamePrefix="select"
@@ -389,22 +311,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 }),
               }}
             />
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledGender && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedGender ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("gender")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -422,9 +328,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               }}
               onChange={(selectedOption) =>
                 handleSelectChange(selectedOption, "nationality")
-              }
-              isDisabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedNationality : true
               }
               options={optionNegara}
               className="basic-single"
@@ -451,22 +354,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
                 }),
               }}
             />
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledNationality && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedNationality ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("nationality")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -481,29 +368,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="expiry_date"
               value={formdata.expiry_date}
               onChange={handleInputChange}
-              disabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedExpiryDate : true
-              }
               className="disabled-input"
             />
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledExpiryDate && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  style={{
-                    cursor: "pointer",
-                    opacity: !isCheckedExpiryDate ? 0.5 : 1,
-                  }}
-                  onClick={() => handleImageClick("expiry_date")}
-                  alt="Checklist Icon"
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -518,29 +384,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="arrivalTime"
               value={formdata.arrivalTime}
               onChange={handleInputChange}
-              disabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedArrivalTime : true
-              }
               className="disabled-input"
             />
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledArrivalTime && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  style={{
-                    cursor: "pointer",
-                    opacity: !isCheckedExpiryDate ? 0.5 : 1,
-                  }}
-                  onClick={() => handleImageClick("arrival_time")}
-                  alt="Checklist Icon"
-                />
-              </>
-            ) : null}
           </div>
         </div>
         <div className="form-group">
@@ -554,28 +399,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               id="destination_location"
               value={formdata.destination_location}
               onChange={handleInputChange}
-              disabled={
-                cardStatus === "iddle" || cardStatus === "checkData" ? !isCheckedDestinationLocation : true
-              }
               className="disabled-input"
             />
-
-            {cardStatus === "iddle" || cardStatus === "checkData" ? (
-              <>
-                <div className="checkbox-container">
-                  {isCommentDisabledDestinationLocation && (
-                    <div className="checkbox-value"></div>
-                  )}
-                </div>
-                <img
-                  src={Checklist}
-                  alt="Checklist Icon"
-                  className={`checklist-img ${!isCheckedDestinationLocation ? "dimmed" : ""
-                    }`}
-                  onClick={() => handleImageClick("destination_location")}
-                />
-              </>
-            ) : null}
           </div>
         </div>
 
