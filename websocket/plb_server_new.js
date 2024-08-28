@@ -91,8 +91,8 @@ const handleSendDataToApi = async (socket, dataUser) => {
     formData.append('fileType', '0');
 
     // Konversi Base64 ke Blob
-    const base64Image = dataUser?.bodyParamsSendKamera?.photoFace.split(',')[1];
-    const contentType = 'image/jpeg';
+    const base64Image = dataUser?.bodyParamsSendKamera?.photoFace // Hilangkan prefix base64 jika ada
+    const contentType = 'image/jpeg'; // Sesuaikan dengan tipe file
     const blob = base64ToBlob(base64Image, contentType);
 
     formData.append('fileData', blob, `${dataUser?.bodyParamsSendKamera?.name}.jpg`);
@@ -120,11 +120,6 @@ const handleSendDataToApi = async (socket, dataUser) => {
             } else {
                 console.error(`Upload ke kamera ${ipCamera[index]} gagal dengan status: ${response.status}`);
             }
-            response.json().then(json => {
-                console.log(`Response dari kamera ${ipCamera[index]}:`, json);
-            }).catch(error => {
-                console.error(`Gagal membaca response JSON dari kamera ${ipCamera[index]}:`, error);
-            });
         });
 
         // Cek apakah semua upload berhasil
