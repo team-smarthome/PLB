@@ -1,7 +1,7 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = ['192.168.2.127'];
+let ipCamera = ['192.168.2.171'];
 let ipServer = "";
 let remoteSocket;
 const axios = require("axios");
@@ -41,7 +41,7 @@ const handleTakePhoto = async (socket) => {
                 jsonrpc: "2.0",
                 method: "collect_start_sync",
                 params: {
-                    show_ui: 1,
+                    show_ui: 0,
                     time_out: 10,
                 },
             }
