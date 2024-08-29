@@ -76,6 +76,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	const handleTakePhoto = async () => {
 		console.log("masukkesini")
+		if (socket_IO_4000.connected) {
+			console.log("Socket IO 4000 is connected");
+		} else {
+			console.log("Socket IO 4000 is not connected");
+		}
 		socket_IO_4000.emit("take_photo");
 		// setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
 		sendDataToInput({
