@@ -89,7 +89,7 @@ function liveCamera() {
     ];
 
     console.log("Streaming camera...");
-    io.emit("stream_camera", `http://localhost:4000/${ipCamera}_.m3u8`);
+    io.emit("stream_camera", `http://localhost:4001/${ipCamera}_.m3u8`);
     console.log(`http://localhost:4000/${ipCamera}_.m3u8`);
 
     processHLS = spawn(cmd_ffmpeg, args_parameter);
@@ -99,11 +99,11 @@ function liveCamera() {
 
     processHLS.stderr.setEncoding("utf8");
     processHLS.stderr.on("data", function (data) {
-        // console.log(data.toString());
+        console.log(data.toString());
     });
 
     processHLS.on("error", function (err) {
-        // console.error(err);
+        console.error(err);
 
     });
 
