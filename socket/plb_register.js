@@ -1,7 +1,7 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = [];
+let ipCamera = [''];
 let ipServer = "";
 let remoteSocket;
 const axios = require("axios");
@@ -47,6 +47,7 @@ const handleTakePhoto = async (socket) => {
             }
         );
         if (response.data.result === "ok") {
+            console.log("succes hit api")
             const stop = await axios.post(`http://${ipCamera[0]}:6002/mvfacial_terminal`, {
                 id: 1,
                 jsonrpc: "2.0",
@@ -121,6 +122,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("take_photo", () => {
+        console.log("Menerima perintah dari frontend")
         handleTakePhoto(socket);
     });
 
