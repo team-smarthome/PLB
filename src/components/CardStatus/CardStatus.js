@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./CardStatusStyle.css";
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -6,23 +6,17 @@ import Gambar3 from "../../assets/images/image-3.svg";
 import Gambar4 from "../../assets/images/image-4.svg";
 import Gambar6 from "../../assets/images/image-6.svg";
 import Gambar7 from "../../assets/images/image-7.svg";
-import Face from "../../assets/images/face2.svg";
-import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import dataKodePos from "../../utils/dataKodePos";
 import Select from "react-select";
 import io from "socket.io-client";
-import { Toast } from "../Toast/Toast";
-import ReactPlayer from "react-player";
 import DataContext from "../../context/DataContext";
-import axios from "axios";
-import { url_dev } from "../../services/env";
 import dataNegara from "../../utils/dataNegara";
 import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
-import dataPasporImg from "../../utils/dataPhotoPaspor";
 import { useAtom } from "jotai";
 import { imageToSend } from "../../utils/atomStates";
+import { initiateSocket, addPendingRequest } from "../../utils/socket";
 
 const parse = require("mrz").parse;
 
@@ -59,25 +53,80 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 		label: item.deskripsi_negara,
 	}));
 
-	const [urlKamera, setUrlKamera] = useState("");
-
-	const [streamKamera, setStreamKamera] = useState(false);
-
 	const [numberPassport, setNumberPassport] = useState(null);
 
-	const socket_IO_4000 = io("http://localhost:4000");
-	const socket_IO_4001 = io("http://localhost:4001");
+	// const socket_IO_4000 = io("http://localhost:4000");
+
+	const socket_IO_4000 = initiateSocket();
+
+	useEffect(() => {
+		socket_IO_4000.on("photo_taken", (imageBase64) => {
+			console.log("Photo_taken:", imageBase64);
+			setCapturedImage(imageBase64);
+			sendDataToInput({
+				statusCardBox: "takePhotoSucces",
+				capturedImage: imageBase64,
+				emailUser: null,
+				titleHeader: "Apply PLB",
+				titleFooter: "Next Step",
+			});
+		});
+		socket_IO_4000.on("error_photo", (error) => {
+			console.error("Error taking photo:", error);
+			sendDataToInput({
+				statusCardBox: "lookCamera",
+				capturedImage: null,
+				emailUser: null,
+				titleHeader: "Apply PLB",
+				titleFooter: "Next Step",
+			});
+		});
+
+		return () => {
+			socket_IO_4000.off("photo_taken");
+			socket_IO_4000.off("error_photo");
+		}
+
+	}, [socket_IO_4000, capturedImage]);
+
+
 
 	const handleTakePhoto = async () => {
-		socket_IO_4000.emit("take_photo");
-		// setCapturedImage(`data:image/jpeg;base64,${dataPasporImg?.visibleImage}`);
-		sendDataToInput({
-			statusCardBox: "waiting2",
-			capturedImage: null,
-			emailUser: null,
-			titleHeader: "Apply PLB",
-			titleFooter: "Next Step",
-		});
+		if (socket_IO_4000.connected) {
+			console.log('testWebsocket Socket connected. Sending take_photo...');
+			socket_IO_4000.emit("take_photo");
+			sendDataToInput({
+				statusCardBox: "waiting2",
+				capturedImage: null,
+				emailUser: null,
+				titleHeader: "Apply PLB",
+				titleFooter: "Next Step",
+			});
+		} else {
+			console.log('testWebsocket Socket not connected. Retrying...');
+			sendDataToInput({
+				statusCardBox: "errorWebsocket",
+				capturedImage: null,
+				emailUser: null,
+				titleHeader: "Apply PLB",
+				titleFooter: "Next Step",
+			});
+			addPendingRequest({ action: 'take_photo' });
+
+
+			socket_IO_4000.connect();
+			// socket_IO_4000.once('connect', () => {
+			// 	console.log('testWebsocket clSocket reconnected. Resending take_photo...');
+			// 	socket_IO_4000.emit("take_photo");
+			// 	sendDataToInput({
+			// 		statusCardBox: "waiting2",
+			// 		capturedImage: null,
+			// 		emailUser: null,
+			// 		titleHeader: "Apply PLB",
+			// 		titleFooter: "Next Step",
+			// 	});
+			// });
+		}
 	};
 
 	const handleReloadPhoto = () => {
@@ -90,48 +139,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 		});
 	};
 
-	useEffect(() => {
-		socket_IO_4000.on("photo_taken", (imageBase64) => {
-			setCapturedImage(imageBase64);
-			sendDataToInput({
-				statusCardBox: "takePhotoSucces",
-				capturedImage: imageBase64,
-				emailUser: null,
-				titleHeader: "Apply PLB",
-				titleFooter: "Next Step",
-			});
-		});
-		socket_IO_4000.on("photo_taken2", (imageBase642) => {
-			setImage(imageBase642);
-			console.log("apakahdapatimagenya", imageBase642)
-			sendDataToInput({
-				ambilImage: imageBase642,
-				statusCardBox: "takePhotoSucces",
-				capturedImage: capturedImage,
-				emailUser: null,
-				titleHeader: "Apply PLB",
-				titleFooter: "Next Step",
-			});
-		});
 
-		socket_IO_4000.on("error_photo", (error) => {
-			console.error("Error taking photo:", error);
-			sendDataToInput({
-				statusCardBox: "lookCamera",
-				capturedImage: null,
-				emailUser: null,
-				titleHeader: "Apply PLB",
-				titleFooter: "Next Step",
-			});
-		});
-	}, [socket_IO_4000]);
 
-	useEffect(() => {
-		socket_IO_4001.on("stream_camera", (stream_url) => {
-			setUrlKamera(stream_url);
-			setStreamKamera(true);
-		});
-	}, [socket_IO_4001])
 
 	const doRetake = () => {
 		// socket_IO_4000.emit("start_stream");
@@ -316,11 +325,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 		}
 	}, []);
 
-	useEffect(() => {
-		socket_IO_4000.on("connect", () => {
-			console.log("BerhasilTerhuhungKeServer4000");
-		});
-	}, []);
+	// useEffect(() => {
+	// 	socket_IO_4000.on("connect", () => {
+	// 		console.log("BerhasilTerhuhungKeServer4000");
+	// 	});
+	// }, []);
 
 	useEffect(() => {
 		switch (statusCardBox) {
@@ -330,12 +339,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 			case "inputEmail":
 				console.log("masukKesiniHandleStreamKamera");
 				socket_IO_4000.emit("start_stream");
-				break;
-			case "lookCamara":
-				socket_IO_4001.on("stream_camera", (stream_url) => {
-					setUrlKamera(stream_url);
-					setStreamKamera(true);
-				});
 				break;
 			case "postalCode":
 				socket_IO_4000.emit("stop_stream");
@@ -618,7 +621,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2 }) => {
 						</h1>
 						<div style={{ height: "180px" }}>
 							{/* <p>ini adalah {urlKamera}</p> */}
-							<VideoPlayer url={urlKamera} />
+							<VideoPlayer url={'http://localhost:4001/stream_.m3u8'} />
 							{/* {streamKamera ? (
                 <ReactPlayer
                   className="react-player"
