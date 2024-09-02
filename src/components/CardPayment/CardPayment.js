@@ -392,6 +392,7 @@ const CardPayment = ({
     if (seconds === 0) {
       setResDataScan("")
       navigate("/home");
+      // window.location.reload();
     }
   }, [navigate, seconds]);
 
@@ -496,8 +497,11 @@ const CardPayment = ({
   };
 
   const handleBackHome = () => {
+    setResDataScan("");
     navigate("/home");
+    // window.location.reload(); // Refreshes the page
   };
+
 
   const handleConfirm = () => {
     const newStatusConfirm = !confirm;

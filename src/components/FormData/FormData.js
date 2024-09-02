@@ -3,6 +3,7 @@ import Select from "react-select";
 import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
+import NoProfile from '../../assets/images/no-profile-picture.svg'
 
 const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   // PLB / BCP Number
@@ -412,7 +413,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             <div className="photo">
               <div className="photo-box">
                 <img
-                  src={formdata.photo || ""}
+                  className={formdata.photo ? "" : "no-image"}
+                  src={formdata.photo || NoProfile}
                   alt=""
                 />
               </div>

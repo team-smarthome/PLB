@@ -294,9 +294,9 @@ const Apply = () => {
   useEffect(() => {
     connectWebSocket(null, socket_IO); // Ensure to pass `socket_IO` properly
 
-    return () => {
-      closeWebSocket();
-    };
+    // return () => {
+    //   closeWebSocket();
+    // };
   }, []);
 
   // Contoh penggunaan di tempat lain
