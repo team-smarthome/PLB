@@ -13,9 +13,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import io from "socket.io-client";
 import { url_dev } from "../../services/env";
 import Cookies from 'js-cookie';
+import { getAllDataLogs } from "../../services/api";
 
 function Report() {
-  const socket_IO = io("http://localhost:4000");
+  const socket_IO = io("http://192.168.2.143:4011");
   const navigate = useNavigate();
   const [loading, isLoading] = useState(false);
   const currentDate = new Date(Date.now()).toISOString().split("T")[0];
@@ -38,6 +39,7 @@ function Report() {
     { value: "KIOSK", label: "CC" },
     { value: ["KICASH", "KIOSK"], label: "ALL" },
   ];
+  const [logsList, setLogsList] = useState([])
 
   const [petugasOptions, setPetugasOptions] = useState([]);
   const [nomorPassportOptions, setNomorPassportOptions] = useState([]);
@@ -51,23 +53,23 @@ function Report() {
     const SideBarStatus = Cookies.get('sidebarStatus');
     const Token = Cookies.get('token');
 
-    const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
-    socket_IO.emit("startFilterUser", { CookieSend });
-    socket_IO.on("responseGetDataUserFilter", (data) => {
-      const dataUser = data.map((item) => ({
-        label: item.name,
-        value: item.name
-      }));
-      setPetugasOptions(dataUser);
-      const dataPassport = data.map((item) => ({
-        label: item.personNum,
-        value: item.personNum
-      }));
-      console.log("dataPassport:", dataPassport);
-      setNomorPassportOptions(dataPassport);
-      console.log("responseGetDataUserFilter:", data);
+    // const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
+    socket_IO.emit("startFilterUser");
+    // socket_IO.on("responseGetDataUserFilter", (data) => {
+    //   const dataUser = data.map((item) => ({
+    //     label: item.name,
+    //     value: item.name
+    //   }));
+    //   setPetugasOptions(dataUser);
+    //   const dataPassport = data.map((item) => ({
+    //     label: item.personNum,
+    //     value: item.personNum
+    //   }));
+    //   console.log("dataPassport:", dataPassport);
+    //   setNomorPassportOptions(dataPassport);
+    //   console.log("responseGetDataUserFilter:", data);
 
-    });
+    // });
   }, []);
 
   // useEffect(() => {
@@ -103,7 +105,19 @@ function Report() {
     setCurrentPage(1);
   }, [startDate, endDate, petugas]);
 
-
+  const getLog = async () => {
+    try {
+      const res = await getAllDataLogs();
+      if (res.status == 200) {
+        setLogsList(res.data.records)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    getLog()
+  }, [])
 
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage);
@@ -302,7 +316,7 @@ function Report() {
 
     const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
     const bodyParamsSendFilter = {
-      name: petugas,
+      name: "",
       beginTime: startDate,
       endTime: endDate,
       type: "all",
@@ -318,7 +332,8 @@ function Report() {
       minAge: 0,
       maxAge: 100
     }
-    socket_IO.emit("historyLog", { bodyParamsSendFilter, CookieSend });
+    console.log(bodyParamsSendFilter, "bodyParamsSendFilter")
+    socket_IO.emit("historyLog", { bodyParamsSendFilter });
     socket_IO.on("responseGetDataUser", (data) => {
       console.log("responseGetDataUser:", data);
       setData(data.matchList);
@@ -356,9 +371,12 @@ function Report() {
           <div className="select-petugas">
             <Select
               id="petugas"
-              value={petugas ? petugasOptions.find((option) => option.value === petugas) : null}
+              value={petugas.value}
               onChange={(selectedOption) => setPetugas(selectedOption.value)}
-              options={petugasOptions}
+              options={logsList.map(data => ({
+                label: data.name,
+                value: data.name,
+              }))}
               className="basic-single"
               styles={{
                 container: (provided) => ({
@@ -383,17 +401,18 @@ function Report() {
             />
           </div>
 
-          <label htmlFor="petugas">Nomor PLB</label>
+          <label htmlFor="petugas">Nomor Register</label>
           <div className="select-petugas">
             <Select
               id="petugas"
               value={
-                petugas
-                  ? nomorPassportOptions.find((option) => option.value === nomorPassport)
-                  : ""
+                nomorPassport.value
               }
-              onChange={(selectedOption) => setNomorPassport(selectedOption.label)}
-              options={nomorPassportOptions}
+              onChange={(selectedOption) => setNomorPassport(selectedOption.value)}
+              options={logsList.map(data => ({
+                label: data.no_register,
+                value: data.no_register,
+              }))}
               className="basic-single"
               styles={{
                 container: (provided) => ({
