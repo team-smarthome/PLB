@@ -1,0 +1,212 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.areaScan {
+  width: 75%;
+  height: 50%;
+  font-size: 22px;
+  text-align: center;
+}
+
+.card-status {
+  display: flex;
+  margin-left: -20px;
+  height: 100%;
+}
+
+.card-container {
+  width: 100%;
+  background-color: #fbaf17;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 40px;
+  margin-bottom: 16px;
+  border-radius: 18px;
+}
+
+.inner-card {
+  width: 96%;
+  height: 95%;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 18px;
+  /* outline: 10px solid #fbaf17; */
+}
+
+.webcam {
+  width: 260px;
+  /* height: 155px; */
+}
+
+.card-title {
+  font-size: 30px;
+  text-align: center;
+  color: #3d5889;
+  margin-top: -10px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.card-title2 {
+  font-size: 30px;
+  text-align: center;
+  color: #3d5889;
+  margin-top: 50px;
+  font-family: "Roboto",
+    Arial,
+    sans-serif;
+}
+
+p {
+  text-align: center;
+  justify-content: justify;
+  margin-top: -10px;
+  color: #3d5889;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.card-image {
+  /* margin-bottom: 20px; */
+  width: 260px;
+  height: 155px;
+  margin-top: 16px;
+  /* object-fit: cover; */
+}
+
+.input-email input {
+  background-color: white !important;
+  border-radius: 10px;
+  height: 30px;
+  width: 300px;
+  /* margin-bottom: 20px; */
+  margin-top: 5px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.input-email {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.input-postal-code input {
+  border-radius: 10px;
+  height: 30px;
+  width: 300px;
+  /* margin-bottom: 20px; */
+  margin-top: 5px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.input-postal-code {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.input-email input::placeholder {
+  color: #acacac;
+  font-size: large;
+  font-family: "Roboto", Arial, sans-serif;
+  /* margin-left: 100px; */
+}
+
+.ok-button {
+  cursor: pointer;
+  background-color: #3d5889;
+  border: 1px solid #3d5889;
+  border-radius: 18px;
+  font-size: 16px;
+  color: white;
+  width: 40%;
+  height: 40px;
+  margin-top: 20px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.ok-button:hover {
+  cursor: pointer;
+  background-color: #fbaf17;
+}
+
+.retake-button {
+  cursor: pointer;
+  background-color: red;
+  border: 1px solid red;
+  border-radius: 18px;
+  font-size: 16px;
+  color: white;
+  width: 40%;
+  height: 40px;
+  margin-top: 20px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.retake-button:hover {
+  cursor: pointer;
+  background-color: #fbaf17;
+}
+
+.container-box-image {
+  text-align: center;
+}
+
+.box-image {
+  margin-top: 20px;
+}
+
+.warning {
+  color: red;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+.potrait-image {
+  max-width: 30%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.webcam-container {
+  position: relative;
+  background-color: black;
+}
+
+.bounding-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 100%;
+  border: 2px solid red;
+  box-sizing: border-box;
+  animation: blink 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
