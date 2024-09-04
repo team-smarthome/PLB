@@ -11,9 +11,19 @@ import Swal from "sweetalert2";
 
 
 const Home = () => {
+  const ipServer = localStorage.getItem("ipServer");
   const navigate = useNavigate();
   const btnOnClick_Apply = () => {
-    navigate("/apply");
+    if (ipServer === null) {
+      Swal.fire({
+        title: "Please configure the server first",
+        icon: "warning",
+        confirmButtonColor: "#3D5889",
+      });
+      navigate("/configuration");
+    } else {
+      navigate("/apply");
+    }
   };
 
   const btnOnClick_Informasi = () => {

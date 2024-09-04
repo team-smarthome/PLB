@@ -1,11 +1,9 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = [''];
-let ipServer = "";
-let remoteSocket;
+let ipCamera = ['192.168.2.127'];
+let ipServerPC = '192.168.2.143';
 const axios = require("axios");
-const ioClient = require("socket.io-client");
 
 const server = http.createServer(function (request, response) {
     const headers = {
@@ -32,8 +30,9 @@ const io = socketIo(server, {
 });
 
 const handleTakePhoto = async (socket) => {
-    console.log("Menjalankan mengambil photo");
+    console.log("====== START TAKE PHOTO ======");
     try {
+        console.log("masuk ke try")
         const response = await axios.post(
             `http://${ipCamera[0]}:6002/mvfacial_terminal`,
             {
@@ -46,17 +45,23 @@ const handleTakePhoto = async (socket) => {
                 },
             }
         );
-        if (response.data.result === "ok") {
-            console.log("succes hit api")
-            const stop = await axios.post(`http://${ipCamera[0]}:6002/mvfacial_terminal`, {
+
+        if (response) {
+            console.log("Menjalankan function stop")
+            await axios.post(`http://${ipCamera[0]}:6002/mvfacial_terminal`, {
                 id: 1,
                 jsonrpc: "2.0",
                 method: "collect_cancel",
                 params: null,
             });
+            // return;
+        }
+
+        if (response.data.result === "ok") {
+            console.log("# SUCCESS FETCH API TAKE PHOTO #");
             const imagePath = response.data.params.image_path;
             const imageUrl = `http://${ipCamera[0]}:80${imagePath}`;
-            // Fetch image from the URL
+
             const imageResponse = await axios.get(imageUrl, {
                 responseType: "arraybuffer",
             });
@@ -65,22 +70,15 @@ const handleTakePhoto = async (socket) => {
                 "binary"
             ).toString("base64");
             const imageBase64 = `data:image/jpeg;base64,${base64Image}`;
-            if (stop.data.result === 'ok') {
-                socket.emit("photo_taken2", imagePath);
-                socket.emit("photo_taken", imageBase64);
-                console.log("mengirim data ke frontend");
-            } else {
-                socket.emit("photo_taken2", imagePath);
-                socket.emit("photo_taken", imageBase64);
-                console.log("mengirim data ke frontend");
-                console.log("gagal")
-            }
+
+            socket.emit("photo_taken", imageBase64);
+            console.log("# SENDING IMAGE TO FRONT-END #");
         } else {
-            console.error("cannot_take_photo");
+            console.error("# ERROR CANNOT TAKE PHOTO #");
             socket.emit("error_photo", "cannot_take_photo");
         }
     } catch (error) {
-        console.error("cannot_take_photo", error);
+        console.error("# ERROR CANNOT TAKE PHOTO : ", error);
         socket.emit("error_photo", "cannot_take_photo");
         await axios.post(`http://${ipCamera[0]}:6002/mvfacial_terminal`, {
             id: 1,
@@ -92,41 +90,24 @@ const handleTakePhoto = async (socket) => {
     }
 };
 
-const handleSendDataUser = async (data) => {
-    console.log("Sending data to remote server", data.ipServerCamera);
-    remoteSocket.emit("sendDataUserToServer", data);
-}
-
-const initializeRemoteSocket = () => {
-    remoteSocket = ioClient(`http://${ipServer}:4010`);
-    remoteSocket.on("connect", () => {
-        console.log("Connected to remote WebSocket server on port 4010");
-    });
-
-    remoteSocket.on("responseSendDataUserFromServer", (data) => {
-        io.emit("responseSendDataUser", data);
-        console.log("responseSendDataUserFromServer", data);
-    });
-}
-
 io.on("connection", (socket) => {
-    socket.emit("message", "Welcome to the RTSP to HLS stream");
     socket.on("saveCameraData", (data) => {
         ipCamera = data.ipServerCamera;
-        ipServer = data.ipServerPC;
-        console.log("ipCamera", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
-
-        if (!remoteSocket) {
-            initializeRemoteSocket();
-        }
+        ipServerPC = data.ipServerPC;
+        console.log("# IPCAMERA: ", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
     });
 
     socket.on("take_photo", () => {
-        console.log("Menerima perintah dari frontend")
+        console.log("# RECEIVED ACTION TAKE PHOTO FROM FRONTEND #");
         handleTakePhoto(socket);
     });
 
-    socket.on("sendDataUser", (data) => {
-        handleSendDataUser(data);
+    socket.emit("DataIPCamera", {
+        ipCamera: ipCamera[0],
+        ipServerPC: ipServerPC,
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
     });
 });

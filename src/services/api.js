@@ -66,3 +66,21 @@ export async function apiPblAddFaceRec(header, body) {
     throw error;
   }
 }
+
+
+export async function apiInsertDataUser(body, url) {
+  try {
+    const response = await axios.post(
+      `http://${url}:8000/api/datauser`,
+      body,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
