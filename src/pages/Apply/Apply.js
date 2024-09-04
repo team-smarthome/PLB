@@ -11,13 +11,13 @@ import { formData, resultDataScan } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend, cookiesData } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
-import { apiPblAddFaceRec } from "../../services/api";
-import io from "socket.io-client";
-
+import { apiInsertDataUser, apiPblAddFaceRec } from "../../services/api";
+import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
+import axios from "axios";
 
 const Apply = () => {
   const socketRef = useRef(null);
-  const socket_IO = io("http://localhost:4000");
+  const socket_IO_4010 = initiateSocket4010();
   const [, setFormData] = useAtom(formData);
   const [image] = useAtom(imageToSend);
   const [dataCookie] = useAtom(cookiesData);
@@ -25,7 +25,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("iddle");
+  const [cardStatus, setCardStatus] = useState("lookCamera");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -38,6 +38,7 @@ const Apply = () => {
   const [meesageConfirm, setMessageConfirm] = useState(
     "Network / Card error / declined dll"
   );
+  const ipServer = localStorage.getItem("ipServer");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const dataTrueorFalse = localStorage.getItem("dataStatus");
   const [cardPaymentProps, setCardPaymentProps] = useState({
@@ -60,6 +61,10 @@ const Apply = () => {
   });
   const [dataScan, setDataScan] = useState()
   const [isConnected, setIsConnected] = useState(false);
+  const [objectApi, setObjectApi] = useState(null);
+  const [objectCamera, setObjectCamera] = useState(null);
+  const [ipKamera, setIpKamera] = useState([]);
+  let loginDataArray = [];
 
   let isCloseTimeoutSet = false;
 
@@ -216,74 +221,74 @@ const Apply = () => {
       return URL.createObjectURL(blob);
     }
   };
-  const connectWebSocket = (ipAddress, socket_IO) => {
-    const socketURL = `ws://localhost:4488`;
-    socketRef.current = new WebSocket(socketURL);
+  // const connectWebSocket = (ipAddress, socket_IO) => {
+  //   const socketURL = `ws://localhost:4488`;
+  //   socketRef.current = new WebSocket(socketURL);
 
-    socketRef.current.onopen = () => {
-      console.log("WebSocket connection opened");
-      isCloseTimeoutSet = false;
-      setCardStatus("iddle"); // Start in 'iddle' state after connection opens
-      setIsConnected(true);
-    };
+  //   socketRef.current.onopen = () => {
+  //     console.log("WebSocket connection opened");
+  //     isCloseTimeoutSet = false;
+  //     setCardStatus("iddle"); // Start in 'iddle' state after connection opens
+  //     setIsConnected(true);
+  //   };
 
-    socketRef.current.onmessage = (event) => {
-      try {
-        const dataJson = JSON.parse(event.data);
-        console.log("Received data from server websocket:", dataJson);
+  //   socketRef.current.onmessage = (event) => {
+  //     try {
+  //       const dataJson = JSON.parse(event.data);
+  //       console.log("Received data from server websocket:", dataJson);
 
-        // Only attempt to decode if `dataJson.uvImage` exists
-        if (dataJson.visibleImage) {
-          setResDataScan(decodeBase64ToImage(dataJson.visibleImage));
-        }
+  //       // Only attempt to decode if `dataJson.uvImage` exists
+  //       if (dataJson.visibleImage) {
+  //         setResDataScan(decodeBase64ToImage(dataJson.visibleImage));
+  //       }
 
-        switch (dataJson.msgType) {
-          case "passportData":
-            break;
-          case "visibleImage":
-            setRecievedTempData((previous) => [...previous, dataJson]);
-            break;
-          case "DeviceController":
-            const { airportId, deviceId, jenisDeviceId } = dataJson;
-            localStorage.setItem("airportId", airportId);
-            localStorage.setItem("deviceId", deviceId);
-            localStorage.setItem("jenisDeviceId", jenisDeviceId);
-            break;
-          default:
-            break;
-        }
-      } catch (error) {
-        console.error("Failed to parse WebSocket message data:", error);
-      }
-    };
+  //       switch (dataJson.msgType) {
+  //         case "passportData":
+  //           break;
+  //         case "visibleImage":
+  //           setRecievedTempData((previous) => [...previous, dataJson]);
+  //           break;
+  //         case "DeviceController":
+  //           const { airportId, deviceId, jenisDeviceId } = dataJson;
+  //           localStorage.setItem("airportId", airportId);
+  //           localStorage.setItem("deviceId", deviceId);
+  //           localStorage.setItem("jenisDeviceId", jenisDeviceId);
+  //           break;
+  //         default:
+  //           break;
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to parse WebSocket message data:", error);
+  //     }
+  //   };
 
-    socketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
-      setIsConnected(false);
-      setCardStatus("errorConnection");
+  //   socketRef.current.onclose = () => {
+  //     console.log("WebSocket connection closed");
+  //     setIsConnected(false);
+  //     setCardStatus("errorConnection");
 
-      // Close handling and reconnection logic
-      if (!isCloseTimeoutSet) {
-        setCardStatus("errorWebsocket");
-        setTimeout(() => {
-          isCloseTimeoutSet = true;
-        }, 3000);
-      } else {
-        // Attempt to reconnect or notify server
-        if (socket_IO) {
-          socket_IO.emit("clientData", "re-newIpAddress");
-        } else {
-          console.warn("socket_IO is undefined.");
-        }
-      }
-    };
+  //     // Close handling and reconnection logic
+  //     if (!isCloseTimeoutSet) {
+  //       setCardStatus("errorWebsocket");
+  //       setTimeout(() => {
+  //         isCloseTimeoutSet = true;
+  //       }, 3000);
+  //     } else {
+  //       // Attempt to reconnect or notify server
+  //       // if (socket_IO) {
+  //       //   socket_IO.emit("clientData", "re-newIpAddress");
+  //       // } else {
+  //       //   console.warn("socket_IO is undefined.");
+  //       // }
+  //     }
+  //   };
 
-    socketRef.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setCardStatus("errorConnection");
-      setIsConnected(false);
-    };
-  };
+  //   socketRef.current.onerror = (error) => {
+  //     console.error("WebSocket error:", error);
+  //     setCardStatus("errorConnection");
+  //     setIsConnected(false);
+  //   };
+  // };
 
   const closeWebSocket = () => {
     if (socketRef.current) {
@@ -292,7 +297,7 @@ const Apply = () => {
   };
 
   useEffect(() => {
-    connectWebSocket(null, socket_IO); // Ensure to pass `socket_IO` properly
+    // connectWebSocket(null, socket_IO_4010); // Ensure to pass `socket_IO` properly
 
     // return () => {
     //   closeWebSocket();
@@ -528,25 +533,135 @@ const Apply = () => {
     }
   }, []);
 
+  const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex) => {
+    console.log("LoginKamerake", cameraIndex, ipCameraSet)
+    try {
+      const encodedPassword = btoa(sPassword);
+      const response = await axios.put(`http://${ipCameraSet}/cgi-bin/entry.cgi/system/login`, {
+        sUserName,
+        sPassword: encodedPassword,
+      });
+      const dataRes = response.data;
+      let authUser = "";
+      console.log(dataRes, "responsehitapi");
+      if (dataRes.status.code === 200) {
+        if (dataRes.data.auth === 0) {
+          authUser = "admin";
+        } else {
+          authUser = "user";
+        }
+        const loginData = `Face-Token=${dataRes.data.token}; face-username=${authUser}; roleId=${dataRes.data.auth}; sidebarStatus=${dataRes.data.status}; token=${dataRes.data.token}`;
+        loginDataArray[cameraIndex] = loginData;
+
+        // Cek jika semua kamera sudah memiliki datanya
+        if (loginDataArray.filter(data => data !== undefined).length === ipKamera.length) {
+          const data = {
+            ipServerPC: ipServer,
+            ipServerCamera: ipKamera,
+            cookiesCamera: loginDataArray,
+          };
+          Toast.fire({
+            icon: "success",
+            title: "Data berhasil disimpan",
+          });
+          socket_IO_4010.emit("saveCameraData", data);
+          if (socket_IO_4010.connected) {
+            console.log("testWebsocket4010 connected");
+            socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera: objectCamera });
+          } else {
+            //connnect ulang ke socket_IO_4010
+            console.log("testWebsocket4010 not connected");
+            socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera: objectCamera });
+            socket_IO_4010.connect();
+          }
+        }
+      } else {
+        Swal.fire(dataRes.status.message);
+      }
+    } catch (error) {
+      Swal.fire("Gagal login");
+    }
+  };
+
+
+
   useEffect(() => {
-    socket_IO.on("responseSendDataUser", (data) => {
+    socket_IO_4010.on("DataIPCamera", (data) => {
+      setIpKamera(data.ipCamera);
+    });
+    socket_IO_4010.on("responseSendDataUser", (data) => {
       console.log("dataResponseSendDataUser", data);
       if (data === "Successfully") {
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: true,
-          isSuccess: false,
-          isFailed: false,
-          isPyamentUrl: false,
-          isPhoto: false,
+        console.log("sharedDataTOSEndAPi", sharedData);
+        const response = apiInsertDataUser(objectApi, ipServer);
+        response.then((res) => {
+          if (res.data.status === 200) {
+            setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: true,
+              isSuccess: false,
+              isFailed: false,
+              isPyamentUrl: false,
+              isPhoto: false,
+            });
+            setDisabled(true);
+          }
+        }).catch((error) => {
+          console.error("Error:", error);
         });
-        setDisabled(true);
+      } else if (data === 'Your session has expired.') {
+        if (ipKamera.length > 0) {
+          const showLoginDialog = (callback, initialUsername = "") => {
+            Swal.fire({
+              title: `Login`,
+              html:
+                `<input id="swal-input1" class="swal2-input" placeholder="Username" value="${initialUsername}">` +
+                '<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
+              focusConfirm: false,
+              showCancelButton: true,
+              confirmButtonText: "Kirim",
+              confirmButtonColor: "#3D5889",
+              cancelButtonText: "Batal",
+              cancelButtonColor: "#d33",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                const username = document.getElementById("swal-input1").value;
+                const password = document.getElementById("swal-input2").value;
+
+                if (username && password) {
+                  callback(username, password);
+                } else {
+                  Swal.fire("Harap masukkan username dan password");
+                  showLoginDialog(callback, username);
+                }
+              }
+            });
+          };
+          const loginAllCameras = (sUserName, sPassword) => {
+            ipKamera.forEach((ipCameraSet, index) => {
+              handleLogin(sUserName, sPassword, ipCameraSet, index);
+            });
+          };
+          showLoginDialog((sUserName, sPassword) => {
+            loginAllCameras(sUserName, sPassword);
+          });
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: "Harap pilih jumlah kamera",
+          });
+        }
       }
     });
-  }, [socket_IO]);
+
+    return () => {
+      socket_IO_4010.off("DataIPCamera");
+      socket_IO_4010.off("responseSendDataUser");
+    }
+  }, [socket_IO_4010, objectApi]);
 
   useEffect(() => {
     if (cardPaymentProps.isPaymentCash || cardPaymentProps.isPaymentCredit) {
@@ -598,15 +713,15 @@ const Apply = () => {
       method: 1,
       identityType: "1",
       gender: sharedData.passportData.sex === "male" ? 1 : 0,
-      personId: sharedData.passportData.noRegister,
-      personNum: sharedData.passportData.docNumber,
+      personNum: sharedData.passportData.noRegister,
+      personId: sharedData.passportData.docNumber,
       name: sharedData.passportData.fullName,
       dateOfBirth: sharedData.passportData.formattedBirthDate,
       sex: sharedData.passportData.sex === "male" ? "M" : "F",
       nationalityCode: sharedData.passportData.nationality,
       expiryDate: `${sharedData.passportData.formattedExpiryDate}`,
       arrivalTime: new Date().getTime(),
-      destinationLocation: sharedData.destinationLocation,
+      destinationLocation: sharedData.passportData.destinationLocation,
       photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       identityData: image ? image : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       effectiveStartTime: Math.floor(new Date().getTime() / 1000).toString(),
@@ -614,7 +729,36 @@ const Apply = () => {
       thirdpartyId: "",
     }
 
-    socket_IO.emit("sendDataUser", { bodyParamsSendKamera });
+    const dataTosendAPI = {
+      no_register: sharedData.passportData.noRegister,
+      no_passport: sharedData.passportData.docNumber,
+      name: sharedData.passportData.fullName,
+      date_of_birth: sharedData.passportData.formattedBirthDate,
+      gender: sharedData.passportData.sex === "male" ? "M" : "F",
+      nationality: sharedData.passportData.nationality,
+      expired_date: `${sharedData.passportData.formattedExpiryDate}`,
+      arrival_time: new Date(),
+      destination_location: sharedData.passportData.destinationLocation,
+      profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+      photo_passport: resDataScan ? resDataScan : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+    };
+
+    setObjectApi(dataTosendAPI);
+    setObjectCamera(bodyParamsSendKamera)
+
+    console.log("sharedDataTOSEndAPi", sharedData);
+
+    if (socket_IO_4010.connected) {
+      console.log("testWebsocket4010 connected");
+      socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera });
+    } else {
+      //connnect ulang ke socket_IO_4010
+      console.log("testWebsocket4010 not connected");
+      addPendingRequest4010({ action: "sendDataUser", data: { bodyParamsSendKamera } });
+      socket_IO_4010.connect();
+    }
+
+
 
     console.log("nilaiBodyParamsSendKamera", bodyParamsSendKamera);
 

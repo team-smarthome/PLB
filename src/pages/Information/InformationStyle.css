@@ -278,3 +278,9 @@
     align-items: center;
 
 }
+
+.container-petugas-panel {
+    background-color: rgba(204, 208, 219, 0.5);
+    width: 100%;
+    height: 100%;
+}

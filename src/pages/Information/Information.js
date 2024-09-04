@@ -23,12 +23,14 @@ import Table from "../../components/Table/Table2";
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Swal from "sweetalert2";
-
+import { FaUserPen } from "react-icons/fa6";
 import { useAtom } from "jotai";
 import { cookiesData, ipDataCamera } from "../../utils/atomStates";
+import { initiateSocketConfig } from "../../utils/socket";
+import PetugasPanel from "./components/PetugasPanel";
 
 const Information = () => {
-	const socket2_IO_4000 = io("http://localhost:4000");
+	const socket2_IO_4000 = initiateSocketConfig();
 	const [newWifiResults, setNewWifiResults] = useState("");
 	const [oldPasswordWarning, setOldPasswordWarning] = useState(false);
 	const [newPasswordWarning, setNewPasswordWarning] = useState(false);
@@ -66,6 +68,10 @@ const Information = () => {
 		{
 			name: "User",
 			icon: FaRegUserCircle,
+		},
+		{
+			name: "Petugas",
+			icon: FaUserPen,
 		},
 		{
 			name: "Change Password",
@@ -132,7 +138,7 @@ const Information = () => {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		if (dataUser.role == 1) {
+		if (dataUser.role === 1) {
 			if (totalCameras > 0) {
 				const showLoginDialog = (callback, initialUsername = "") => {
 					Swal.fire({
@@ -160,17 +166,12 @@ const Information = () => {
 						}
 					});
 				};
-
 				const loginAllCameras = (sUserName, sPassword) => {
-					// Lakukan login untuk semua kamera
 					cameraIPs.forEach((ipCameraSet, index) => {
 						handleLogin(sUserName, sPassword, ipCameraSet, index);
 					});
 				};
-
-				// Tampilkan dialog login hanya sekali
 				showLoginDialog((sUserName, sPassword) => {
-
 					loginAllCameras(sUserName, sPassword);
 				});
 			} else {
@@ -183,13 +184,19 @@ const Information = () => {
 			const data = {
 				ipServerPC: newWifiResults,
 				ipServerCamera: ipCameraRegister,
-				cookiesCamera: loginDataArray,
 			};
 			Toast.fire({
 				icon: "success",
 				title: "Data berhasil disimpan",
 			});
-			socket2_IO_4000.emit("saveCameraData", data);
+			if (socket2_IO_4000.connected) {
+				socket2_IO_4000.emit("saveCameraData", data);
+			} else {
+				Toast.fire({
+					icon: "error",
+					title: "Gagal menyimpan data websocket tidak terhubung",
+				});
+			}
 		}
 	};
 
@@ -267,14 +274,17 @@ const Information = () => {
 
 		const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
 		socket2_IO_4000.emit("startFilterUser", { CookieSend });
-		// socket2_IO_4000.on("responseGetDataUserFilter", (data) => {
-		// 	setData(data);
-		// 	console.log("datayangdidapat", data);
-		// });
 		setDataUser(JSON.parse(getUserdata))
 	}, []);
 
 	useEffect(() => {
+		socket2_IO_4000.on("DataIPCamera", (data) => {
+			setIpCameraRegister(data.ipCamera);
+			setNewWifiResults(data.ipServerPC);
+			console.log("dataUserKameraSetting", data);
+			localStorage.setItem("ipServer", data.ipServerPC);
+		});
+
 		socket2_IO_4000.on("photo_taken", (imageBase64) => {
 			setLoading(false);
 			setStreamKamera(false);
@@ -282,9 +292,12 @@ const Information = () => {
 			console.log("imagebase64", imageBase64);
 			setCapturedImageTest(imageBase64);
 			console.log("Image_path_received: ", imageBase64);
-
 			socket2_IO_4000.emit("stop_stream");
 		});
+		return () => {
+			socket2_IO_4000.off("photo_taken");
+			socket2_IO_4000.off("DataIPCamera");
+		}
 	}, [socket2_IO_4000]);
 
 	const handleShowOldPassword = () => {
@@ -347,7 +360,7 @@ const Information = () => {
 	}, []);
 
 	useEffect(() => {
-		if (currentTab === 4) {
+		if (currentTab === 5) {
 			handlePrint();
 			setTimeout(() => {
 				setCurrentTab(0);
@@ -407,6 +420,10 @@ const Information = () => {
 											</div>
 										</>
 									) : currentTab === 1 ? (
+										<div className="container-petugas-panel">
+											<PetugasPanel />
+										</div>
+									) : currentTab === 2 ? (
 										<>
 											<div className="custom-container">
 												<form
@@ -633,7 +650,7 @@ const Information = () => {
 												</form>
 											</div>
 										</>
-									) : currentTab === 2 ? (
+									) : currentTab === 3 ? (
 										<>
 											<form
 												className="full-width-form"
@@ -803,7 +820,7 @@ const Information = () => {
 												</button>
 											</form>
 										</>
-									) : currentTab === 3 ? (
+									) : currentTab === 4 ? (
 										<>
 											<div
 												style={{

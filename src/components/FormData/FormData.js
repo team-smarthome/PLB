@@ -71,60 +71,63 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
   const [formdata, setFormData] = useState(initialFormData);
 
   useEffect(() => {
-    if (sharedData.passportData === null) {
-      setFormData(initialFormData);
-    } else {
-      const dataNationality = dataNegara.data.map((negara) => ({
-        value: negara.id_negara,
-        label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
-      }));
+    // if (sharedData.passportData === null) {
+    //   setFormData(initialFormData);
+    // } else {
+    const dataNationality = dataNegara.data.map((negara) => ({
+      value: negara.id_negara,
+      label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
+    }));
 
-      setOptionNegara(dataNationality);
+    setOptionNegara(dataNationality);
 
-      const dataGender = [
-        { value: "male", label: "MALE" },
-        { value: "female", label: "FEMALE" },
-      ];
+    const dataGender = [
+      { value: "male", label: "MALE" },
+      { value: "female", label: "FEMALE" },
+    ];
 
-      setOptionGender(dataGender);
+    setOptionGender(dataGender);
 
+    if (sharedData.passportData) {
+      const filteredNationality = dataNationality.filter(
+        (negara) => negara.value === sharedData.passportData.nationality
+      );
+
+      // gender
       if (sharedData.passportData) {
-        const filteredNationality = dataNationality.filter(
-          (negara) => negara.value === sharedData.passportData.nationality
+        const filteredGender = dataGender.filter(
+          (sex) => sex.value === sharedData.passportData.sex || ""
         );
-
-        // gender
-        if (sharedData.passportData) {
-          const filteredGender = dataGender.filter(
-            (sex) => sex.value === sharedData.passportData.sex || ""
-          );
-
-          setFormData((prevData) => ({
-            ...prevData,
-            sex: filteredGender.length > 0 ? filteredGender[0] : "",
-          }));
-        }
 
         setFormData((prevData) => ({
           ...prevData,
-          passport_number: sharedData.passportData.docNumber || "",
-          register_code: sharedData.passportData.noRegister || "",
-          full_name: sharedData.passportData.fullName || "",
-          date_of_birth: sharedData.passportData.formattedBirthDate || "",
-          nationality:
-            filteredNationality.length > 0 ? filteredNationality[0] : "",
-          expiry_date: sharedData.passportData.formattedExpiryDate || "",
-          arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
-          destination_location: sharedData.passportData.destinationLocation || "",
+          sex: filteredGender.length > 0 ? filteredGender[0] : "",
         }));
       }
 
       setFormData((prevData) => ({
         ...prevData,
-        photo: sharedData.photoFace || "",
+        passport_number: sharedData.passportData.docNumber || "",
+        register_code: sharedData.passportData.noRegister || "",
+        full_name: sharedData.passportData.fullName || "",
+        date_of_birth: sharedData.passportData.formattedBirthDate || "",
+        nationality:
+          filteredNationality.length > 0 ? filteredNationality[0] : "",
+        expiry_date: sharedData.passportData.formattedExpiryDate || "",
+        arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
+        destination_location: sharedData.passportData.destinationLocation || "",
       }));
     }
+    console.log("sharedDataFormData", sharedData);
+    setFormData((prevData) => ({
+      ...prevData,
+      photo: sharedData.photoFace || "",
+    }));
+    // }
   }, [sharedData]);
+
+  // console.log("sharedDataFormData", sharedData);
+  console.log("formdaFormData", formdata);
 
 
   const handleInputChange = (e) => {
