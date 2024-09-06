@@ -28,6 +28,7 @@ import { useAtom } from "jotai";
 import { cookiesData, ipDataCamera } from "../../utils/atomStates";
 import { initiateSocketConfig } from "../../utils/socket";
 import PetugasPanel from "./components/PetugasPanel";
+import { getDataPetugas } from "../../services/api";
 
 const Information = () => {
 	const socket2_IO_4000 = initiateSocketConfig();
@@ -70,10 +71,6 @@ const Information = () => {
 			icon: FaRegUserCircle,
 		},
 		{
-			name: "Petugas",
-			icon: FaUserPen,
-		},
-		{
 			name: "Change Password",
 			icon: RiLockPasswordLine,
 		},
@@ -90,6 +87,9 @@ const Information = () => {
 			icon: BsPrinter,
 		},
 	];
+
+	const [filterName, setFilterName] = useState("");
+	const [dataPetugasRegister, setDataPetugasRegister] = useState([]);
 
 	const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex) => {
 		console.log("LoginKamerake", cameraIndex, ipCameraSet)
@@ -189,6 +189,7 @@ const Information = () => {
 				icon: "success",
 				title: "Data berhasil disimpan",
 			});
+			localStorage.setItem("ipServer", newWifiResults);
 			if (socket2_IO_4000.connected) {
 				socket2_IO_4000.emit("saveCameraData", data);
 			} else {
@@ -222,7 +223,35 @@ const Information = () => {
 				// alert('IP server belum dimasukkan');
 			}
 		}
+		//  else if (currentTab === 1) {
+		// 	console.log("masukesini")
+		// 	console.log("newWifiResults", newWifiResults);
+		// 	if (newWifiResults !== "") {
+		// 		console.log("masukesini")
+		// 		getDataPetugas(newWifiResults, filterName).then(response => {
+		// 			console.log("responsePetugas", response.data);
+		// 			if (response.data.status === 200) {
+		// 				console.log("dataPetugasGetIn", response.data.data);
+		// 				setDataPetugasRegister(response.data.data);
+		// 			}
+		// 		}).catch(error => {
+		// 			console.error("Error:", error);
+		// 		});
+		// 	}
+		// }
 	}, [currentTab]);
+
+	const handleFilter = (e) => {
+		getDataPetugas(newWifiResults, e).then(response => {
+			console.log("responsePetugas", response.data);
+			if (response.data.status === 200) {
+				console.log("dataPetugasGetIn", response.data.data);
+				setDataPetugasRegister(response.data.data);
+			}
+		}).catch(error => {
+			console.error("Error:", error);
+		});
+	}
 
 	const handleTakePhoto = async () => {
 		console.log("handleTakenPhoto");
@@ -266,14 +295,6 @@ const Information = () => {
 
 	useEffect(() => {
 		const getUserdata = Cookies.get('userdata');
-		const FaceToken = Cookies.get('Face-Token');
-		const FaceUsername = Cookies.get('face-username');
-		const RoleID = Cookies.get('roleId');
-		const SideBarStatus = Cookies.get('sidebarStatus');
-		const Token = Cookies.get('token');
-
-		const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
-		socket2_IO_4000.emit("startFilterUser", { CookieSend });
 		setDataUser(JSON.parse(getUserdata))
 	}, []);
 
@@ -360,7 +381,7 @@ const Information = () => {
 	}, []);
 
 	useEffect(() => {
-		if (currentTab === 5) {
+		if (currentTab === 4) {
 			handlePrint();
 			setTimeout(() => {
 				setCurrentTab(0);
@@ -419,453 +440,530 @@ const Information = () => {
 												<Table data={data} onDelete={handleDelete} />
 											</div>
 										</>
-									) : currentTab === 1 ? (
-										<div className="container-petugas-panel">
-											<PetugasPanel />
-										</div>
-									) : currentTab === 2 ? (
-										<>
-											<div className="custom-container">
-												<form
-													className="custom-form"
-													autoComplete="off"
-												>
-													<h2 className="custom-heading">
-														Change Password
-													</h2>
-													<div className="custom-input-container">
-														<label
-															htmlFor="oldPassword"
-															className="custom-label"
-														>
-															Old Password
-														</label>
-														<div className="old-pasword">
-															<input
-																type={
-																	!showOldPassword
-																		? "text"
-																		: "password"
-																}
-																name="oldPassword"
-																id="oldPassword"
-																placeholder="Enter Old Password"
-																onChange={
-																	handleOldPasswordChange
-																}
-																className="custom-input"
-															/>
-															{showOldPassword ? (
-																<IoEyeOffOutline
-																	size={25}
-																	color="black"
-																	onClick={
-																		handleShowOldPassword
-																	}
-																	style={{
-																		cursor: "pointer",
-																		marginLeft:
-																			"-2rem",
-																	}}
-																/>
-															) : (
-																<IoEyeOutline
-																	size={25}
-																	color="black"
-																	onClick={
-																		handleShowOldPassword
-																	}
-																	style={{
-																		cursor: "pointer",
-																		marginLeft:
-																			"-2rem",
-																	}}
-																/>
-															)}
-														</div>
-
-														{oldPasswordWarning && (
-															<p
-																style={{
-																	color: "red",
-																	textAlign:
-																		"start",
-																	marginTop:
-																		"0.5rem",
-																	marginBottom:
-																		"-0.5rem",
-																}}
+									)
+										// : currentTab === 1 ? (
+										// 	<div className="container-petugas-panel">
+										// 		<PetugasPanel dataUser={dataPetugasRegister} onFilter={handleFilter} />
+										// 	</div>
+										// ) 
+										: currentTab === 1 ? (
+											<>
+												<div className="custom-container">
+													<form
+														className="custom-form"
+														autoComplete="off"
+													>
+														<h2 className="custom-heading">
+															Change Password
+														</h2>
+														<div className="custom-input-container">
+															<label
+																htmlFor="oldPassword"
+																className="custom-label"
 															>
-																Old password
-																must not be
-																empty
-															</p>
-														)}
-														<label
-															htmlFor="newPassword"
-															className="custom-label"
-														>
-															New Password
-														</label>
-														<div className="old-pasword">
-															<input
-																type={
-																	!showNewPassword
-																		? "text"
-																		: "password"
-																}
-																name="newPassword"
-																id="newPassword"
-																placeholder="Enter New Password"
-																onChange={
-																	handleNewPasswordChange
-																}
-																className="custom-input"
-															/>
-															{showNewPassword ? (
-																<IoEyeOffOutline
-																	size={25}
-																	color="black"
-																	onClick={
-																		handleShowNewPassword
-																	}
-																	style={{
-																		cursor: "pointer",
-																		marginLeft:
-																			"-2rem",
-																	}}
-																/>
-															) : (
-																<IoEyeOutline
-																	size={25}
-																	color="black"
-																	onClick={
-																		handleShowNewPassword
-																	}
-																	style={{
-																		cursor: "pointer",
-																		marginLeft:
-																			"-2rem",
-																	}}
-																/>
-															)}
-														</div>
-														{newPasswordWarning && (
-															<p
-																style={{
-																	color: "red",
-																	textAlign:
-																		"start",
-																	marginTop:
-																		"0.5rem",
-																	marginBottom:
-																		"-0.5rem",
-																}}
-															>
-																New password
-																must not be
-																empty
-															</p>
-														)}
-														<label
-															htmlFor="confirmPassword"
-															className="custom-label"
-														>
-															Confirm Password
-														</label>
-														<div className="old-pasword">
-															<input
-																type={
-																	!showConfirmPassword
-																		? "text"
-																		: "password"
-																}
-																name="confirmPassword"
-																id="confirmPassword"
-																placeholder="Enter Confirm Password"
-																onChange={
-																	handleConfirmPasswordChange
-																}
-																className="custom-input"
-															/>
-															{showConfirmPassword ? (
-																<IoEyeOffOutline
-																	size={25}
-																	color="black"
-																	onClick={
-																		handleShowConfirmPassword
-																	}
-																	style={{
-																		cursor: "pointer",
-																		marginLeft:
-																			"-2rem",
-																	}}
-																/>
-															) : (
-																<IoEyeOutline
-																	size={25}
-																	color="black"
-																	onClick={
-																		handleShowConfirmPassword
-																	}
-																	style={{
-																		cursor: "pointer",
-																		marginLeft:
-																			"-2rem",
-																	}}
-																/>
-															)}
-														</div>
-														{confirmPasswordWarning && (
-															<p
-																style={{
-																	color: "red",
-																	textAlign:
-																		"start",
-																	marginTop:
-																		"0.5rem",
-																	marginBottom:
-																		"-0.5rem",
-																}}
-															>
-																Confirm password
-																must not be
-																empty
-															</p>
-														)}
-													</div>
-													<div className="custom-button-container">
-														<button
-															style={{
-																width: "30%",
-															}}
-															type="submit"
-															className="custom-button"
-														>
-															<p className="custom-button-text">
-																Save
-															</p>
-														</button>
-													</div>
-												</form>
-											</div>
-										</>
-									) : currentTab === 3 ? (
-										<>
-											<form
-												className="full-width-form"
-												onSubmit={handleSubmit}
-												style={{
-													width: "120vh",
-												}}
-											>
-												<div className="form-group">
-													<div className="wrapper-form">
-														<div className="wrapper-input">
-															<label htmlFor="ip_server_pc">
-																IP Server PC
+																Old Password
 															</label>
-														</div>
-														<input
-															type="text"
-															name="ipServerPC"
-															id="ipServerPC"
-															className={
-																newWifiResults
-																	? ""
-																	: ""
-															}
-															value={
-																newWifiResults
-															}
-															onChange={(e) =>
-																setNewWifiResults(
-																	e.target
-																		.value
-																)
-															}
-														/>
-													</div>
-												</div>
-												{dataUser.role == 1 ?
-													<div>
-														<div className="form-group">
-															<div className="wrapper-form">
-																<div className="wrapper-input">
-																	<label htmlFor="total_cameras">Jumlah Kamera</label>
-																</div>
-																<Select
-																	id="totalCameras"
-																	name="totalCameras"
-																	value={optionCameras.find(
-																		(option) => option.value === totalCameras
-																	)}
-																	onChange={handleTotalCamerasChange}
-																	options={optionCameras}
-																	className="basic-single"
-																	classNamePrefix="select"
-																	styles={{
-																		container: (provided) => ({
-																			...provided,
-																			flex: 1,
-																			width: '100%',
-																			borderRadius: '10px',
-																			backgroundColor:
-																				'rgba(217, 217, 217, 0.75)',
-																			fontFamily: 'Roboto, Arial, sans-serif',
-																		}),
-																		valueContainer: (provided) => ({
-																			...provided,
-																			flex: 1,
-																			width: '100%',
-																		}),
-																		control: (provided) => ({
-																			...provided,
-																			flex: 1,
-																			width: '100%',
-																			backgroundColor:
-																				'rgba(217, 217, 217, 0.75)',
-																		}),
-																	}}
+															<div className="old-pasword">
+																<input
+																	type={
+																		!showOldPassword
+																			? "text"
+																			: "password"
+																	}
+																	name="oldPassword"
+																	id="oldPassword"
+																	placeholder="Enter Old Password"
+																	onChange={
+																		handleOldPasswordChange
+																	}
+																	className="custom-input"
 																/>
+																{showOldPassword ? (
+																	<IoEyeOffOutline
+																		size={25}
+																		color="black"
+																		onClick={
+																			handleShowOldPassword
+																		}
+																		style={{
+																			cursor: "pointer",
+																			marginLeft:
+																				"-2rem",
+																		}}
+																	/>
+																) : (
+																	<IoEyeOutline
+																		size={25}
+																		color="black"
+																		onClick={
+																			handleShowOldPassword
+																		}
+																		style={{
+																			cursor: "pointer",
+																			marginLeft:
+																				"-2rem",
+																		}}
+																	/>
+																)}
 															</div>
-														</div>
 
-														{totalCameras > 0 && (
+															{oldPasswordWarning && (
+																<p
+																	style={{
+																		color: "red",
+																		textAlign:
+																			"start",
+																		marginTop:
+																			"0.5rem",
+																		marginBottom:
+																			"-0.5rem",
+																	}}
+																>
+																	Old password
+																	must not be
+																	empty
+																</p>
+															)}
+															<label
+																htmlFor="newPassword"
+																className="custom-label"
+															>
+																New Password
+															</label>
+															<div className="old-pasword">
+																<input
+																	type={
+																		!showNewPassword
+																			? "text"
+																			: "password"
+																	}
+																	name="newPassword"
+																	id="newPassword"
+																	placeholder="Enter New Password"
+																	onChange={
+																		handleNewPasswordChange
+																	}
+																	className="custom-input"
+																/>
+																{showNewPassword ? (
+																	<IoEyeOffOutline
+																		size={25}
+																		color="black"
+																		onClick={
+																			handleShowNewPassword
+																		}
+																		style={{
+																			cursor: "pointer",
+																			marginLeft:
+																				"-2rem",
+																		}}
+																	/>
+																) : (
+																	<IoEyeOutline
+																		size={25}
+																		color="black"
+																		onClick={
+																			handleShowNewPassword
+																		}
+																		style={{
+																			cursor: "pointer",
+																			marginLeft:
+																				"-2rem",
+																		}}
+																	/>
+																)}
+															</div>
+															{newPasswordWarning && (
+																<p
+																	style={{
+																		color: "red",
+																		textAlign:
+																			"start",
+																		marginTop:
+																			"0.5rem",
+																		marginBottom:
+																			"-0.5rem",
+																	}}
+																>
+																	New password
+																	must not be
+																	empty
+																</p>
+															)}
+															<label
+																htmlFor="confirmPassword"
+																className="custom-label"
+															>
+																Confirm Password
+															</label>
+															<div className="old-pasword">
+																<input
+																	type={
+																		!showConfirmPassword
+																			? "text"
+																			: "password"
+																	}
+																	name="confirmPassword"
+																	id="confirmPassword"
+																	placeholder="Enter Confirm Password"
+																	onChange={
+																		handleConfirmPasswordChange
+																	}
+																	className="custom-input"
+																/>
+																{showConfirmPassword ? (
+																	<IoEyeOffOutline
+																		size={25}
+																		color="black"
+																		onClick={
+																			handleShowConfirmPassword
+																		}
+																		style={{
+																			cursor: "pointer",
+																			marginLeft:
+																				"-2rem",
+																		}}
+																	/>
+																) : (
+																	<IoEyeOutline
+																		size={25}
+																		color="black"
+																		onClick={
+																			handleShowConfirmPassword
+																		}
+																		style={{
+																			cursor: "pointer",
+																			marginLeft:
+																				"-2rem",
+																		}}
+																	/>
+																)}
+															</div>
+															{confirmPasswordWarning && (
+																<p
+																	style={{
+																		color: "red",
+																		textAlign:
+																			"start",
+																		marginTop:
+																			"0.5rem",
+																		marginBottom:
+																			"-0.5rem",
+																	}}
+																>
+																	Confirm password
+																	must not be
+																	empty
+																</p>
+															)}
+														</div>
+														<div className="custom-button-container">
+															<button
+																style={{
+																	width: "30%",
+																}}
+																type="submit"
+																className="custom-button"
+															>
+																<p className="custom-button-text">
+																	Save
+																</p>
+															</button>
+														</div>
+													</form>
+												</div>
+											</>
+										) : currentTab === 2 ? (
+											<>
+												<form
+													className="full-width-form"
+													onSubmit={handleSubmit}
+													style={{
+														width: "120vh",
+													}}
+												>
+													<div className="form-group">
+														<div className="wrapper-form">
+															<div className="wrapper-input">
+																<label htmlFor="ip_server_pc">
+																	IP Server PC
+																</label>
+															</div>
+															<input
+																type="text"
+																name="ipServerPC"
+																id="ipServerPC"
+																className={
+																	newWifiResults
+																		? ""
+																		: ""
+																}
+																value={
+																	newWifiResults
+																}
+																onChange={(e) =>
+																	setNewWifiResults(
+																		e.target
+																			.value
+																	)
+																}
+															/>
+														</div>
+													</div>
+													{dataUser.role == 1 ?
+														<div>
 															<div className="form-group">
 																<div className="wrapper-form">
 																	<div className="wrapper-input">
-																		<label htmlFor="status_card_reader">Pilih Kamera</label>
+																		<label htmlFor="total_cameras">Jumlah Kamera</label>
 																	</div>
 																	<Select
-																		id="statusCardReader"
-																		name="statusCardReader"
+																		id="totalCameras"
+																		name="totalCameras"
+																		value={optionCameras.find(
+																			(option) => option.value === totalCameras
+																		)}
+																		onChange={handleTotalCamerasChange}
+																		options={optionCameras}
+																		className="basic-single"
 																		classNamePrefix="select"
-																		options={cameraOptions}
-																		onChange={handleCameraSelect}
-																		value={cameraOptions.find(option => option.value === selectedCamera)}
-																		placeholder="-- Pilih Kamera --"
 																		styles={{
 																			container: (provided) => ({
 																				...provided,
 																				flex: 1,
-																				width: "100%",
-																				borderRadius: "10px",
-																				backgroundColor: "rgba(217, 217, 217, 0.75)",
-																				fontFamily: "Roboto, Arial, sans-serif",
+																				width: '100%',
+																				borderRadius: '10px',
+																				backgroundColor:
+																					'rgba(217, 217, 217, 0.75)',
+																				fontFamily: 'Roboto, Arial, sans-serif',
+																			}),
+																			valueContainer: (provided) => ({
+																				...provided,
+																				flex: 1,
+																				width: '100%',
 																			}),
 																			control: (provided) => ({
 																				...provided,
-																				backgroundColor: "rgba(217, 217, 217, 0.75)",
+																				flex: 1,
+																				width: '100%',
+																				backgroundColor:
+																					'rgba(217, 217, 217, 0.75)',
 																			}),
 																		}}
 																	/>
 																</div>
 															</div>
-														)}
 
-														{selectedCamera && (
-															<div className="form-group">
-																<div className="wrapper-form">
-																	<div className="wrapper-input">
-																		<label htmlFor="status_camera">
-																			Masukkan IP untuk {selectedCamera}
-																		</label>
+															{totalCameras > 0 && (
+																<div className="form-group">
+																	<div className="wrapper-form">
+																		<div className="wrapper-input">
+																			<label htmlFor="status_card_reader">Pilih Kamera</label>
+																		</div>
+																		<Select
+																			id="statusCardReader"
+																			name="statusCardReader"
+																			classNamePrefix="select"
+																			options={cameraOptions}
+																			onChange={handleCameraSelect}
+																			value={cameraOptions.find(option => option.value === selectedCamera)}
+																			placeholder="-- Pilih Kamera --"
+																			styles={{
+																				container: (provided) => ({
+																					...provided,
+																					flex: 1,
+																					width: "100%",
+																					borderRadius: "10px",
+																					backgroundColor: "rgba(217, 217, 217, 0.75)",
+																					fontFamily: "Roboto, Arial, sans-serif",
+																				}),
+																				control: (provided) => ({
+																					...provided,
+																					backgroundColor: "rgba(217, 217, 217, 0.75)",
+																				}),
+																			}}
+																		/>
 																	</div>
-																	<input
-																		type="text"
-																		name="statusCamera"
-																		id="statusCamera"
-																		className="disabled-input"
-																		onChange={(e) => handleIPChange(e, selectedCameraIndex)}
-																		value={cameraIPs[selectedCameraIndex] || ''}
-																	/>
 																</div>
-															</div>
-														)}
-													</div> :
-													<div className="wrapper-form">
-														<div className="wrapper-input">
-															<label htmlFor="ip_server_camera">
-																IP Server Camera
-															</label>
-														</div>
-														<input
-															type="text"
-															name="ipServerCamera"
-															id="ipServerCamera"
-															className={
-																newWifiResults
-																	? ""
-																	: ""
-															}
-															value={
-																ipCameraRegister
-															}
-															onChange={(e) =>
-																setIpCameraRegister([...ipCameraRegister,
-																e.target
-																	.value]
-																)
-															}
-														/>
-													</div>
+															)}
 
-												}
-												<button
-													className="ok-button"
-													style={{ width: "100%" }}
+															{selectedCamera && (
+																<div className="form-group">
+																	<div className="wrapper-form">
+																		<div className="wrapper-input">
+																			<label htmlFor="status_camera">
+																				Masukkan IP untuk {selectedCamera}
+																			</label>
+																		</div>
+																		<input
+																			type="text"
+																			name="statusCamera"
+																			id="statusCamera"
+																			className="disabled-input"
+																			onChange={(e) => handleIPChange(e, selectedCameraIndex)}
+																			value={cameraIPs[selectedCameraIndex] || ''}
+																		/>
+																	</div>
+																</div>
+															)}
+														</div> :
+														<div className="wrapper-form">
+															<div className="wrapper-input">
+																<label htmlFor="ip_server_camera">
+																	IP Server Camera
+																</label>
+															</div>
+															<input
+																type="text"
+																name="ipServerCamera"
+																id="ipServerCamera"
+																className={
+																	newWifiResults
+																		? ""
+																		: ""
+																}
+																value={
+																	ipCameraRegister
+																}
+																onChange={(e) =>
+																	setIpCameraRegister([...ipCameraRegister,
+																	e.target
+																		.value]
+																	)
+																}
+															/>
+														</div>
+
+													}
+													<button
+														className="ok-button"
+														style={{ width: "100%" }}
+													>
+														Save
+													</button>
+												</form>
+											</>
+										) : currentTab === 3 ? (
+											<>
+												<div
+													style={{
+														backgroundColor: "white",
+														width: "130vh",
+														height: "70vh",
+														borderRadius: "3%",
+													}}
 												>
-													Save
-												</button>
-											</form>
-										</>
-									) : currentTab === 4 ? (
-										<>
-											<div
-												style={{
-													backgroundColor: "white",
-													width: "130vh",
-													height: "70vh",
-													borderRadius: "3%",
-												}}
-											>
-												<h1
-													className="card-title"
-													style={{ paddingTop: "5%" }}
-												>
-													Test Camera Configuration
-												</h1>
-												{streamKamera ? (
-													<>
-														<div
-															style={{
-																height: "280px",
-																display: "flex",
-																alignItems:
-																	"center",
-																justifyContent:
-																	"center",
-															}}
-														>
-															{/* {
+													<h1
+														className="card-title"
+														style={{ paddingTop: "5%" }}
+													>
+														Test Camera Configuration
+													</h1>
+													{streamKamera ? (
+														<>
+															<div
+																style={{
+																	height: "280px",
+																	display: "flex",
+																	alignItems:
+																		"center",
+																	justifyContent:
+																		"center",
+																}}
+															>
+																{/* {
 																<p>
 																	ini adalah{" "}
 																	{urlKamera}
 																</p>
 															} */}
-															<VideoPlayer
-																url={urlKamera}
-															/>
-															{/* <ReactPlayer
+																<VideoPlayer
+																	url={urlKamera}
+																/>
+																{/* <ReactPlayer
 																className="react-player"
 																url={urlKamera}
 																width="100%"
 																height="100%"
 																playing={true}
 															/> */}
-														</div>
-														<div>
+															</div>
+															<div>
+																<button
+																	className="ok-button"
+																	style={{
+																		marginLeft:
+																			"29%",
+																		marginBottom:
+																			"5%",
+																	}}
+																	onClick={
+																		handleTakePhoto
+																	}
+																>
+																	Take a face
+																	Image
+																</button>
+															</div>
+														</>
+													) : loading ? (
+														<>
+															<div
+																className="loading-container"
+																style={{
+																	padding: "15%",
+																	display: "flex",
+																	justifyContent:
+																		"center",
+																}}
+															>
+																<h2
+																	style={{
+																		color: "#3d5889",
+																	}}
+																>
+																	Please Wait...
+																</h2>
+															</div>
+														</>
+													) : (
+														<>
+															<div
+																style={{
+																	height: "280px",
+																	display: "flex",
+																	alignItems:
+																		"center",
+																	justifyContent:
+																		"center",
+																}}
+															>
+																{succesCapture ? (
+																	<>
+																		<img
+																			src={
+																				capturedImageTest
+																			}
+																			alt="wajah"
+																			style={{
+																				width: "20%",
+																			}}
+																		/>
+																	</>
+																) : (
+																	<>
+																		<img
+																			src={
+																				Face
+																			}
+																			alt="wajah"
+																			style={{
+																				width: "30%",
+																			}}
+																		/>
+																	</>
+																)}
+															</div>
 															<button
 																className="ok-button"
 																style={{
@@ -875,96 +973,21 @@ const Information = () => {
 																		"5%",
 																}}
 																onClick={
-																	handleTakePhoto
+																	startStream
 																}
 															>
-																Take a face
-																Image
+																Start Stream Camera
 															</button>
-														</div>
-													</>
-												) : loading ? (
-													<>
-														<div
-															className="loading-container"
-															style={{
-																padding: "15%",
-																display: "flex",
-																justifyContent:
-																	"center",
-															}}
-														>
-															<h2
-																style={{
-																	color: "#3d5889",
-																}}
-															>
-																Please Wait...
-															</h2>
-														</div>
-													</>
-												) : (
-													<>
-														<div
-															style={{
-																height: "280px",
-																display: "flex",
-																alignItems:
-																	"center",
-																justifyContent:
-																	"center",
-															}}
-														>
-															{succesCapture ? (
-																<>
-																	<img
-																		src={
-																			capturedImageTest
-																		}
-																		alt="wajah"
-																		style={{
-																			width: "20%",
-																		}}
-																	/>
-																</>
-															) : (
-																<>
-																	<img
-																		src={
-																			Face
-																		}
-																		alt="wajah"
-																		style={{
-																			width: "30%",
-																		}}
-																	/>
-																</>
-															)}
-														</div>
-														<button
-															className="ok-button"
-															style={{
-																marginLeft:
-																	"29%",
-																marginBottom:
-																	"5%",
-															}}
-															onClick={
-																startStream
-															}
-														>
-															Start Stream Camera
-														</button>
-													</>
-												)}
-											</div>
-										</>
-									) : (
-										<>
-											<h1>Test Printer Configuration</h1>
-											<h2>Please Wait...</h2>
-										</>
-									)}
+														</>
+													)}
+												</div>
+											</>
+										) : (
+											<>
+												<h1>Test Printer Configuration</h1>
+												<h2>Please Wait...</h2>
+											</>
+										)}
 								</>
 							)}
 						</div>

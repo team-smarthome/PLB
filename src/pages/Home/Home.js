@@ -31,7 +31,7 @@ const Home = () => {
   };
 
   const btnOnClick_Search_Passport = () => {
-    navigate("/history-log");
+    navigate("/history-register");
   };
   const deleteAllCookies = () => {
     const cookies = document.cookie.split(';');
@@ -87,7 +87,7 @@ const Home = () => {
             </div>
             <div className="div-kanan-bawah-apply" onClick={btnOnClick_Search_Passport}>
               <IoSearchSharp size={60} />
-              History Log
+              History Register
             </div>
           </div>
           <div className="div-kiri-apply" onClick={btnOnClick_Informasi}>

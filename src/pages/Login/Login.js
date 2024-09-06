@@ -56,7 +56,7 @@ const Login = () => {
       isLoading(true);
       const encodedPassword = btoa(sPassword);
       const response = await axios.post(`http://192.168.2.143:8000/api/login`, {
-        name: sUserName,
+        nip: sUserName,
         password: sPassword,
       });
       const dataRes = response.data;
