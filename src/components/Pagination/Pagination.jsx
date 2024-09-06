@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ReactPaginate from "react-paginate";
 import "./Pagination.css";
 
 const Pagination = ({ onPageChange, pageCount }) => {
-
-
   return (
     <div>
       <ReactPaginate
