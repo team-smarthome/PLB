@@ -84,3 +84,20 @@ export async function apiInsertDataUser(body, url) {
     console.error("Error:", error);
   }
 }
+
+export async function apiGetDataLogRegister(params) {
+  try {
+    const response = await axios({
+      method: "GET",
+      url: "http://192.168.2.143:8000/api/datauser",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params
+    })
+    return response;
+  } catch (error) {
+    console.log(error)
+  }
+
+}

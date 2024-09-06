@@ -8,6 +8,8 @@ import SpvLogin from "../pages/SpvLogin/SpvLogin";
 import Report from "../pages/Report/Report";
 import Swal from "sweetalert2";
 import Information from "../pages/Information/Information";
+import Validation from "../pages/Validation/Validation";
+import Cpanel from "../pages/Cpanel/Cpanel";
 
 const isAuthenticated = () => {
   const token = Cookies.get('token');
@@ -20,7 +22,8 @@ const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? (
     element
   ) : (
-    <Navigate to="/" replace state={{ from: window.location.pathname }} />
+    element
+    // <Navigate to="/" replace state={{ from: window.location.pathname }} />
   );
 };
 
@@ -33,6 +36,8 @@ const Routes = () => {
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
       <Route path="/configuration" element={<ProtectedRoute element={<Information />} />} />
+      <Route path="/validation" element={<ProtectedRoute element={<Validation />} />} />
+      <Route path="/cpanel/*" element={<Cpanel />} />
       {/* <Route path="/menu" element={<SpvLogin />} />
       <Route path="/history-log" element={<Report />} />
       <Route path="/home" element={<Home />} />
