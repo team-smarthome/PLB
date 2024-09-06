@@ -1,0 +1,71 @@
+.header-body {
+    background-color: #fff;
+    /* width: 100%; */
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.user-profile h4 {
+    font-weight: 600;
+    font-size: 18px;
+    color: #11375c;
+}
+
+.user-profile img {
+    border-radius: 50%;
+}
+
+.cpanel-content {
+    transition: all 0.5s ease;
+}
+
+.input-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.input-search-container button {
+    width: auto;
+    padding: 10px 20px;
+    height: 40px;
+    font-size: 16px;
+    max-width: 100px;
+    min-width: 80px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    background-color: #11375c;
+    color: #fff;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+/* .input-search-container button:hover {
+    background-color: #11375c;
+    color: #fff;
+} */
+
+
+.search-table-list {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.search-table span {
+    font-weight: 600;
+}
+
+.search-table input {
+    background-color: #fff;
+}
