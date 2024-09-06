@@ -32,7 +32,7 @@ const Routes = () => {
     <ReactRoutes>
       <Route path="/" element={<Login />} />
       <Route path="/menu" element={<ProtectedRoute element={<SpvLogin />} />} />
-      <Route path="/history-log" element={<ProtectedRoute element={<Report />} />} />
+      <Route path="/history-register" element={<ProtectedRoute element={<Report />} />} />
       <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
       <Route path="/apply" element={<ProtectedRoute element={<Apply />} />} />
       <Route path="/configuration" element={<ProtectedRoute element={<Information />} />} />

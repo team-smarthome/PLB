@@ -1,127 +1,74 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Report.css";
 import Table from "../../components/Table/Table";
 import Pagination from "../../components/Pagination/Pagination";
-import Select from "react-select";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import io from "socket.io-client";
-import { url_dev } from "../../services/env";
-import Cookies from 'js-cookie';
-import { getAllDataLogs } from "../../services/api";
+import { getDataUserAPI } from "../../services/api";
+import { format } from 'date-fns';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 function Report() {
-  const socket_IO = io("http://192.168.2.143:4011");
   const navigate = useNavigate();
-  const [loading, isLoading] = useState(false);
-  const currentDate = new Date(Date.now()).toISOString().split("T")[0];
-  const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [startDate, setStartDate] = useState(currentDate);
-  const [endDate, setEndDate] = useState(currentDate);
-  const [mulaiDate, setMulaiDate] = useState(new Date());
-  const [selesaiDate, setSelesaiDate] = useState(new Date());
-  const [petugas, setPetugas] = useState("");
-  const [nomorPassport, setNomorPassport] = useState("");
-  const [pages, setPages] = useState(1);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
-    value: ["KICASH", "KIOSK"],
-    label: "ALL",
+  const [loading, setIsloading] = useState(true);
+  const [startDate, setStartDate] = useState(null);
+  const [dataUser, setDataUser] = useState([]);
+  const [noPassport, setNoPassport] = useState("");
+  const [noRegister, setNoRegister] = useState("");
+  const [name, setName] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    per_page: 10,
+    current_page: 1,
+    last_page: 1,
   });
-  const perPage = 20;
-  const options = [
-    { value: "KICASH", label: "CASH" },
-    { value: "KIOSK", label: "CC" },
-    { value: ["KICASH", "KIOSK"], label: "ALL" },
-  ];
-  const [logsList, setLogsList] = useState([])
+  const [totalDataFilter, setTotalDataFilter] = useState(0);
 
-  const [petugasOptions, setPetugasOptions] = useState([]);
-  const [nomorPassportOptions, setNomorPassportOptions] = useState([]);
-
-  let payloadTempt = {};
-
-  useEffect(() => {
-    const FaceToken = Cookies.get('Face-Token');
-    const FaceUsername = Cookies.get('face-username');
-    const RoleID = Cookies.get('roleId');
-    const SideBarStatus = Cookies.get('sidebarStatus');
-    const Token = Cookies.get('token');
-
-    // const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
-    socket_IO.emit("startFilterUser");
-    // socket_IO.on("responseGetDataUserFilter", (data) => {
-    //   const dataUser = data.map((item) => ({
-    //     label: item.name,
-    //     value: item.name
-    //   }));
-    //   setPetugasOptions(dataUser);
-    //   const dataPassport = data.map((item) => ({
-    //     label: item.personNum,
-    //     value: item.personNum
-    //   }));
-    //   console.log("dataPassport:", dataPassport);
-    //   setNomorPassportOptions(dataPassport);
-    //   console.log("responseGetDataUserFilter:", data);
-
-    // });
-  }, []);
-
-  // useEffect(() => {
-  //   const FaceToken = Cookies.get('Face-Token');
-  //   const FaceUsername = Cookies.get('face-username');
-  //   const RoleID = Cookies.get('roleId');
-  //   const SideBarStatus = Cookies.get('sidebarStatus');
-  //   const Token = Cookies.get('token');
-
-  //   const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
-  //   const bodyParamsSendKamera = {
-  //     name: "",
-  //     beginTime: "-25200",
-  //     endTime: "1724086799",
-  //     type: "all",
-  //     gender: "all",
-  //     beginPosition: 0,
-  //     endPosition: 19,
-  //     limit: 20,
-  //     page: 1,
-  //     status: "all",
-  //     passState: 0,
-  //     passStatus: -1,
-  //     personCode: "",
-  //     minAge: 0,
-  //     maxAge: 100
-  //   }
-  //   socket_IO.emit("historyLog", { bodyParamsSendKamera, CookieSend });
-  // }, [])
-
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [startDate, endDate, petugas]);
-
-  const getLog = async () => {
+  const getDataUser = async (params) => {
     try {
-      const res = await getAllDataLogs();
-      if (res.status == 200) {
-        setLogsList(res.data.records)
-      }
+      const response = await getDataUserAPI(params);
+      setIsloading(false);
+      setDataUser(response.data.data);
+      setPagination(response.data.pagination);
+      setTotalDataFilter(response.data.data.length);
     } catch (error) {
-      console.log(error)
+      setIsloading(false);
+      console.error("Error:", error);
     }
-  }
-  useEffect(() => {
-    getLog()
-  }, [])
-
-  const handlePageClick = (selectedPage) => {
-    setCurrentPage(selectedPage);
   };
+
+  const handleApplyFilter = () => {
+    const formattedStartDate = startDate ? format(startDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx") : null;
+
+    const filterParams = {
+      page: page,
+      no_passport: noPassport,
+      name: name,
+      no_register: noRegister,
+      ...(formattedStartDate && { arrival_time: formattedStartDate })
+    };
+
+    console.log("filterParams", filterParams);
+    setIsloading(true);
+    getDataUser(filterParams);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const filterParams = {
+        page: page,
+        no_passport: noPassport,
+        name: name,
+        no_register: noRegister,
+      };
+      await getDataUser(filterParams);
+    };
+
+    fetchData();
+  }, []);
 
   const generatePDF = () => {
     const pdf = new jsPDF();
@@ -134,41 +81,36 @@ function Report() {
     )} ${currentDate.toLocaleTimeString("en-US", { hour12: true })}`;
 
     pdf.setFontSize(fontSize);
-
-    pdf.text(`Reconciliation Date: ${startDate} - ${endDate}`, 16, 20);
+    pdf.text(`Laporan Data User`, 10, 10);
 
     const itemHeaders = [
       "No",
-      "Date",
-      "Register No.",
-      "Full Name",
-      "Passport No.",
+      "No. PLB",
+      "No. Register",
+      "Nama",
+      "Tanggal Lahir",
+      "Jenis Kelamin",
       "Nationality",
-      "Visa Number",
-      "Receipt",
-      "Type",
-      "Billed Price",
+      "Arrival Time",
+      "Expired Date",
+      "Destination Location",
     ];
-    const itemRows = data.map((item, index) => [
+    const itemRows = dataUser.map((item, index) => [
       index + 1,
-      `${item.timestamp}`,
-      `${item.register_number}`,
-      `${item.full_name}`,
-      `${item.passport_number}`,
-      `${item.citizenship}`,
-      `${item.visa_number}`,
-      `${item.receipt}`,
-      `${item.payment_method}`,
-      new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      }).format(item.billed_price),
+      `${item.no_passport}`,
+      `${item.no_register}`,
+      `${item.name}`,
+      `${item.date_of_birth}`,
+      `${item.gender}`,
+      `${item.nationality}`,
+      `${item.arrival_time}`,
+      `${item.expired_date}`,
+      `${item.destination_location}`,
     ]);
-
-
 
     pdf.autoTable({
       head: [itemHeaders],
+      body: itemRows,
       startY: 30,
       styles: {
         fontSize: 5,
@@ -186,31 +128,31 @@ function Report() {
     // Add column headers
     const headers = [
       "No",
-      "Date",
-      "Register No.",
-      "Full Name",
-      "Passport No.",
+      "No. PLB",
+      "No. Register",
+      "Nama",
+      "Tanggal Lahir",
+      "Jenis Kelamin",
       "Nationality",
-      "Visa Number",
-      "Receipt",
-      "Type",
-      "Billed Price",
+      "Arrival Time",
+      "Expired Date",
+      "Destination Location",
     ];
     worksheet.addRow(headers);
 
     // Add data rows
-    data.forEach((item, index) => {
+    dataUser.forEach((item, index) => {
       const row = [
         index + 1,
-        item.timestamp,
-        item.register_number,
-        item.full_name,
-        item.passport_number,
-        item.citizenship,
-        item.visa_number,
-        item.receipt,
-        item.payment_method,
-        item.billed_price.split(".")[0],
+        `${item.no_passport}`,
+        `${item.no_register}`,
+        `${item.name}`,
+        `${item.date_of_birth}`,
+        `${item.gender}`,
+        `${item.nationality}`,
+        `${item.arrival_time}`,
+        `${item.expired_date}`,
+        `${item.destination_location}`,
       ];
       worksheet.addRow(row);
     });
@@ -222,7 +164,7 @@ function Report() {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
-      const filename = `Payment_Report_${startDate}_${endDate}.xlsx`;
+      const filename = "History Register Report.xlsx";
       if (window.navigator && window.navigator.msSaveOrOpenBlob) {
         // For IE
         window.navigator.msSaveOrOpenBlob(blob, filename);
@@ -240,241 +182,93 @@ function Report() {
     });
   };
 
-  const storage = JSON.parse(localStorage.getItem("user"));
-  const name = storage?.fullName;
-
-  const handleLogout = async () => {
-    // Menampilkan konfirmasi alert ketika tombol logout diklik menggunakan SweetAlert2
-    const result = await Swal.fire({
-      title: "Are you sure want to logout?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#3D5889",
-      cancelButtonColor: "#d33",
+  const resetFilter = () => {
+    setNoPassport("");
+    setName("");
+    setNoRegister("");
+    setStartDate(null);
+    setPage(1);
+    setPagination({
+      total: 0,
+      per_page: 10,
+      current_page: 1,
+      last_page: 1,
     });
-
-    if (result.isConfirmed) {
-      // Proses logout di sini (hapus localStorage, dll.)
-      navigate("/");
-      localStorage.removeItem("user");
-      localStorage.removeItem("JwtToken");
-      localStorage.removeItem("cardNumberPetugas");
-      localStorage.removeItem("key");
-      localStorage.removeItem("token");
-      localStorage.removeItem("jenisDeviceId");
-      localStorage.removeItem("deviceId");
-      localStorage.removeItem("airportId");
-      localStorage.removeItem("price");
-    }
-  };
-
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-  useEffect(() => {
-    setStartDate(Math.floor(new Date(startDate).getTime() / 1000).toString());
-    setEndDate(Math.floor(new Date(endDate).getTime() / 1000).toString());
-  }, []);
-
-  console.log("startDate:", startDate);
-
-  const handleChangeStartDate = (date) => {
-    setMulaiDate(date);
-    const formattedDate = formatDate(date);
-    const epochDate = Math.floor(new Date(formattedDate).getTime() / 1000).toString();
-    console.log("Tanggal_dipilih:", epochDate);
-    setStartDate(epochDate);
-  };
-
-  const handleChangeEndDate = (date) => {
-    setSelesaiDate(date);
-    const formattedDate = formatDate(date);
-    const epochDateEnd = Math.floor(new Date(formattedDate).getTime() / 1000).toString();
-    console.log("Tanggal_dipilih:", epochDateEnd);
-    setEndDate(epochDateEnd);
-  };
-
-  const handleSubmitFilter = async () => {
-    console.log("SubmitstartDate:", startDate);
-    console.log("SubmitendDate:", endDate);
-    console.log("Submitpetugas:", petugas);
-    console.log("SubmitnomorPassport:", nomorPassport);
-    const FaceToken = Cookies.get('Face-Token');
-    const FaceUsername = Cookies.get('face-username');
-    const RoleID = Cookies.get('roleId');
-    const SideBarStatus = Cookies.get('sidebarStatus');
-    const Token = Cookies.get('token');
-
-    const CookieSend = `Face-Token=${FaceToken}; face-username=${FaceUsername}; roleId=${RoleID}; sidebarStatus=${SideBarStatus}; token=${Token}`
-    const bodyParamsSendFilter = {
-      name: "",
-      beginTime: startDate,
-      endTime: endDate,
-      type: "all",
-      gender: "all",
-      beginPosition: 0,
-      endPosition: 19,
-      limit: 20,
-      page: 1,
-      status: "all",
-      passState: 0,
-      passStatus: -1,
-      personCode: nomorPassport,
-      minAge: 0,
-      maxAge: 100
-    }
-    console.log(bodyParamsSendFilter, "bodyParamsSendFilter")
-    socket_IO.emit("historyLog", { bodyParamsSendFilter });
-    socket_IO.on("responseGetDataUser", (data) => {
-      console.log("responseGetDataUser:", data);
-      setData(data.matchList);
-      setPages(data.numOfMatches);
-    });
+    setIsloading(true);
+    const fetchData = async () => {
+      const filterParams = {
+        page: 1,
+        no_passport: "",
+        name: "",
+        no_register: null,
+      };
+      await getDataUser(filterParams);
+    };
+    fetchData();
   }
 
   return (
     <div className="body">
-      <h1>History Log</h1>
-      <div className="header-combo">
-        <form action="#" method="POST" className="form-filter">
-          <label htmlFor="tanggalAwal">Tanggal Awal</label>
-          <DatePicker
-            selected={mulaiDate}
-            onChange={handleChangeStartDate}
-            showTimeSelect
-            timeFormat="HH:mm"
-            dateFormat="dd/MM/yyyy HH:mm"
-            className="date-picker"
-            timeIntervals={1}
-          />
-
-          <label htmlFor="tanggalAkhir">Tanggal Akhir</label>
-          <DatePicker
-            selected={selesaiDate}
-            onChange={handleChangeEndDate}
-            showTimeSelect
-            timeIntervals={1}
-            timeFormat="HH:mm"
-            dateFormat="dd/MM/yyyy HH:mm"
-            className="date-picker"
-          />
-          <label htmlFor="petugas">Nama</label>
-          <div className="select-petugas">
-            <Select
-              id="petugas"
-              value={petugas.value}
-              onChange={(selectedOption) => setPetugas(selectedOption.value)}
-              options={logsList.map(data => ({
-                label: data.name,
-                value: data.name,
-              }))}
-              className="basic-single"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                }),
-              }}
-            />
+      <h1>History Register</h1>
+      <div className="container-filter">
+        <div className="filter-top">
+          <div className="filter-rigth">
+            <div className="input-filter-top">
+              <p>No. PLB</p>
+              <input
+                type="text"
+                placeholder="Nomor PLB"
+                value={noPassport}
+                onChange={(e) => setNoPassport(e.target.value)}
+              />
+            </div>
+            <div className="input-filter-bottom">
+              <p>Nama Lengkap</p>
+              <input
+                type="text"
+                placeholder="Nama Lengkap"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
           </div>
-
-          <label htmlFor="petugas">Nomor Register</label>
-          <div className="select-petugas">
-            <Select
-              id="petugas"
-              value={
-                nomorPassport.value
-              }
-              onChange={(selectedOption) => setNomorPassport(selectedOption.value)}
-              options={logsList.map(data => ({
-                label: data.no_register,
-                value: data.no_register,
-              }))}
-              className="basic-single"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
-                }),
-              }}
-            />
-          </div>
-          <button
-            type="button"
-            className="handle-sumbit-bg"
-            onClick={handleSubmitFilter}
-          >
-            Submit
-          </button>
-        </form>
-      </div>
-      <div className="content">
-        <div className="table-header">
-          <div className="combo">
-            <button className="menu" onClick={() => navigate("/home")}>
-              Home
-            </button>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: "2vh",
-              flexDirection: "row-reverse",
-            }}
-          >
-            <button
-              className="print-pdf"
-              disabled={data.length === 0 ? true : false}
-              onClick={() => generatePDF()}
-            >
-              Cetak PDF
-            </button>
-            <button
-              className="print-excel"
-              disabled={data.length === 0 ? true : false}
-              onClick={() => generateExcel()}
-            >
-              Cetak Excel
-            </button>
+          <div className="filter-left">
+            <div className="input-filter-top2">
+              <p>No. Register</p>
+              <input
+                type="text"
+                placeholder="Nomor Register"
+                value={noRegister}
+                onChange={(e) => setNoRegister(e.target.value)}
+              />
+            </div>
+            <div className="input-filter-bottom2">
+              <p>Tanggal Lahir</p>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                dateFormat="dd/MM/yyyy HH:mm"
+                className="date-picker"
+                timeIntervals={1}
+              />
+            </div>
           </div>
         </div>
+        <div className="filter-bottom">
+          <div className="button-filter-first">
+            <button onClick={() => { navigate("/home") }}>Home</button>
+            <button className="" disabled={dataUser.length === 0 ? true : false} onClick={() => generatePDF()}>Cetak PDF</button>
+            <button className="" disabled={dataUser.length === 0 ? true : false} onClick={() => generateExcel()} >Cetak Excel</button>
+          </div>
+          <div className="button-filter-second">
+            <button onClick={resetFilter}>Reset</button>
+            <button onClick={handleApplyFilter}>Terapkan</button>
+          </div>
+        </div>
+      </div>
+      <div className="content">
         {loading ? (
           <div className={"content-loading"}>
             <div className="loader-report-spin">
@@ -483,11 +277,12 @@ function Report() {
           </div>
         ) : (
           <>
-            <Table data={data} page={currentPage} />
+            <Table data={dataUser} page={pagination.current_page} perPage={pagination.per_page} />
             <div className="table-footer">
+              <p>Menampilkan {totalDataFilter} data dari Total Data{pagination.total}</p>
               <Pagination
-                onPageChange={handlePageClick}
-                pageCount={Math.ceil(pages / perPage)}
+                pageCount={pagination.last_page}
+                onPageChange={(selectedPage) => setPage(selectedPage)}
               />
             </div>
           </>

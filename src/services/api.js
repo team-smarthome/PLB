@@ -1,5 +1,5 @@
 import axios from "axios";
-import { url_dev } from "./env";
+import { url_dev, url_devel } from "./env";
 
 export async function apiPaymentHistory(header, body) {
   const apiUrl = `${url_dev}HistoryTransaction.php`;
@@ -100,4 +100,33 @@ export async function apiGetDataLogRegister(params) {
     console.log(error)
   }
 
-}
+  export const getDataPetugas = async (url, searchName) => {
+    try {
+      const response = await axios.get(`http://${url}:8000/api/users`, {
+        params: {
+          name: searchName
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  export const getDataUserAPI = async (filterParams) => {
+    console.log("filterParams2", filterParams);
+    try {
+      const response = await axios.get(`${url_devel}datauser`, {
+        params: filterParams,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }

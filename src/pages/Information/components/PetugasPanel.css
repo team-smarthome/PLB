@@ -1,0 +1,140 @@
+.container-petugas-panel-component {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3% 5% 3% 5%;
+    /* top right bottom left*/
+    margin: 2% 2% 0 2%;
+    background-color: white;
+    border-radius: 1rem;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.header-search {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    /* background-color: red; */
+}
+
+.search-username {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    height: 60%;
+}
+
+
+.search-button {
+    background-color: #337AB7;
+    color: white;
+    padding: 2.2%;
+    display: flex;
+    gap: 0.5rem;
+}
+
+
+.search-button:hover {
+    cursor: pointer;
+    background-color: #286090;
+}
+
+
+.search-username input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    height: 60%;
+}
+
+.button-style {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+
+.title-container {
+    margin-top: 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+    text-align: center;
+}
+
+/* td:first-child {
+    text-align: center;
+}
+
+td:last-child {
+    text-align: center;
+} */
+
+
+tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #e9e9e9;
+}
+
+.button-style-petugas {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-style {
+    background-color: #337AB7;
+    padding: 2%;
+    display: flex;
+    gap: 0.5rem;
+    /* flex-direction: row; */
+}
+
+.delete-style {
+    background-color: #D9534F;
+    padding: 2%;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-style:hover {
+    cursor: pointer;
+    background-color: #286090;
+}
+
+.delete-style:hover {
+    cursor: pointer;
+    background-color: #C9302C;
+}
