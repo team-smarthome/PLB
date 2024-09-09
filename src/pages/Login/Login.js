@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import "./LoginStyle.css";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
 import Cookies from 'js-cookie';
-import { url_dev } from "../../services/env";
-// import { Spinner } from "flowbite-react";
-
+import { url_devel } from "../../services/env";
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [sUserName, setUsername] = useState("");
@@ -18,27 +16,8 @@ const Login = () => {
   };
 
   const [loading, isLoading] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
 
-  useEffect(() => {
-    // handleMaintenance();
-    const handleOnline = () => {
-      setIsOnline(true);
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
 
   const version = "3.0.5";
 
@@ -54,28 +33,14 @@ const Login = () => {
     e.preventDefault();
     try {
       isLoading(true);
-      const encodedPassword = btoa(sPassword);
-      const response = await axios.post(`http://192.168.2.143:8000/api/login`, {
+      const response = await axios.post(`${url_devel}login`, {
         nip: sUserName,
         password: sPassword,
       });
       const dataRes = response.data;
       console.log(dataRes, "respinsehitapi");
-      let authUser = ""
-      if (dataRes.status == 200) {
+      if (dataRes.status === 200) {
         isLoading(false);
-        // if (dataRes.data.auth === 0) {
-        //   authUser = "admin";
-        // } else {
-        //   authUser = "user";
-        // }
-        // Cookies.set('token', dataRes.data.token, { expires: 1, domain: '192.168.2.127' });
-        // Cookies.set('sidebarStatus', dataRes.data.status, { expires: 1, domain: '192.168.2.127' });
-        // Cookies.set('roleId', dataRes.data.auth, { expires: 1, domain: '192.168.2.127' });
-        // Cookies.set('face-username', authUser, { expires: 1, domain: '192.168.2.127' });
-        // Cookies.set('Face-Token', dataRes.data.token, { expires: 1, domain: '192.168.2.127' });
-
-
         Cookies.set('token', dataRes.token, { expires: 1 });
         Cookies.set('userdata', JSON.stringify(dataRes.user), { expires: 1 });
         Toast.fire({
@@ -86,13 +51,6 @@ const Login = () => {
       }
     } catch (error) {
       isLoading(false);
-      // localStorage.removeItem("JwtToken");
-      // if (error.response && error.response.status === 401) {
-      //   Toast.fire({
-      //     icon: "error",
-      //     title: "Username or Password is Wrong",
-      //   });
-      // }
     }
   };
 
