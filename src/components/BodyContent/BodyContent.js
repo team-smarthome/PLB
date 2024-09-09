@@ -22,7 +22,8 @@ const BodyContent = ({
   setShareDataPaymentProps,
   dataNumberPermohonan,
   FailedMessage,
-  sendDataToParent1
+  sendDataToParent1,
+  isShowHeader = true
 }) => {
   const [sharedData, setSharedData] = useState({
     passportData: null,
