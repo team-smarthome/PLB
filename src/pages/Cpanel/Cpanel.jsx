@@ -1,17 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/sidebar/sidebar';
 import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import LogRegister from '../LogRegister/LogRegister';
 import LogFaceReg from '../LogFaceReg/LogFaceReg';
 import { RiMenu3Fill } from "react-icons/ri";
+import Cookies from 'js-cookie';
 import './cpanel.style.css'
 import ario from '../../assets/images/ario.jpeg'
 import UserManagement from '../UserManagement/UserManagement';
 const Cpanel = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [userData, setUserData] = useState({})
     const handleSidebarToggle = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+
+    const getUserData = async () => {
+        const user = await Cookies.get('userdata')
+        setUserData(JSON.parse(user))
+    }
+
+    useEffect(() => {
+        getUserData()
+    }, [])
+    function handleSplitName(name) {
+        if (name) {
+            const splitName = name.split(' ')
+                .slice(0, 3)
+                .map(word => word[0])
+                .join('')
+            return splitName
+        }
+    }
     return (
         <div style={{
             display: isSidebarOpen ? 'flex' : "",
@@ -34,8 +54,12 @@ const Cpanel = () => {
                         onClick={handleSidebarToggle}
                     />
                     <div className="user-profile">
-                        <img src={ario} alt="" width={55} height={55} />
-                        <h4>Ario Prima</h4>
+                        {/* <img src={ario} alt="" width={55} height={55} /> */}
+                        <div className="circle-container">
+                            <span className="circle">{handleSplitName(userData?.petugas?.nama_petugas)}</span>
+                        </div>
+
+                        <h4>{userData?.petugas?.nama_petugas}</h4>
                     </div>
                 </div>
                 <ReactRoutes>

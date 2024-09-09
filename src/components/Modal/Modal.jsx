@@ -8,7 +8,8 @@ const Modals = ({
     headerName,
     buttonName,
     width,
-    children
+    children,
+    onConfirm = () => { },
 }) => {
     const [animationState, setAnimationState] = useState(false);
 
@@ -65,7 +66,7 @@ const Modals = ({
                     className="button-container"
                 >
                     <Button onClick={close}>Cancel</Button>
-                    <Button>{buttonName}</Button>
+                    <Button onClick={onConfirm}>{buttonName}</Button>
                 </div>
             </div>
         </div>
