@@ -38,25 +38,25 @@ const Sidebar = ({ isOpen }) => {
                             <span className="link_name">Log</span>
                         </a>
                         <FaChevronDown
-                            onClick={() => handleMenuToggle("category")}
+
                             color="#fff"
                             size={25}
                             style={{ cursor: 'pointer' }}
                         />
                     </div>
-                    {menuOpen.category && (
-                        <ul
-                            className="sub-menu-link"
-                        >
-                            <Link to='/cpanel/log-register' className="link">
-                                <a >Log Register</a>
-                            </Link>
-                            <Link to='/cpanel/log-facereg' className="link">
-                                <a >Log Facereg</a>
-                            </Link>
-                        </ul>
-                    )}
                 </li>
+                {menuOpen.category && (
+                    <ul
+                        className="sub-menu-link"
+                    >
+                        <Link to='/cpanel/log-register' className="link">
+                            <a >Log Register</a>
+                        </Link>
+                        <Link to='/cpanel/log-facereg' className="link">
+                            <a >Log Facereg</a>
+                        </Link>
+                    </ul>
+                )}
             </ul>
         </div>
     );

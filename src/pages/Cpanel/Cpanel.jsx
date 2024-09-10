@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/sidebar/sidebar';
-import { Route, Routes as ReactRoutes } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useNavigate } from 'react-router-dom';
 import LogRegister from '../LogRegister/LogRegister';
 import LogFaceReg from '../LogFaceReg/LogFaceReg';
 import { RiMenu3Fill } from "react-icons/ri";
@@ -9,8 +9,10 @@ import './cpanel.style.css'
 import ario from '../../assets/images/ario.jpeg'
 import UserManagement from '../UserManagement/UserManagement';
 const Cpanel = () => {
+    const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [userData, setUserData] = useState({})
+    const [showUserButton, setShowUserButton] = useState(false)
     const handleSidebarToggle = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
@@ -31,6 +33,12 @@ const Cpanel = () => {
                 .join('')
             return splitName
         }
+    }
+
+    const handleLogout = () => {
+        Cookies.remove('token')
+        Cookies.remove('userdata')
+        navigate('/')
     }
     return (
         <div style={{
@@ -53,7 +61,7 @@ const Cpanel = () => {
                         style={{ cursor: 'pointer' }}
                         onClick={handleSidebarToggle}
                     />
-                    <div className="user-profile">
+                    <div className="user-profile" onClick={() => setShowUserButton(!showUserButton)}>
                         {/* <img src={ario} alt="" width={55} height={55} /> */}
                         <div className="circle-container">
                             <span className="circle">{handleSplitName(userData?.petugas?.nama_petugas)}</span>
@@ -61,6 +69,9 @@ const Cpanel = () => {
 
                         <h4>{userData?.petugas?.nama_petugas}</h4>
                     </div>
+                    {showUserButton && <div className="user-button-list">
+                        <button onClick={handleLogout}>Logout</button>
+                    </div>}
                 </div>
                 <ReactRoutes>
                     <Route path="/log-register" element={<LogRegister />} />
