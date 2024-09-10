@@ -4,7 +4,7 @@ import DataContext from "../../context/DataContext";
 
 const CardListValidation = ({ status, setStatus }) => {
   console.log(status, "status")
-  const [listData, setListData] = useState(["Passport Photo"]);
+  const [listData, setListData] = useState(["Data User"]);
   // console.log("DataStatus", data);
 
   return (
