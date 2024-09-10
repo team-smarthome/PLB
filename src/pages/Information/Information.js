@@ -300,6 +300,12 @@ const Information = () => {
 		console.log(JSON.parse(getUserdata), 'hasildaricookie')
 	}, []);
 
+	const DataUser = {
+		nip: dataUser?.nip,
+		fullName: dataUser?.petugas?.nama_petugas,
+		jabatan: dataUser?.jabatan?.nama_jabatan,
+	};
+
 	useEffect(() => {
 		socket2_IO_4000.on("DataIPCamera", (data) => {
 			setIpCameraRegister(data.ipCamera);
@@ -438,8 +444,23 @@ const Information = () => {
 								<>
 									{currentTab === 0 ? (
 										<>
+											<div className="profile_atas">
+												<img src={Profile} alt="profile_icons" />
+											</div>
 											<div className="kotak-profile">
-												<Table data={data} onDelete={handleDelete} />
+												<div className="profile-key">
+													<div className="profile-title">Nip</div>
+													<div className="profile-title">Nama</div>
+													<div className="profile-title">Jabatan</div>
+												</div>
+												<div className="profile-value">
+													<div className="profile-name">: {DataUser.nip}</div>
+													<div className="profile-email">: {DataUser.fullName}</div>
+													<div className="profile-office-city">
+														: {DataUser.jabatan}
+													</div>
+
+												</div>
 											</div>
 										</>
 									)
@@ -712,7 +733,7 @@ const Information = () => {
 															/>
 														</div>
 													</div>
-													{dataUser.role == 1 ?
+													{dataUser.role === 1 ?
 														<div>
 															<div className="form-group">
 																<div className="wrapper-form">
