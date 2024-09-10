@@ -183,8 +183,9 @@ const Information = () => {
 		} else {
 			const data = {
 				ipServerPC: newWifiResults,
-				ipServerCamera: ipCameraRegister,
+				ipServerCamera: [ipCameraRegister],
 			};
+			console.log(data, "datanya")
 			Toast.fire({
 				icon: "success",
 				title: "Data berhasil disimpan",
@@ -826,9 +827,9 @@ const Information = () => {
 																	ipCameraRegister
 																}
 																onChange={(e) =>
-																	setIpCameraRegister([...ipCameraRegister,
-																	e.target
-																		.value]
+																	setIpCameraRegister(
+																		e.target
+																			.value
 																	)
 																}
 															/>
