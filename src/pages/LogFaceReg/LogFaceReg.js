@@ -7,7 +7,7 @@ import { io } from 'socket.io-client'
 const LogFaceReg = () => {
     const [logData, setLogData] = useState([])
     const navigate = useNavigate()
-    const socket_IO = io("http://192.168.2.143:4020");
+    const socket_IO = io("http://192.168.2.100:4020");
     useEffect(() => {
         socket_IO.on("responseHistoryLogs", (data) => {
             if (data.length > 0) {

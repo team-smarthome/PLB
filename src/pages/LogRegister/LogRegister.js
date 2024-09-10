@@ -72,7 +72,7 @@ const LogRegister = () => {
             <td>{row.nationality}</td>
             <td>
                 <img
-                    src={`http://192.168.2.143:8000/storage/${row.profile_image}`}
+                    src={`http://192.168.2.100:8000/storage/${row.profile_image}`}
                     alt="Profile"
                     width={100}
                     height={100}

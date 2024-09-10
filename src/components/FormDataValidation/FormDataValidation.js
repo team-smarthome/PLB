@@ -6,25 +6,6 @@ import dataNegara from "../../utils/dataNegara";
 import NoProfile from '../../assets/images/no-profile-picture.svg'
 
 const FormDataValidation = ({ setSharedData, dataLogs }) => {
-  // PLB / BCP Number
-  const [isCheckedPassportNumber, setIsCheckedPassportNumber] = useState(false);
-  //Registrasion Number
-  const [isCheckedRegisterCode, setIsCheckedRegisterCode] = useState(false);
-  // fullName
-  const [isCheckedFullName, setIsCheckedFullName] = useState(false);
-  // dateOfBirth
-  const [isCheckedDateOfBirth, setIsCheckedDateOfBirth] = useState(false);
-  // gender
-  const [isCheckedGender, setIsCheckedGender] = useState(false);
-  //nationality
-  const [isCheckedNationality, setIsCheckedNationality] = useState(false);
-  // expiryDate
-  const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
-  // arrivalTime
-  const [isCheckedArrivalTime, setIsCheckedArrivalTime] = useState(false);
-  // destinationLocation
-  const [isCheckedDestinationLocation, setIsCheckedDestinationLocation] = useState(false);
-
   const [optionNegara, setOptionNegara] = useState(dataNegara.data.map((negara) => ({
     value: negara.id_negara,
     label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
@@ -343,7 +324,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
               <div className="photo-box">
                 <img
                   className={formdata.photo ? "" : "no-image"}
-                  src={formdata.photo ? `http://192.168.2.143:8000/storage/${formdata.photo}` : NoProfile}
+                  src={formdata.photo ? `http://192.168.2.100:8000/storage/${formdata.photo}` : NoProfile}
                   alt="Profile"
                 />
               </div>

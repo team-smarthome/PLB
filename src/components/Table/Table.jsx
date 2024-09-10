@@ -1,13 +1,19 @@
 import React from "react";
 import "./Table.css";
+import { useNavigate } from "react-router-dom";
+import dataNegara from "../../utils/dataNegara";
 
 const Table = ({ data, page, perPage }) => {
+  const navigate = useNavigate();
 
+  const handleRowClick = (item) => {
+    // Kirim data yang diklik ke halaman detail
+    navigate("/validation", { state: item });
+  };
 
   if (!Array.isArray(data) || data.length === 0) {
     return <div>No data available.</div>;
   }
-
   return (
     <div>
       <table className="custom-table">
@@ -23,25 +29,35 @@ const Table = ({ data, page, perPage }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td>{(page - 1) * perPage + index + 1}</td>
-              <td>{item.no_passport}</td>
-              <td>{item.no_register}</td>
-              <td>{item.name}</td>
-              <td>{item.nationality}</td>
-              <td>{item.arrival_time}</td>
-              <td>
-                <img
-                  src={`http://192.168.2.143:8000/storage/${item.profile_image}`}
-                  alt="Foto Profile"
-                  width="80"
-                  height="80"
-                  style={{ borderRadius: "100%" }}
-                />
-              </td>
-            </tr>
-          ))}
+          {data.map((item, index) => {
+            const findNationality = dataNegara.data.find(
+              (dataNegaraItem) => dataNegaraItem.id_negara === item.nationality
+            );
+
+            return (
+              <tr
+                key={index}
+                onClick={() => handleRowClick(item)}
+                style={{ cursor: "pointer" }}
+              >
+                <td>{(page - 1) * perPage + index + 1}</td>
+                <td>{item.no_passport}</td>
+                <td>{item.no_register}</td>
+                <td>{item.name}</td>
+                <td>{findNationality ? `${findNationality.id_negara}-${findNationality.deskripsi_negara}` : "Unknown"}</td>
+                <td>{item.arrival_time}</td>
+                <td>
+                  <img
+                    src={`http://192.168.2.100:8000/storage/${item.profile_image}`}
+                    alt="Foto Profile"
+                    width="80"
+                    height="80"
+                    style={{ borderRadius: "100%" }}
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
