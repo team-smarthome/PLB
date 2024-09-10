@@ -99,34 +99,35 @@ export async function apiGetDataLogRegister(params) {
   } catch (error) {
     console.log(error)
   }
+}
 
-  export const getDataPetugas = async (url, searchName) => {
-    try {
-      const response = await axios.get(`http://${url}:8000/api/users`, {
-        params: {
-          name: searchName
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
-      return response;
-    } catch (error) {
-      console.error("Error:", error);
-    }
+export const getDataPetugas = async (url, searchName) => {
+  try {
+    const response = await axios.get(`http://${url}:8000/api/users`, {
+      params: {
+        name: searchName
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error:", error);
   }
+}
 
-  export const getDataUserAPI = async (filterParams) => {
-    console.log("filterParams2", filterParams);
-    try {
-      const response = await axios.get(`${url_devel}datauser`, {
-        params: filterParams,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
-      return response;
-    } catch (error) {
-      console.error("Error:", error);
-    }
+export const getDataUserAPI = async (filterParams) => {
+  console.log("filterParams2", filterParams);
+  try {
+    const response = await axios.get(`${url_devel}datauser`, {
+      params: filterParams,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error:", error);
   }
+}
