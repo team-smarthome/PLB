@@ -1,6 +1,7 @@
 import axios from "axios";
 import { url_dev, url_devel } from "./env";
 
+const baseUrl = "http://192.168.2.100:8000/api"
 export async function apiPaymentHistory(header, body) {
   const apiUrl = `${url_dev}HistoryTransaction.php`;
   const headers = header;
@@ -89,7 +90,7 @@ export async function apiGetDataLogRegister(params) {
   try {
     const response = await axios({
       method: "GET",
-      url: "http://192.168.2.143:8000/api/datauser",
+      url: `${baseUrl}/datauser`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -100,7 +101,6 @@ export async function apiGetDataLogRegister(params) {
     console.log(error)
   }
 }
-
 export const getDataPetugas = async (url, searchName) => {
   try {
     const response = await axios.get(`http://${url}:8000/api/users`, {
@@ -129,5 +129,67 @@ export const getDataUserAPI = async (filterParams) => {
     return response;
   } catch (error) {
     console.error("Error:", error);
+  }
+}
+
+export const getAllPetugas = async (params, page) => {
+  try {
+    const res = await axios({
+      method: "get",
+      url: `${baseUrl}/users`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: { ...params, page }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const InsertPetugas = async (payload) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${baseUrl}/register`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const UpdatePetugas = async (id, payload) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${baseUrl}/users/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const DeletePetugas = async (id) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${baseUrl}/users/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
   }
 }
