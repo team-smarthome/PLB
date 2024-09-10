@@ -2,6 +2,7 @@ import React from "react";
 import "./Table.css";
 import { useNavigate } from "react-router-dom";
 import dataNegara from "../../utils/dataNegara";
+import { url_devel } from "../../services/env";
 
 const Table = ({ data, page, perPage }) => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const Table = ({ data, page, perPage }) => {
                 <td>{item.arrival_time}</td>
                 <td>
                   <img
-                    src={`http://192.168.2.100:8000/storage/${item.profile_image}`}
+                    src={`${url_devel}storage/${item.profile_image}`}
                     alt="Foto Profile"
                     width="80"
                     height="80"

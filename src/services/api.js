@@ -120,7 +120,7 @@ export const getDataPetugas = async (url, searchName) => {
 export const getDataUserAPI = async (filterParams) => {
   console.log("filterParams2", filterParams);
   try {
-    const response = await axios.get(`${url_devel}datauser`, {
+    const response = await axios.get(`${url_devel}api/datauser`, {
       params: filterParams,
       headers: {
         'Content-Type': 'application/json'

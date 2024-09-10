@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import { url_socket } from '../services/env';
 
 let socket;
 
@@ -74,11 +75,11 @@ export const initiateSocketConfig = () => {
 
 export const initiateSocket4010 = () => {
     if (!socket4010) {
-        if (!ipServer) {
+        if (!url_socket) {
             console.log('testWebsocket4010 ipServer tidak ada');
             return;
         }
-        socket4010 = io(`http://${ipServer}:4010`);
+        socket4010 = io(`${url_socket}:4010`);
         socket4010.on('connect', () => {
             console.log('testWebsocket4010 Socket connection established');
 
@@ -123,7 +124,7 @@ const sendTakePhotoRequest4010 = (data) => {
 
 export const initiateSocket4020 = () => {
     if (!socket4020) {
-        socket4020 = io('http://192.168.2.100:4030');
+        socket4020 = io(`${url_socket}:4030`);
         socket4020.on('connect', () => {
             if (socket4020.connected) {
                 console.log('coba connect 4030 fase 1')
@@ -165,9 +166,4 @@ export const addPendingRequest4020 = (request) => {
 
 };
 
-const sendLogHistoryRequestRequest = () => {
-    if (socket4020) {
-        socket4020.emit("logHistory");
-    }
-};
 
