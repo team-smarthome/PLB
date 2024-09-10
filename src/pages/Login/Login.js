@@ -33,7 +33,7 @@ const Login = () => {
     e.preventDefault();
     try {
       isLoading(true);
-      const response = await axios.post(`${url_devel}login`, {
+      const response = await axios.post(`${url_devel}api/login`, {
         nip: sUserName,
         password: sPassword,
       });

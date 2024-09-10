@@ -3,6 +3,7 @@ import TableLog from '../../components/TableLog/TableLog'
 import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
 import { apiGetDataLogRegister } from '../../services/api'
+import { url_devel } from '../../services/env'
 
 const LogRegister = () => {
     const [search, setSearch] = useState({
@@ -68,11 +69,11 @@ const LogRegister = () => {
             <td>{row.no_passport}</td>
             <td>{row.no_register}</td>
             <td>{row.name}</td>
-            <td>{row.gender == "M" ? "Laki-laki" : "Perempuan"}</td>
+            <td>{row.gender === "M" ? "Laki-laki" : "Perempuan"}</td>
             <td>{row.nationality}</td>
             <td>
                 <img
-                    src={`http://192.168.2.143:8000/storage/${row.profile_image}`}
+                    src={`${url_devel}storage/${row.profile_image}`}
                     alt="Profile"
                     width={100}
                     height={100}

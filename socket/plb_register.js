@@ -2,7 +2,7 @@ const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
 let ipCamera = ['192.168.2.127'];
-let ipServerPC = '192.168.2.143';
+let ipServerPC = '192.168.2.100';
 const axios = require("axios");
 
 const server = http.createServer(function (request, response) {

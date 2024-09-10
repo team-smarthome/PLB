@@ -183,8 +183,9 @@ const Information = () => {
 		} else {
 			const data = {
 				ipServerPC: newWifiResults,
-				ipServerCamera: ipCameraRegister,
+				ipServerCamera: [ipCameraRegister],
 			};
+			console.log(data, "datanya")
 			Toast.fire({
 				icon: "success",
 				title: "Data berhasil disimpan",
@@ -296,6 +297,7 @@ const Information = () => {
 	useEffect(() => {
 		const getUserdata = Cookies.get('userdata');
 		setDataUser(JSON.parse(getUserdata))
+		console.log(JSON.parse(getUserdata), 'hasildaricookie')
 	}, []);
 
 	useEffect(() => {
@@ -826,9 +828,9 @@ const Information = () => {
 																	ipCameraRegister
 																}
 																onChange={(e) =>
-																	setIpCameraRegister([...ipCameraRegister,
-																	e.target
-																		.value]
+																	setIpCameraRegister(
+																		e.target
+																			.value
 																	)
 																}
 															/>

@@ -1,12 +1,17 @@
 import { io } from 'socket.io-client';
+import { url_socket } from '../services/env';
 
 let socket;
 
 let socket4010;
 
+let socket4020;
+
 let pendingTakePhotoRequests = [];
 
 let pendingTakePhotoRequests4010 = [];
+
+let pendingTakePhotoRequests4020 = [];
 
 const ipServer = localStorage.getItem('ipServer');
 
@@ -70,11 +75,11 @@ export const initiateSocketConfig = () => {
 
 export const initiateSocket4010 = () => {
     if (!socket4010) {
-        if (!ipServer) {
+        if (!url_socket) {
             console.log('testWebsocket4010 ipServer tidak ada');
             return;
         }
-        socket4010 = io(`http://${ipServer}:4010`);
+        socket4010 = io(`${url_socket}:4010`);
         socket4010.on('connect', () => {
             console.log('testWebsocket4010 Socket connection established');
 
@@ -115,3 +120,50 @@ const sendTakePhotoRequest4010 = (data) => {
         socket4010.emit("sendDataUser", data);
     }
 };
+
+
+export const initiateSocket4020 = () => {
+    if (!socket4020) {
+        socket4020 = io(`${url_socket}:4030`);
+        socket4020.on('connect', () => {
+            if (socket4020.connected) {
+                console.log('coba connect 4030 fase 1')
+                socket4020.emit("logHistory");
+            } else {
+                console.log('coba connect 4030 fase 2')
+                //coba connect
+                socket4020.connect();
+                socket4020.emit("logHistory");
+            }
+        });
+
+        // Event handler untuk koneksi terputus
+        socket4020.on('disconnect', () => {
+            console.log('testWebsocket Socket disconnected. Attempting to reconnect...');
+        });
+
+        // Event handler untuk reconnect attempt
+        socket4020.on('reconnect_attempt', (attemptNumber) => {
+            console.log(`testWebsocket Reconnect attempt ${attemptNumber}`);
+        });
+
+        // Event handler untuk reconnect berhasil
+        socket4020.on('reconnect', () => {
+            console.log('testWebsocket Reconnected to socket server');
+        });
+
+        // Event handler untuk reconnect gagal
+        socket4020.on('reconnect_failed', () => {
+            console.log('testWebsocket Reconnect failed');
+        });
+    }
+    return socket4020;
+};
+
+export const addPendingRequest4020 = (request) => {
+    console.log('testWebsocket4020 pendingRequest', request);
+    pendingTakePhotoRequests4020.push(request);
+
+};
+
+

@@ -62,7 +62,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	useEffect(() => {
 		socket_IO_4000.on("photo_taken", (imageBase64) => {
-			console.log("Photo_taken:", imageBase64);
 			setCapturedImage(imageBase64);
 			sendDataToInput({
 				statusCardBox: "takePhotoSucces",
