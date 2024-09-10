@@ -17,8 +17,8 @@ import BodyContentValidation from "../../components/BodyContentValidation/BodyCo
 
 const Validation = () => {
   const location = useLocation()
+  const [dataLogs, setDataLogs] = useState({})
   const detailData = location.state
-  console.log(detailData, "detaildata")
   const socketRef = useRef(null);
   const socket_IO = io("http://192.168.2.143:4020");
   const [, setFormData] = useAtom(formData);
@@ -26,7 +26,7 @@ const Validation = () => {
   const [dataCookie] = useAtom(cookiesData);
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
-  const [isEnableStep, setIsEnableStep] = useState(true);
+  const [isEnableStep, setIsEnableStep] = useState(false);
   const [tabStatus, setTabStatus] = useState(0);
   const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
@@ -63,7 +63,7 @@ const Validation = () => {
   });
   const [dataScan, setDataScan] = useState()
   const [isConnected, setIsConnected] = useState(false);
-  const [dataLogs, setDataLogs] = useState({})
+
 
   let isCloseTimeoutSet = false;
 
@@ -289,13 +289,11 @@ const Validation = () => {
     }
   };
 
-  // useEffect(() => {
-  //   connectWebSocket(null, socket_IO); // Ensure to pass `socket_IO` properly
-
-  //   // return () => {
-  //   //   closeWebSocket();
-  //   // };
-  // }, []);
+  useEffect(() => {
+    console.log("dataLogs1", detailData)
+    setDataLogs(detailData)
+    console.log("dataLogs2", dataLogs)
+  }, [detailData])
 
   useEffect(() => {
     socket_IO.on("responseHistoryLogs", (data) => {
@@ -802,6 +800,15 @@ const Validation = () => {
         sendDataToParent1={receiveDataFromChild}
         dataScan={dataScan}
         isShowHeader={false}
+      />
+      <Footer
+        titleBack="Back"
+        titleStep={titleFooter}
+        isEnableBack={isEnableBack}
+        isEnableStep={isEnableStep}
+        btnOnClick_Back={() => navigate(-1)}
+        btnOnClick_Step={btnOnClick_Step}
+        isDisabled={isDisabled}
       />
     </div>
   );

@@ -297,6 +297,7 @@ const Information = () => {
 	useEffect(() => {
 		const getUserdata = Cookies.get('userdata');
 		setDataUser(JSON.parse(getUserdata))
+		console.log(JSON.parse(getUserdata), 'hasildaricookie')
 	}, []);
 
 	useEffect(() => {
