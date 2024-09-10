@@ -2,29 +2,44 @@ import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
-import { io } from 'socket.io-client'
+import { addPendingRequest4020, initiateSocket4020 } from '../../utils/socket'
 
 const LogFaceReg = () => {
     const [logData, setLogData] = useState([])
     const navigate = useNavigate()
-    const socket_IO = io("http://192.168.2.100:4020");
+    const socket_IO_4020 = initiateSocket4020();
+
     useEffect(() => {
-        socket_IO.on("responseHistoryLogs", (data) => {
+        socket_IO_4020.on("responseHistoryLogs", (data) => {
             if (data.length > 0) {
-                console.log(data, "data")
+                console.log(data, "datayanddapatdariwes")
                 setLogData(data)
                 setInterval(() => {
-                    socket_IO.emit('logHistory2')
-                }, 5000);
+                    if (socket_IO_4020.connected) {
+                        socket_IO_4020.emit('logHistory')
+                    } else {
+                        addPendingRequest4020({ action: 'logHistory' });
+                        socket_IO_4020.connect();
+                    }
+
+                }, 2000);
             }
         });
+        return () => {
+            socket_IO_4020.off('responseHistoryLogs')
+            socket_IO_4020.off('logHistory')
+        }
+    }, [socket_IO_4020])
 
-
-
-    }, [socket_IO]);
     useEffect(() => {
-        socket_IO.emit('logHistory')
+        if (socket_IO_4020.connected) {
+            socket_IO_4020.emit('logHistory')
+        } else {
+            addPendingRequest4020({ action: 'logHistory' });
+            socket_IO_4020.connect();
+        }
     }, [])
+
     const dummy = [
         {
             id: 1,

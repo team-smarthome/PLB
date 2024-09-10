@@ -4,9 +4,13 @@ let socket;
 
 let socket4010;
 
+let socket4020;
+
 let pendingTakePhotoRequests = [];
 
 let pendingTakePhotoRequests4010 = [];
+
+let pendingTakePhotoRequests4020 = [];
 
 const ipServer = localStorage.getItem('ipServer');
 
@@ -115,3 +119,55 @@ const sendTakePhotoRequest4010 = (data) => {
         socket4010.emit("sendDataUser", data);
     }
 };
+
+
+export const initiateSocket4020 = () => {
+    if (!socket4020) {
+        socket4020 = io('http://192.168.2.100:4030');
+        socket4020.on('connect', () => {
+            if (socket4020.connected) {
+                console.log('coba connect 4030 fase 1')
+                socket4020.emit("logHistory");
+            } else {
+                console.log('coba connect 4030 fase 2')
+                //coba connect
+                socket4020.connect();
+                socket4020.emit("logHistory");
+            }
+        });
+
+        // Event handler untuk koneksi terputus
+        socket4020.on('disconnect', () => {
+            console.log('testWebsocket Socket disconnected. Attempting to reconnect...');
+        });
+
+        // Event handler untuk reconnect attempt
+        socket4020.on('reconnect_attempt', (attemptNumber) => {
+            console.log(`testWebsocket Reconnect attempt ${attemptNumber}`);
+        });
+
+        // Event handler untuk reconnect berhasil
+        socket4020.on('reconnect', () => {
+            console.log('testWebsocket Reconnected to socket server');
+        });
+
+        // Event handler untuk reconnect gagal
+        socket4020.on('reconnect_failed', () => {
+            console.log('testWebsocket Reconnect failed');
+        });
+    }
+    return socket4020;
+};
+
+export const addPendingRequest4020 = (request) => {
+    console.log('testWebsocket4020 pendingRequest', request);
+    pendingTakePhotoRequests4020.push(request);
+
+};
+
+const sendLogHistoryRequestRequest = () => {
+    if (socket4020) {
+        socket4020.emit("logHistory");
+    }
+};
+
