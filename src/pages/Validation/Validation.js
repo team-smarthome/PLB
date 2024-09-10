@@ -7,15 +7,18 @@ import "./Validation.style.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
 import { formData, resultDataScan } from "../../utils/atomStates";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { imageToSend, cookiesData } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
-import { apiPblAddFaceRec, getAllDataLogs } from "../../services/api";
+import { apiPblAddFaceRec } from "../../services/api";
 import io from "socket.io-client";
 import BodyContentValidation from "../../components/BodyContentValidation/BodyContentValidation";
 
 
 const Validation = () => {
+  const location = useLocation()
+  const detailData = location.state
+  console.log(detailData, "detaildata")
   const socketRef = useRef(null);
   const socket_IO = io("http://192.168.2.143:4020");
   const [, setFormData] = useAtom(formData);
@@ -63,17 +66,7 @@ const Validation = () => {
   const [dataLogs, setDataLogs] = useState({})
 
   let isCloseTimeoutSet = false;
-  const getLog = async () => {
-    try {
-      const data = await getAllDataLogs();
-      console.log(data, "datanya")
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  useEffect(() => {
-    getLog()
-  }, [])
+
 
   const receiveDataFromChild = (data) => {
     // console.log("dataFromChild", data);
@@ -305,27 +298,17 @@ const Validation = () => {
   // }, []);
 
   useEffect(() => {
-
-    socket_IO.emit('logHistory')
-
     socket_IO.on("responseHistoryLogs", (data) => {
       console.log("responseHistoryLogs:", data);
       if (data.status == 200) {
         setDataLogs(data?.records[0])
+        socket_IO.emit('logHistory2')
       }
-      // console.log("responseHistoryLogs:", typeof data);
     });
 
 
-    // return () => {
-    //   socket_IO.off("responseHistoryLogs");
-
-    // }
 
   }, [socket_IO]);
-
-
-
 
   // Contoh penggunaan di tempat lain
   const handleTokenExpiration = () => {
