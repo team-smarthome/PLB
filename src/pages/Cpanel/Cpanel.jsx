@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../components/sidebar/sidebar';
-import { Route, Routes as ReactRoutes, useNavigate } from 'react-router-dom';
+import { Route, Routes as ReactRoutes, useNavigate, Navigate } from 'react-router-dom';
 import LogRegister from '../LogRegister/LogRegister';
 import LogFaceReg from '../LogFaceReg/LogFaceReg';
 import { RiMenu3Fill } from "react-icons/ri";
@@ -73,7 +73,9 @@ const Cpanel = () => {
                         <button onClick={handleLogout}>Logout</button>
                     </div>}
                 </div>
-                <ReactRoutes>
+                <ReactRoutes >
+                    <Route path="*" element={<NotFound />} />
+                    <Route path="/" element={<Navigate to="/cpanel/user-management" />} />
                     <Route path="/log-register" element={<LogRegister />} />
                     <Route path="/log-facereg" element={<LogFaceReg />} />
                     <Route path="/user-management" element={<UserManagement />} />
@@ -83,4 +85,12 @@ const Cpanel = () => {
     );
 };
 
+
+const NotFound = () => {
+    return (
+        <div style={{ width: '100%', height: "100vh", display: 'flex', justifyContent: 'center', alignItems: "center" }}>
+            <h1>404 | Not Found</h1>
+        </div>
+    )
+}
 export default Cpanel;

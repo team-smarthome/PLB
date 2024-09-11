@@ -1,0 +1,21 @@
+.config-container {
+    padding: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.config-container .input-config {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.input-config span {
+    width: 30%;
+    font-weight: 500;
+}
+
+.input-config input {
+    width: 70%;
+}
