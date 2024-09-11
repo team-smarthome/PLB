@@ -1,14 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
 import { addPendingRequest4020, initiateSocket4020 } from '../../utils/socket'
+import Modals from '../../components/Modal/Modal'
+import './logfacereg.style.css'
+import { loginCamera } from '../../services/api'
 
 const LogFaceReg = () => {
     const [logData, setLogData] = useState([])
     const navigate = useNavigate()
     const socket_IO_4020 = initiateSocket4020();
-
+    const [showModalConfig, setShowModalConfig] = useState(false)
+    const [showModalLogin, setShowModalLogin] = useState(false)
+    const [ipServerPC, setIpServerPC] = useState('');
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [ipServerCamera, setIpServerCamera] = useState([]);
+    const [isConfigEmpty, setIsConfigEmpty] = useState(false)
+    const ipCameraRef = useRef(null)
     useEffect(() => {
         socket_IO_4020.on("responseHistoryLogs", (data) => {
             if (data.length > 0) {
@@ -32,6 +42,24 @@ const LogFaceReg = () => {
     }, [socket_IO_4020])
 
     useEffect(() => {
+
+        const tokenLocalStorage = localStorage.getItem('logCameraToken')
+        const ipServerCameraLocalStorage = localStorage.getItem('ipServerCamera')
+        const ipServerPCLocalStorage = localStorage.getItem('ipServerPC')
+        console.log(tokenLocalStorage, ipServerCameraLocalStorage, ipServerPCLocalStorage, "Config sini")
+        if (tokenLocalStorage && ipServerCameraLocalStorage && ipServerPCLocalStorage) {
+            if (socket_IO_4020.connected) {
+                socket_IO_4020.emit('saveCameraData', {
+                    ipServerCamera: [ipServerCameraLocalStorage],
+                    ipServerPCLocalStorage,
+                    cookiesCamera: [tokenLocalStorage]
+                })
+                setIsConfigEmpty(false)
+            }
+        } else {
+            console.log("gk ada")
+            setIsConfigEmpty(true)
+        }
         if (socket_IO_4020.connected) {
             socket_IO_4020.emit('logHistory')
         } else {
@@ -72,6 +100,7 @@ const LogFaceReg = () => {
             profile_image: ario
         },
     ]
+
     const handleEpochToDate = (epoch) => {
         const date = new Date(epoch * 1000);
 
@@ -87,6 +116,7 @@ const LogFaceReg = () => {
         console.log(formattedDate, "dataConvert");
         return formattedDate;
     };
+
     const customRowRenderer = (row) => (
         <>
             <td>{row?.personId}</td>
@@ -106,10 +136,12 @@ const LogFaceReg = () => {
             </td>
         </>
     );
+
     const getDetailData = (row) => {
         // console.log(row, "rownya")
-        navigate('/validation', { state: row })
+        navigate('/validation', { state: { detailDataLog: row, isCp: true } })
     }
+
     const generateExcel = () => {
         const Excel = require("exceljs");
         const workbook = new Excel.Workbook();
@@ -166,9 +198,105 @@ const LogFaceReg = () => {
             }
         });
     };
+
+    const handleCloseModal = () => {
+        setShowModalConfig(false)
+        setIpServerCamera([])
+        setIpServerPC("")
+    }
+
+    const handleCloseModalLogin = () => {
+        setShowModalLogin(false)
+
+    }
+
+    const handleSubmit = () => {
+        console.log(ipServerCamera, ipServerPC, "sini")
+        if (ipServerCamera !== "" && ipServerPC !== "") {
+            setShowModalLogin(true);
+            localStorage.setItem('ipServerCamera', ipServerCamera)
+            localStorage.setItem('ipServerPC', ipServerPC)
+        }
+    };
+
+    const handleSubmitLogin = async () => {
+        try {
+            console.log(username, password, "sini login")
+            const encodePassword = btoa(password)
+            const payload = {
+                sUserName: username,
+                sPassword: encodePassword
+            }
+            const res = await loginCamera(ipServerCamera, payload)
+            console.log(res, "res")
+            const dataResponse = res.data.data
+            if (res.status == 200) {
+                const authUser = dataResponse.auth === 0 ? "admin" : "user"
+                const loginData = `Face-Token=${dataResponse.token}; face-username=${authUser}; roleId=${dataResponse.auth}; sidebarStatus=${dataResponse.status}; token=${dataResponse.token}`;
+                localStorage.setItem("logCameraToken", loginData)
+                if (socket_IO_4020.connected) {
+                    setShowModalConfig(false)
+                    setShowModalLogin(false)
+                    socket_IO_4020.emit('saveCameraData', {
+                        ipServerCamera: [ipServerCamera],
+                        ipServerPC,
+                        cookiesCamera: [loginData]
+                    })
+                    socket_IO_4020.emit('logHistory')
+                } else {
+                    addPendingRequest4020({ action: 'logHistory' });
+                    socket_IO_4020.connect();
+                }
+            }
+        } catch (error) {
+            console.log(error, "error")
+        }
+    }
+
+    const ModalConfigContent = () => {
+        return (
+            <div className="config-container">
+                <div className="input-config">
+                    <span>IP Server PC</span>
+                    <input type="text" value={ipServerPC} onChange={(e) => setIpServerPC(e.target.value)} />
+                </div>
+                <div className="input-config">
+                    <span>IP Server Camera</span>
+                    <input type="text" value={ipServerCamera} onChange={(e) => setIpServerCamera(e.target.value)} />
+                </div>
+                <Modals
+                    showModal={showModalLogin}
+                    closeModal={handleCloseModalLogin}
+                    headerName="Login"
+                    onConfirm={handleSubmitLogin}
+                    buttonName="Confirm"
+                >
+                    {ModalLoginContent()}
+                </Modals>
+            </div>
+        )
+    }
+
+    const ModalLoginContent = () => {
+        return (
+            <div className="config-container">
+                <div className="input-config">
+                    <span>Username</span>
+                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                </div>
+                <div className="input-config">
+                    <span>Password</span>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="input-search-container">
+            <div className="input-search-container"
+            // style={{ opacity: isConfigEmpty ? 0 : 1 }}
+            >
                 <div className="search-table-list">
                     <div className="search-table">
                         <span>Nomor PLB : </span>
@@ -180,6 +308,12 @@ const LogFaceReg = () => {
                     </div>
                 </div>
                 <div className="buttons-container" style={{ display: 'flex', gap: 10 }}>
+                    <button
+                        style={{ backgroundColor: 'blue' }}
+                        onClick={() => setShowModalConfig(true)}
+                    >
+                        Config
+                    </button>
                     <button
                         onClick={generateExcel}
                         style={{ backgroundColor: "green" }}
@@ -194,9 +328,18 @@ const LogFaceReg = () => {
             <TableLog
                 tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result"]}
                 tBody={logData}
-                // handler={getDetailData}
+                handler={getDetailData}
                 rowRenderer={customRowRenderer}
             />
+            <Modals
+                buttonName="Confirm"
+                headerName="Config Ip Camera"
+                showModal={showModalConfig}
+                closeModal={handleCloseModal}
+                onConfirm={handleSubmit}
+            >
+                {ModalConfigContent()}
+            </Modals>
         </div>
     )
 }

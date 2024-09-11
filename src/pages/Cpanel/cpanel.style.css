@@ -94,3 +94,45 @@
 .search-table input {
     background-color: #fff;
 }
+
+.user-button-list {
+    display: flex;
+    justify-content: space-between;
+    /* Creates space between buttons */
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    width: 13%;
+    /* Increased width for better visibility */
+    max-height: 150px;
+    position: absolute;
+    z-index: 99;
+    top: 13%;
+    right: 0;
+    border: solid .5% black;
+    border-radius: 6px;
+    padding: 5px;
+    /* Adds some padding for better content spacing */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Adds a subtle shadow for depth */
+}
+
+.user-button-list button {
+    width: 100%;
+    height: auto;
+    /* Allow the button height to adjust based on content */
+    padding: 10px;
+    /* Added padding for better touch targets */
+    font-weight: 600;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    /* Smooth background change on hover */
+}
+
+.user-button-list button:hover {
+    background-color: #f0f0f0;
+    /* Light gray background on hover */
+}

@@ -35,7 +35,7 @@ const UserManagement = () => {
     const getAllPetugasData = async (page = 1) => {
         try {
             setIsLoading(true)
-            const response = await getAllPetugas(search, { page })
+            const response = await getAllPetugas(search, page)
             if (response.status == 200) {
                 console.log(response.data.data)
                 setDataPetugas(response?.data?.data)
