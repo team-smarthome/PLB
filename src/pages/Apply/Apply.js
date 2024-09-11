@@ -709,24 +709,31 @@ const Apply = () => {
 
 
   const doSaveRequestVoaPayment = async (sharedData) => {
+
     const bodyParamsSendKamera = {
-      method: 1,
-      identityType: "1",
-      gender: sharedData.passportData.sex === "male" ? 1 : 0,
-      personNum: sharedData.passportData.noRegister,
-      personId: sharedData.passportData.docNumber,
-      name: sharedData.passportData.fullName,
-      dateOfBirth: sharedData.passportData.formattedBirthDate,
-      sex: sharedData.passportData.sex === "male" ? "M" : "F",
-      nationalityCode: sharedData.passportData.nationality,
-      expiryDate: `${sharedData.passportData.formattedExpiryDate}`,
-      arrivalTime: new Date().getTime(),
-      destinationLocation: sharedData.passportData.destinationLocation,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      identityData: image ? image : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      effectiveStartTime: Math.floor(new Date().getTime() / 1000).toString(),
-      validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
-      thirdpartyId: "",
+      method: "addfaceinfonotify",
+      params: {
+        data: [
+          {
+            personId: sharedData.passportData.docNumber,
+            personNum: sharedData.passportData.noRegister,
+            passStrategyId: "",
+            personIDType: 1,
+            personName: sharedData.passportData.fullName,
+            personGender: sharedData.passportData.sex === "male" ? 1 : 0,
+            validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+            validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
+            personType: 1,
+            identityType: 1,
+            identityId: sharedData.passportData.docNumber,
+            identitySubType: 1,
+            identificationTimes: -1,
+            identityDataBase64: sharedData.photoFace ? sharedData.photoFace : `${dataPasporImg.visibleImage}`,
+            status: 0,
+            reserve: "",
+          }
+        ],
+      }
     }
 
     const dataTosendAPI = {
