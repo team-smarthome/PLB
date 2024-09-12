@@ -193,3 +193,19 @@ export const DeletePetugas = async (id) => {
     console.log(error)
   }
 }
+
+export const getUserbyPassport = async (no_passport) => {
+  try {
+    const response = await axios.get(`${url_devel}api/datauser`, {
+      params: {
+        no_passport
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response;
+  } catch (error) {
+    return error.message
+  }
+}

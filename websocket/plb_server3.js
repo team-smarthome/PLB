@@ -99,6 +99,12 @@ io.on("connection", (socket) => {
     socket.on("saveCameraData", (data) => {
         ipCamera = data?.ipServerCamera;
         console.log("DataDariInformation", data);
+        if (data) {
+            socket.emit("saveDataCamera", "successfully");
+        } else {
+            socket.emit("saveDataCamera", "failed");
+        }
+
     });
 
     socket.emit("DataIPCamera", {

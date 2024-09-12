@@ -9,11 +9,13 @@ import { getDataUserAPI } from "../../services/api";
 import { format } from 'date-fns';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import e from "cors";
 
 function Report() {
   const navigate = useNavigate();
   const [loading, setIsloading] = useState(true);
   const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [dataUser, setDataUser] = useState([]);
   const [noPassport, setNoPassport] = useState("");
   const [noRegister, setNoRegister] = useState("");
@@ -42,13 +44,15 @@ function Report() {
 
   const handleApplyFilter = () => {
     const formattedStartDate = startDate ? format(startDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx") : null;
+    const formattedEndDate = endDate ? format(endDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx") : null;
 
     const filterParams = {
       page: page,
       no_passport: noPassport,
       name: name,
       no_register: noRegister,
-      ...(formattedStartDate && { arrival_time: formattedStartDate })
+      ...(formattedStartDate && { startDate: formattedStartDate }),
+      ...(formattedEndDate && { endDate: formattedEndDate }),
     };
 
     console.log("filterParams", filterParams);
@@ -231,9 +235,7 @@ function Report() {
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-          </div>
-          <div className="filter-left">
-            <div className="input-filter-top2">
+            <div className="input-filter-bottom">
               <p>No. Register</p>
               <input
                 type="text"
@@ -242,11 +244,25 @@ function Report() {
                 onChange={(e) => setNoRegister(e.target.value)}
               />
             </div>
+          </div>
+          <div className="filter-left">
             <div className="input-filter-bottom2">
-              <p>Tanggal Lahir</p>
+              <p>Tanggal Mulai</p>
               <DatePicker
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                dateFormat="dd/MM/yyyy HH:mm"
+                className="date-picker"
+                timeIntervals={1}
+              />
+            </div>
+            <div className="input-filter-bottom2">
+              <p>Tanggal Terakhir</p>
+              <DatePicker
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
                 showTimeSelect
                 timeFormat="HH:mm"
                 dateFormat="dd/MM/yyyy HH:mm"

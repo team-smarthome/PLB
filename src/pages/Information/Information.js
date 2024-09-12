@@ -9,7 +9,6 @@ import { useReactToPrint } from "react-to-print";
 import Printer from "../../components/Printer/Printer";
 import { Toast } from "../../components/Toast/Toast";
 import axios from "axios";
-import { url_devel } from "../../services/env";
 import ImageSucces from "../../assets/images/image-2.svg";
 import { FaRegUserCircle } from "react-icons/fa";
 import { RiLockPasswordLine } from "react-icons/ri";
@@ -19,15 +18,12 @@ import { BsPrinter } from "react-icons/bs";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { MdMenu } from "react-icons/md";
 import VideoPlayer from "../../components/VideoPlayer";
-import Table from "../../components/Table/Table2";
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Swal from "sweetalert2";
-import { FaUserPen } from "react-icons/fa6";
 import { useAtom } from "jotai";
 import { cookiesData, ipDataCamera } from "../../utils/atomStates";
 import { initiateSocketConfig } from "../../utils/socket";
-import PetugasPanel from "./components/PetugasPanel";
 import { getDataPetugas } from "../../services/api";
 
 const Information = () => {
@@ -40,13 +36,10 @@ const Information = () => {
 	const [streamKamera, setStreamKamera] = useState(false);
 	const printRef = useRef();
 	const navigate = useNavigate();
-	const [ipCamera, setIpCamera] = useState("");
-	const [statusCamera, setStatusCamera] = useState("OFF");
 	const [isSucces, setIsSucces] = useState(false);
 	const [showOldPassword, setShowOldPassword] = useState(true);
 	const [showNewPassword, setShowNewPassword] = useState(true);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(true);
-	const [statusCardReader, setStatusCardReader] = useState("OFF");
 	const [loading, setLoading] = useState(false);
 	const [capturedImageTest, setCapturedImageTest] = useState("");
 	const [succesCapture, setSuccesCapture] = useState(false);
@@ -56,13 +49,10 @@ const Information = () => {
 	const [cameraIPs, setCameraIPs] = useState([]);
 	const [loginData, setLoginData] = useState(false);
 	const [loginDataArray1, setLoginDataArray1] = useState([]);
-	let loginDataArray = [];
-	const [dataCookiesnya, setDataCookiesnya] = useAtom(cookiesData);
 	const [dataIPCameranya, setDataIPCameranya] = useAtom(ipDataCamera);
 	const [currentTab, setCurrentTab] = useState(0);
 	const [isWaiting, setIsWaiting] = useState(false);
 	const [isOpen, setIsOpen] = useState(false)
-	const [role, setRole] = useState(1)
 	const [dataUser, setDataUser] = useState({})
 	const [ipCameraRegister, setIpCameraRegister] = useState([])
 	const listConfiguration = [
@@ -88,127 +78,79 @@ const Information = () => {
 		},
 	];
 
-	const [filterName, setFilterName] = useState("");
 	const [dataPetugasRegister, setDataPetugasRegister] = useState([]);
-
-	const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex) => {
-		console.log("LoginKamerake", cameraIndex, ipCameraSet)
-		try {
-			const encodedPassword = btoa(sPassword);
-			const response = await axios.put(`http://${ipCameraSet}/cgi-bin/entry.cgi/system/login`, {
-				sUserName,
-				sPassword: encodedPassword,
-			});
-			const dataRes = response.data;
-			let authUser = "";
-			console.log(dataRes, "responsehitapi");
-			if (dataRes.status.code === 200) {
-				if (dataRes.data.auth === 0) {
-					authUser = "admin";
-				} else {
-					authUser = "user";
-				}
-				const loginData = `Face-Token=${dataRes.data.token}; face-username=${authUser}; roleId=${dataRes.data.auth}; sidebarStatus=${dataRes.data.status}; token=${dataRes.data.token}`;
-				loginDataArray[cameraIndex] = loginData;
-
-				// Cek jika semua kamera sudah memiliki datanya
-				if (loginDataArray.filter(data => data !== undefined).length === totalCameras) {
-					const socket_server_4010 = io(`http://${newWifiResults}:4010`);
-					const data = {
-						ipServerPC: newWifiResults,
-						ipServerCamera: cameraIPs,
-						cookiesCamera: loginDataArray,
-					};
-					Toast.fire({
-						icon: "success",
-						title: "Data berhasil disimpan",
-					});
-					socket2_IO_4000.emit("saveCameraData", data);
-					socket_server_4010.emit("saveCameraData", data);
-					setDataCookiesnya(loginDataArray);
-					setDataIPCameranya(cameraIPs);
-				}
-			} else {
-				Swal.fire(dataRes.status.message);
-			}
-		} catch (error) {
-			Swal.fire("Gagal login");
-		}
-	};
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		if (dataUser.role === 1) {
-			if (totalCameras > 0) {
-				const showLoginDialog = (callback, initialUsername = "") => {
-					Swal.fire({
-						title: `Login`,
-						html:
-							`<input id="swal-input1" class="swal2-input" placeholder="Username" value="${initialUsername}">` +
-							'<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
-						focusConfirm: false,
-						showCancelButton: true,
-						confirmButtonText: "Kirim",
-						confirmButtonColor: "#3D5889",
-						cancelButtonText: "Batal",
-						cancelButtonColor: "#d33",
-					}).then((result) => {
-						if (result.isConfirmed) {
-							const username = document.getElementById("swal-input1").value;
-							const password = document.getElementById("swal-input2").value;
+		console.log("cameraIPsTotallength", cameraIPs.length);
+		console.log("cameraIPsTotallength", cameraIPs);
+		if (cameraIPs.length > 0) {
+			setIsWaiting(true);
+			if (dataUser.role === 1) {
 
-							if (username && password) {
-								callback(username, password);
-							} else {
-								Swal.fire("Harap masukkan username dan password");
-								showLoginDialog(callback, username);
-							}
+				const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+				const data = {
+					ipServerCamera: cameraIPs,
+				};
+				socket_server_4010.emit("saveCameraData", data);
+				socket_server_4010.on('saveDataCamera', (data) => {
+					if (data === "successfully") {
+						setIsWaiting(false);
+						Toast.fire({
+							icon: "success",
+							title: "Data berhasil disimpan",
+						});
+					} else {
+						Toast.fire({
+							icon: "error",
+							title: "Gagal menyimpan data",
+						});
+					}
+				})
+				setDataIPCameranya(cameraIPs);
+
+			} else {
+				const data = {
+					ipServerPC: newWifiResults,
+					ipServerCamera: cameraIPs,
+				};
+				Toast.fire({
+					icon: "success",
+					title: "Data berhasil disimpan",
+				});
+				if (socket2_IO_4000.connected) {
+					socket2_IO_4000.emit("saveCameraData", data);
+					socket2_IO_4000.on("saveDataCamera", (data) => {
+						if (data === "successfully") {
+							localStorage.setItem("ipServer", newWifiResults);
+							setIsWaiting(false);
+							Toast.fire({
+								icon: "success",
+								title: "Data berhasil disimpan",
+							});
+						} else {
+							setIsWaiting(false);
+							Toast.fire({
+								icon: "error",
+								title: "Gagal menyimpan data",
+							});
 						}
 					});
-				};
-				const loginAllCameras = (sUserName, sPassword) => {
-					cameraIPs.forEach((ipCameraSet, index) => {
-						handleLogin(sUserName, sPassword, ipCameraSet, index);
+				} else {
+					setIsWaiting(false);
+					Toast.fire({
+						icon: "error",
+						title: "Gagal menyimpan data websocket tidak terhubung",
 					});
-				};
-				showLoginDialog((sUserName, sPassword) => {
-					loginAllCameras(sUserName, sPassword);
-				});
-			} else {
-				Toast.fire({
-					icon: "error",
-					title: "Harap pilih jumlah kamera",
-				});
+				}
 			}
 		} else {
-			const data = {
-				ipServerPC: newWifiResults,
-				ipServerCamera: [ipCameraRegister],
-			};
-			console.log(data, "datanya")
 			Toast.fire({
-				icon: "success",
-				title: "Data berhasil disimpan",
+				icon: "error",
+				title: "Harap pilih jumlah kamera",
 			});
-			localStorage.setItem("ipServer", newWifiResults);
-			if (socket2_IO_4000.connected) {
-				socket2_IO_4000.emit("saveCameraData", data);
-			} else {
-				Toast.fire({
-					icon: "error",
-					title: "Gagal menyimpan data websocket tidak terhubung",
-				});
-			}
 		}
 	};
-
-	const handleDelete = async (personId) => {
-		console.log("personIDNYAINFORMAS")
-		if (newWifiResults) {
-			const websocketUser = io(`http://${newWifiResults}:4010`)
-			websocketUser.emit("deleteDataUser", personId)
-		};
-	}
 
 	useEffect(() => {
 		if (currentTab === 0) {
@@ -221,38 +163,9 @@ const Information = () => {
 				});
 
 			} else {
-				// alert('IP server belum dimasukkan');
 			}
 		}
-		//  else if (currentTab === 1) {
-		// 	console.log("masukesini")
-		// 	console.log("newWifiResults", newWifiResults);
-		// 	if (newWifiResults !== "") {
-		// 		console.log("masukesini")
-		// 		getDataPetugas(newWifiResults, filterName).then(response => {
-		// 			console.log("responsePetugas", response.data);
-		// 			if (response.data.status === 200) {
-		// 				console.log("dataPetugasGetIn", response.data.data);
-		// 				setDataPetugasRegister(response.data.data);
-		// 			}
-		// 		}).catch(error => {
-		// 			console.error("Error:", error);
-		// 		});
-		// 	}
-		// }
 	}, [currentTab]);
-
-	const handleFilter = (e) => {
-		getDataPetugas(newWifiResults, e).then(response => {
-			console.log("responsePetugas", response.data);
-			if (response.data.status === 200) {
-				console.log("dataPetugasGetIn", response.data.data);
-				setDataPetugasRegister(response.data.data);
-			}
-		}).catch(error => {
-			console.error("Error:", error);
-		});
-	}
 
 	const handleTakePhoto = async () => {
 		console.log("handleTakenPhoto");
@@ -308,7 +221,7 @@ const Information = () => {
 
 	useEffect(() => {
 		socket2_IO_4000.on("DataIPCamera", (data) => {
-			setIpCameraRegister(data.ipCamera);
+			setCameraIPs(data.ipCamera);
 			setNewWifiResults(data.ipServerPC);
 			console.log("dataUserKameraSetting", data);
 			localStorage.setItem("ipServer", data.ipServerPC);
@@ -323,6 +236,9 @@ const Information = () => {
 			console.log("Image_path_received: ", imageBase64);
 			socket2_IO_4000.emit("stop_stream");
 		});
+
+
+
 		return () => {
 			socket2_IO_4000.off("photo_taken");
 			socket2_IO_4000.off("DataIPCamera");
@@ -380,13 +296,6 @@ const Information = () => {
 		}, 3000);
 	};
 
-
-	useEffect(() => {
-		const socketCamera = io("http://localhost:4001");
-		socketCamera.on("cameraStatus", (data) => {
-			setStatusCamera(data.status);
-		});
-	}, []);
 
 	useEffect(() => {
 		if (currentTab === 4) {
@@ -464,11 +373,6 @@ const Information = () => {
 											</div>
 										</>
 									)
-										// : currentTab === 1 ? (
-										// 	<div className="container-petugas-panel">
-										// 		<PetugasPanel dataUser={dataPetugasRegister} onFilter={handleFilter} />
-										// 	</div>
-										// ) 
 										: currentTab === 1 ? (
 											<>
 												<div className="custom-container">
@@ -846,12 +750,12 @@ const Information = () => {
 																		: ""
 																}
 																value={
-																	ipCameraRegister
+																	cameraIPs
 																}
 																onChange={(e) =>
-																	setIpCameraRegister(
-																		e.target
-																			.value
+																	setCameraIPs(
+																		[e.target
+																			.value]
 																	)
 																}
 															/>
@@ -894,22 +798,9 @@ const Information = () => {
 																		"center",
 																}}
 															>
-																{/* {
-																<p>
-																	ini adalah{" "}
-																	{urlKamera}
-																</p>
-															} */}
 																<VideoPlayer
 																	url={urlKamera}
 																/>
-																{/* <ReactPlayer
-																className="react-player"
-																url={urlKamera}
-																width="100%"
-																height="100%"
-																playing={true}
-															/> */}
 															</div>
 															<div>
 																<button
@@ -1043,7 +934,6 @@ const Information = () => {
 										onClick={() => setCurrentTab(index)}
 									>
 										<div className="number-style">
-											{/* <img src={listIcons[index]} alt={`${list}_icons`} /> */}
 											<list.icon
 												size={45}
 												color="black"

@@ -15,13 +15,14 @@ import dataNegara from "../../utils/dataNegara";
 import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import { useAtom } from "jotai";
-import { imageToSend, resultDataScan } from "../../utils/atomStates";
+import { imageToSend, resultDataScan, caputedImageAfter } from "../../utils/atomStates";
 import { initiateSocket, addPendingRequest } from "../../utils/socket";
 
 const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
+	const [capturedImageAfter2, setCapturedImageAfter2] = useAtom(caputedImageAfter);
 	const { data } = useContext(DataContext);
 	const [capturedImage, setCapturedImage] = useState(null);
 	const [email, setEmail] = useState(null);
@@ -55,13 +56,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	}));
 
 	const [numberPassport, setNumberPassport] = useState(null);
-
 	// const socket_IO_4000 = io("http://localhost:4000");
 
 	const socket_IO_4000 = initiateSocket();
 
 	useEffect(() => {
 		socket_IO_4000.on("photo_taken", (imageBase64) => {
+			setCapturedImageAfter2(imageBase64);
 			setCapturedImage(imageBase64);
 			sendDataToInput({
 				statusCardBox: "takePhotoSucces",
@@ -97,7 +98,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			socket_IO_4000.emit("take_photo");
 			sendDataToInput({
 				statusCardBox: "waiting2",
-				capturedImage: null,
+				capturedImage: capturedImage,
 				emailUser: null,
 				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
@@ -229,7 +230,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 			sendDataToInput({
 				statusCardBox: "waiting",
-				capturedImage: null,
+				capturedImage: capturedImage,
 				emailUser: null,
 				titleHeader: "Apply PLB",
 				titleFooter: "Next Step",
@@ -253,7 +254,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					setTimeout(() => {
 						sendDataToInput({
 							statusCardBox: "searchPassport",
-							capturedImage: null,
+							capturedImage: capturedImage,
 							emailUser: null,
 							titleHeader: "Apply PLB",
 							titleFooter: "Next Step",
@@ -643,7 +644,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "takePhotoSucces":
 				return (
 					<>
-						{capturedImage && (
+						{(capturedImage || capturedImageAfter2) && (
 							<div className="container-box-image">
 								<h1 className="card-title">
 									Take Photo Success
@@ -655,7 +656,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 											width: "100vh",
 											height: "30vh",
 										}}
-										src={capturedImage}
+										src={capturedImage ? capturedImage : capturedImageAfter2}
 										alt="Captured Image"
 										className="potrait-image"
 									/>
