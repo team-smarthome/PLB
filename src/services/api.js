@@ -209,3 +209,27 @@ export const getUserbyPassport = async (no_passport) => {
     return error.message
   }
 }
+export const loginCamera = async (ipCamera, payload) => {
+  try {
+    const res = await axios({
+      url: `http://${ipCamera}/cgi-bin/entry.cgi/system/login`,
+      method: "PUT",
+      data: payload
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getDataUserByPassportNumber = async (params) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${baseUrl}/datauser/${params}`,
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}

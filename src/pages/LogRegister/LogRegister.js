@@ -8,7 +8,9 @@ import { url_devel } from '../../services/env'
 const LogRegister = () => {
     const [search, setSearch] = useState({
         name: "",
-        no_passport: ""
+        no_passport: "",
+        startDate: "",
+        endDate: ""
     })
     const navigate = useNavigate()
     const [logData, setLogData] = useState([])
@@ -148,6 +150,14 @@ const LogRegister = () => {
                     <div className="search-table">
                         <span>Nama : </span>
                         <input type="text" placeholder='Masukkan nama' value={search.name} onChange={(e) => setSearch({ ...search, name: e.target.value })} />
+                    </div>
+                    <div className="search-table">
+                        <span>Start Date : </span>
+                        <input type="datetime-local" value={search.startDate} onChange={(e) => setSearch({ ...search, startDate: e.target.value })} />
+                    </div>
+                    <div className="search-table">
+                        <span>End Date : </span>
+                        <input type="datetime-local" value={search.endDate} onChange={(e) => setSearch({ ...search, endDate: e.target.value })} />
                     </div>
                 </div>
                 <div className="buttons-container" style={{ display: 'flex', gap: 10 }}>
