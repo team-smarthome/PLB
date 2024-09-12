@@ -8,9 +8,10 @@ import './logfacereg.style.css'
 import { loginCamera } from '../../services/api'
 
 const LogFaceReg = () => {
-    const [logData, setLogData] = useState([])
     const navigate = useNavigate()
     const socket_IO_4020 = initiateSocket4020();
+
+    const [logData, setLogData] = useState([])
     const [showModalConfig, setShowModalConfig] = useState(false)
     const [showModalLogin, setShowModalLogin] = useState(false)
     const [ipServerPC, setIpServerPC] = useState('');
@@ -18,11 +19,17 @@ const LogFaceReg = () => {
     const [password, setPassword] = useState('')
     const [ipServerCamera, setIpServerCamera] = useState([]);
     const [isConfigEmpty, setIsConfigEmpty] = useState(false)
+    const [status, setStatus] = useState("loading")
     const ipCameraRef = useRef(null)
+
+    const tokenLocalStorage = localStorage.getItem('logCameraToken')
+    const ipServerCameraLocalStorage = localStorage.getItem('ipServerCamera')
+    const ipServerPCLocalStorage = localStorage.getItem('ipServerPC')
     useEffect(() => {
         socket_IO_4020.on("responseHistoryLogs", (data) => {
             if (data.length > 0) {
                 console.log(data, "datayanddapatdariwes")
+                setStatus("success")
                 setLogData(data)
                 setInterval(() => {
                     if (socket_IO_4020.connected) {
@@ -43,9 +50,6 @@ const LogFaceReg = () => {
 
     useEffect(() => {
 
-        const tokenLocalStorage = localStorage.getItem('logCameraToken')
-        const ipServerCameraLocalStorage = localStorage.getItem('ipServerCamera')
-        const ipServerPCLocalStorage = localStorage.getItem('ipServerPC')
         console.log(tokenLocalStorage, ipServerCameraLocalStorage, ipServerPCLocalStorage, "Config sini")
         if (tokenLocalStorage && ipServerCameraLocalStorage && ipServerPCLocalStorage) {
             if (socket_IO_4020.connected) {
@@ -295,7 +299,7 @@ const LogFaceReg = () => {
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
             <div className="input-search-container"
-            // style={{ opacity: isConfigEmpty ? 0 : 1 }}
+            // style={{ opacity: status != "success" ? 0 : 1 }}
             >
                 <div className="search-table-list">
                     <div className="search-table">
@@ -325,12 +329,19 @@ const LogFaceReg = () => {
                     </button>
                 </div>
             </div>
-            <TableLog
-                tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result"]}
-                tBody={logData}
-                handler={getDetailData}
-                rowRenderer={customRowRenderer}
-            />
+            {status == "loading" && (
+                <div className="loading">
+                    <span className="loader-loading-table"></span>
+                </div>
+            )}
+            {status == "success" && logData &&
+                <TableLog
+                    tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result"]}
+                    tBody={logData}
+                    handler={getDetailData}
+                    rowRenderer={customRowRenderer}
+                />
+            }
             <Modals
                 buttonName="Confirm"
                 headerName="Config Ip Camera"

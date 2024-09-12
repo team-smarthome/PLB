@@ -10,7 +10,7 @@ import { formData, resultDataScan } from "../../utils/atomStates";
 import { useLocation, useNavigate } from "react-router-dom";
 import { imageToSend, cookiesData } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
-import { apiPblAddFaceRec } from "../../services/api";
+import { apiPblAddFaceRec, getDataUserByPassportNumber } from "../../services/api";
 import io from "socket.io-client";
 import BodyContentValidation from "../../components/BodyContentValidation/BodyContentValidation";
 
@@ -289,10 +289,24 @@ const Validation = () => {
     }
   };
 
+  const getDetailDataUser = async (noPassport) => {
+    try {
+      const response = await getDataUserByPassportNumber(noPassport)
+      console.log(response, "response sini")
+      if (response.status == 200) {
+        setDataLogs(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     console.log("dataLogs1", detailData)
+    if (detailData.detailDataLog && detailData.isCp == true) {
+      getDetailDataUser(detailData.detailDataLog.personId)
+    }
     setDataLogs(detailData)
-    console.log("dataLogs2", dataLogs)
   }, [detailData])
 
   useEffect(() => {
