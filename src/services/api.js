@@ -233,3 +233,13 @@ export const getDataUserByPassportNumber = async (params) => {
     console.log(error)
   }
 }
+
+
+export const deleteDataUserPlb = async (params) => {
+  try {
+    const res = await axios.delete(`${url_devel}api/datauser/${params}`);
+    return res;
+  } catch (error) {
+    console(error.message);
+  }
+}
