@@ -1,8 +1,8 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = ['192.168.2.127'];
-let ipServerPC = '192.168.2.100';
+let ipCamera = [''];
+let ipServerPC = '';
 const axios = require("axios");
 
 const server = http.createServer(function (request, response) {
@@ -92,9 +92,14 @@ const handleTakePhoto = async (socket) => {
 
 io.on("connection", (socket) => {
     socket.on("saveCameraData", (data) => {
-        ipCamera = data.ipServerCamera;
         ipServerPC = data.ipServerPC;
+        ipCamera = data?.ipServerCamera;
         console.log("# IPCAMERA: ", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
+        if (data) {
+            socket.emit("saveDataCamera", "successfully");
+        } else {
+            socket.emit("saveDataCamera", "failed");
+        }
     });
 
     socket.on("take_photo", () => {
@@ -103,8 +108,8 @@ io.on("connection", (socket) => {
     });
 
     socket.emit("DataIPCamera", {
-        ipCamera: ipCamera[0],
         ipServerPC: ipServerPC,
+        ipCamera: ipCamera[0],
     });
 
     socket.on("disconnect", () => {

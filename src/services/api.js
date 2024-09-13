@@ -194,6 +194,21 @@ export const DeletePetugas = async (id) => {
   }
 }
 
+export const getUserbyPassport = async (no_passport) => {
+  try {
+    const response = await axios.get(`${url_devel}api/datauser`, {
+      params: {
+        no_passport
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response;
+  } catch (error) {
+    return error.message
+  }
+}
 export const loginCamera = async (ipCamera, payload) => {
   try {
     const res = await axios({
@@ -216,5 +231,15 @@ export const getDataUserByPassportNumber = async (params) => {
     return res
   } catch (error) {
     console.log(error)
+  }
+}
+
+
+export const deleteDataUserPlb = async (params) => {
+  try {
+    const res = await axios.delete(`${url_devel}api/datauser/${params}`);
+    return res;
+  } catch (error) {
+    console(error.message);
   }
 }

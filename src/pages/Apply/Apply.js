@@ -7,11 +7,11 @@ import dataPasporImg from "../../utils/dataPhotoPaspor";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
-import { formData, resultDataScan } from "../../utils/atomStates";
+import { formData, resultDataScan, caputedImageAfter } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
-import { imageToSend, cookiesData } from "../../utils/atomStates";
+import { imageToSend } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
-import { apiInsertDataUser, apiPblAddFaceRec } from "../../services/api";
+import { apiInsertDataUser, apiPblAddFaceRec, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import axios from "axios";
 
@@ -20,7 +20,6 @@ const Apply = () => {
   const socket_IO_4010 = initiateSocket4010();
   const [, setFormData] = useAtom(formData);
   const [image] = useAtom(imageToSend);
-  const [dataCookie] = useAtom(cookiesData);
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
@@ -324,6 +323,7 @@ const Apply = () => {
     setSharedData(newSharedData);
   };
   const [resDataScan, setResDataScan] = useAtom(resultDataScan)
+  const [caputedImageAfter2, setCaputedImageAfter2] = useAtom(caputedImageAfter)
   const btnOnClick_Back = () => {
     setResDataScan("")
     navigate('/home')
@@ -439,6 +439,23 @@ const Apply = () => {
           isPyamentUrl: false,
           isPhoto: false,
         });
+        // setTimeout(() => {
+        //   setCardPaymentProps({
+        //     isWaiting: false,
+        //     isCreditCard: false,
+        //     isPaymentCredit: false,
+        //     isPaymentCash: false,
+        //     isPrinted: false,
+        //     isSuccess: false,
+        //     isFailed: false,
+        //     isPyamentUrl: false,
+        //     isPhoto: false,
+        //     isDoRetake: false,
+        //   });
+        //   setDisabled(false);
+        //   setIsEnableStep(true);
+        //   setCardStatus("takePhotoSucces");
+        // }, 100);
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
@@ -572,6 +589,7 @@ const Apply = () => {
     socket_IO_4010.on("responseSendDataUser", (data) => {
       console.log("dataResponseSendDataUser", data);
       if (data === "Successfully") {
+        setCaputedImageAfter2(null);
         console.log("sharedDataTOSEndAPi", sharedData);
         const response = apiInsertDataUser(objectApi, ipServer);
         response.then((res) => {
@@ -588,6 +606,8 @@ const Apply = () => {
               isPhoto: false,
             });
             setDisabled(true);
+            setRecievedTempData([]);
+            setDataPrimaryPassport(null);
           }
         }).catch((error) => {
           console.error("Error:", error);
@@ -634,6 +654,27 @@ const Apply = () => {
             title: "Harap pilih jumlah kamera",
           });
         }
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: "Gagal mengirim data",
+        });
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
+        });
+        setDisabled(false);
+        setIsEnableStep(true);
+        setCardStatus("takePhotoSucces");
+        setTabStatus(2);
       }
     });
 
@@ -657,7 +698,7 @@ const Apply = () => {
 
   useEffect(() => {
     if (cardStatus === "goPayment") {
-      setIsEnableStep(false);
+      setIsEnableStep(true);
     } else if (cardStatus === "iddle") {
       const params = {
         code: "email",
@@ -689,26 +730,60 @@ const Apply = () => {
 
 
   const doSaveRequestVoaPayment = async (sharedData) => {
-    const bodyParamsSendKamera = {
-      method: 1,
-      identityType: "1",
-      gender: sharedData.passportData.sex === "male" ? 1 : 0,
-      personNum: sharedData.passportData.noRegister,
-      personId: sharedData.passportData.docNumber,
-      name: sharedData.passportData.fullName,
-      dateOfBirth: sharedData.passportData.formattedBirthDate,
-      sex: sharedData.passportData.sex === "male" ? "M" : "F",
-      nationalityCode: sharedData.passportData.nationality,
-      expiryDate: `${sharedData.passportData.formattedExpiryDate}`,
-      arrivalTime: new Date().getTime(),
-      destinationLocation: sharedData.passportData.destinationLocation,
-      photoFace: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      identityData: image ? image : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      effectiveStartTime: Math.floor(new Date().getTime() / 1000).toString(),
-      validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
-      thirdpartyId: "",
+
+    const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
+    console.log("checkDataUser", checkDataUser.data.data);
+    if (checkDataUser.data.data.length > 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Data sudah ada",
+        text: "Silahkan periksa kembali data anda",
+        confirmButtonColor: "#3d5889",
+      });
+      setCardPaymentProps({
+        isWaiting: false,
+        isCreditCard: false,
+        isPaymentCredit: false,
+        isPaymentCash: false,
+        isPrinted: false,
+        isSuccess: false,
+        isFailed: false,
+        isPyamentUrl: false,
+        isPhoto: false,
+        isDoRetake: false,
+      });
+      setDisabled(false);
+      setIsEnableStep(true);
+      setCardStatus("takePhotoSucces");
+      return;
     }
 
+    setCaputedImageAfter2(sharedData.photoFace);
+    const bodyParamsSendKamera = {
+      method: "addfaceinfonotify",
+      params: {
+        data: [
+          {
+            personId: sharedData.passportData.docNumber,
+            personNum: sharedData.passportData.noRegister,
+            passStrategyId: "",
+            personIDType: 1,
+            personName: sharedData.passportData.fullName,
+            personGender: sharedData.passportData.sex === "male" ? 1 : 0,
+            validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+            validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
+            personType: 1,
+            identityType: 1,
+            identityId: sharedData.passportData.docNumber,
+            identitySubType: 1,
+            identificationTimes: -1,
+            identityDataBase64: sharedData.photoFace ? sharedData?.photoFace.split(',')[1] : "",
+            status: 0,
+            reserve: "",
+          }
+        ],
+      }
+    }
     const dataTosendAPI = {
       no_register: sharedData.passportData.noRegister,
       no_passport: sharedData.passportData.docNumber,
@@ -722,7 +797,6 @@ const Apply = () => {
       profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       photo_passport: resDataScan ? `data:image/jpeg;base64,${resDataScan}` : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
     };
-
     setObjectApi(dataTosendAPI);
     setObjectCamera(bodyParamsSendKamera)
 
@@ -745,217 +819,8 @@ const Apply = () => {
 
     setIsEnableStep(false);
 
-    // console.log("bodyParam", bodyParam);
   };
 
-  useEffect(() => {
-    if (confirm) {
-      if (meesageConfirm === "Passport is not from voa country.") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        setDisabled(false);
-        setCardStatus("errorVoa");
-        setTitleFooter("Next Step");
-        setTabStatus(1);
-        setTitleHeader("Apply PLB");
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setTimeout(() => {
-          setStatusPaymentCredit(false);
-
-          setCardStatus("iddle");
-
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
-          setIsEnableBack(true);
-          setConfirm(false);
-        }, 5000);
-      } else if (meesageConfirm === "Failed when request payment pg") {
-        // setTimeout(() => {
-        //   setDisabled(false);
-        //   setCardPaymentProps({
-        //     isWaiting: false,
-        //     isCreditCard: false,
-        //     isPaymentCredit: false,
-        //     isPaymentCash: false,
-        //     isPrinted: false,
-        //     isSuccess: false,
-        //     isFailed: false,
-        //     isPhoto: false,
-        //     isDoRetake: false,
-        //   });
-        // }, 3000);
-      } else if (
-        meesageConfirm === "Passport is not active for at least 6 months."
-      ) {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        setDisabled(false);
-        setTitleHeader("Apply PLB");
-        setCardStatus("errorBulan");
-        setTitleFooter("Next Step");
-        setTabStatus(1);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setTimeout(() => {
-          setStatusPaymentCredit(false);
-
-          setCardStatus("iddle");
-
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
-          setIsEnableBack(true);
-          setConfirm(false);
-        }, 5000);
-      } else if (meesageConfirm === "Passport is from danger country.") {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        setDisabled(false);
-        setTitleHeader("Apply PLB");
-        setCardStatus("errorDanger");
-        setTitleFooter("Next Step");
-        setTabStatus(1);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setTimeout(() => {
-          setStatusPaymentCredit(false);
-
-          setCardStatus("iddle");
-
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
-          setIsEnableBack(true);
-          setConfirm(false);
-        }, 5000);
-      } else if (
-        meesageConfirm === "Required field 'photoFace' is missing" ||
-        meesageConfirm ===
-        "Face on the passport doesn't match with captured image."
-      ) {
-        const params = {
-          code: "email",
-          data: "",
-        };
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: true,
-          isDoRetake: false,
-        });
-        setIsEnableBack(false);
-        setIsEnableStep(false);
-        setDisabled(false);
-      } else if (
-        meesageConfirm === "Invalid JWT Token" ||
-        meesageConfirm === "Expired JWT Token"
-      ) {
-        setTimeout(() => {
-          const params = {
-            code: "email",
-            data: "",
-          };
-          setDisabled(false);
-          setTitleFooter("Next Step");
-          setTabStatus(1);
-          setStatusPaymentCredit(false);
-
-          setCardStatus("iddle");
-
-          setRecievedTempData([]);
-          setDataPrimaryPassport(null);
-          setIsEnableBack(true);
-          setCardPaymentProps({
-            isWaiting: false,
-            isCreditCard: false,
-            isPaymentCredit: false,
-            isPaymentCash: false,
-            isPrinted: false,
-            isSuccess: false,
-            isFailed: false,
-            isPhoto: false,
-            isDoRetake: false,
-          });
-          // navigate("/");
-          localStorage.removeItem("user");
-          localStorage.removeItem("JwtToken");
-          localStorage.removeItem("cardNumberPetugas");
-          localStorage.removeItem("key");
-          localStorage.removeItem("token");
-          localStorage.removeItem("jenisDeviceId");
-          localStorage.removeItem("deviceId");
-          localStorage.removeItem("airportId");
-          localStorage.removeItem("price");
-        }, 5000);
-      } else {
-        // console.log("jalan gk ya??");
-        const params = {
-          code: "email",
-          data: "",
-        };
-        setDisabled(false);
-        setTabStatus(1);
-        setTitleFooter("Next Step");
-        setTitleHeader("Apply PLB");
-        setStatusPaymentCredit(false);
-
-        setCardStatus("iddle");
-
-        setRecievedTempData([]);
-        setDataPrimaryPassport(null);
-        setIsEnableBack(true);
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setConfirm(false);
-      }
-    }
-  }, [confirm]);
 
   return (
     <div className="background-apply-voa">
