@@ -24,7 +24,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("lookCamera");
+  const [cardStatus, setCardStatus] = useState("");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -220,74 +220,74 @@ const Apply = () => {
       return URL.createObjectURL(blob);
     }
   };
-  // const connectWebSocket = (ipAddress, socket_IO) => {
-  //   const socketURL = `ws://localhost:4488`;
-  //   socketRef.current = new WebSocket(socketURL);
+  const connectWebSocket = (ipAddress, socket_IO) => {
+    const socketURL = `ws://localhost:4488`;
+    socketRef.current = new WebSocket(socketURL);
 
-  //   socketRef.current.onopen = () => {
-  //     console.log("WebSocket connection opened");
-  //     isCloseTimeoutSet = false;
-  //     setCardStatus("iddle"); // Start in 'iddle' state after connection opens
-  //     setIsConnected(true);
-  //   };
+    socketRef.current.onopen = () => {
+      console.log("WebSocket connection opened");
+      isCloseTimeoutSet = false;
+      setCardStatus("iddle"); // Start in 'iddle' state after connection opens
+      setIsConnected(true);
+    };
 
-  //   socketRef.current.onmessage = (event) => {
-  //     try {
-  //       const dataJson = JSON.parse(event.data);
-  //       console.log("Received data from server websocket:", dataJson);
+    socketRef.current.onmessage = (event) => {
+      try {
+        const dataJson = JSON.parse(event.data);
+        console.log("Received data from server websocket:", dataJson);
 
-  //       // Only attempt to decode if `dataJson.uvImage` exists
-  //       if (dataJson.visibleImage) {
-  //         setResDataScan(decodeBase64ToImage(dataJson.visibleImage));
-  //       }
+        // Only attempt to decode if `dataJson.uvImage` exists
+        if (dataJson.visibleImage) {
+          setResDataScan(decodeBase64ToImage(dataJson.visibleImage));
+        }
 
-  //       switch (dataJson.msgType) {
-  //         case "passportData":
-  //           break;
-  //         case "visibleImage":
-  //           setRecievedTempData((previous) => [...previous, dataJson]);
-  //           break;
-  //         case "DeviceController":
-  //           const { airportId, deviceId, jenisDeviceId } = dataJson;
-  //           localStorage.setItem("airportId", airportId);
-  //           localStorage.setItem("deviceId", deviceId);
-  //           localStorage.setItem("jenisDeviceId", jenisDeviceId);
-  //           break;
-  //         default:
-  //           break;
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to parse WebSocket message data:", error);
-  //     }
-  //   };
+        switch (dataJson.msgType) {
+          case "passportData":
+            break;
+          case "visibleImage":
+            setRecievedTempData((previous) => [...previous, dataJson]);
+            break;
+          case "DeviceController":
+            const { airportId, deviceId, jenisDeviceId } = dataJson;
+            localStorage.setItem("airportId", airportId);
+            localStorage.setItem("deviceId", deviceId);
+            localStorage.setItem("jenisDeviceId", jenisDeviceId);
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error("Failed to parse WebSocket message data:", error);
+      }
+    };
 
-  //   socketRef.current.onclose = () => {
-  //     console.log("WebSocket connection closed");
-  //     setIsConnected(false);
-  //     setCardStatus("errorConnection");
+    socketRef.current.onclose = () => {
+      console.log("WebSocket connection closed");
+      setIsConnected(false);
+      setCardStatus("errorConnection");
 
-  //     // Close handling and reconnection logic
-  //     if (!isCloseTimeoutSet) {
-  //       setCardStatus("errorWebsocket");
-  //       setTimeout(() => {
-  //         isCloseTimeoutSet = true;
-  //       }, 3000);
-  //     } else {
-  //       // Attempt to reconnect or notify server
-  //       // if (socket_IO) {
-  //       //   socket_IO.emit("clientData", "re-newIpAddress");
-  //       // } else {
-  //       //   console.warn("socket_IO is undefined.");
-  //       // }
-  //     }
-  //   };
+      // Close handling and reconnection logic
+      if (!isCloseTimeoutSet) {
+        setCardStatus("errorWebsocket");
+        setTimeout(() => {
+          isCloseTimeoutSet = true;
+        }, 3000);
+      } else {
+        // Attempt to reconnect or notify server
+        // if (socket_IO) {
+        //   socket_IO.emit("clientData", "re-newIpAddress");
+        // } else {
+        //   console.warn("socket_IO is undefined.");
+        // }
+      }
+    };
 
-  //   socketRef.current.onerror = (error) => {
-  //     console.error("WebSocket error:", error);
-  //     setCardStatus("errorConnection");
-  //     setIsConnected(false);
-  //   };
-  // };
+    socketRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setCardStatus("errorConnection");
+      setIsConnected(false);
+    };
+  };
 
   const closeWebSocket = () => {
     if (socketRef.current) {
@@ -296,11 +296,11 @@ const Apply = () => {
   };
 
   useEffect(() => {
-    // connectWebSocket(null, socket_IO_4010); // Ensure to pass `socket_IO` properly
+    connectWebSocket(null, socket_IO_4010); // Ensure to pass `socket_IO` properly
 
-    // return () => {
-    //   closeWebSocket();
-    // };
+    return () => {
+      closeWebSocket();
+    };
   }, []);
 
   // Contoh penggunaan di tempat lain

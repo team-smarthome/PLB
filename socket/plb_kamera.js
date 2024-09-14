@@ -54,8 +54,8 @@ const io = socketIo(server, {
 
 function liveCamera() {
     var pathStream = `./videos/stream/stream_.m3u8`;
-    var cmd_ffmpeg = "ffmpeg";
-    // var cmd_ffmpeg = "/usr/local/bin/ffmpeg"
+    // var cmd_ffmpeg = "ffmpeg";
+    var cmd_ffmpeg = "/usr/local/bin/ffmpeg"
     var url_rtsp = `rtsp://admin:123456@${ipCamera}:554/stream`;
 
     var args_parameter = [
