@@ -7,8 +7,8 @@ import NoProfile from '../../assets/images/no-profile-picture.svg'
 
 const FormDataValidation = ({ setSharedData, dataLogs }) => {
   const [optionNegara, setOptionNegara] = useState(dataNegara.data.map((negara) => ({
-    value: negara.id_negara,
-    label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
+    value: negara?.id_negara,
+    label: `${negara?.id_negara} - ${negara?.deskripsi_negara}`,
   })));
   const [optionGender, setOptionGender] = useState([
     { value: "male", label: "MALE" },
@@ -58,7 +58,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
   });
 
   useEffect(() => {
-    const findNationality = dataNegara.data.find((data) => data.id_negara == dataLogs?.nationality)
+    const findNationality = dataNegara.data.find((data) => data?.id_negara === dataLogs?.nationality)
     setFormData({
       passport_number: dataLogs?.no_passport || "",
       register_code: dataLogs?.no_register || "",
@@ -70,7 +70,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
           ? { value: "female", label: "FEMALE" }
           : "",
       nationality: dataLogs?.nationality
-        ? { valueOf: findNationality.id_negara, label: findNationality.deskripsi_negara }
+        ? { valueOf: findNationality?.id_negara, label: findNationality?.deskripsi_negara }
         : "",
       expiry_date: dataLogs?.expired_date || "",
       arrivaltime: dataLogs?.arrival_time || new Date().toISOString().split('T')[0],
@@ -324,7 +324,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
               <div className="photo-box">
                 <img
                   className={formdata.photo ? "" : "no-image"}
-                  src={formdata.photo ? `http://192.168.2.100:8000/storage/${formdata.photo}` : NoProfile}
+                  src={formdata.photo ? `data:image/jpeg;base64,${formdata.photo}` : NoProfile}
                   alt="Profile"
                 />
               </div>

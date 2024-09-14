@@ -1,7 +1,6 @@
 import axios from "axios";
 import { url_dev, url_devel } from "./env";
 
-const baseUrl = "http://192.168.2.100:8000/api"
 export async function apiPaymentHistory(header, body) {
   const apiUrl = `${url_dev}HistoryTransaction.php`;
   const headers = header;
@@ -90,7 +89,7 @@ export async function apiGetDataLogRegister(params) {
   try {
     const response = await axios({
       method: "GET",
-      url: `${baseUrl}/datauser`,
+      url: `${url_devel}api/datauser`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -136,7 +135,7 @@ export const getAllPetugas = async (params, page) => {
   try {
     const res = await axios({
       method: "get",
-      url: `${baseUrl}/users`,
+      url: `${url_devel}api/users`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -152,7 +151,7 @@ export const InsertPetugas = async (payload) => {
   try {
     const res = await axios({
       method: "post",
-      url: `${baseUrl}/register`,
+      url: `${url_devel}api/register`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -168,7 +167,7 @@ export const UpdatePetugas = async (id, payload) => {
   try {
     const res = await axios({
       method: "PUT",
-      url: `${baseUrl}/users/${id}`,
+      url: `${url_devel}api/users/${id}`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -183,7 +182,7 @@ export const DeletePetugas = async (id) => {
   try {
     const res = await axios({
       method: "delete",
-      url: `${baseUrl}/users/${id}`,
+      url: `${url_devel}api/users/${id}`,
       headers: {
         'Content-Type': 'application/json'
       }
@@ -226,7 +225,7 @@ export const getDataUserByPassportNumber = async (params) => {
   try {
     const res = await axios({
       method: "GET",
-      url: `${baseUrl}/datauser/${params}`,
+      url: `${url_devel}api/datauser/${params}`,
     })
     return res
   } catch (error) {
@@ -239,7 +238,7 @@ export const deleteDataUserPlb = async (params) => {
   try {
     const res = await axios({
       method: "DELETE",
-      url: `${baseUrl}/datauser/${params}`,
+      url: `${url_devel}api/datauser/${params}`,
     });
     return res;
   } catch (error) {
@@ -250,7 +249,7 @@ export const editDataUserPlb = async (data, params) => {
   try {
     const res = await axios({
       method: "PUT",
-      url: `${baseUrl}/datauser/${params}`,
+      url: `${url_devel}api/datauser/${params}`,
       data
     });
     return res;

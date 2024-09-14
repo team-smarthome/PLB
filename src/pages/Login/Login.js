@@ -19,7 +19,7 @@ const Login = () => {
 
 
 
-  const version = "3.0.5";
+  const version = "1.0.0";
 
   const isAuthenticated = () => {
     return Cookies.get('token') !== undefined;

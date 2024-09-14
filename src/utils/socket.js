@@ -13,8 +13,6 @@ let pendingTakePhotoRequests4010 = [];
 
 let pendingTakePhotoRequests4020 = [];
 
-const ipServer = localStorage.getItem('ipServer');
-
 export const initiateSocket = () => {
     if (!socket) {
         socket = io('http://localhost:4000');
@@ -124,14 +122,18 @@ const sendTakePhotoRequest4010 = (data) => {
 
 export const initiateSocket4020 = () => {
     if (!socket4020) {
-        socket4020 = io(`${url_socket}:4030`);
+        socket4020 = io(`http://localhost:4030`);
         socket4020.on('connect', () => {
             if (socket4020.connected) {
-                console.log('coba connect 4030 fase 1')
+                while (pendingTakePhotoRequests4020.length > 0) {
+                    const { action, data } = pendingTakePhotoRequests4020.shift(); // Ambil permintaan pertama
+                    if (action === 'logHistory') {
+                        socket4020.emit("logHistory", data);
+                    }
+                }
                 socket4020.emit("logHistory");
             } else {
                 console.log('coba connect 4030 fase 2')
-                //coba connect
                 socket4020.connect();
                 socket4020.emit("logHistory");
             }
@@ -161,7 +163,7 @@ export const initiateSocket4020 = () => {
 };
 
 export const addPendingRequest4020 = (request) => {
-    console.log('testWebsocket4020 pendingRequest', request);
+    console.log('testWebsocket4020_pendingRequest', request);
     pendingTakePhotoRequests4020.push(request);
 
 };

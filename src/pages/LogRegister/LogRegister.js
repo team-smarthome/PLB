@@ -125,13 +125,13 @@ const LogRegister = () => {
         try {
             const res = await deleteDataUserPlb(detailData.no_passport)
             console.log(res, "res delete")
-            if (res.status == 201) {
+            if (res.status === 201) {
                 socket_IO_4010.emit('deleteDataUser', {
                     no_passport: detailData.no_passport
                 })
                 socket_IO_4010.on('responseDeleteDataUser', (data) => {
                     console.log(data, "res socket")
-                    if (data == "Successfully") {
+                    if (data === "Successfully") {
                         getLogRegister()
                         setShowModalDelete(false)
                     }
@@ -167,7 +167,7 @@ const LogRegister = () => {
             <td>{row.nationality}</td>
             <td>
                 <img
-                    src={`${url_devel}storage/${row.profile_image}`}
+                    src={`data:image/jpeg;base64,${row.profile_image}`}
                     alt="Profile"
                     width={100}
                     height={100}
@@ -175,7 +175,7 @@ const LogRegister = () => {
                 />
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                {/* <button onClick={() => openModalEdit(row)}>Edit</button> */}
+                <button onClick={() => openModalEdit(row)}>Edit</button>
                 <button onClick={() => deleteModal(row)} style={{ background: 'red' }}>Delete</button>
             </td>
         </>
@@ -197,7 +197,7 @@ const LogRegister = () => {
                 item.no_passport,
                 item.no_register,
                 item.name,
-                item.gender == "M" ? "Laki-laki" : "Perempuan",
+                item.gender === "M" ? "Laki-laki" : "Perempuan",
             ];
             worksheet.addRow(row);
         });
@@ -339,7 +339,6 @@ const LogRegister = () => {
             destination_location: row.destination_location || "",
             photo_passport: row.photo_passport || "",
             profile_image: row.profile_image || "",
-            arrival_time: row.arrival_time || "",
         })
         setShowModalEdit(true)
     }
@@ -421,7 +420,7 @@ const LogRegister = () => {
                     <div className="input-file-container" onClick={() => refInputFace.current?.click()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         {detailData.profile_image ?
                             (
-                                <img src={detailData.profile_image.includes('user_profile_images/') ? `${url_devel}storage/${detailData.profile_image}`
+                                <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
                                     : detailData.profile_image}
                                     alt="" height={175} />
                             )
@@ -435,7 +434,7 @@ const LogRegister = () => {
                     <div className="input-file-container" onClick={() => refInputPassport.current?.click()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         {detailData.photo_passport ?
                             (
-                                <img src={detailData.photo_passport.includes('user_photo_passport/') ? `${url_devel}storage/${detailData.photo_passport}`
+                                <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
                                     : detailData.photo_passport}
                                     alt="" height={175} />
                             )
@@ -449,36 +448,8 @@ const LogRegister = () => {
         )
     }
 
-    async function convertImageToBase64(detailData) {
-        const imageUrl = `http://192.168.2.100:8000/storage/${detailData.profile_image}`;
-
-        try {
-            const imageResponse = await axios.get(imageUrl
-                // {
-                // responseType: "blob", // Fetch the image as a Blob
-                // }
-            );
-
-            // Create a new FileReader instance
-            const reader = new FileReader();
-
-            // Read the Blob as a Data URL (Base64 string)
-            reader.readAsDataURL(imageResponse.data);
-
-            reader.onloadend = function () {
-                const base64Image = reader.result;
-                console.log("Base64 image:", base64Image);
-            };
-
-        } catch (error) {
-            console.error("Error converting image to Base64:", error);
-        }
-    }
-
     const handleEdit = async () => {
         try {
-            // const convertedImage = await convertImageToBase64(detailData)
-            // return console.log("convertedImage", convertedImage)
             const res = await editDataUserPlb(detailData, detailData.no_passport)
             const dataEdit = {
                 method: "addfaceinfonotify",
@@ -505,7 +476,7 @@ const LogRegister = () => {
                     ],
                 }
             }
-            if (res.status == 200) {
+            if (res.status === 200) {
                 socket_IO_4010.emit('editDataUser', dataEdit)
                 socket_IO_4010.on('responseEditDataUser', (data) => {
                     console.log(data, "res socket")

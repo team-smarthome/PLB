@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
-import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
 import { addPendingRequest4020, initiateSocket4020 } from '../../utils/socket'
 import Modals from '../../components/Modal/Modal'
@@ -10,7 +9,6 @@ import { loginCamera } from '../../services/api'
 const LogFaceReg = () => {
     const navigate = useNavigate()
     const socket_IO_4020 = initiateSocket4020();
-
     const [logData, setLogData] = useState([])
     const [showModalConfig, setShowModalConfig] = useState(false)
     const [showModalLogin, setShowModalLogin] = useState(false)
@@ -31,14 +29,13 @@ const LogFaceReg = () => {
                 console.log(data, "datayanddapatdariwes")
                 setStatus("success")
                 setLogData(data)
-                setInterval(() => {
+                setTimeout(() => {
                     if (socket_IO_4020.connected) {
                         socket_IO_4020.emit('logHistory')
                     } else {
                         addPendingRequest4020({ action: 'logHistory' });
                         socket_IO_4020.connect();
                     }
-
                 }, 2000);
             }
         });
@@ -67,48 +64,14 @@ const LogFaceReg = () => {
         if (socket_IO_4020.connected) {
             socket_IO_4020.emit('logHistory')
         } else {
-            addPendingRequest4020({ action: 'logHistory' });
+            addPendingRequest4020({ action: 'logHistory', data: {} });
             socket_IO_4020.connect();
         }
     }, [])
 
-    const dummy = [
-        {
-            id: 1,
-            no_plb: '3213122131',
-            no_register: "431412321",
-            name: "ario",
-            similiarity: 80,
-            recognitionStatus: 'success',
-            recognitionTime: '2024-09-06 16:45',
-            profile_image: ario
-        },
-        {
-            id: 2,
-            no_plb: '3213122131',
-            no_register: "431412321",
-            name: "ario",
-            similiarity: 80,
-            recognitionStatus: 'success',
-            recognitionTime: '2024-09-06 16:45',
-            profile_image: ario
-        },
-        {
-            id: 3,
-            no_plb: '3213122131',
-            no_register: "431412321",
-            name: "ario",
-            similiarity: 80,
-            recognitionStatus: 'success',
-            recognitionTime: '2024-09-06 16:45',
-            profile_image: ario
-        },
-    ]
 
     const handleEpochToDate = (epoch) => {
         const date = new Date(epoch * 1000);
-
-
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-indexed month
         const year = date.getFullYear();

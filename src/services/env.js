@@ -1,5 +1,5 @@
 // const currentOrigin = window.location.origin;
-const currentOrigin = "http://192.168.2.100";
+const currentOrigin = "http://127.0.0.1";
 
 export const url_dev = `${currentOrigin}/`;
 export const url_production = `${currentOrigin}/api/`;
