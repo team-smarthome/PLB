@@ -22,6 +22,10 @@ thead tr {
     text-transform: capitalize;
 }
 
+th {
+    color: white;
+}
+
 th,
 td {
     padding: 12px;

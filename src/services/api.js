@@ -237,9 +237,24 @@ export const getDataUserByPassportNumber = async (params) => {
 
 export const deleteDataUserPlb = async (params) => {
   try {
-    const res = await axios.delete(`${url_devel}api/datauser/${params}`);
+    const res = await axios({
+      method: "DELETE",
+      url: `${baseUrl}/datauser/${params}`,
+    });
     return res;
   } catch (error) {
-    console(error.message);
+    console.log(error);
+  }
+}
+export const editDataUserPlb = async (data, params) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${baseUrl}/datauser/${params}`,
+      data
+    });
+    return res;
+  } catch (error) {
+    console.log(error);
   }
 }
