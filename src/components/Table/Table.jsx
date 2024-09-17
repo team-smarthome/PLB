@@ -32,7 +32,7 @@ const Table = ({ data, page, perPage }) => {
         <tbody>
           {data.map((item, index) => {
             const findNationality = dataNegara.data.find(
-              (dataNegaraItem) => dataNegaraItem.id_negara === item.nationality
+              (dataNegaraItem) => dataNegaraItem?.id_negara === item?.nationality
             );
 
             return (
@@ -45,11 +45,11 @@ const Table = ({ data, page, perPage }) => {
                 <td>{item.no_passport}</td>
                 <td>{item.no_register}</td>
                 <td>{item.name}</td>
-                <td>{findNationality ? `${findNationality.id_negara}-${findNationality.deskripsi_negara}` : "Unknown"}</td>
+                <td>{findNationality ? `${findNationality?.id_negara}-${findNationality?.deskripsi_negara}` : "Unknown"}</td>
                 <td>{item.arrival_time}</td>
                 <td>
                   <img
-                    src={`${url_devel}storage/${item.profile_image}`}
+                    src={`data:image/jpeg;base64,${item.profile_image}`}
                     alt="Foto Profile"
                     width="80"
                     height="80"

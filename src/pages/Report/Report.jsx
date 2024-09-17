@@ -9,7 +9,6 @@ import { getDataUserAPI } from "../../services/api";
 import { format } from 'date-fns';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import e from "cors";
 
 function Report() {
   const navigate = useNavigate();
@@ -72,6 +71,7 @@ function Report() {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const generatePDF = () => {
@@ -256,6 +256,7 @@ function Report() {
                 dateFormat="dd/MM/yyyy HH:mm"
                 className="date-picker"
                 timeIntervals={1}
+                placeholderText="Tanggal/Bulan/Tahun HH:mm"
               />
             </div>
             <div className="input-filter-bottom2">
@@ -268,6 +269,7 @@ function Report() {
                 dateFormat="dd/MM/yyyy HH:mm"
                 className="date-picker"
                 timeIntervals={1}
+                placeholderText="Tanggal/Bulan/Tahun HH:mm"
               />
             </div>
           </div>

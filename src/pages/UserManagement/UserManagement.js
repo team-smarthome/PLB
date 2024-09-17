@@ -36,7 +36,7 @@ const UserManagement = () => {
         try {
             setIsLoading(true)
             const response = await getAllPetugas(search, page)
-            if (response.status == 200) {
+            if (response.status === 200) {
                 console.log(response.data.data)
                 setDataPetugas(response?.data?.data)
                 setTotalPages(response.data.pagination.last_page);
@@ -81,7 +81,7 @@ const UserManagement = () => {
         try {
             setIsLoading(true)
             const res = await DeletePetugas(formData.id);
-            if (res.status == 200) {
+            if (res.status === 200) {
                 Toast.fire({
                     icon: "success",
                     title: "Petugas berhasil dihapus.",
@@ -363,7 +363,7 @@ const UserManagement = () => {
                 <td>{row?.petugas?.gender == "M" ? "Laki-laki" : "Perempuan"}</td>
                 <td>{row?.petugas?.tanggal_lahir}</td>
                 <td>{row?.jabatan?.nama_jabatan}</td>
-                <td>{row?.role == 0 ? "Super Admin" : row?.role == 1 ? "admin" : "user"}</td>
+                <td>{row?.role === 0 ? "Super Admin" : row?.role === 1 ? "admin" : "user"}</td>
                 <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>
             </>
         )
