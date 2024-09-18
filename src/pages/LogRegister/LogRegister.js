@@ -14,6 +14,7 @@ const LogRegister = () => {
     const [showModalAdd, setShowModalAdd] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const [showModalDelete, setShowModalDelete] = useState(false)
+    const [status, setStatus] = useState("loading")
     const [detailData, setDetailData] = useState({
         passport_number: "",
         register_code: "",
@@ -77,6 +78,7 @@ const LogRegister = () => {
             })
             if (res.status == 200) {
                 console.log(res.data.data, "res.data.data")
+                setStatus("success")
                 setLogData(res.data.data)
             }
         } catch (error) {
@@ -175,7 +177,7 @@ const LogRegister = () => {
                 />
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                <button onClick={() => openModalEdit(row)}>Edit</button>
+                {/* <button onClick={() => openModalEdit(row)}>Edit</button> */}
                 <button onClick={() => deleteModal(row)} style={{ background: 'red' }}>Delete</button>
             </td>
         </>
@@ -532,19 +534,24 @@ const LogRegister = () => {
                         style={{ backgroundColor: "green" }}
                     >Export
                     </button>
-                    <button
+                    {/* <button
                         onClick={() => setShowModalAdd(true)}
                         style={{ backgroundColor: "#11375c" }}
                     >Add
-                    </button>
+                    </button> */}
                 </div>
             </div>
-            <TableLog
+            {status === "loading" && (
+                <div className="loading">
+                    <span className="loader-loading-table"></span>
+                </div>
+            )}
+            {status === "success" && logData && <TableLog
                 tHeader={['No', 'no plb', 'no register', 'name', 'gender', 'nationality', 'profile image', "action"]}
                 tBody={logData}
                 // handler={getDetailData}
                 rowRenderer={customRowRenderer}
-            />
+            />}
             <Modals
                 showModal={showModalAdd}
                 buttonName="Submit"
