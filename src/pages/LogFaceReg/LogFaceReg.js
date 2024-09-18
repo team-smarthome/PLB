@@ -34,7 +34,7 @@ const LogFaceReg = () => {
     const [noRegister, setNoRegister] = useState("");
     const [name, setName] = useState("");
     const [page, setPage] = useState(1);
-    const [selectedCondition, setSelectedCondition] = useState('name');
+    const [selectedCondition, setSelectedCondition] = useState('personId');
 
     const [params, setParams] = useState({
         name: "",
@@ -167,6 +167,16 @@ const LogFaceReg = () => {
     }, [selectedOption])
 
     const handleSelectChange = (event) => {
+        setParams(
+            {
+                name: "",
+                personId: "",
+                startDate: "",
+                endDate: "",
+                passStatus: ""
+            }
+        )
+        setSelectedCondition("personId")
         setLogData([])
         setStatus("loading")
         console.log(logData, "selectedOptionRow123")
