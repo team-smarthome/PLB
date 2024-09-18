@@ -4,14 +4,17 @@ import { useNavigate } from 'react-router-dom'
 import { addPendingRequest4020, initiateSocket4020 } from '../../utils/socket'
 import Modals from '../../components/Modal/Modal'
 import './logfacereg.style.css'
-import { apiInsertLog, loginCamera } from '../../services/api'
+import { apiGetIp, apiInsertLog, getDataLogApi, loginCamera } from '../../services/api'
 import axios from 'axios'
+import Cookies from 'js-cookie';
+import { Select } from 'flowbite-react'
 
 const LogFaceReg = () => {
     const navigate = useNavigate()
     const socket_IO_4020 = initiateSocket4020();
     const [logData, setLogData] = useState([])
-    const [showModalConfig, setShowModalConfig] = useState(true)
+    const [showModalConfig, setShowModalConfig] = useState(false)
+    const [optionIp, setOptionIp] = useState([])
     const [showModalLogin, setShowModalLogin] = useState(false)
     const [ipServerPC, setIpServerPC] = useState('');
     const [username, setUsername] = useState('')
@@ -21,11 +24,17 @@ const LogFaceReg = () => {
     const [status, setStatus] = useState("loading")
     const ipCameraRef = useRef(null)
     const [statusAll, setStatusAll] = useState("")
-
+    const [dataUserId, setDataUserId] = useState({})
     const tokenLocalStorage = localStorage.getItem('logCameraToken')
     const ipServerCameraLocalStorage = localStorage.getItem('ipServerCamera')
     const ipServerPCLocalStorage = localStorage.getItem('ipServerPC')
     const ipCameraLocalStorage = localStorage.getItem('cameraIpNew')
+    const [selectedOption, setSelectedOption] = useState('192.2.1');
+    const [noPassport, setNoPassport] = useState("");
+    const [noRegister, setNoRegister] = useState("");
+    const [name, setName] = useState("");
+    const [page, setPage] = useState(1);
+
 
     const handleEpochToDate = (epoch) => {
         const date = new Date(epoch * 1000);
@@ -42,75 +51,170 @@ const LogFaceReg = () => {
     };
 
     useEffect(() => {
-        const ipCameraNew = localStorage.getItem('cameraIpNew')
-        if (ipServerCamera.length === 0 && ipCameraNew) {
+        const ipCameraNew = localStorage.getItem('cameraIpNew');
+        console.log(selectedOption, "selectedOptionRow12312312312");
+        if (ipServerCamera.length === 0 && ipCameraNew && selectedOption !== "192.2.1") {
             socket_IO_4020.on("responseHistoryLogs", (data) => {
                 if (data.length > 0) {
-                    console.log(data, "datayanddapatdariwes")
-                    setStatus("success")
-                    setLogData(data)
+                    console.log(data, "datayanddapatdariwes");
+                    setStatus("success");
+                    setLogData(data);
+
                     const dataInsert = {
                         personId: data[0]?.personId,
                         personCode: data[0]?.personCode,
                         similarity: data[0]?.images_info[0]?.similarity,
                         passStatus: data[0]?.passStatus === 6 ? "Failed" : "Success",
                         time: data[0]?.time,
-                        img_path: data[0]?.images_info[0]?.img_path,
+                        img_path: `http://${ipCameraNew}/ofsimage/${data[0]?.images_info[0]?.img_path}`,
                         ipCamera: ipCameraNew
-                    }
+                    };
 
-                    const response = apiInsertLog(dataInsert)
-                    response.then(res => {
-                        console.log(res, "responInsert")
-                        if (res.status === 200) {
-                            setTimeout(() => {
-                                if (socket_IO_4020.connected) {
-                                    console.log("masuk_sini_socket")
-                                    socket_IO_4020.emit('historyLog')
-                                } else {
-                                    console.log("masuk_sini_socket_gagal")
-                                    addPendingRequest4020({ action: 'historyLog' });
-                                    socket_IO_4020.connect();
-                                }
-                            }, 2000);
-                        } else {
-                            console.log("masuk_sini_gagal")
-                        }
-                    }).catch(err => console.log(err))
+                    // Kirim data ke API
+                    apiInsertLog(dataInsert)
+                        .then(res => {
+                            console.log(res, "responInsert");
+                            if (res.status === 201) {
+                                setTimeout(() => {
+                                    if (socket_IO_4020.connected) {
+                                        console.log("masuk_sini_socket");
+                                        socket_IO_4020.emit('historyLog');
+                                    } else {
+                                        console.log("masuk_sini_socket_gagal");
+                                        addPendingRequest4020({ action: 'historyLog' });
+                                        socket_IO_4020.connect();
+                                    }
+                                }, 2000);
+                            } else {
+                                console.log("masuk_sini_gagal");
+                            }
+                        })
+                        .catch(err => console.log(err));
                 }
-            })
+            });
+
+            // Bersihkan listener socket saat komponen di-unmount
             return () => {
-                socket_IO_4020.off('responseHistoryLogs')
-                socket_IO_4020.off('historyLog')
-            }
+                socket_IO_4020.off('responseHistoryLogs');
+                socket_IO_4020.off('historyLog');
+            };
         } else {
-            console.log("masuk_sini_noip")
-            // setShowModalConfig(true)
+            setStatus("loading");
+            console.log("masuk_sini_noip");
         }
 
-    }, [socket_IO_4020])
+    }, [socket_IO_4020, ipServerCamera, selectedOption]);
 
 
 
-    const customRowRenderer = (row) => (
-        <>
-            <td>{row?.personId}</td>
-            <td>{row?.personCode}</td>
-            <td>{row?.name}</td>
-            <td>{row?.images_info[0]?.similarity}</td>
-            <td>{row?.passStatus === 6 ? "Failed" : "Success"}</td>
-            <td>{handleEpochToDate(row?.time)}</td>
-            <td>
-                <img
-                    src={`${ipCameraLocalStorage}/ofsimage/${row.images_info[0].img_path}`}
-                    alt="result"
-                    width={100}
-                    height={100}
-                    style={{ borderRadius: "50%" }}
-                />
-            </td>
-        </>
-    );
+    const getLogData = async (params) => {
+        try {
+            const response = await getDataLogApi(params);
+            setStatus("success")
+            console.log(response.data.data, "dataLog")
+            setLogData(response.data.data)
+        } catch (error) {
+            setStatus("succes")
+            console.log(error.message)
+        }
+    }
+
+
+    useEffect(() => {
+        setStatus('loading')
+        const getDataIp = Cookies.get('userdata');
+        const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
+        getAllIp.then(res => {
+            if (res.data.status === 200) {
+                const dataOptions = res.data.data.map(item => ({
+                    value: item.ipAddress,
+                    label: item.namaKamera,
+                }));
+                const defaultOption = {
+                    value: '192.2.1',
+                    label: 'All Camera'
+                };
+                const updatedOptions = [defaultOption, ...dataOptions];
+                setOptionIp(updatedOptions);
+                console.log(updatedOptions, "dataOptions");
+            }
+        }).catch(err => console.log(err.message))
+        const fetchData = async () => {
+            const filterParams = {
+                page: page,
+                no_passport: noPassport,
+                name: name,
+                no_register: noRegister,
+            };
+            await getLogData(filterParams);
+        };
+
+        fetchData();
+
+    }, [selectedOption])
+
+    const handleSelectChange = (event) => {
+        setLogData([])
+        setStatus("loading")
+        console.log(logData, "selectedOptionRow123")
+        setStatus("loading")
+        localStorage.setItem('cameraIpNew', event.target.value)
+        handleSubmit(event.target.value)
+        setSelectedOption(event.target.value);
+        console.log('Selected_IP:', event.target.value);
+    };
+
+
+
+    const customRowRenderer = (row) => {
+        console.log(selectedOption, "selectedOptionRow");
+        console.log(row, "selectedOptionRow");
+        return (
+            <>
+                {!selectedOption.includes("192.168") ? (
+                    <>
+                        <td>{row?.personId}</td>
+                        <td>{row?.personCode}</td>
+                        <td>{row?.name}</td>
+                        <td>{row?.similarity}</td>
+                        <td>{row?.passStatus === 6 ? "Failed" : "Success"}</td>
+                        <td>{handleEpochToDate(row?.time)}</td>
+                        <td>
+                            <img
+                                src={`${row?.img_path}`}
+                                alt="result"
+                                width={100}
+                                height={100}
+                                style={{ borderRadius: "50%" }}
+                            />
+                        </td>
+                        <td>{row?.ipCamera}</td>
+                    </>
+                ) : (
+                    <>
+                        <td>{row?.personId}</td>
+                        <td>{row?.personCode}</td>
+                        <td>{row?.name}</td>
+                        <td>{row?.images_info?.[0]?.similarity ?? row?.similarity}</td>
+                        <td>{row?.passStatus === 6 ? "Failed" : "Success"}</td>
+                        <td>{handleEpochToDate(row?.time)}</td>
+                        <td>
+                            <img
+                                src={row?.images_info?.[0]?.img_path ? `http://${ipCameraLocalStorage}/ofsimage/${row.images_info[0].img_path}` : ''}
+                                alt="result"
+                                width={100}
+                                height={100}
+                                style={{ borderRadius: "50%" }}
+                            />
+
+                        </td>
+                        <td>{ipCameraLocalStorage}</td>
+                    </>
+                )}
+            </>
+        );
+    };
+
 
     const getDetailData = (row) => {
         navigate('/validation', { state: { detailDataLog: row, isCp: true } })
@@ -171,13 +275,10 @@ const LogFaceReg = () => {
     }
 
 
-    const handleSubmit = async () => {
-        setShowModalConfig(false)
-        console.log(ipServerCamera, "ipServerCameraManaBro")
-        localStorage.setItem("cameraIpNew", ipServerCamera)
+    const handleSubmit = async (ipParams) => {
         try {
-            if (ipServerCamera !== "") {
-                const response = await axios.put(`http://${ipServerCamera}/cgi-bin/entry.cgi/system/login`, {
+            if (ipParams !== "") {
+                const response = await axios.put(`http://${ipParams}/cgi-bin/entry.cgi/system/login`, {
                     "sUserName": "admin",
                     "sPassword": btoa("Maxvision@2024")
                 })
@@ -185,7 +286,7 @@ const LogFaceReg = () => {
                 if (response.data.status.code === 200) {
                     const loginData = `Face-Token=${dataRes.token}; face-username="admin"; roleId=${dataRes.auth}; sidebarStatus=${dataRes.status}; token=${dataRes.token}`;
                     const dataSendWs = {
-                        ipServerCamera: ipServerCamera,
+                        ipServerCamera: ipParams,
                         cookiesCamera: loginData
                     }
                     if (socket_IO_4020.connected) {
@@ -228,12 +329,16 @@ const LogFaceReg = () => {
                     </div>
                 </div>
                 <div className="buttons-container" style={{ display: 'flex', gap: 10 }}>
-                    <button
-                        style={{ backgroundColor: 'blue' }}
-                        onClick={() => setShowModalConfig(true)}
+                    <select
+                        value={selectedOption}
+                        onChange={handleSelectChange}
                     >
-                        Config
-                    </button>
+                        {optionIp.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                     <button
                         onClick={generateExcel}
                         style={{ backgroundColor: "green" }}
@@ -252,7 +357,7 @@ const LogFaceReg = () => {
             )}
             {status === "success" && logData &&
                 <TableLog
-                    tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result"]}
+                    tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
                     tBody={logData}
                     handler={getDetailData}
                     rowRenderer={customRowRenderer}

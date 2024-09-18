@@ -318,4 +318,18 @@ export const apiDeleteIp = async (params) => {
   } catch (error) {
     console.log(error)
   }
-} 
+}
+
+export const getDataLogApi = async (filterParams) => {
+  try {
+    const response = await axios.get(`${url_devel}api/face-reg`, {
+      params: filterParams,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
