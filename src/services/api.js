@@ -257,3 +257,65 @@ export const editDataUserPlb = async (data, params) => {
     console.log(error);
   }
 }
+
+export const apiInsertLog = async (data) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/face-reg`,
+      data
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+export const apiIsertIP = async (data) => {
+  console.log("Form_submitted", data)
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/ipconfig`,
+      data
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const apiGetIp = async (params) => {
+  try {
+    const res = await axios.get(`${url_devel}api/ipconfig/${params}`);
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const apiEditIp = async (data, params) => {
+  try {
+    const res = await axios({
+      method: "put",
+      url: `${url_devel}api/ipconfig/${params}`,
+      data
+    });
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const apiDeleteIp = async (params) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/ipconfig/${params}`
+    });
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+} 

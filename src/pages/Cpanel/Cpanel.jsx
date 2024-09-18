@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import './cpanel.style.css'
 import ario from '../../assets/images/ario.jpeg'
 import UserManagement from '../UserManagement/UserManagement';
+import SettingIp from '../../components/SettingIp/SettingIp';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -79,6 +80,7 @@ const Cpanel = () => {
                     <Route path="/log-register" element={<LogRegister />} />
                     <Route path="/log-facereg" element={<LogFaceReg />} />
                     <Route path="/user-management" element={<UserManagement />} />
+                    <Route path="/setting-ip" element={<SettingIp />} />
                 </ReactRoutes>
             </div>
         </div>
