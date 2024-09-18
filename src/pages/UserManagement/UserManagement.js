@@ -429,7 +429,7 @@ const UserManagement = () => {
                 ) : (
                     <>
                         <TableLog
-                            tHeader={['no', 'nama', 'nip', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action']}
+                            tHeader={['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action']}
                             tBody={dataPetugas}
                             onEdit={editModal}
                             onDelete={deleteModal}
