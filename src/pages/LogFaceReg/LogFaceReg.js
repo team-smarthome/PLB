@@ -34,6 +34,23 @@ const LogFaceReg = () => {
     const [noRegister, setNoRegister] = useState("");
     const [name, setName] = useState("");
     const [page, setPage] = useState(1);
+    const [selectedCondition, setSelectedCondition] = useState('name');
+
+    const [params, setParams] = useState({
+        name: "",
+        type: "all",
+        gender: "all",
+        beginPosition: 0,
+        endPosition: 19,
+        limit: 20,
+        page: 1,
+        status: "all",
+        passState: 0,
+        passStatus: -1,
+        personCode: "",
+        minAge: 0,
+        maxAge: 100
+    })
 
 
     const handleEpochToDate = (epoch) => {
@@ -216,6 +233,21 @@ const LogFaceReg = () => {
     };
 
 
+    const handleSelectChange2 = (e) => {
+        setParams({
+            ...params,
+            [selectedCondition]: ""
+        })
+        setSelectedCondition(e.target.value);
+
+    }
+    const handleChange = (e) => {
+        setParams({
+            ...params,
+            [selectedCondition]: e.target.value
+        })
+    }
+
     const getDetailData = (row) => {
         navigate('/validation', { state: { detailDataLog: row, isCp: true } })
     }
@@ -315,18 +347,44 @@ const LogFaceReg = () => {
         )
     }
 
+    const handleChangeStatus = (e) => {
+        setParams({
+            ...params,
+            passStatus: parseInt(e.target.value)
+        })
+    }
+
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
             <div className="input-search-container">
                 <div className="search-table-list">
                     <div className="search-table">
-                        <span>Nomor PLB : </span>
-                        <input type="text" placeholder='Masukkan nomor plb' />
+                        <select
+                            value={selectedCondition}
+                            onChange={handleSelectChange2}
+                        // style={{ marginRight: '10px', }}
+                        >
+                            <option value="name">Name</option>
+                            <option value="personCode">Employee ID</option>
+                        </select>
+
+                        <input type="text"
+                            value={selectedCondition === "name" ? params.name : params.personCode}
+                            onChange={handleSelectChange2}
+                            placeholder={`Masukkan ${selectedCondition == "name" ? "nama" : "nomor plb"}`}
+                            style={{ marginRight: 5 }}
+                        />
+                        <select
+                            value={params.passStatus}
+                            onChange={handleChangeStatus}
+                        // style={{ marginRight: '10px', }}
+                        >
+                            <option value="-1">All</option>
+                            <option value="0">Success</option>
+                            <option value="6">Failed</option>
+                        </select>
                     </div>
-                    <div className="search-table">
-                        <span>Nama : </span>
-                        <input type="text" placeholder='Masukkan nama' />
-                    </div>
+
                 </div>
                 <div className="buttons-container" style={{ display: 'flex', gap: 10 }}>
                     <select
