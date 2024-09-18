@@ -272,7 +272,7 @@ export const apiInsertLog = async (data) => {
 }
 
 
-export const apiIsertIP = async (data) => {
+export const apiInsertIP = async (data) => {
   console.log("Form_submitted", data)
   try {
     const res = await axios({
