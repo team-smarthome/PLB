@@ -126,9 +126,11 @@ export const initiateSocket4020 = () => {
         socket4020.on('connect', () => {
             if (socket4020.connected) {
                 while (pendingTakePhotoRequests4020.length > 0) {
-                    const { action, data } = pendingTakePhotoRequests4020.shift(); // Ambil permintaan pertama
-                    if (action === 'logHistory') {
-                        socket4020.emit("logHistory", data);
+                    const { action, data } = pendingTakePhotoRequests4020.shift();
+                    if (action === 'logHistory2') {
+                        socket4020.emit("logHistory2", data);
+                    } else {
+                        socket4020.emit("logHistory");
                     }
                 }
                 socket4020.emit("logHistory");

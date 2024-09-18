@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Sidebar = ({ isOpen }) => {
     const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState({});
+    const [menuSetting, setMenuSetting] = useState({});
 
 
     const handleMenuToggle = (menuKey) => {
@@ -16,6 +17,13 @@ const Sidebar = ({ isOpen }) => {
             [menuKey]: !prevState[menuKey],
         }));
     };
+
+    const handleSettingToggle = (menuKey) => {
+        setMenuSetting((prevState) => ({
+            ...prevState,
+            [menuKey]: !prevState[menuKey],
+        }));
+    }
 
     return (
         <div className={`sidebar ${isOpen ? "" : "close"}`}>
@@ -51,6 +59,23 @@ const Sidebar = ({ isOpen }) => {
                         />
                     </div>
                 </li>
+                <li>
+                    <div
+                        className="iocn-link"
+                        onClick={() => handleSettingToggle("setting")}
+                    >
+                        <a >
+
+                            <span className="link_name">Setting</span>
+                        </a>
+                        <FaChevronDown
+
+                            color="#fff"
+                            size={25}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </div>
+                </li>
                 {menuOpen.category && (
                     <ul
                         className="sub-menu-link"
@@ -61,6 +86,19 @@ const Sidebar = ({ isOpen }) => {
                         <Link to='/cpanel/log-facereg' className="link">
                             <a >Log Facereg</a>
                         </Link>
+                    </ul>
+                )}
+
+                {menuSetting.setting && (
+                    <ul
+                        className="sub-menu-link"
+                    >
+                        <Link to='/cpanel/setting-ip' className="link">
+                            <a >Setting IP</a>
+                        </Link>
+                        {/* <Link to='/cpanel/setting-facereg' className="link">
+                            <a >Setting Facereg</a>
+                        </Link> */}
                     </ul>
                 )}
             </ul>
