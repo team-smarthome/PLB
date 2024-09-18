@@ -38,18 +38,10 @@ const LogFaceReg = () => {
 
     const [params, setParams] = useState({
         name: "",
-        type: "all",
-        gender: "all",
-        beginPosition: 0,
-        endPosition: 19,
-        limit: 20,
-        page: 1,
-        status: "all",
-        passState: 0,
-        passStatus: -1,
-        personCode: "",
-        minAge: 0,
-        maxAge: 100
+        personId: "",
+        startDate: "",
+        endDate: "",
+        passStatus: ""
     })
 
 
@@ -80,6 +72,7 @@ const LogFaceReg = () => {
                     const dataInsert = {
                         personId: data[0]?.personId,
                         personCode: data[0]?.personCode,
+                        name: data[0]?.name,
                         similarity: data[0]?.images_info[0]?.similarity,
                         passStatus: data[0]?.passStatus === 6 ? "Failed" : "Success",
                         time: data[0]?.time,
@@ -124,7 +117,7 @@ const LogFaceReg = () => {
 
 
 
-    const getLogData = async (params) => {
+    const getLogData = async () => {
         try {
             const response = await getDataLogApi(params);
             setStatus("success")
@@ -136,7 +129,10 @@ const LogFaceReg = () => {
         }
     }
 
-
+    const handleSearch = () => {
+        setSelectedOption('192.2.1')
+        getLogData()
+    }
     useEffect(() => {
         setStatus('loading')
         const getDataIp = Cookies.get('userdata');
@@ -163,7 +159,7 @@ const LogFaceReg = () => {
                 name: name,
                 no_register: noRegister,
             };
-            await getLogData(filterParams);
+            await getLogData();
         };
 
         fetchData();
@@ -350,7 +346,7 @@ const LogFaceReg = () => {
     const handleChangeStatus = (e) => {
         setParams({
             ...params,
-            passStatus: parseInt(e.target.value)
+            passStatus: e.target.value
         })
     }
 
@@ -364,25 +360,38 @@ const LogFaceReg = () => {
                             onChange={handleSelectChange2}
                         // style={{ marginRight: '10px', }}
                         >
-                            <option value="name">Name</option>
-                            <option value="personCode">Employee ID</option>
+                            <option value="name">Nama</option>
+                            <option value="personId">Nomor Passport</option>
                         </select>
 
                         <input type="text"
-                            value={selectedCondition === "name" ? params.name : params.personCode}
-                            onChange={handleSelectChange2}
+                            value={selectedCondition === "name" ? params.name : params.personId}
+                            onChange={handleChange}
                             placeholder={`Masukkan ${selectedCondition == "name" ? "nama" : "nomor plb"}`}
                             style={{ marginRight: 5 }}
                         />
                         <select
                             value={params.passStatus}
                             onChange={handleChangeStatus}
-                        // style={{ marginRight: '10px', }}
+                            style={{ marginRight: '20px', }}
                         >
-                            <option value="-1">All</option>
-                            <option value="0">Success</option>
-                            <option value="6">Failed</option>
+                            <option value="">All</option>
+                            <option value="Success">Success</option>
+                            <option value="Failed">Failed</option>
                         </select>
+
+                        <span>Start Date : </span>
+                        <input type="datetime-local"
+                            value={params.startDate}
+                            onChange={(e) => setParams({ ...params, startDate: e.target.value })}
+                            style={{ marginRight: '10px', }}
+                            st
+                        />
+                        <span>End Date : </span>
+                        <input type="datetime-local"
+                            value={params.endDate}
+                            onChange={(e) => setParams({ ...params, endDate: e.target.value })}
+                        />
                     </div>
 
                 </div>
@@ -403,7 +412,7 @@ const LogFaceReg = () => {
                     >Export
                     </button>
                     <button
-
+                        onClick={handleSearch}
                     >Search
                     </button>
                 </div>
