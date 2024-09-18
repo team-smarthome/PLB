@@ -76,11 +76,11 @@
 }
 
 
-.sidebar .nav-links li .iocn-link {
+.sidebar .nav-links li .icon-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
+    padding: 10px;
 }
 
 .sidebar .nav-links li:hover {
@@ -111,11 +111,19 @@
 }
 
 .sub-menu-link .link,
-.link {
+.link,
+.link a {
     color: #fff;
     text-decoration: none;
     font-weight: bold;
     /* font-size: 16px; */
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.sub-menu-link .link:active {
+    background: #fbaf17;
 }
 
 .sub-menu-link .link:hover {
