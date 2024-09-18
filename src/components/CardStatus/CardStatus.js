@@ -764,7 +764,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						></textarea> */}
 						{resDataScan && (
 							<img
-								src={resDataScan}
+								src={`data:image/jpeg;base64,${resDataScan}`}
 								alt="image"
 								width={550}
 								height={350}

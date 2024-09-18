@@ -47,7 +47,15 @@ const Login = () => {
           icon: "success",
           title: "Berhasil Masuk",
         });
-        navigate("/home");
+
+        console.log(dataRes?.user?.role, "roleANninggg");
+
+        if (dataRes?.user?.role === 2) {
+          navigate("/home");
+        } else {
+          navigate("/cpanel");
+        }
+
       }
     } catch (error) {
       isLoading(false);

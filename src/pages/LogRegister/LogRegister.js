@@ -125,7 +125,7 @@ const LogRegister = () => {
         try {
             const res = await deleteDataUserPlb(detailData.no_passport)
             console.log(res, "res delete")
-            if (res.status === 201) {
+            if (res.status == 200) {
                 socket_IO_4010.emit('deleteDataUser', {
                     no_passport: detailData.no_passport
                 })
@@ -476,7 +476,7 @@ const LogRegister = () => {
                     ],
                 }
             }
-            if (res.status === 200) {
+            if (res.status == 200) {
                 socket_IO_4010.emit('editDataUser', dataEdit)
                 socket_IO_4010.on('responseEditDataUser', (data) => {
                     console.log(data, "res socket")
