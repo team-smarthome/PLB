@@ -272,7 +272,7 @@ export const apiInsertLog = async (data) => {
 }
 
 
-export const apiIsertIP = async (data) => {
+export const apiInsertIP = async (data) => {
   console.log("Form_submitted", data)
   try {
     const res = await axios({
@@ -318,4 +318,79 @@ export const apiDeleteIp = async (params) => {
   } catch (error) {
     console.log(error)
   }
-} 
+}
+
+export const getDataLogApi = async (filterParams) => {
+  try {
+    const response = await axios.get(`${url_devel}api/face-reg`, {
+      params: filterParams,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+export const getAllNegaraData = async (params, page) => {
+  try {
+    const res = await axios({
+      method: "get",
+      url: `${url_devel}api/country`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: { ...params, page }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const InsertNegara = async (payload) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/country`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const UpdateNegara = async (id, payload) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${url_devel}api/country/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const DeleteNegara = async (id) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/country/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}

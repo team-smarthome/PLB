@@ -397,29 +397,51 @@ const UserManagement = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="input-search-container">
-                <div className="search-table-list" style={{ alignItems: 'center' }}>
-                    <div className="search-table">
-                        <span>Nama : </span>
-                        <input
-                            type="text"
-                            placeholder='Masukkan nama'
+            <div className="userManagement-header ">
+                <div className='face-reg-filter-name'>
+                    <div className='label-filter-name' style={{ width: "15%", paddingTop: '2.5%' }} >
+                        <p>Input Name</p>
+                    </div>
+                    <div className='value-filter-name'>
+                        <input type="text"
+                            placeholder='Inser Name'
                             onChange={(e) => setSearch({ ...search, nama_petugas: e.target.value })}
                             value={search.nama_petugas}
+
                         />
                     </div>
-                    <div className="search-table">
-                        <span>NIP : </span>
+                </div>
+                <div className='face-reg-filter-kamera'>
+                    <div className='label-filter-name' style={{
+                        alignItems: 'flex-end',
+                        paddingRight: "3%"
+                    }}>
+                        <p>Input Nip</p>
+                    </div>
+                    <div className='value-filter-name'>
                         <input
                             type="text"
-                            placeholder='Masukkan nip'
+                            placeholder='Input nip'
                             onChange={(e) => setSearch({ ...search, nip: e.target.value })}
                             value={search.nip}
+                            style={{
+                                width: "88%",
+                                marginTop: '0%',
+                            }}
                         />
                     </div>
-                    <button onClick={getAllPetugasData}>Search</button>
                 </div>
-                <button onClick={openModalAdd}>Tambah</button>
+            </div>
+            <div className='submit-face-reg'>
+                <button
+                    onClick={openModalAdd}
+                >Add
+                </button>
+                <button
+                    onClick={getAllPetugasData}
+                >Search
+                </button>
+
             </div>
             {isLoading ?
                 (
@@ -429,7 +451,7 @@ const UserManagement = () => {
                 ) : (
                     <>
                         <TableLog
-                            tHeader={['no', 'nama', 'nip', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action']}
+                            tHeader={['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action']}
                             tBody={dataPetugas}
                             onEdit={editModal}
                             onDelete={deleteModal}

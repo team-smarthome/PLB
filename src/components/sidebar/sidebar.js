@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
-import { FaChevronDown } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag } from "react-icons/fa";
+import { TbLogs } from "react-icons/tb";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { IoSettingsSharp } from "react-icons/io5";
+
 
 
 const Sidebar = ({ isOpen }) => {
+    const location = useLocation()
+    // console.log(location, "location")
     const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState({});
     const [menuSetting, setMenuSetting] = useState({});
@@ -39,34 +44,25 @@ const Sidebar = ({ isOpen }) => {
             <ul className="nav-links">
                 <li>
                     <Link to='/cpanel/user-management' className="link">
+                        <FaUsers
+                            size={30}
+                            style={{ marginRight: '10px' }}
+                        />
                         <span className="link_name">User Management</span>
                     </Link>
                 </li>
                 <li>
                     <div
-                        className="iocn-link"
+                        className="icon-link"
                         onClick={() => handleMenuToggle("category")}
                     >
                         <a >
-
+                            <TbLogs
+                                size={30}
+                                color="#fff"
+                                style={{ marginRight: '10px' }}
+                            />
                             <span className="link_name">Log</span>
-                        </a>
-                        <FaChevronDown
-
-                            color="#fff"
-                            size={25}
-                            style={{ cursor: 'pointer' }}
-                        />
-                    </div>
-                </li>
-                <li>
-                    <div
-                        className="iocn-link"
-                        onClick={() => handleSettingToggle("setting")}
-                    >
-                        <a >
-
-                            <span className="link_name">Setting</span>
                         </a>
                         <FaChevronDown
 
@@ -81,19 +77,56 @@ const Sidebar = ({ isOpen }) => {
                         className="sub-menu-link"
                     >
                         <Link to='/cpanel/log-register' className="link">
-                            <a >Log Register</a>
+                            <a>
+                                <FaRegAddressCard
+                                    size={25}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                Log Register
+                            </a>
                         </Link>
                         <Link to='/cpanel/log-facereg' className="link">
-                            <a >Log Facereg</a>
+                            <a>
+                                <FaUserCircle
+                                    size={25}
+                                    style={{ marginRight: '10px' }}
+                                />
+                                Log Facereg
+                            </a>
                         </Link>
                     </ul>
                 )}
+                <li>
+                    <div
+                        className="icon-link"
+                        onClick={() => handleSettingToggle("setting")}
+                    >
+                        <a >
+                            <
+                                IoSettingsSharp
+                                size={30}
+                                color="#fff"
+                                style={{ marginRight: '10px' }}
+                            />
+                            <span className="link_name">Setting</span>
+                        </a>
+                        <FaChevronDown
 
+                            color="#fff"
+                            size={25}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </div>
+                </li>
                 {menuSetting.setting && (
                     <ul
                         className="sub-menu-link"
                     >
                         <Link to='/cpanel/setting-ip' className="link">
+                            <FaNetworkWired
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
                             <a >Setting IP</a>
                         </Link>
                         {/* <Link to='/cpanel/setting-facereg' className="link">
@@ -101,6 +134,15 @@ const Sidebar = ({ isOpen }) => {
                         </Link> */}
                     </ul>
                 )}
+                <li>
+                    <Link to='/cpanel/country' className="link">
+                        <FaFlag
+                            size={30}
+                            style={{ marginRight: '10px' }}
+                        />
+                        <span className="link_name">Country Master</span>
+                    </Link>
+                </li>
             </ul>
         </div>
     );
