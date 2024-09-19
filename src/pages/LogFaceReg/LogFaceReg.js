@@ -8,6 +8,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
+import ImgsViewer from "react-images-viewer";
 
 const LogFaceReg = () => {
     const navigate = useNavigate()
@@ -22,6 +23,17 @@ const LogFaceReg = () => {
     const [page, setPage] = useState(1);
     const [changePage, setChangePage] = useState(false)
     const [disablePaginate, setDisablePaginate] = useState(false)
+    const [isOpenImage, setIsOpenImage] = useState(false)
+    const [currentImage, setCurrentImage] = useState(null)
+    const [imagesData, setImagesData] = useState([])
+    const [params, setParams] = useState({
+        page: page,
+        name: "",
+        personId: "",
+        startDate: "",
+        endDate: "",
+        passStatus: ""
+    })
     const [pagination, setPagination] = useState({
         total: 0,
         per_page: 10,
@@ -53,16 +65,6 @@ const LogFaceReg = () => {
             label: 'Failed'
         },
     ]
-
-    const [params, setParams] = useState({
-        page: page,
-        name: "",
-        personId: "",
-        startDate: "",
-        endDate: "",
-        passStatus: ""
-    })
-
 
     const handleEpochToDate = (epoch) => {
         const date = new Date(epoch * 1000);
@@ -350,7 +352,8 @@ const LogFaceReg = () => {
     }
 
     const getDetailData = (row) => {
-        navigate('/validation', { state: { detailDataLog: row, isCp: true } })
+        // console.log(row.personCode)
+        navigate('/validation', { state: { detailDataLog: row.personCode, isCp: true } })
     }
 
     const generateExcel = () => {
@@ -401,6 +404,18 @@ const LogFaceReg = () => {
         });
     };
 
+
+    const handleOpenImage = (row, index) => {
+        setIsOpenImage(true)
+        setCurrentImage(index)
+    }
+    const nextImage = () => {
+        setCurrentImage(currentImage + 1)
+    }
+    const prevImage = () => {
+        setCurrentImage(currentImage - 1)
+    }
+    // cons
     const handleSubmit = async (ipParams) => {
         try {
             if (ipParams !== "") {
@@ -607,8 +622,16 @@ const LogFaceReg = () => {
                     <TableLog
                         tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
                         tBody={logData}
-                        handler={getDetailData}
+                        handler={handleOpenImage}
                         rowRenderer={customRowRenderer}
+                    />
+                    <ImgsViewer
+                        imgs={imagesData}
+                        isOpen={isOpenImage}
+                        onClickPrev={prevImage}
+                        onClickNext={nextImage}
+                        onClose={() => { setIsOpenImage(false) }}
+                        currImg={currentImage}
                     />
                     {!disablePaginate && (
                         <div className="table-footer">
