@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
-import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired } from "react-icons/fa";
+import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag } from "react-icons/fa";
 import { TbLogs } from "react-icons/tb";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp } from "react-icons/io5";
 
 
 
 const Sidebar = ({ isOpen }) => {
+    const location = useLocation()
+    // console.log(location, "location")
     const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState({});
     const [menuSetting, setMenuSetting] = useState({});
@@ -132,6 +134,15 @@ const Sidebar = ({ isOpen }) => {
                         </Link> */}
                     </ul>
                 )}
+                <li>
+                    <Link to='/cpanel/country' className="link">
+                        <FaFlag
+                            size={30}
+                            style={{ marginRight: '10px' }}
+                        />
+                        <span className="link_name">Country Master</span>
+                    </Link>
+                </li>
             </ul>
         </div>
     );
