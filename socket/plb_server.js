@@ -1,8 +1,9 @@
 const webSocketsServerPort = 4010;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = ["192.168.2.166", "192.168.2.171"];
+let ipCamera = [];
 const axios = require("axios");
+const ping = require('ping');
 
 const server = http.createServer(function (request, response) {
     const headers = {
@@ -137,15 +138,46 @@ const handleEditDataUser = async (socket, dataUser) => {
 io.on("connection", (socket) => {
     socket.emit("message", "Welcome to the RTSP to HLS stream");
 
-    socket.on("saveCameraData", (data) => {
-        ipCamera = data?.ipServerCamera;
-        console.log("DataDariInformation", data);
-        if (data) {
-            socket.emit("saveDataCamera", "successfully");
-        } else {
-            socket.emit("saveDataCamera", "failed");
-        }
+    socket.on("saveCameraData", async (data) => {
+        const ipToCheck = data?.ipServerCamera;
 
+        if (ipToCheck && ipToCheck.length > 0) {
+            let allIpsReachable = true;
+            for (const ip of ipToCheck) {
+                const res = await ping.promise.probe(ip);
+                if (res.alive) {
+                    console.log(`IP ${ip} is reachable`);
+                } else {
+                    console.log(`IP ${ip} is not reachable`);
+                    allIpsReachable = false;
+                }
+            }
+
+            if (allIpsReachable) {
+                ipCamera = [...ipCamera, ...ipToCheck];
+                console.log("DataDariInformation", ipCamera);
+                socket.emit("saveDataCamera", "successfully");
+            } else {
+                console.log("IPs are not reachable");
+                socket.emit("saveDataCamera", "notConnectedIp");
+            }
+        } else {
+            socket.emit("saveDataCamera", "failed - no IPs provided");
+        }
+    });
+
+    socket.on("deleteCameraData", (data) => {
+        const ipToDelete = data?.ipServerCamera;
+
+        if (ipToDelete && ipToDelete.length > 0) {
+            ipCamera = ipCamera.filter(ip => !ipToDelete.includes(ip));
+            // ipCamera = ipCamera.filter(ip => ip !== ipToDelete);
+
+            console.log("Updated ipCamera after deletion:", ipCamera);
+            socket.emit("deleteDataCamera", "successfullyDeleted");
+        } else {
+            socket.emit("deleteDataCamera", "failed - no IPs provided for deletion");
+        }
     });
 
     socket.emit("DataIPCamera", {

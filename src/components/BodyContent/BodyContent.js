@@ -23,7 +23,9 @@ const BodyContent = ({
   dataNumberPermohonan,
   FailedMessage,
   sendDataToParent1,
-  isShowHeader = true
+  isShowHeader = true,
+  country
+
 }) => {
   const [sharedData, setSharedData] = useState({
     passportData: null,
@@ -173,7 +175,7 @@ const BodyContent = ({
         )}
       </div>
       <div className="right-panel">
-        <FormData cardStatus={cardStatus} sharedData={sharedData} setSharedData={setSharedData} />
+        <FormData cardStatus={cardStatus} sharedData={sharedData} setSharedData={setSharedData} country={country} />
       </div>
     </div>
   );

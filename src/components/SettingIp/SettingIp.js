@@ -6,6 +6,8 @@ import './settingip.style.css'
 import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import TableLog from '../TableLog/TableLog';
 import Modals from '../Modal/Modal';
+import { io } from 'socket.io-client';
+import { Toast } from "../../components/Toast/Toast";
 
 const SettingIp = () => {
     const [totalCameras, setTotalCameras] = useState(0);
@@ -19,6 +21,113 @@ const SettingIp = () => {
     const [modalEdit, setModalEdit] = useState(false);
     const [modalDelete, setModalDelete] = useState(false);
     const [detailData, setDetailData] = useState({})
+    const [newWifiResults, setNewWifiResults] = useState("");
+    const [canAddIpKamerea, setCanAddIpKamerea] = useState(false);
+    const [status, setStatus] = useState("loading")
+    const [kirimData, setSetKirimData] = useState(false)
+
+    const handleSubmitIpServer = () => {
+        setStatus("loading")
+        if (newWifiResults) {
+            const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+            socket_server_4010.on('connect', () => {
+                console.log('connect to server');
+                setCanAddIpKamerea(true);
+                setStatus("success")
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Success Connect to Server'
+                });
+            });
+        } else {
+            setStatus("success")
+            canAddIpKamerea(false);
+            Toast.fire({
+                icon: 'error',
+                title: 'Please Input Ip Server'
+            });
+        }
+    }
+    const handleSubmitCrudKameraToServer = (params, dataApiKemera, action) => {
+        closeModalAdd()
+        closeModalDelete()
+        setStatus("loading")
+        if (newWifiResults) {
+            const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+            const sendDataToWs = {
+                ipServerCamera: [params]
+            }
+
+            if (action === "add") {
+                socket_server_4010.emit("saveCameraData", sendDataToWs);
+                socket_server_4010.on('saveDataCamera', (data) => {
+                    if (data === "successfully") {
+                        const insertIpKamera = apiInsertIP(dataApiKemera);
+                        insertIpKamera.then((res) => {
+                            if (res.status == 200) {
+                                fetchAllIp()
+                                setStatus("success")
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Data berhasil disimpan",
+                                });
+                            }
+                        }).catch((err) => {
+                            setStatus("success")
+                            Toast.fire({
+                                icon: "error",
+                                title: "Gagal menyimpan data ke API",
+                            })
+                            console.log(err);
+                        });
+                    } else {
+                        setStatus("success")
+                        Toast.fire({
+                            icon: "error",
+                            title: "Gagal menyimpan data",
+                        });
+                    }
+                })
+            } else if (action === "delete") {
+                socket_server_4010.emit("deleteCameraData", sendDataToWs);
+                socket_server_4010.on('deleteDataCamera', (data) => {
+                    if (data === "successfullyDeleted") {
+                        const deleteIpKamera = apiDeleteIp(dataApiKemera.id);
+                        deleteIpKamera.then((res) => {
+                            if (res.status == 200) {
+                                fetchAllIp()
+                                setStatus("success")
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Data berhasil dihapus",
+                                });
+                            }
+                        }).catch((err) => {
+                            setStatus("success")
+                            Toast.fire({
+                                icon: "error",
+                                title: "Gagal menghapus data",
+                            })
+                            console.log(err);
+                        });
+                    } else {
+                        setStatus("success")
+                        Toast.fire({
+                            icon: "error",
+                            title: "Gagal menghapus data",
+                        });
+                    }
+                })
+            }
+        } else {
+            setStatus("success")
+            canAddIpKamerea(false);
+            Toast.fire({
+                icon: 'error',
+                title: 'Please Input Ip Server'
+            });
+        }
+    }
 
     const optionCameras = [...Array(10)].map((_, index) => ({
         value: index + 1,
@@ -35,16 +144,19 @@ const SettingIp = () => {
             if (res.data.data.length === 0) {
                 setCameraNames(new Array(totalCameras).fill(''));
                 setCameraIPs(new Array(totalCameras).fill(''));
-                setIsEditing(false); // No data, so we are in submit mode
+                setIsEditing(false);
+                setStatus("success")
             } else {
                 const names = res.data.data.map(item => item.namaKamera);
                 const ips = res.data.data.map(item => item.ipAddress);
                 setTotalCameras(res.data.data.length);
                 setCameraNames(names);
                 setCameraIPs(ips);
-                setIsEditing(true); // Data present, so we are in edit mode
+                setIsEditing(true);
+                setStatus("success")
             }
         } catch (err) {
+            setStatus("success")
             console.log(err.message);
         }
     };
@@ -105,15 +217,7 @@ const SettingIp = () => {
             userId: dataUserIp?.petugas?.id,
         };
 
-        const insertIpKamera = apiInsertIP(dataApiKemera);
-        insertIpKamera.then((res) => {
-            if (res.status == 200) {
-                closeModalAdd()
-                fetchAllIp()
-            }
-        }).catch((err) => {
-            console.log(err);
-        });
+        handleSubmitCrudKameraToServer(detailData?.ipAddress, dataApiKemera, "add");
 
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
@@ -125,7 +229,6 @@ const SettingIp = () => {
             ...detailData,
             userId: dataUserIp?.petugas?.id,
         };
-
         const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
         editIpKamera.then((res) => {
             if (res.status == 200) {
@@ -140,21 +243,7 @@ const SettingIp = () => {
     };
 
     const handleDelete = () => {
-        const deleteIpKamera = apiDeleteIp(detailData.id);
-        deleteIpKamera.then((res) => {
-            if (res.status == 200) {
-                closeModalDelete()
-                fetchAllIp()
-            }
-            // if (res?.data?.status) {
-            //     setTotalCameras(0);
-            //     setCameraNames([]);
-            //     setCameraIPs([]);
-            //     setIsEditing(false);
-            // }
-        }).catch((err) => {
-            console.log(err.message);
-        });
+        handleSubmitCrudKameraToServer(detailData?.ipAddress, detailData, "delete");
     }
 
     const openModalAdd = () => {
@@ -189,14 +278,19 @@ const SettingIp = () => {
         <>
             <td>{row.namaKamera}</td>
             <td>{row.ipAddress}</td>
-            <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                <button
-                    onClick={() => openModalEdit(row)}
-                >Edit</button>
-                <button
-                    onClick={() => openModalDelete(row)}
-                    style={{ background: 'red' }}>Delete</button>
-            </td>
+            {canAddIpKamerea && (
+                <>
+                    <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
+                        <button
+                            onClick={() => openModalEdit(row)}
+                        >Edit</button>
+                        <button
+                            onClick={() => openModalDelete(row)}
+                            style={{ background: 'red' }}>Delete</button>
+                    </td>
+                </>
+            )}
+
         </>
     );
 
@@ -247,45 +341,86 @@ const SettingIp = () => {
         )
     }
     return (
-        <div className='config-container'>
-            <div className="add-btn-container">
-                <button
-                    onClick={openModalAdd}
-                >Tambah</button>
-            </div>
-            <TableLog
-                tHeader={['no', 'Nama Kamera', "Ip Address", "Action"]}
-                tBody={listCamera}
-                rowRenderer={customRowRenderer}
-            />
-            <Modals
-                buttonName="Submit"
-                headerName="Add Kamera"
-                closeModal={closeModalAdd}
-                showModal={modalAdd}
-                onConfirm={handleSubmit}
-            >
-                {modalAddLayout()}
-            </Modals>
-            <Modals
-                buttonName="Submit"
-                headerName="Edit Kamera"
-                closeModal={closeModalEdit}
-                showModal={modalEdit}
-                onConfirm={handleEdit}
-            >
-                {modalEditLayout()}
-            </Modals>
-            <Modals
-                buttonName="Submit"
-                headerName="Delete Kamera"
-                closeModal={closeModalDelete}
-                showModal={modalDelete}
-                onConfirm={handleDelete}
-            >
-                {modalDeleteLayout()}
-            </Modals>
-            {/* <form
+        <>
+            <div className='config-container'>
+                <div className='face-reg-filter-name'>
+                    <div className='label-filter-name' style={{ width: "20%", paddingTop: '2.5%' }} >
+                        <p>Input Ip Server</p>
+                    </div>
+                    <div className='value-filter-name'>
+                        <input type="text"
+                            placeholder='Input Ip Server'
+                            value={
+                                newWifiResults
+                            }
+                            onChange={(e) =>
+                                setNewWifiResults(
+                                    e.target
+                                        .value
+                                )
+                            }
+
+                        />
+                    </div>
+                </div>
+                <div className='submit-face-reg'>
+                    {canAddIpKamerea && (
+                        <>
+                            <button
+                                onClick={openModalAdd}
+                            >Add
+                            </button>
+                        </>
+                    )}
+
+                    <button
+                        onClick={handleSubmitIpServer}
+                    >Submit
+                    </button>
+
+                </div>
+                {status === "loading" && (
+                    <div className="loading">
+                        <span className="loader-loading-table"></span>
+                    </div>
+                )}
+                {status === "success" &&
+                    <>
+                        <TableLog
+                            tHeader={['no', 'Nama Kamera', "Ip Address", "Action"]}
+                            tBody={listCamera}
+                            rowRenderer={customRowRenderer}
+                        />
+                    </>
+                }
+                <Modals
+                    buttonName="Submit"
+                    headerName="Add Kamera"
+                    closeModal={closeModalAdd}
+                    showModal={modalAdd}
+                    onConfirm={handleSubmit}
+                >
+                    {modalAddLayout()}
+                </Modals>
+                <Modals
+                    buttonName="Submit"
+                    headerName="Edit Kamera"
+                    closeModal={closeModalEdit}
+                    showModal={modalEdit}
+                    onConfirm={handleEdit}
+                >
+                    {modalEditLayout()}
+                </Modals>
+                <Modals
+                    buttonName="Submit"
+                    headerName="Delete Kamera"
+                    closeModal={closeModalDelete}
+                    showModal={modalDelete}
+                    onConfirm={handleDelete}
+                >
+                    {modalDeleteLayout()}
+                </Modals>
+                {/* <form
                 // className=""
                 onSubmit={isEditing ? handleEdit : handleSubmit} // Adjust submit handler based on mode
             // style={{ width: "120vh" }}
@@ -386,7 +521,7 @@ const SettingIp = () => {
                     </button>
                 </div>
             </form> */}
-            {/* <div className="btn-submit">
+                {/* <div className="btn-submit">
                 <button
                     type="submit"
                 // className="btn-submit"
@@ -394,12 +529,13 @@ const SettingIp = () => {
                     {isEditing ? 'Simpan Perubahan' : 'Simpan'}
                 </button>
             </div> */}
-            {/* <button
+                {/* <button
                 onClick={handleDelete}
             >
                 Delete
             </button> */}
-        </div>
+            </div>
+        </>
     );
 };
 

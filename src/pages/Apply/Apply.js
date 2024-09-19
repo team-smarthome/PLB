@@ -10,8 +10,7 @@ import { Toast } from "../../components/Toast/Toast";
 import { formData, resultDataScan, caputedImageAfter } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
-import Cookies from 'js-cookie';
-import { apiInsertDataUser, apiPblAddFaceRec, getAllNegaraData, getUserbyPassport } from "../../services/api";
+import { apiInsertDataUser, getAllNegaraData, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import axios from "axios";
 
@@ -24,7 +23,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("iddle");
+  const [cardStatus, setCardStatus] = useState("lookCamera");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -119,9 +118,6 @@ const Apply = () => {
         compositeCheckDigit: data.compositeCheckDigit,
       };
 
-      // console.log("newDataPassport", newDataPassport);
-
-      // Handle received data
       const dataHardCodePaspor = newDataPassport;
 
       let fullName =
@@ -129,11 +125,8 @@ const Apply = () => {
 
       dataHardCodePaspor.fullName = fullName;
 
-      // Buat fungsi untuk mengonversi format tanggal
       function formatDate(dateString) {
-        if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
-
-        // Pisahkan tahun, bulan, dan tanggal dari string
+        if (!dateString || dateString.length !== 6) return null;
         var year = dateString.substring(0, 2);
         var month = dateString.substring(2, 4);
         var day = dateString.substring(4, 6);
@@ -147,21 +140,15 @@ const Apply = () => {
       }
 
       function formatDateExpiry(dateString) {
-        if (!dateString || dateString.length !== 6) return null; // Pastikan format tanggal benar
-
-        // Pisahkan tahun, bulan, dan tanggal dari string
+        if (!dateString || dateString.length !== 6) return null;
         var year = dateString.substring(0, 2);
         var month = dateString.substring(2, 4);
         var day = dateString.substring(4, 6);
-
-        // Konversi tahun menjadi format empat digit (asumsi tahun 1900-1999 atau 2000-2099)
         year = parseInt(year) < 50 ? "20" + year : "19" + year;
 
-        // Kembalikan tanggal dalam format yang diinginkan
         return year + "-" + month + "-" + day;
       }
 
-      // Terapkan format tanggal pada data paspor
       dataHardCodePaspor.formattedExpiryDate = formatDateExpiry(
         dataHardCodePaspor.expiryDate
       );
@@ -171,9 +158,6 @@ const Apply = () => {
       dataHardCodePaspor.email = dataHardCodePaspor.email
         ? dataHardCodePaspor.email
         : "";
-
-      // console.log("dataHardCodePaspor", dataHardCodePaspor);
-
       setDataPrimaryPassport(dataHardCodePaspor);
 
       setCardStatus("success");
@@ -188,20 +172,6 @@ const Apply = () => {
   };
 
   const [receiveTempData, setRecievedTempData] = useState([]);
-  const checkAndHandleTokenExpiration = () => {
-    const jwtToken = localStorage.getItem("JwtToken");
-    if (!jwtToken) {
-      return false;
-    }
-
-    const decodedToken = JSON.parse(atob(jwtToken.split(".")[1]));
-    const expirationTime = decodedToken.exp * 1000;
-    const now = Date.now();
-    const isExpired = now > expirationTime;
-
-    return !isExpired;
-  };
-
 
   const connectWebSocket = (ipAddress, socket_IO) => {
     const socketURL = `ws://localhost:4488`;
@@ -249,19 +219,12 @@ const Apply = () => {
       setIsConnected(false);
       setCardStatus("errorConnection");
 
-      // Close handling and reconnection logic
       if (!isCloseTimeoutSet) {
         setCardStatus("errorWebsocket");
         setTimeout(() => {
           isCloseTimeoutSet = true;
         }, 3000);
       } else {
-        // Attempt to reconnect or notify server
-        // if (socket_IO) {
-        //   socket_IO.emit("clientData", "re-newIpAddress");
-        // } else {
-        //   console.warn("socket_IO is undefined.");
-        // }
       }
     };
 
@@ -279,42 +242,31 @@ const Apply = () => {
   };
 
   useEffect(() => {
-    connectWebSocket(null, socket_IO_4010); // Ensure to pass `socket_IO` properly
-    // const res = await getAllNegaraData()
-    // res.then((())
-
+    connectWebSocket(null, socket_IO_4010);
     return () => {
       closeWebSocket();
     };
   }, []);
 
-  // Contoh penggunaan di tempat lain
-  const handleTokenExpiration = () => {
-    // const isTokenValid = checkAndHandleTokenExpiration();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAllNegaraData();
+        if (response.data.status === 200) {
+          setCountry(response?.data?.data.map(item => ({
+            value: item.nama_negara,
+            label: item.nama_negara
+          })))
+        } else {
+        }
+      } catch (error) {
+        console.error("Error fetching negara data:", error.message);
+      }
+    };
 
-    // if (!isTokenValid) {
-    //   // Token has expired, handle the expiration here
-    //   Swal.fire({
-    //     icon: "error",
-    //     text: "Expired JWT Token",
-    //     confirmButtonColor: "#3d5889",
-    //   }).then((result) => {
-    //     // If the user clicks "OK", clear localStorage
-    //     if (result.isConfirmed) {
-    //       // navigate("/");
-    //       localStorage.removeItem("user");
-    //       localStorage.removeItem("JwtToken");
-    //       localStorage.removeItem("cardNumberPetugas");
-    //       localStorage.removeItem("key");
-    //       localStorage.removeItem("token");
-    //       localStorage.removeItem("jenisDeviceId");
-    //       localStorage.removeItem("deviceId");
-    //       localStorage.removeItem("airportId");
-    //       localStorage.removeItem("price");
-    //     }
-    //   });
-    // }
-  };
+    fetchData();
+
+  }, []);
 
   const updateStatusPaymentCredit = (newstatusPaymentCredit) => {
     setStatusPaymentCredit(newstatusPaymentCredit);
@@ -343,7 +295,6 @@ const Apply = () => {
     if (isEnableBack) {
       console.log("cardStatusSaatIni", cardStatus);
       if (cardPaymentProps.isPaymentCredit || cardPaymentProps.isPaymentCash) {
-        handleTokenExpiration();
         setCardPaymentProps({
           isCreditCard: false,
           isPaymentCredit: false,
@@ -428,7 +379,7 @@ const Apply = () => {
           setCardStatus("lookCamera");
           setTabStatus(2);
         }
-      } else if (cardStatus === "takePhotoSucces") {
+      } else if (cardStatus === "lookCamera") {
         setFormData(sharedData);
         setDataPermohonan(sharedData);
         doSaveRequestVoaPayment(sharedData);
@@ -444,23 +395,6 @@ const Apply = () => {
           isPyamentUrl: false,
           isPhoto: false,
         });
-        // setTimeout(() => {
-        //   setCardPaymentProps({
-        //     isWaiting: false,
-        //     isCreditCard: false,
-        //     isPaymentCredit: false,
-        //     isPaymentCash: false,
-        //     isPrinted: false,
-        //     isSuccess: false,
-        //     isFailed: false,
-        //     isPyamentUrl: false,
-        //     isPhoto: false,
-        //     isDoRetake: false,
-        //   });
-        //   setDisabled(false);
-        //   setIsEnableStep(true);
-        //   setCardStatus("takePhotoSucces");
-        // }, 100);
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
@@ -798,12 +732,14 @@ const Apply = () => {
       nationality: sharedData.passportData.nationality,
       expired_date: `${sharedData.passportData.formattedExpiryDate}`,
       arrival_time: new Date(),
-      destination_location: sharedData.passportData.destinationLocation,
+      destination_location: sharedData.passportData.destination_location,
       profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
       photo_passport: resDataScan ? `data:image/jpeg;base64,${resDataScan}` : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
     };
     setObjectApi(dataTosendAPI);
     setObjectCamera(bodyParamsSendKamera)
+
+    console.log("DataYNAAPIDIKIRIM", dataTosendAPI);
 
     console.log("sharedDataTOSEndAPi", sharedData);
 
@@ -831,6 +767,7 @@ const Apply = () => {
     <div className="background-apply-voa">
       <Header title={titleHeader} />
       <BodyContent
+        country={country}
         tabStatus={tabStatus}
         cardStatus={cardStatus}
         setCardStatus={setCardStatus}

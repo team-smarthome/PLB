@@ -149,7 +149,6 @@ const LogFaceReg = () => {
             console.log(response.data.data, "dataLog")
             setLogData(response.data.data)
             setTotalDataFilter(response?.data?.data?.length);
-            console.log(response?.data?.pagination, "paginationyamase2");
             setPagination(response?.data?.pagination);
         } catch (error) {
             setStatus("succes")
@@ -196,7 +195,6 @@ const LogFaceReg = () => {
 
     useEffect(() => {
         if (changePage) {
-            console.log('apakahmasuksiniMASEEEEEE')
             getLogDataPaginate()
         }
 

@@ -5,55 +5,10 @@ import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
 import NoProfile from '../../assets/images/no-profile-picture.svg'
 
-const FormData = ({ sharedData, setSharedData, cardStatus }) => {
-  // PLB / BCP Number
-  const [isCheckedPassportNumber, setIsCheckedPassportNumber] = useState(false);
-  //Registrasion Number
-  const [isCheckedRegisterCode, setIsCheckedRegisterCode] = useState(false);
-  // fullName
-  const [isCheckedFullName, setIsCheckedFullName] = useState(false);
-  // dateOfBirth
-  const [isCheckedDateOfBirth, setIsCheckedDateOfBirth] = useState(false);
-  // gender
-  const [isCheckedGender, setIsCheckedGender] = useState(false);
-  //nationality
-  const [isCheckedNationality, setIsCheckedNationality] = useState(false);
-  // expiryDate
-  const [isCheckedExpiryDate, setIsCheckedExpiryDate] = useState(false);
-  // arrivalTime
-  const [isCheckedArrivalTime, setIsCheckedArrivalTime] = useState(false);
-  // destinationLocation
-  const [isCheckedDestinationLocation, setIsCheckedDestinationLocation] = useState(false);
+const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
 
   const [optionNegara, setOptionNegara] = useState([]);
   const [optionGender, setOptionGender] = useState([]);
-
-  // passportNumber
-  const [isCommentDisabledPassportNumber, setIsCommentDisabledPassportNumber] =
-    useState(true);
-  //Registrasion Number
-  const [isCommentDisabledRegisterCode, setIsCommentDisabledRegisterCode] =
-    useState(true);
-  // fullName
-  const [isCommentDisabledFullName, setIsCommentDisabledFullName] =
-    useState(true);
-  // dateOfBirth
-  const [isCommentDisabledDateOfBirth, setIsCommentDisabledDateOfBirth] =
-    useState(true);
-  // gender
-  const [isCommentDisabledGender, setIsCommentDisabledGender] = useState(true);
-  // nationality
-  const [isCommentDisabledNationality, setIsCommentDisabledNationality] =
-    useState(true);
-  // expiryDate
-  const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
-    useState(true);
-  // arrivalTime
-  const [isCommentDisabledArrivalTime, setIsCommentDisabledArrivalTime] =
-    useState(true);
-  // destinationLocation
-  const [isCommentDisabledDestinationLocation, setIsCommentDisabledDestinationLocation] =
-    useState(true);
 
   const initialFormData = {
     passport_number: "",
@@ -68,12 +23,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     photo: "",
   };
 
+
   const [formdata, setFormData] = useState(initialFormData);
 
   useEffect(() => {
-    // if (sharedData.passportData === null) {
-    //   setFormData(initialFormData);
-    // } else {
     const dataNationality = dataNegara.data.map((negara) => ({
       value: negara.id_negara,
       label: `${negara.id_negara} - ${negara.deskripsi_negara}`,
@@ -93,17 +46,27 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
         (negara) => negara.value === sharedData.passportData.nationality
       );
 
-      // gender
-      if (sharedData.passportData) {
-        const filteredGender = dataGender.filter(
-          (sex) => sex.value === sharedData.passportData.sex || ""
-        );
+      const filteredGender = dataGender.filter(
+        (sex) => sex.value === sharedData.passportData.sex || ""
+      );
 
-        setFormData((prevData) => ({
-          ...prevData,
-          sex: filteredGender.length > 0 ? filteredGender[0] : "",
-        }));
-      }
+      setFormData((prevData) => ({
+        ...prevData,
+        sex: filteredGender.length > 0 ? filteredGender[0] : "",
+      }));
+
+
+      const filteredCountry = country.filter(
+        (country) => country.value === sharedData.passportData.destinationLocation
+      );
+
+      setFormData((prevData) => ({
+        ...prevData,
+        destination_location: filteredCountry.length > 0 ? filteredCountry[0] : "",
+      }));
+
+
+
 
       setFormData((prevData) => ({
         ...prevData,
@@ -115,7 +78,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
           filteredNationality.length > 0 ? filteredNationality[0] : "",
         expiry_date: sharedData.passportData.formattedExpiryDate || "",
         arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
-        destination_location: sharedData.passportData.destinationLocation || "",
       }));
     }
     console.log("sharedDataFormData", sharedData);
@@ -126,7 +88,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     // }
   }, [sharedData]);
 
-  // console.log("sharedDataFormData", sharedData);
   console.log("formdaFormData", formdata);
 
 
@@ -142,6 +103,21 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
       passportData: {
         ...prevData.passportData,
         [name]: value,
+      },
+    }));
+  };
+
+  const handleSelectChangeDestination = (selectedOption) => {
+    setFormData({
+      ...formdata,
+      destination_location: selectedOption.value,
+    });
+
+    setSharedData((prevData) => ({
+      ...prevData,
+      passportData: {
+        ...prevData.passportData,
+        destination_location: selectedOption.value,
       },
     }));
   };
@@ -354,14 +330,50 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             <div className="wrapper-input">
               <label htmlFor="destination_location">Destination Location</label>
             </div>
-            <input
+            <Select
+              value={country.find(option => option.value === formdata.destination_location)}
+              onChange={handleSelectChangeDestination}
+              options={
+                country?.map((option) => (
+                  {
+                    value: option.value,
+                    label: option.label
+                  }
+                ))
+              }
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  position: 'relative',
+                  flex: 1,
+                  width: "91.7%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+            {/* <input
               type="text"
               name="destinationLocation"
               id="destination_location"
               value={formdata.destination_location}
               onChange={handleInputChange}
               className="disabled-input"
-            />
+            /> */}
           </div>
         </div>
 
