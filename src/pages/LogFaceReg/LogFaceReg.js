@@ -25,7 +25,6 @@ const LogFaceReg = () => {
     const [disablePaginate, setDisablePaginate] = useState(false)
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
-    const [imagesData, setImagesData] = useState([])
     const [params, setParams] = useState({
         page: page,
         name: "",
@@ -404,7 +403,7 @@ const LogFaceReg = () => {
         });
     };
 
-
+    const resultArray = logData.map(item => ({ src: !selectedOption.includes("192.168") ? item.img_path : `http://${ipCameraLocalStorage}${item.sSnapshotPath}` }));
     const handleOpenImage = (row, index) => {
         setIsOpenImage(true)
         setCurrentImage(index)
@@ -625,14 +624,6 @@ const LogFaceReg = () => {
                         handler={handleOpenImage}
                         rowRenderer={customRowRenderer}
                     />
-                    <ImgsViewer
-                        imgs={imagesData}
-                        isOpen={isOpenImage}
-                        onClickPrev={prevImage}
-                        onClickNext={nextImage}
-                        onClose={() => { setIsOpenImage(false) }}
-                        currImg={currentImage}
-                    />
                     {!disablePaginate && (
                         <div className="table-footer">
                             <>Show {totalDataFilter} of {pagination?.total} entries</>
@@ -644,7 +635,15 @@ const LogFaceReg = () => {
                     )}
                 </>
             }
-        </div>
+            <ImgsViewer
+                imgs={resultArray}
+                isOpen={isOpenImage}
+                onClickPrev={prevImage}
+                onClickNext={nextImage}
+                onClose={() => { setIsOpenImage(false) }}
+                currImg={currentImage}
+            />
+        </div >
     )
 }
 

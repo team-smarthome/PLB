@@ -9,6 +9,7 @@ import './cpanel.style.css'
 import ario from '../../assets/images/ario.jpeg'
 import UserManagement from '../UserManagement/UserManagement';
 import SettingIp from '../../components/SettingIp/SettingIp';
+import Country from '../Country/Country';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -68,7 +69,7 @@ const Cpanel = () => {
                             <span className="circle">{handleSplitName(userData?.petugas?.nama_petugas)}</span>
                         </div>
 
-                        <h4>{userData?.petugas?.nama_petugas}</h4>
+                        <h4>{userData?.petugas?.nama_petugas ?? ""}</h4>
                     </div>
                     {showUserButton && <div className="user-button-list">
                         <button onClick={handleLogout}>Logout</button>
@@ -81,6 +82,7 @@ const Cpanel = () => {
                     <Route path="/log-facereg" element={<LogFaceReg />} />
                     <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/setting-ip" element={<SettingIp />} />
+                    <Route path="/country" element={<Country />} />
                 </ReactRoutes>
             </div>
         </div>

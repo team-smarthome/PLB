@@ -11,7 +11,7 @@ import { formData, resultDataScan, caputedImageAfter } from "../../utils/atomSta
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
 import Cookies from 'js-cookie';
-import { apiInsertDataUser, apiPblAddFaceRec, getUserbyPassport } from "../../services/api";
+import { apiInsertDataUser, apiPblAddFaceRec, getAllNegaraData, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import axios from "axios";
 
@@ -280,7 +280,9 @@ const Apply = () => {
 
   useEffect(() => {
     connectWebSocket(null, socket_IO_4010); // Ensure to pass `socket_IO` properly
-    const res
+    // const res = await getAllNegaraData()
+    // res.then((())
+
     return () => {
       closeWebSocket();
     };
