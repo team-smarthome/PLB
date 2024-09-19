@@ -303,7 +303,7 @@ const LogFaceReg = () => {
         setIpServerCamera([])
         setIpServerPC("")
     }
-    const resultArray = logData.map(item => ({ src: item.img_path }));
+    const resultArray = !selectedOption.includes("192.168") ? logData.map(item => ({ src: item.img_path })) : logData.map(item => ({ src: `http://${ipCameraLocalStorage}/ofsimage/${item.images_info[0].img_path}` }));
     const handleOpenImage = (row, index) => {
         setIsOpenImage(true)
         setCurrentImage(index)
