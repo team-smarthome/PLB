@@ -7,6 +7,7 @@ import './logfacereg.style.css'
 import { apiGetIp, apiInsertLog, getDataLogApi, loginCamera } from '../../services/api'
 import axios from 'axios'
 import Cookies from 'js-cookie';
+import ImgsViewer from "react-images-viewer";
 import { Select } from 'flowbite-react'
 
 const LogFaceReg = () => {
@@ -35,7 +36,8 @@ const LogFaceReg = () => {
     const [name, setName] = useState("");
     const [page, setPage] = useState(1);
     const [selectedCondition, setSelectedCondition] = useState('name');
-
+    const [isOpenImage, setIsOpenImage] = useState(false)
+    const [currentImage, setCurrentImage] = useState(null)
     const [params, setParams] = useState({
         name: "",
         personId: "",
@@ -228,7 +230,6 @@ const LogFaceReg = () => {
         );
     };
 
-
     const handleSelectChange2 = (e) => {
         setParams({
             ...params,
@@ -245,7 +246,8 @@ const LogFaceReg = () => {
     }
 
     const getDetailData = (row) => {
-        navigate('/validation', { state: { detailDataLog: row, isCp: true } })
+        // console.log(row.personCode)
+        navigate('/validation', { state: { detailDataLog: row.personCode, isCp: true } })
     }
 
     const generateExcel = () => {
@@ -301,8 +303,18 @@ const LogFaceReg = () => {
         setIpServerCamera([])
         setIpServerPC("")
     }
-
-
+    const resultArray = logData.map(item => ({ src: item.img_path }));
+    const handleOpenImage = (row, index) => {
+        setIsOpenImage(true)
+        setCurrentImage(index)
+    }
+    const nextImage = () => {
+        setCurrentImage(currentImage + 1)
+    }
+    const prevImage = () => {
+        setCurrentImage(currentImage - 1)
+    }
+    // cons
     const handleSubmit = async (ipParams) => {
         try {
             if (ipParams !== "") {
@@ -426,10 +438,18 @@ const LogFaceReg = () => {
                 <TableLog
                     tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
                     tBody={logData}
-                    handler={getDetailData}
+                    handler={handleOpenImage}
                     rowRenderer={customRowRenderer}
                 />
             }
+            <ImgsViewer
+                imgs={resultArray}
+                isOpen={isOpenImage}
+                onClickPrev={prevImage}
+                onClickNext={nextImage}
+                onClose={() => { setIsOpenImage(false) }}
+                currImg={currentImage}
+            />
             <Modals
                 buttonName="Confirm"
                 headerName="Config Ip Camera"
