@@ -63,6 +63,9 @@ const Apply = () => {
   const [objectApi, setObjectApi] = useState(null);
   const [objectCamera, setObjectCamera] = useState(null);
   const [ipKamera, setIpKamera] = useState([]);
+
+  const [country, setCountry] = useState([])
+
   let loginDataArray = [];
 
   let isCloseTimeoutSet = false;
@@ -277,7 +280,7 @@ const Apply = () => {
 
   useEffect(() => {
     connectWebSocket(null, socket_IO_4010); // Ensure to pass `socket_IO` properly
-
+    const res
     return () => {
       closeWebSocket();
     };

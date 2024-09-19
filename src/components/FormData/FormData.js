@@ -146,49 +146,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
     }));
   };
 
-  const handleImageClick = (type) => {
-    switch (type) {
-      case "passport_number":
-        setIsCheckedPassportNumber(!isCheckedPassportNumber);
-        setIsCommentDisabledPassportNumber(!isCommentDisabledPassportNumber);
-        break;
-      case "register_code":
-        setIsCheckedRegisterCode(!isCheckedRegisterCode);
-        setIsCommentDisabledRegisterCode(!isCommentDisabledRegisterCode);
-        break;
-      case "full_name":
-        setIsCheckedFullName(!isCheckedFullName);
-        setIsCommentDisabledFullName(!isCommentDisabledFullName);
-        break;
-      case "date_of_birth":
-        setIsCheckedDateOfBirth(!isCheckedDateOfBirth);
-        setIsCommentDisabledDateOfBirth(!isCommentDisabledDateOfBirth);
-        break;
-      case "gender":
-        setIsCheckedGender(!isCheckedGender);
-        setIsCommentDisabledGender(!isCommentDisabledGender);
-        break;
-      case "nationality":
-        setIsCheckedNationality(!isCheckedNationality);
-        setIsCommentDisabledNationality(!isCommentDisabledNationality);
-        break;
-      case "expiry_date":
-        setIsCheckedExpiryDate(!isCheckedExpiryDate);
-        setIsCommentDisabledExpiryDate(!isCommentDisabledExpiryDate);
-        break;
-      case "arrival_time":
-        setIsCheckedArrivalTime(!isCheckedArrivalTime);
-        setIsCommentDisabledArrivalTime(!isCommentDisabledArrivalTime);
-        break;
-      case "destination_location":
-        setIsCheckedDestinationLocation(!isCheckedDestinationLocation);
-        setIsCommentDisabledDestinationLocation(!isCommentDisabledDestinationLocation);
-        break;
-      default:
-        break;
-    }
-  };
-
   const handleSelectChange = (selectedOption, fieldName) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -226,7 +183,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
             />
           </div>
         </div>
-
+        {/* 
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
@@ -241,7 +198,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus }) => {
               className="disabled-input"
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="form-group">
           <div className="wrapper-form">
