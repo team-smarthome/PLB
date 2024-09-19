@@ -20,7 +20,7 @@ const TableLog = ({ tHeader, tBody, handler = () => { }, isAction = false, onEdi
                         </tr>
                     ) : (
                         tBody.map((row, index) => (
-                            <tr key={index} onClick={() => handler(row)} style={{ cursor: 'pointer' }}>
+                            <tr key={index} onClick={() => handler(row, index)} style={{ cursor: 'pointer' }}>
                                 <td>{index + 1}</td>
                                 {rowRenderer ? rowRenderer(row) : (
                                     <>
