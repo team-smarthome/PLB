@@ -38,6 +38,7 @@ const LogFaceReg = () => {
     const [selectedCondition, setSelectedCondition] = useState('name');
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
+    const [imagesData, setImagesData] = useState([])
     const [params, setParams] = useState({
         name: "",
         personId: "",
@@ -303,7 +304,18 @@ const LogFaceReg = () => {
         setIpServerCamera([])
         setIpServerPC("")
     }
-    const resultArray = !selectedOption.includes("192.168") ? logData.map(item => ({ src: item.img_path })) : logData.map(item => ({ src: `http://${ipCameraLocalStorage}/ofsimage/${item.images_info[0].img_path}` }));
+    // const resultArray =  ? logData.map(item => ({ src: item.img_path })) : logData.map(item => ({ src: `http://${ipCameraLocalStorage}/ofsimage/${item?.images_info[0]?.img_path}` }));
+    useEffect(() => {
+        if (!selectedOption.includes("192.168")) {
+            const imagesMap = logData.map(item => ({ src: item.img_path }))
+            setImagesData(imagesMap)
+        } else {
+            const imagesIpMap = logData.map(item => ({ src: `http://${ipCameraLocalStorage}/ofsimage/${item?.images_info[0]?.img_path}` }))
+            setImagesData(imagesIpMap)
+
+        }
+    }, [])
+
     const handleOpenImage = (row, index) => {
         setIsOpenImage(true)
         setCurrentImage(index)
@@ -443,7 +455,7 @@ const LogFaceReg = () => {
                 />
             }
             <ImgsViewer
-                imgs={resultArray}
+                imgs={imagesData}
                 isOpen={isOpenImage}
                 onClickPrev={prevImage}
                 onClickNext={nextImage}
