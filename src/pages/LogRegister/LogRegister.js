@@ -504,42 +504,69 @@ const LogRegister = () => {
     }
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="input-search-container">
-                <div className="search-table-list">
-                    <div className="search-table">
-                        <span>Nomor PLB : </span>
-                        <input type="text" placeholder='Masukkan nomor plb' value={search.no_passport} onChange={(e) => setSearch({ ...search, no_passport: e.target.value })} />
+            <div className="face-reg-header" style={{
+                height: "13vh"
+            }}>
+                <div className='face-reg-filter-name'>
+                    <div className='label-filter-name' style={{
+                        gap: "35%",
+                        paddingTop: "3%"
+                    }}>
+                        <p>No. PLB</p>
+                        <p>Full Name</p>
                     </div>
-                    <div className="search-table">
-                        <span>Nama : </span>
-                        <input type="text" placeholder='Masukkan nama' value={search.name} onChange={(e) => setSearch({ ...search, name: e.target.value })} />
-                    </div>
-                    <div className="search-table">
-                        <span>Start Date : </span>
-                        <input type="datetime-local" value={search.startDate} onChange={(e) => setSearch({ ...search, startDate: e.target.value })} />
-                    </div>
-                    <div className="search-table">
-                        <span>End Date : </span>
-                        <input type="datetime-local" value={search.endDate} onChange={(e) => setSearch({ ...search, endDate: e.target.value })} />
+                    <div className='value-filter-name' style={{
+                        width: "65%"
+                    }}>
+                        <input type="text"
+                            value={search.no_passport}
+                            onChange={(e) => setSearch({ ...search, no_passport: e.target.value })}
+                            placeholder={`Enter No PLB`}
+                        />
+
+                        <input type="text"
+                            value={search.name}
+                            onChange={(e) => setSearch({ ...search, name: e.target.value })}
+                            placeholder={`Enter Name`}
+                        />
                     </div>
                 </div>
-                <div className="buttons-container" style={{ display: 'flex', gap: 10 }}>
-                    <button
-                        onClick={getLogRegister}
-                        style={{ backgroundColor: "#0e2133" }}
-                    >Search
-                    </button>
-                    <button
-                        onClick={generateExcel}
-                        style={{ backgroundColor: "green" }}
-                    >Export
-                    </button>
-                    {/* <button
-                        onClick={() => setShowModalAdd(true)}
-                        style={{ backgroundColor: "#11375c" }}
-                    >Add
-                    </button> */}
+                <div className='face-reg-filter-kamera'>
+                    <div className='label-filter-name' style={{
+                        gap: "35%",
+                        paddingTop: "3%"
+                    }}>
+                        <p>Start Date</p>
+                        <p>End Date</p>
+                    </div>
+                    <div className='value-filter-name'>
+                        <input type="datetime-local"
+                            value={search.startDate}
+                            onChange={(e) => setSearch({ ...search, startDate: e.target.value })}
+                            style={{
+                                width: "88%",
+                            }}
+                        />
+                        <input type="datetime-local"
+                            value={search.endDate}
+                            onChange={(e) => setSearch({ ...search, endDate: e.target.value })}
+                            style={{
+                                width: "88%",
+                            }}
+                        />
+                    </div>
                 </div>
+            </div>
+            <div className='submit-face-reg'>
+                <button
+                    onClick={generateExcel}
+                >Export
+                </button>
+                <button
+                    onClick={() => setShowModalAdd(true)}
+                >Add
+                </button>
+
             </div>
             {status === "loading" && (
                 <div className="loading">

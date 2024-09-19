@@ -1,42 +1,61 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import { useNavigate } from 'react-router-dom'
 import { addPendingRequest4020, initiateSocket4020 } from '../../utils/socket'
-import Modals from '../../components/Modal/Modal'
 import './logfacereg.style.css'
-import { apiGetIp, apiInsertLog, getDataLogApi, loginCamera } from '../../services/api'
+import { apiGetIp, apiInsertLog, getDataLogApi } from '../../services/api'
 import axios from 'axios'
 import Cookies from 'js-cookie';
-import { Select } from 'flowbite-react'
+import Select from "react-select";
+import Pagination from '../../components/Pagination/Pagination'
 
 const LogFaceReg = () => {
     const navigate = useNavigate()
     const socket_IO_4020 = initiateSocket4020();
     const [logData, setLogData] = useState([])
-    const [showModalConfig, setShowModalConfig] = useState(false)
     const [optionIp, setOptionIp] = useState([])
-    const [showModalLogin, setShowModalLogin] = useState(false)
-    const [ipServerPC, setIpServerPC] = useState('');
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [ipServerCamera, setIpServerCamera] = useState([]);
-    const [isConfigEmpty, setIsConfigEmpty] = useState(false)
     const [status, setStatus] = useState("loading")
-    const ipCameraRef = useRef(null)
-    const [statusAll, setStatusAll] = useState("")
-    const [dataUserId, setDataUserId] = useState({})
-    const tokenLocalStorage = localStorage.getItem('logCameraToken')
-    const ipServerCameraLocalStorage = localStorage.getItem('ipServerCamera')
-    const ipServerPCLocalStorage = localStorage.getItem('ipServerPC')
     const ipCameraLocalStorage = localStorage.getItem('cameraIpNew')
     const [selectedOption, setSelectedOption] = useState('192.2.1');
-    const [noPassport, setNoPassport] = useState("");
-    const [noRegister, setNoRegister] = useState("");
-    const [name, setName] = useState("");
-    const [page, setPage] = useState(1);
     const [selectedCondition, setSelectedCondition] = useState('personId');
+    const [totalDataFilter, setTotalDataFilter] = useState(0);
+    const [page, setPage] = useState(1);
+    const [changePage, setChangePage] = useState(false)
+    const [disablePaginate, setDisablePaginate] = useState(false)
+    const [pagination, setPagination] = useState({
+        total: 0,
+        per_page: 10,
+        current_page: 1,
+        last_page: 1,
+    });
+    const optionFilter = [
+        {
+            value: 'personId',
+            label: 'Nomor Passport'
+        },
+        {
+            value: 'name',
+            label: 'Nama'
+        },
+    ]
+
+    const optionFilterStatus = [
+        {
+            value: '',
+            label: 'All'
+        },
+        {
+            value: 'Success',
+            label: 'Success'
+        },
+        {
+            value: 'Failed',
+            label: 'Failed'
+        },
+    ]
 
     const [params, setParams] = useState({
+        page: page,
         name: "",
         personId: "",
         startDate: "",
@@ -60,9 +79,14 @@ const LogFaceReg = () => {
     };
 
     useEffect(() => {
+        if (selectedOption !== "192.2.1") {
+            setDisablePaginate(true)
+        } else {
+            setDisablePaginate(false)
+        }
         const ipCameraNew = localStorage.getItem('cameraIpNew');
         console.log(selectedOption, "selectedOptionRow12312312312");
-        if (ipServerCamera.length === 0 && ipCameraNew && selectedOption !== "192.2.1") {
+        if (ipCameraNew && selectedOption !== "192.2.1") {
             socket_IO_4020.on("responseHistoryLogs", (data) => {
                 if (data.length > 0) {
                     console.log(data, "datayanddapatdariwes");
@@ -100,10 +124,10 @@ const LogFaceReg = () => {
                             }
                         })
                         .catch(err => console.log(err));
+                } else {
+                    setStatus("success");
                 }
             });
-
-            // Bersihkan listener socket saat komponen di-unmount
             return () => {
                 socket_IO_4020.off('responseHistoryLogs');
                 socket_IO_4020.off('historyLog');
@@ -113,7 +137,7 @@ const LogFaceReg = () => {
             console.log("masuk_sini_noip");
         }
 
-    }, [socket_IO_4020, ipServerCamera, selectedOption]);
+    }, [socket_IO_4020, selectedOption]);
 
 
 
@@ -123,17 +147,93 @@ const LogFaceReg = () => {
             setStatus("success")
             console.log(response.data.data, "dataLog")
             setLogData(response.data.data)
+            setTotalDataFilter(response?.data?.data?.length);
+            console.log(response?.data?.pagination, "paginationyamase2");
+            setPagination(response?.data?.pagination);
         } catch (error) {
             setStatus("succes")
             console.log(error.message)
         }
     }
 
+    const getLogDataPaginate = async () => {
+        try {
+            const response = await getDataLogApi(params);
+            setStatus("success")
+            console.log(response.data.data, "dataLog")
+            setLogData(response.data.data)
+            setTotalDataFilter(response?.data?.data?.length);
+            console.log(response?.data?.pagination, "paginationyamase2");
+            setPagination(response?.data?.pagination);
+            setChangePage(false)
+        } catch (error) {
+            setStatus("succes")
+            console.log(error.message)
+        }
+    }
+
+
     const handleSearch = () => {
         setSelectedOption('192.2.1')
+        setPage(1)
+        setParams(prevState => ({
+            ...prevState,
+            page: 1
+        }));
         getLogData()
     }
+
     useEffect(() => {
+        if (selectedOption !== "192.2.1") {
+            setDisablePaginate(true)
+        } else {
+            setDisablePaginate(false)
+        }
+        getLogData();
+    }, [selectedOption])
+
+
+    useEffect(() => {
+        if (changePage) {
+            console.log('apakahmasuksiniMASEEEEEE')
+            getLogDataPaginate()
+        }
+
+    }, [changePage])
+
+
+    useEffect(() => {
+        setParams(prevState => ({
+            ...prevState,
+            page: page
+        }));
+        setChangePage(true)
+    }, [page]);
+
+
+    useEffect(() => {
+        //=============GK PAKE INTERNET=============//
+        // setStatus('success')
+        // const dataOptinDummy = [
+        //     {
+        //         value: '192.2.1',
+        //         label: 'All Camera'
+        //     },
+        //     {
+        //         value: '192.168.2.166',
+        //         label: 'Camera 1'
+        //     },
+        //     {
+        //         value: '192.168.171',
+        //         label: 'Camera 2'
+        //     },
+        // ]
+
+        // setOptionIp(dataOptinDummy)
+        //=============STOP=============//
+
+        //=============PAKE INTERNET=============//
+
         setStatus('loading')
         const getDataIp = Cookies.get('userdata');
         const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
@@ -148,27 +248,19 @@ const LogFaceReg = () => {
                     label: 'All Camera'
                 };
                 const updatedOptions = [defaultOption, ...dataOptions];
-                setOptionIp(updatedOptions);
+                setOptionIp(updatedOptions)
                 console.log(updatedOptions, "dataOptions");
             }
         }).catch(err => console.log(err.message))
-        const fetchData = async () => {
-            const filterParams = {
-                page: page,
-                no_passport: noPassport,
-                name: name,
-                no_register: noRegister,
-            };
-            await getLogData();
-        };
+        //=============STOP=============//
+    }, [])
 
-        fetchData();
 
-    }, [selectedOption])
-
-    const handleSelectChange = (event) => {
+    const handleSelectChange = (selected) => {
+        setPage(1)
         setParams(
             {
+                page: 1,
                 name: "",
                 personId: "",
                 startDate: "",
@@ -181,10 +273,11 @@ const LogFaceReg = () => {
         setStatus("loading")
         console.log(logData, "selectedOptionRow123")
         setStatus("loading")
-        localStorage.setItem('cameraIpNew', event.target.value)
-        handleSubmit(event.target.value)
-        setSelectedOption(event.target.value);
-        console.log('Selected_IP:', event.target.value);
+        localStorage.setItem('cameraIpNew', selected.value)
+        handleSubmit(selected.value)
+        setSelectedOption(selected.value);
+        console.log('Selected_IP:', selected.value);
+
     };
 
 
@@ -200,7 +293,7 @@ const LogFaceReg = () => {
                         <td>{row?.personCode}</td>
                         <td>{row?.name}</td>
                         <td>{row?.similarity}</td>
-                        <td>{row?.passStatus === 6 ? "Failed" : "Success"}</td>
+                        <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
                         <td>{handleEpochToDate(row?.time)}</td>
                         <td>
                             <img
@@ -219,7 +312,7 @@ const LogFaceReg = () => {
                         <td>{row?.personCode}</td>
                         <td>{row?.name}</td>
                         <td>{row?.images_info?.[0]?.similarity ?? row?.similarity}</td>
-                        <td>{row?.passStatus === 6 ? "Failed" : "Success"}</td>
+                        <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
                         <td>{handleEpochToDate(row?.time)}</td>
                         <td>
                             <img
@@ -239,14 +332,16 @@ const LogFaceReg = () => {
     };
 
 
-    const handleSelectChange2 = (e) => {
+    const handleSelectChange2 = (selectedOption) => {
+        setSelectedCondition(selectedOption.value);
+        console.log(selectedOption.value, "selectedOptionRow");
         setParams({
             ...params,
-            [selectedCondition]: ""
-        })
-        setSelectedCondition(e.target.value);
+            [selectedOption.value]: ""
+        });
+        console.log(params, "selectedOptionRow");
+    };
 
-    }
     const handleChange = (e) => {
         setParams({
             ...params,
@@ -272,7 +367,7 @@ const LogFaceReg = () => {
                 item.personId,
                 item.personCode,
                 item.name,
-                item?.images_info[0]?.similarity,
+                item?.similarity,
                 item?.passStatus === 6 ? "Failed" : "Success",
                 handleEpochToDate(item?.time),
             ];
@@ -306,13 +401,6 @@ const LogFaceReg = () => {
         });
     };
 
-    const handleCloseModal = () => {
-        setShowModalConfig(false)
-        setIpServerCamera([])
-        setIpServerPC("")
-    }
-
-
     const handleSubmit = async (ipParams) => {
         try {
             if (ipParams !== "") {
@@ -331,7 +419,6 @@ const LogFaceReg = () => {
                         console.log(dataSendWs, "ipServerCamera222222")
                         socket_IO_4020.emit('logHistory2', dataSendWs)
                     } else {
-                        console.log(ipServerCamera, "ipServerCamera333333")
                         addPendingRequest4020({ action: 'logHistory2', data: dataSendWs });
                         socket_IO_4020.connect();
                     }
@@ -342,90 +429,173 @@ const LogFaceReg = () => {
         }
     };
 
-    const ModalConfigContent = () => {
-        return (
-            <div className="config-container">
-                <div className="input-config">
-                    <span>IP Server Camera</span>
-                    <input type="text" value={ipServerCamera} onChange={(e) => setIpServerCamera(e.target.value)} />
-                </div>
-            </div>
-        )
-    }
+    const handleChangeStatus = (selectedOption) => {
+        setParams(prevState => ({
+            ...prevState,
+            passStatus: selectedOption ? selectedOption.value : ""
+        }));
+    };
 
-    const handleChangeStatus = (e) => {
-        setParams({
-            ...params,
-            passStatus: e.target.value
-        })
-    }
+    // const handleChangeStatus = (selectedOption) => {
+    //     setParams(prevState => {
+    //         const newState = {
+    //             ...prevState,
+    //             passStatus: selectedOption ? selectedOption.value : ""
+    //         };
+    //         console.log(newState, "updated params in setParams callback");
+    //         return newState;
+    //     });
+    //     console.log(selectedOption, "selectedOptionRowtest");
+    // };
+
+
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="input-search-container">
-                <div className="search-table-list">
-                    <div className="search-table">
-                        <select
-                            value={selectedCondition}
+            <div className="face-reg-header">
+                <div className='face-reg-filter-name'>
+                    <div className='label-filter-name'>
+                        <p>Filter By</p>
+                        <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
+                        <p>Status</p>
+                    </div>
+                    <div className='value-filter-name'>
+                        <Select
+                            value={optionFilter.find(option => option.value === selectedCondition)}
                             onChange={handleSelectChange2}
-                        // style={{ marginRight: '10px', }}
-                        >
-                            <option value="name">Nama</option>
-                            <option value="personId">Nomor Passport</option>
-                        </select>
-
+                            options={optionFilter}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
                         <input type="text"
                             value={selectedCondition === "name" ? params.name : params.personId}
                             onChange={handleChange}
-                            placeholder={`Masukkan ${selectedCondition == "name" ? "nama" : "nomor plb"}`}
-                            style={{ marginRight: 5 }}
+                            placeholder={`Enter ${selectedCondition == "name" ? "name" : "passport number"}`}
+                            className='input-filter-name-1'
                         />
-                        <select
-                            value={params.passStatus}
+                        <Select
+                            value={optionFilterStatus.find(option => option.value === params.passStatus) || optionFilterStatus[0]}
                             onChange={handleChangeStatus}
-                            style={{ marginRight: '20px', }}
-                        >
-                            <option value="">All</option>
-                            <option value="Success">Success</option>
-                            <option value="Failed">Failed</option>
-                        </select>
-
-                        <span>Start Date : </span>
+                            options={optionFilterStatus}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
+                    </div>
+                </div>
+                <div className='face-reg-filter-kamera'>
+                    <div className='label-filter-name'>
+                        <p>Start Date</p>
+                        <p>End Date</p>
+                        <p>Select Camera</p>
+                    </div>
+                    <div className='value-filter-name'>
                         <input type="datetime-local"
                             value={params.startDate}
                             onChange={(e) => setParams({ ...params, startDate: e.target.value })}
-                            style={{ marginRight: '10px', }}
-                            st
+                            style={{
+                                width: "88%",
+                            }}
                         />
-                        <span>End Date : </span>
                         <input type="datetime-local"
                             value={params.endDate}
                             onChange={(e) => setParams({ ...params, endDate: e.target.value })}
+                            style={{
+                                width: "88%",
+                            }}
+                        />
+                        <Select
+                            value={optionIp.find(option => option.value === selectedOption)}
+                            onChange={handleSelectChange}
+                            options={
+                                optionIp?.map((option) => (
+                                    {
+                                        value: option.value,
+                                        label: option.label
+                                    }
+                                ))
+                            }
+                            className="basic-single"
+                            classNamePrefix="select"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
                         />
                     </div>
+                </div>
+            </div>
+            <div className='submit-face-reg'>
+                <button
+                    onClick={generateExcel}
+                >Export
+                </button>
+                <button
+                    onClick={handleSearch}
+                >Search
+                </button>
 
-                </div>
-                <div className="buttons-container" style={{ display: 'flex', gap: 10 }}>
-                    <select
-                        value={selectedOption}
-                        onChange={handleSelectChange}
-                    >
-                        {optionIp.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                    <button
-                        onClick={generateExcel}
-                        style={{ backgroundColor: "green" }}
-                    >Export
-                    </button>
-                    <button
-                        onClick={handleSearch}
-                    >Search
-                    </button>
-                </div>
             </div>
             {status === "loading" && (
                 <div className="loading">
@@ -433,22 +603,24 @@ const LogFaceReg = () => {
                 </div>
             )}
             {status === "success" && logData &&
-                <TableLog
-                    tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
-                    tBody={logData}
-                    handler={getDetailData}
-                    rowRenderer={customRowRenderer}
-                />
+                <>
+                    <TableLog
+                        tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
+                        tBody={logData}
+                        handler={getDetailData}
+                        rowRenderer={customRowRenderer}
+                    />
+                    {!disablePaginate && (
+                        <div className="table-footer">
+                            <>Show {totalDataFilter} of {pagination?.total} entries</>
+                            <Pagination
+                                pageCount={pagination?.last_page}
+                                onPageChange={(selectedPage) => setPage(selectedPage)}
+                            />
+                        </div>
+                    )}
+                </>
             }
-            <Modals
-                buttonName="Confirm"
-                headerName="Config Ip Camera"
-                showModal={showModalConfig}
-                closeModal={handleCloseModal}
-                onConfirm={handleSubmit}
-            >
-                {ModalConfigContent()}
-            </Modals>
         </div>
     )
 }
