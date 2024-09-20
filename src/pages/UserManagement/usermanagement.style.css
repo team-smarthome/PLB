@@ -194,11 +194,41 @@
 
 .submit-buttons {
     display: flex;
-    width: 97%;
-    height: 7%;
     padding-top: 1%;
     justify-content: end;
+    align-items: center;
     gap: 2%;
+    margin-bottom: 1.5rem;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.input-icon-wrapper input {
+    padding-left: 35px;
+    max-width: 350px;
+    min-width: 250px;
+    height: 30px;
+    width: 100%;
+}
+
+.input-icon {
+    position: absolute;
+    left: 10px;
+    /* Adjust the position of the icon */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    /* Adjust color as needed */
+    font-size: 18px;
+    /* Adjust size of the icon */
+}
+
+.submit-buttons input {
+    height: 30px;
+    width: 30%;
 }
 
 .submit-buttons button {
