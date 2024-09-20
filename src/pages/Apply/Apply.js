@@ -704,7 +704,7 @@ const Apply = () => {
         data: [
           {
             personId: sharedData.passportData.docNumber,
-            personNum: sharedData.passportData.noRegister,
+            personNum: sharedData.passportData.docNumber,
             passStrategyId: "",
             personIDType: 1,
             personName: sharedData.passportData.fullName,
@@ -724,7 +724,7 @@ const Apply = () => {
       }
     }
     const dataTosendAPI = {
-      no_register: sharedData.passportData.noRegister,
+      // no_register: sharedData.passportData.noRegister,
       no_passport: sharedData.passportData.docNumber,
       name: sharedData.passportData.fullName,
       date_of_birth: sharedData.passportData.formattedBirthDate,

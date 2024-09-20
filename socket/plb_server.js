@@ -138,6 +138,8 @@ const handleEditDataUser = async (socket, dataUser) => {
 io.on("connection", (socket) => {
     socket.emit("message", "Welcome to the RTSP to HLS stream");
 
+    // ============================ADD CAMERA============================
+
     socket.on("saveCameraData", async (data) => {
         const ipToCheck = data?.ipServerCamera;
 
@@ -166,6 +168,8 @@ io.on("connection", (socket) => {
         }
     });
 
+    // ============================Deleted Camera============================
+
     socket.on("deleteCameraData", (data) => {
         const ipToDelete = data?.ipServerCamera;
 
@@ -180,10 +184,45 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.emit("DataIPCamera", {
-        ipCamera: ipCamera,
-        ipServerPC: ipCamera,
+    // ============================Edit Camera============================
+
+    socket.on("editCameraData", async (data) => {
+        const oldIp = data?.oldIp;
+        const newIp = data?.newIp;
+
+        if (oldIp && newIp) {
+            const index = ipCamera.indexOf(oldIp);
+
+            if (index !== -1) {
+                const res = await ping.promise.probe(newIp);
+
+                if (res.alive) {
+                    ipCamera[index] = newIp;
+                    console.log(`IP ${oldIp} telah diubah menjadi ${newIp}`);
+                    socket.emit("editDataCamera", "successfullyEdited");
+                } else {
+                    console.log(`IP ${newIp} is not reachable, edit aborted`);
+                    socket.emit("editDataCamera", "newIpNotReachable");
+                }
+            } else {
+                console.log(`IP ${oldIp} tidak ditemukan di array`);
+                socket.emit("editDataCamera", "ipNotFound");
+            }
+        } else {
+            socket.emit("editDataCamera", "failed - missing oldIp or newIp");
+        }
     });
+
+    socket.on('saveCameraDataFirst', (data) => {
+        console.log("DataDariInformation", data);
+        ipCamera = [...ipCamera, ...data?.ipServerCamera];
+        socket.emit("saveDataCamera", "successfully");
+    });
+
+    // socket.emit("DataIPCamera", {
+    //     ipCamera: ipCamera,
+    //     ipServerPC: ipCamera,
+    // });
 
     socket.on("deleteDataUser", (data) => {
         console.log("DatayangditerimaDelete", data);
@@ -198,5 +237,11 @@ io.on("connection", (socket) => {
     socket.on("editDataUser", (data) => {
         console.log("================Menerima Data dari Registers=======")
         handleEditDataUser(socket, data);
+    });
+
+    socket.on('getCameraData', () => {
+        socket.emit('DataIPCamera', {
+            ipCamera: ipCamera,
+        });
     });
 });

@@ -84,7 +84,7 @@ const Validation = () => {
         nationality: data.NationalityCode,
         sex: sexMapping[data.Sex],
         issuingState: data.IssuingCountry,
-        noRegister: data.NoRegister,
+        // noRegister: data.NoRegister,
         email: data.Email,
         postal_code: data.PostalCode,
         city: data.City,
@@ -396,7 +396,7 @@ const Validation = () => {
           });
         } else if (
           isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
-          isEmptyOrNull(dataChecked.noRegister) || !hasProperty(dataChecked, "noRegister") ||
+          // isEmptyOrNull(dataChecked.noRegister) || !hasProperty(dataChecked, "noRegister") ||
           isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
           isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
           isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
@@ -552,7 +552,7 @@ const Validation = () => {
       method: 1,
       identityType: "1",
       gender: sharedData.passportData.sex === "male" ? 1 : 0,
-      personId: sharedData.passportData.noRegister,
+      // personId: sharedData.passportData.noRegister,
       personNum: sharedData.passportData.docNumber,
       name: sharedData.passportData.fullName,
       dateOfBirth: sharedData.passportData.formattedBirthDate,

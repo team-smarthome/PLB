@@ -17,7 +17,7 @@ const LogRegister = () => {
     const [status, setStatus] = useState("loading")
     const [detailData, setDetailData] = useState({
         passport_number: "",
-        register_code: "",
+        // register_code: "",
         full_name: "",
         date_of_birth: "",
         nationality: "",
@@ -40,36 +40,6 @@ const LogRegister = () => {
     const refInputPassport = useRef()
     const [imageFace, setImageFace] = useState(null)
     const [imagePassport, setImagePassport] = useState(null)
-    const dummy = [
-        {
-            id: 1,
-            no_plb: '3213122131',
-            no_register: "431412321",
-            name: "ario",
-            gender: 'laki-laki',
-            nationality: 'indonesia',
-            profile_image: ario
-        },
-        {
-            id: 2,
-            no_plb: '3213122131',
-            no_register: "431412321",
-            name: "ario",
-            gender: 'laki-laki',
-            nationality: 'indonesia',
-            profile_image: ario
-        },
-        {
-            id: 3,
-            no_plb: '3213122131',
-            no_register: "431412321",
-            name: "ario",
-            gender: 'laki-laki',
-            nationality: 'indonesia',
-            profile_image: ario
-        },
-
-    ]
 
     const getLogRegister = async () => {
         try {
@@ -93,7 +63,7 @@ const LogRegister = () => {
         setDetailData({
             ...detailData,
             no_passport: row.no_passport || "",
-            no_register: row.no_register || "",
+            // no_register: row.no_register || "",
             name: row.name || "",
             date_of_birth: row.date_of_birth || "",
             nationality: row.nationality || "",
@@ -109,7 +79,7 @@ const LogRegister = () => {
     const closeDeleteModal = () => {
         setDetailData({
             no_passport: "",
-            no_register: "",
+            // no_register: "",
             name: "",
             date_of_birth: "",
             nationality: "",
@@ -163,7 +133,7 @@ const LogRegister = () => {
     const customRowRenderer = (row) => (
         <>
             <td>{row.no_passport}</td>
-            <td>{row.no_register}</td>
+            {/* <td>{row.no_register}</td> */}
             <td>{row.name}</td>
             <td>{row.gender === "M" ? "Laki-laki" : "Perempuan"}</td>
             <td>{row.nationality}</td>
@@ -189,7 +159,7 @@ const LogRegister = () => {
         const worksheet = workbook.addWorksheet("Payment Report");
 
         // Add column headers
-        const headers = ['No', 'no plb', 'no register', 'name', 'gender', 'nationality']
+        const headers = ['No', 'no plb', 'name', 'gender', 'nationality']
         worksheet.addRow(headers);
 
         // Add data rows
@@ -197,7 +167,7 @@ const LogRegister = () => {
             const row = [
                 index + 1,
                 item.no_passport,
-                item.no_register,
+                // item.no_register,
                 item.name,
                 item.gender === "M" ? "Laki-laki" : "Perempuan",
             ];
@@ -245,10 +215,10 @@ const LogRegister = () => {
                     <span>PLB / BCP Number</span>
                     <input type="text" name="no_passport" id="" value={detailData.no_passport} onChange={handleChange} />
                 </div>
-                <div className="register-input">
+                {/* <div className="register-input">
                     <span>Registration Number</span>
                     <input type="text" name="no_register" id="" value={detailData.no_register} onChange={handleChange} />
-                </div>
+                </div> */}
                 <div className="register-input">
                     <span>Full Name</span>
                     <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} />
@@ -331,7 +301,7 @@ const LogRegister = () => {
         setDetailData({
             ...detailData,
             no_passport: row.no_passport || "",
-            no_register: row.no_register || "",
+            // no_register: row.no_register || "",
             name: row.name || "",
             date_of_birth: row.date_of_birth || "",
             nationality: row.nationality || "",
@@ -348,7 +318,7 @@ const LogRegister = () => {
     const closeModaledit = () => {
         setDetailData({
             no_passport: "",
-            no_register: "",
+            // no_register: "",
             name: "",
             date_of_birth: "",
             nationality: "",
@@ -374,10 +344,10 @@ const LogRegister = () => {
                     <span>PLB / BCP Number</span>
                     <input type="text" name="no_passport" id="" value={detailData.no_passport} onChange={handleChange} />
                 </div>
-                <div className="register-input">
+                {/* <div className="register-input">
                     <span>Registration Number</span>
                     <input type="text" name="no_register" id="" value={detailData.no_register} onChange={handleChange} />
-                </div>
+                </div> */}
                 <div className="register-input">
                     <span>Full Name</span>
                     <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} />
@@ -574,7 +544,7 @@ const LogRegister = () => {
                 </div>
             )}
             {status === "success" && logData && <TableLog
-                tHeader={['No', 'no plb', 'no register', 'name', 'gender', 'nationality', 'profile image', "action"]}
+                tHeader={['No', 'no plb', 'name', 'gender', 'nationality', 'profile image', "action"]}
                 tBody={logData}
                 // handler={getDetailData}
                 rowRenderer={customRowRenderer}
