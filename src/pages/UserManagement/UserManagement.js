@@ -474,6 +474,7 @@ const UserManagement = () => {
                 headerName="Add User"
                 buttonName="Confirm"
                 onConfirm={handleAddPetugas}
+                width="500px"
             >
                 {addModalContent()}
             </Modals>
@@ -483,6 +484,7 @@ const UserManagement = () => {
                 headerName="Edit User"
                 buttonName="Confirm"
                 onConfirm={handleEditPetugas}
+                width="500px"
             >
                 {editModalContent()}
             </Modals>
