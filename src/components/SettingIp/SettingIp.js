@@ -26,6 +26,7 @@ const SettingIp = () => {
     const [status, setStatus] = useState("loading")
     const [kirimData, setSetKirimData] = useState(false)
     const [ipEdit, setIpEdit] = useState("")
+    const [statusKamera, SetStatusKamera] = useState([])
 
     const handleSubmitIpServer = () => {
         setStatus("loading")
@@ -59,7 +60,7 @@ const SettingIp = () => {
             });
         }
     }
-    const handleSubmitCrudKameraToServer = (params, dataApiKemera, action) => {
+    const handleSubmitCrudKameraToServer = (action, params, dataApiKemera) => {
         closeModalAdd()
         closeModalDelete()
         setStatus("loading")
@@ -100,7 +101,7 @@ const SettingIp = () => {
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
-                            title: "Gagal menyimpan data",
+                            title: "IP Kamera Not Found",
                         });
                     }
                 })
@@ -167,13 +168,37 @@ const SettingIp = () => {
             }
         } else {
             setStatus("success")
-            canAddIpKamerea(false);
+            setCanAddIpKamerea(false)
             Toast.fire({
                 icon: 'error',
                 title: 'Please Input Ip Server'
             });
         }
     }
+
+    const handleCheckStatus = () => {
+        setStatus("loading")
+        if (newWifiResults) {
+            const socket = io(`http://${newWifiResults}:4010`);
+
+            socket.emit("checkStatusKamera")
+
+            socket.on("statusKameraResponse", (data) => {
+                setStatus("success")
+                SetStatusKamera(data)
+                console.log("HASILDARISTATUSKAMERA", data)
+            })
+
+        } else {
+            setStatus("success")
+            setCanAddIpKamerea(false);
+            Toast.fire({
+                icon: 'error',
+                title: 'Please Input Ip Server'
+            });
+        }
+    }
+
 
     const optionCameras = [...Array(10)].map((_, index) => ({
         value: index + 1,
@@ -273,7 +298,7 @@ const SettingIp = () => {
             userId: dataUserIp?.petugas?.id,
         };
 
-        handleSubmitCrudKameraToServer(detailData?.ipAddress, dataApiKemera, "add");
+        handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
 
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
@@ -285,7 +310,7 @@ const SettingIp = () => {
             ...detailData,
             userId: dataUserIp?.petugas?.id,
         };
-        handleSubmitCrudKameraToServer(ipEdit, dataApiKemera, "delete");
+        handleSubmitCrudKameraToServer("edit", ipEdit, dataApiKemera);
 
         // console.log(dataApiKemera, 'dataApiKemera');
         // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
@@ -302,7 +327,7 @@ const SettingIp = () => {
     };
 
     const handleDelete = () => {
-        handleSubmitCrudKameraToServer(detailData?.ipAddress, detailData, "delete");
+        handleSubmitCrudKameraToServer("delete", detailData?.ipAddress, detailData);
     }
 
     const openModalAdd = () => {
@@ -333,13 +358,48 @@ const SettingIp = () => {
         setDetailData({})
         setModalDelete(false)
     }
-    const customRowRenderer = (row) =>
-    (
-        <>
-            <td>{row.namaKamera}</td>
-            <td>{row.ipAddress}</td>
-            {canAddIpKamerea && (
-                <>
+    const customRowRenderer = (row) => {
+        const kameraStatus = statusKamera.find(item => item.ip === row.ipAddress);
+
+        return (
+            <>
+                <td>{row.namaKamera}</td>
+                <td>{row.ipAddress}</td>
+                <td>
+                    {kameraStatus ? (
+                        <div style={{ color: kameraStatus.status === 'error' ? 'red' : 'green' }}>
+                            {kameraStatus.status === 'error' ? 'Inactive' : 'Active'}
+                        </div>
+                    ) : (
+                        <div style={{ color: 'gray' }}>Unknown</div>
+                    )}
+                </td>
+                <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
+                    <button
+                        onClick={() => openModalEdit(row)}
+                        disabled={!canAddIpKamerea}
+                        style={{
+                            background: canAddIpKamerea ? 'initial' : 'gray',
+                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
+                            color: canAddIpKamerea ? 'initial' : 'white',
+                        }}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        onClick={() => openModalDelete(row)}
+                        disabled={!canAddIpKamerea}
+                        style={{
+                            background: canAddIpKamerea ? 'red' : 'gray',
+                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
+                            color: 'white',
+                        }}
+                    >
+                        Delete
+                    </button>
+                </td>
+
+                {/* {canAddIpKamerea && (
                     <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
                         <button
                             onClick={() => openModalEdit(row)}
@@ -348,11 +408,10 @@ const SettingIp = () => {
                             onClick={() => openModalDelete(row)}
                             style={{ background: 'red' }}>Delete</button>
                     </td>
-                </>
-            )}
-
-        </>
-    );
+                )} */}
+            </>
+        );
+    };
 
     const modalAddLayout = () => (
         <div className="modal-edit-container">
@@ -411,6 +470,18 @@ const SettingIp = () => {
                         <input type="text"
                             placeholder='Input Ip Server'
                             value={
+                                canAddIpKamerea ? '' : newWifiResults
+                            }
+                            onChange={(e) =>
+                                setNewWifiResults(
+                                    e.target.value
+                                )
+                            }
+                        />
+
+                        {/* <input type="text"
+                            placeholder='Input Ip Server'
+                            value={
                                 newWifiResults
                             }
                             onChange={(e) =>
@@ -420,10 +491,11 @@ const SettingIp = () => {
                                 )
                             }
 
-                        />
+                        /> */}
                     </div>
                 </div>
                 <div className='submit-face-reg'>
+
                     {canAddIpKamerea && (
                         <>
                             <button
@@ -432,11 +504,19 @@ const SettingIp = () => {
                             </button>
                         </>
                     )}
-
                     <button
                         onClick={handleSubmitIpServer}
                     >Submit
                     </button>
+                    <button
+                        style={{
+                            backgroundColor: '#E6AF3C',
+
+                        }}
+                        onClick={handleCheckStatus}
+                    >Check Status
+                    </button>
+
 
                 </div>
                 {status === "loading" && (
@@ -447,7 +527,7 @@ const SettingIp = () => {
                 {status === "success" &&
                     <>
                         <TableLog
-                            tHeader={['no', 'Nama Kamera', "Ip Address"]}
+                            tHeader={['no', 'Nama Kamera', "Ip Address", "Status", "Action"]}
                             tBody={listCamera}
                             rowRenderer={customRowRenderer}
                         />

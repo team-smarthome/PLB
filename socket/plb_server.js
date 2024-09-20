@@ -136,6 +136,7 @@ const handleEditDataUser = async (socket, dataUser) => {
 
 
 io.on("connection", (socket) => {
+
     socket.emit("message", "Welcome to the RTSP to HLS stream");
 
     // ============================ADD CAMERA============================
@@ -218,6 +219,24 @@ io.on("connection", (socket) => {
         ipCamera = [...ipCamera, ...data?.ipServerCamera];
         socket.emit("saveDataCamera", "successfully");
     });
+
+    socket.on("checkStatusKamera", async () => {
+        let results = [];
+        for (let ip of ipCamera) {
+            try {
+                const res = await ping.promise.probe(ip)
+                if (!res.alive) {
+                    results.push({ ip, status: "error" });
+                } else {
+                    results.push({ ip, status: "ok" });
+                }
+            } catch (error) {
+                results.push({ ip, status: "error" });
+            }
+        }
+        socket.emit("statusKameraResponse", results);
+    })
+
 
     // socket.emit("DataIPCamera", {
     //     ipCamera: ipCamera,

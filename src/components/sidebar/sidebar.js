@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
-import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag } from "react-icons/fa";
+import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag, FaServer } from "react-icons/fa";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp } from "react-icons/io5";
@@ -81,11 +81,23 @@ const Sidebar = ({ isOpen }) => {
                         </div>
                     </li>
                 )}
-                {userInfo.role === 0 && menuSetting.setting && (
-                    <ul className="sub-menu-link">
-                        <Link to='/cpanel/setting-ip' className={`link ${isActive('/cpanel/setting-ip') ? 'active' : ''}`}>
-                            <FaNetworkWired size={25} style={{ marginRight: '10px' }} />
-                            Setting IP
+                {userInfo.role == 0 && menuSetting.setting && (
+                    <ul
+                        className="sub-menu-link"
+                    >
+                        <Link to='/cpanel/setting-server' className={`link ${isActive('/cpanel/setting-server') ? 'active' : ''}`}>
+                            <FaServer
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <a >Server</a>
+                        </Link>
+                        <Link to='/cpanel/setting-camera' className={`link ${isActive('/cpanel/setting-ip') ? 'active' : ''}`}>
+                            <FaNetworkWired
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <a >Camera</a>
                         </Link>
                     </ul>
                 )}
