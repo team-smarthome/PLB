@@ -295,6 +295,16 @@ export const apiGetIp = async (params) => {
   }
 }
 
+export const apiGetAllIp = async () => {
+  try {
+    const res = await axios.get(`${url_devel}api/ipconfig`);
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
 export const apiEditIp = async (data, params) => {
   try {
     const res = await axios({
