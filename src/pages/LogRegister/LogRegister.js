@@ -8,8 +8,12 @@ import Modals from '../../components/Modal/Modal'
 import dataNegara from '../../utils/dataNegara'
 import { initiateSocket4010 } from '../../utils/socket'
 import axios from 'axios'
+import Cookies from 'js-cookie';
+import './logregister.style.css'
 
 const LogRegister = () => {
+    const userCookie = Cookies.get('userdata')
+    const userInfo = JSON.parse(userCookie)
     const socket_IO_4010 = initiateSocket4010();
     const [showModalAdd, setShowModalAdd] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
@@ -527,15 +531,17 @@ const LogRegister = () => {
                     </div>
                 </div>
             </div>
-            <div className='submit-face-reg'>
+            <div className='submit-buttons-registers'>
                 <button
                     onClick={generateExcel}
+                    className='add-data'
                 >Export
                 </button>
-                <button
+                {userInfo.role == 0 && <button
+                    className='search'
                     onClick={() => setShowModalAdd(true)}
                 >Add
-                </button>
+                </button>}
 
             </div>
             {status === "loading" && (

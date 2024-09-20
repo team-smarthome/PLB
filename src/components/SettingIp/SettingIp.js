@@ -447,7 +447,7 @@ const SettingIp = () => {
                 {status === "success" &&
                     <>
                         <TableLog
-                            tHeader={['no', 'Nama Kamera', "Ip Address", "Action"]}
+                            tHeader={['no', 'Nama Kamera', "Ip Address"]}
                             tBody={listCamera}
                             rowRenderer={customRowRenderer}
                         />
