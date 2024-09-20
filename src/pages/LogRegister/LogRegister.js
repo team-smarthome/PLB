@@ -531,7 +531,11 @@ const LogRegister = () => {
                     </div>
                 </div>
             </div>
-            <div className='submit-buttons-registers'>
+            <div className='submit-buttons-registers' style={{
+                width: "99.4%",
+                paddingTop: "1%",
+                paddingBottom: "1%",
+            }}>
                 <button
                     onClick={generateExcel}
                     className='add-data'
@@ -542,6 +546,14 @@ const LogRegister = () => {
                     onClick={() => setShowModalAdd(true)}
                 >Add
                 </button>}
+                <button
+                    className='search'
+                    onClick={getLogRegister}
+                    style={{
+                        backgroundColor: '#4F70AB',
+                    }}
+                >Search
+                </button>
 
             </div>
             {status === "loading" && (

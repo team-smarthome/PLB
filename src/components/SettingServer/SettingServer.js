@@ -8,6 +8,14 @@ const SettingServer = () => {
     const [loading, setLoading] = useState(false);
     let socket_server_4010;
 
+
+    useEffect(() => {
+        const serverIPSocket = localStorage.getItem('serverIPSocket');
+        if (serverIPSocket) {
+            setNewWifiResults(serverIPSocket);
+        }
+    }, []);
+
     const handleSubmit = () => {
         setLoading(true);
         if (newWifiResults) {

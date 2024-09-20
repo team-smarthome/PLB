@@ -606,6 +606,9 @@ const LogFaceReg = () => {
                 </button>
                 <button
                     onClick={handleSearch}
+                    style={{
+                        backgroundColor: '#4F70AB',
+                    }}
                 >Search
                 </button>
 

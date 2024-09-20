@@ -443,31 +443,40 @@ const UserManagement = () => {
                 <button
                     onClick={getAllPetugasData}
                     className='search-data'
+                    style={{ 
+                        backgroundColor: "#4F70AB"
+                     }}
                 >Search
-                </button>
-                {userInfo.role == 0 && <button
-                    onClick={openModalAdd}
-                    className='add-data'
-                >Add
-                </button>}
-            </div>
-            {isLoading ?
-                (
-                    <div className="loading">
-                        <span className="loader-loading-table"></span>
-                    </div>
-                ) : (
-                    <>
-                        <TableLog
-                            tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
-                            tBody={dataPetugas}
-                            onEdit={editModal}
-                            onDelete={deleteModal}
-                            rowRenderer={customRowRenderer}
-                        />
-                        {renderPaginationControls()}
-                    </>
-                )}
+            </button>
+            {userInfo.role == 0 && <button
+                onClick={openModalAdd}
+                className='add-data'
+                style={{
+                    backgroundColor: '#11375C',
+                    marginRight: 10,
+                }}
+            >Add
+            </button>}
+        </div>
+            {
+        isLoading ?
+            (
+                <div className="loading">
+                    <span className="loader-loading-table"></span>
+                </div>
+            ) : (
+                <>
+                    <TableLog
+                        tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
+                        tBody={dataPetugas}
+                        onEdit={editModal}
+                        onDelete={deleteModal}
+                        rowRenderer={customRowRenderer}
+                    />
+                    {renderPaginationControls()}
+                </>
+            )
+    }
             <Modals
                 showModal={isShowModalAdd}
                 closeModal={closeModalAdd}
@@ -498,7 +507,7 @@ const UserManagement = () => {
                 {deleteModalContent()}
             </Modals>
 
-        </div>
+        </div >
     )
 }
 

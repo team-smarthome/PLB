@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from "react-select";
 import Cookies from 'js-cookie';
-import { apiDeleteIp, apiEditIp, apiGetIp, apiInsertIP } from '../../services/api';
+import { apiDeleteIp, apiEditIp, apiGetAllIp, apiGetIp, apiInsertIP } from '../../services/api';
 import './settingip.style.css'
 import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import TableLog from '../TableLog/TableLog';
@@ -211,7 +211,8 @@ const SettingIp = () => {
 
     const fetchAllIp = async () => {
         try {
-            const res = await apiGetIp(dataUserIp?.petugas?.id);
+            // const res = await apiGetIp(dataUserIp?.petugas?.id);
+            const res = await apiGetAllIp();
             console.log(res, 'res');
             setListCamera(res.data.data)
             if (res.data.data.length === 0) {
@@ -244,6 +245,7 @@ const SettingIp = () => {
     }, [dataUserIp?.petugas?.id, totalCameras]);
 
     useEffect(() => {
+        handleCheckStatus()
         const websocketIp = localStorage.getItem('serverIPSocket');
         setIpserverWebsocket(websocketIp);
         console.log("nilaidariwebsocket", websocketIp);
@@ -532,6 +534,15 @@ const SettingIp = () => {
         <>
             <div className='config-container'>
                 <div className='submit-face-reg'>
+                    <button
+                        style={{
+                            backgroundColor: '#3DBB6F',
+                            width: '10%',
+
+                        }}
+                        onClick={handleCheckStatus}
+                    >Check Status
+                    </button>
 
                     {canAddIpKamerea && (
                         <>
@@ -541,18 +552,7 @@ const SettingIp = () => {
                             </button>
                         </>
                     )}
-                    {/* <button
-                        onClick={handleSubmitIpServer}
-                    >Submit
-                    </button> */}
-                    <button
-                        style={{
-                            backgroundColor: '#E6AF3C',
 
-                        }}
-                        onClick={handleCheckStatus}
-                    >Check Status
-                    </button>
 
 
                 </div>
