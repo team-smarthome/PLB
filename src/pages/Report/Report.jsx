@@ -49,7 +49,7 @@ function Report() {
       page: page,
       no_passport: noPassport,
       name: name,
-      no_register: noRegister,
+      // no_register: noRegister,
       ...(formattedStartDate && { startDate: formattedStartDate }),
       ...(formattedEndDate && { endDate: formattedEndDate }),
     };
@@ -65,7 +65,7 @@ function Report() {
         page: page,
         no_passport: noPassport,
         name: name,
-        no_register: noRegister,
+        // no_register: noRegister,
       };
       await getDataUser(filterParams);
     };
@@ -90,7 +90,7 @@ function Report() {
     const itemHeaders = [
       "No",
       "No. PLB",
-      "No. Register",
+      // "No. Register",
       "Nama",
       "Tanggal Lahir",
       "Jenis Kelamin",
@@ -102,7 +102,7 @@ function Report() {
     const itemRows = dataUser.map((item, index) => [
       index + 1,
       `${item.no_passport}`,
-      `${item.no_register}`,
+      // `${item.no_register}`,
       `${item.name}`,
       `${item.date_of_birth}`,
       `${item.gender}`,
@@ -133,7 +133,7 @@ function Report() {
     const headers = [
       "No",
       "No. PLB",
-      "No. Register",
+      // "No. Register",
       "Nama",
       "Tanggal Lahir",
       "Jenis Kelamin",
@@ -149,7 +149,7 @@ function Report() {
       const row = [
         index + 1,
         `${item.no_passport}`,
-        `${item.no_register}`,
+        // `${item.no_register}`,
         `${item.name}`,
         `${item.date_of_birth}`,
         `${item.gender}`,
@@ -189,7 +189,7 @@ function Report() {
   const resetFilter = () => {
     setNoPassport("");
     setName("");
-    setNoRegister("");
+    // setNoRegister("");
     setStartDate(null);
     setPage(1);
     setPagination({
@@ -235,7 +235,7 @@ function Report() {
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-            <div className="input-filter-bottom">
+            {/* <div className="input-filter-bottom">
               <p>No. Register</p>
               <input
                 type="text"
@@ -243,7 +243,7 @@ function Report() {
                 value={noRegister}
                 onChange={(e) => setNoRegister(e.target.value)}
               />
-            </div>
+            </div> */}
           </div>
           <div className="filter-left">
             <div className="input-filter-bottom2">

@@ -15,38 +15,10 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
     { value: "female", label: "FEMALE" },
   ]);
 
-  // passportNumber
-  const [isCommentDisabledPassportNumber, setIsCommentDisabledPassportNumber] =
-    useState(true);
-  //Registrasion Number
-  const [isCommentDisabledRegisterCode, setIsCommentDisabledRegisterCode] =
-    useState(true);
-  // fullName
-  const [isCommentDisabledFullName, setIsCommentDisabledFullName] =
-    useState(true);
-  // dateOfBirth
-  const [isCommentDisabledDateOfBirth, setIsCommentDisabledDateOfBirth] =
-    useState(true);
-  // gender
-  const [isCommentDisabledGender, setIsCommentDisabledGender] = useState(true);
-  // nationality
-  const [isCommentDisabledNationality, setIsCommentDisabledNationality] =
-    useState(true);
-  // expiryDate
-  const [isCommentDisabledExpiryDate, setIsCommentDisabledExpiryDate] =
-    useState(true);
-  // arrivalTime
-  const [isCommentDisabledArrivalTime, setIsCommentDisabledArrivalTime] =
-    useState(true);
-  // destinationLocation
-  const [isCommentDisabledDestinationLocation, setIsCommentDisabledDestinationLocation] =
-    useState(true);
-  console.log(dataLogs, "datalog from form")
-  // const initialFormData = 
 
   const [formdata, setFormData] = useState({
     passport_number: "",
-    register_code: "",
+    // register_code: "",
     full_name: "",
     date_of_birth: "",
     sex: "",
@@ -61,7 +33,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
     const findNationality = dataNegara.data.find((data) => data?.id_negara === dataLogs?.nationality)
     setFormData({
       passport_number: dataLogs?.no_passport || "",
-      register_code: dataLogs?.no_register || "",
+      // register_code: dataLogs?.no_register || "",
       full_name: dataLogs?.name || "",
       date_of_birth: dataLogs?.date_of_birth || "",
       sex: dataLogs?.gender === "M"
@@ -134,7 +106,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
           </div>
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
               <label htmlFor="register_code">Registrasion Number</label>
@@ -148,7 +120,7 @@ const FormDataValidation = ({ setSharedData, dataLogs }) => {
               className="disabled-input"
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="form-group">
           <div className="wrapper-form">

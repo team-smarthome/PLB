@@ -22,7 +22,7 @@ const Table = ({ data, page, perPage }) => {
           <tr>
             <th>No</th>
             <th>No PLB</th>
-            <th>No Register</th>
+            {/* <th>No Register</th> */}
             <th>Nama</th>
             <th>Nationality</th>
             <th>Arrival Time</th>
@@ -43,7 +43,7 @@ const Table = ({ data, page, perPage }) => {
               >
                 <td>{(page - 1) * perPage + index + 1}</td>
                 <td>{item.no_passport}</td>
-                <td>{item.no_register}</td>
+                {/* <td>{item.no_register}</td> */}
                 <td>{item.name}</td>
                 <td>{findNationality ? `${findNationality?.id_negara}-${findNationality?.deskripsi_negara}` : "Unknown"}</td>
                 <td>{item.arrival_time}</td>

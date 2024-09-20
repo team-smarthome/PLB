@@ -311,7 +311,13 @@
   display: flex;
   flex-basis: 50%;
   flex-direction: column;
-  gap: 6%;
+  /* align-items: end; */
+  height: 70%;
+  /* background-color: red;
+  display: flex;
+  flex-basis: 50%;
+  flex-direction: column; */
+  /* gap: 6%; */
 }
 
 .input-filter-top,
@@ -345,6 +351,7 @@
 
 
 .filter-left {
+  /* background-color: green; */
   display: flex;
   flex-basis: 50%;
   flex-direction: column;

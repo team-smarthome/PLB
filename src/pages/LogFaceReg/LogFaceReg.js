@@ -289,7 +289,7 @@ const LogFaceReg = () => {
                 {!selectedOption.includes("192.168") ? (
                     <>
                         <td>{row?.personId}</td>
-                        <td>{row?.personCode}</td>
+                        {/* <td>{row?.personCode}</td> */}
                         <td>{row?.name}</td>
                         <td>{row?.similarity}</td>
                         <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
@@ -308,7 +308,7 @@ const LogFaceReg = () => {
                 ) : (
                     <>
                         <td>{row?.personId}</td>
-                        <td>{row?.personCode}</td>
+                        {/* <td>{row?.personCode}</td> */}
                         <td>{row?.name}</td>
                         <td>{row?.images_info?.[0]?.similarity ?? row?.similarity}</td>
                         <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
@@ -358,14 +358,14 @@ const LogFaceReg = () => {
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Payment Report");
 
-        const headers = ['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time"]
+        const headers = ['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time"]
         worksheet.addRow(headers);
 
         logData.forEach((item, index) => {
             const row = [
                 index + 1,
                 item.personId,
-                item.personCode,
+                // item.personCode,
                 item.name,
                 item?.similarity,
                 item?.passStatus === 6 ? "Failed" : "Success",
@@ -617,7 +617,7 @@ const LogFaceReg = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['No', 'no plb', 'no register', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
+                        tHeader={['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
                         tBody={logData}
                         handler={handleOpenImage}
                         rowRenderer={customRowRenderer}
