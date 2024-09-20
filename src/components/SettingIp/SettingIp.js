@@ -101,7 +101,7 @@ const SettingIp = () => {
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
-                            title: "Gagal menyimpan data",
+                            title: "IP Kamera Not Found",
                         });
                     }
                 })
@@ -310,7 +310,7 @@ const SettingIp = () => {
             ...detailData,
             userId: dataUserIp?.petugas?.id,
         };
-        handleSubmitCrudKameraToServer("delete", ipEdit, dataApiKemera);
+        handleSubmitCrudKameraToServer("edit", ipEdit, dataApiKemera);
 
         // console.log(dataApiKemera, 'dataApiKemera');
         // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
@@ -374,7 +374,32 @@ const SettingIp = () => {
                         <div style={{ color: 'gray' }}>Unknown</div>
                     )}
                 </td>
-                {canAddIpKamerea && (
+                <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
+                    <button
+                        onClick={() => openModalEdit(row)}
+                        disabled={!canAddIpKamerea}
+                        style={{
+                            background: canAddIpKamerea ? 'initial' : 'gray',
+                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
+                            color: canAddIpKamerea ? 'initial' : 'white',
+                        }}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        onClick={() => openModalDelete(row)}
+                        disabled={!canAddIpKamerea}
+                        style={{
+                            background: canAddIpKamerea ? 'red' : 'gray',
+                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
+                            color: 'white',
+                        }}
+                    >
+                        Delete
+                    </button>
+                </td>
+
+                {/* {canAddIpKamerea && (
                     <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
                         <button
                             onClick={() => openModalEdit(row)}
@@ -383,7 +408,7 @@ const SettingIp = () => {
                             onClick={() => openModalDelete(row)}
                             style={{ background: 'red' }}>Delete</button>
                     </td>
-                )}
+                )} */}
             </>
         );
     };
@@ -445,6 +470,18 @@ const SettingIp = () => {
                         <input type="text"
                             placeholder='Input Ip Server'
                             value={
+                                canAddIpKamerea ? '' : newWifiResults
+                            }
+                            onChange={(e) =>
+                                setNewWifiResults(
+                                    e.target.value
+                                )
+                            }
+                        />
+
+                        {/* <input type="text"
+                            placeholder='Input Ip Server'
+                            value={
                                 newWifiResults
                             }
                             onChange={(e) =>
@@ -454,7 +491,7 @@ const SettingIp = () => {
                                 )
                             }
 
-                        />
+                        /> */}
                     </div>
                 </div>
                 <div className='submit-face-reg'>

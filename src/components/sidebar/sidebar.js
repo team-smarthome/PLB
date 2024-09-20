@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
-import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag } from "react-icons/fa";
+import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag, FaServer } from "react-icons/fa";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp } from "react-icons/io5";
@@ -124,12 +124,19 @@ const Sidebar = ({ isOpen }) => {
                     <ul
                         className="sub-menu-link"
                     >
-                        <Link to='/cpanel/setting-ip' className="link">
+                        <Link to='/cpanel/setting-server' className="link">
+                            <FaServer
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <a >Server</a>
+                        </Link>
+                        <Link to='/cpanel/setting-camera' className="link">
                             <FaNetworkWired
                                 size={25}
                                 style={{ marginRight: '10px' }}
                             />
-                            <a >Setting IP</a>
+                            <a >Camera</a>
                         </Link>
                         {/* <Link to='/cpanel/setting-facereg' className="link">
                             <a >Setting Facereg</a>

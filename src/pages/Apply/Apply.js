@@ -23,7 +23,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("lookCamera");
+  const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -88,7 +88,7 @@ const Apply = () => {
         nationality: data.NationalityCode,
         sex: sexMapping[data.Sex],
         issuingState: data.IssuingCountry,
-        noRegister: data.NoRegister,
+        // noRegister: data.NoRegister,
         email: data.Email,
         postal_code: data.PostalCode,
         city: data.City,
@@ -363,7 +363,6 @@ const Apply = () => {
           });
         } else if (
           isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
-          isEmptyOrNull(dataChecked.noRegister) || !hasProperty(dataChecked, "noRegister") ||
           isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
           isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
           isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
@@ -379,7 +378,7 @@ const Apply = () => {
           setCardStatus("lookCamera");
           setTabStatus(2);
         }
-      } else if (cardStatus === "lookCamera") {
+      } else if (cardStatus === "takePhotoSucces") {
         setFormData(sharedData);
         setDataPermohonan(sharedData);
         doSaveRequestVoaPayment(sharedData);
