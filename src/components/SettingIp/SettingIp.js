@@ -25,11 +25,22 @@ const SettingIp = () => {
     const [canAddIpKamerea, setCanAddIpKamerea] = useState(false);
     const [status, setStatus] = useState("loading")
     const [kirimData, setSetKirimData] = useState(false)
+    const [ipEdit, setIpEdit] = useState("")
 
     const handleSubmitIpServer = () => {
         setStatus("loading")
         if (newWifiResults) {
             const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+
+            socket_server_4010.emit('getCameraData')
+
+            socket_server_4010.on('DataIPCamera', (data) => {
+                if (data?.ipCamera.length === 0) {
+                    console.log('DataIPCamera', data?.ipCamera.length);
+                    socket_server_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs })
+                }
+            });
+
             socket_server_4010.on('connect', () => {
                 console.log('connect to server');
                 setCanAddIpKamerea(true);
@@ -41,7 +52,7 @@ const SettingIp = () => {
             });
         } else {
             setStatus("success")
-            canAddIpKamerea(false);
+            setCanAddIpKamerea(false);
             Toast.fire({
                 icon: 'error',
                 title: 'Please Input Ip Server'
@@ -56,6 +67,11 @@ const SettingIp = () => {
             const socket_server_4010 = io(`http://${newWifiResults}:4010`);
             const sendDataToWs = {
                 ipServerCamera: [params]
+            }
+
+            const sendDataToWsEdit = {
+                oldIp: ipEdit,
+                newIp: dataApiKemera.ipAddress
             }
 
             if (action === "add") {
@@ -118,6 +134,36 @@ const SettingIp = () => {
                         });
                     }
                 })
+            } else if (action === "edit") {
+                socket_server_4010.emit("editCameraData", sendDataToWsEdit);
+                socket_server_4010.on('editDataCamera', (data) => {
+                    if (data === "successfullyEdited") {
+                        const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
+                        editIpKamera.then((res) => {
+                            if (res.status == 200) {
+                                fetchAllIp()
+                                setStatus("success")
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Data berhasil diubah",
+                                });
+                            }
+                        }).catch((err) => {
+                            setStatus("success")
+                            Toast.fire({
+                                icon: "error",
+                                title: "Gagal mengubah data",
+                            })
+                            console.log(err);
+                        });
+                    } else {
+                        setStatus("success")
+                        Toast.fire({
+                            icon: "error",
+                            title: "Gagal mengubah data",
+                        });
+                    }
+                })
             }
         } else {
             setStatus("success")
@@ -139,7 +185,6 @@ const SettingIp = () => {
         try {
             const res = await apiGetIp(dataUserIp?.petugas?.id);
             console.log(res, 'res');
-            // console.log(res.data.data, "res.data.data")
             setListCamera(res.data.data)
             if (res.data.data.length === 0) {
                 setCameraNames(new Array(totalCameras).fill(''));
@@ -169,6 +214,17 @@ const SettingIp = () => {
             fetchAllIp();
         }
     }, [dataUserIp?.petugas?.id, totalCameras]);
+
+
+    // useEffect(() => {
+    //     setDataUserIp(JSON.parse(getUserdata));
+
+    //     if (dataUserIp?.petugas?.id) {
+
+    //     }
+
+    // }, []);
+
 
     const handleTotalCamerasChange = (selectedOption) => {
         if (selectedOption) {
@@ -224,20 +280,23 @@ const SettingIp = () => {
 
     const handleEdit = (e) => {
         e.preventDefault();
-        console.log(dataUserIp, 'dataUserIp');
+        console.log(ipEdit, 'dataUserIp');
         const dataApiKemera = {
             ...detailData,
             userId: dataUserIp?.petugas?.id,
         };
-        const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
-        editIpKamera.then((res) => {
-            if (res.status == 200) {
-                closeModalEdit()
-                fetchAllIp()
-            }
-        }).catch((err) => {
-            console.log(err.message);
-        });
+        handleSubmitCrudKameraToServer(ipEdit, dataApiKemera, "delete");
+
+        // console.log(dataApiKemera, 'dataApiKemera');
+        // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
+        // editIpKamera.then((res) => {
+        //     if (res.status == 200) {
+        //         closeModalEdit()
+        //         fetchAllIp()
+        //     }
+        // }).catch((err) => {
+        //     console.log(err.message);
+        // });
 
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
@@ -256,6 +315,7 @@ const SettingIp = () => {
         setModalAdd(false)
     }
     const openModalEdit = (row) => {
+        setIpEdit(row?.ipAddress)
         setDetailData(row)
         setModalEdit(true)
     }
