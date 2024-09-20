@@ -92,7 +92,7 @@ const Sidebar = ({ isOpen }) => {
                             />
                             <a >Server</a>
                         </Link>
-                        <Link to='/cpanel/setting-camera' className={`link ${isActive('/cpanel/setting-ip') ? 'active' : ''}`}>
+                        <Link to='/cpanel/setting-camera' className={`link ${isActive('/cpanel/setting-camera') ? 'active' : ''}`}>
                             <FaNetworkWired
                                 size={25}
                                 style={{ marginRight: '10px' }}

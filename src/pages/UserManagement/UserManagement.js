@@ -3,7 +3,7 @@ import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './usermanagement.style.css'
 import { DeletePetugas, getAllPetugas, InsertPetugas, UpdatePetugas } from '../../services/api'
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
 import Cookies from 'js-cookie';
 
@@ -38,7 +38,7 @@ const UserManagement = () => {
     const getAllPetugasData = async (page = 1) => {
         try {
             setIsLoading(true)
-            const response = await getAllPetugas(search, page)
+            const response = await getAllPetugas({ nama_petugas: search.nama_petugas }, page)
             if (response.status === 200) {
                 console.log(response.data.data)
                 setDataPetugas(response?.data?.data)
@@ -400,7 +400,7 @@ const UserManagement = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="userManagement-header ">
+            {/* <div className="userManagement-header ">
                 <div className='face-reg-filter-name'>
                     <div className='label-filter-name' style={{ width: "15%", paddingTop: '2.5%' }} >
                         <p>Input Name</p>
@@ -434,19 +434,22 @@ const UserManagement = () => {
                         />
                     </div>
                 </div>
-            </div>
+            </div> */}
             <div className='submit-buttons'>
-                {userInfo.role == 0 && <button
-                    onClick={openModalAdd}
-                    className='add-data'
-                >Add
-                </button>}
+                <div className="input-icon-wrapper">
+                    <FaSearch className="input-icon" />
+                    <input type="text" placeholder="Search by Name or NIP" onChange={(e) => setSearch({ ...search, nama_petugas: e.target.value })} />
+                </div>
                 <button
                     onClick={getAllPetugasData}
                     className='search-data'
                 >Search
                 </button>
-
+                {userInfo.role == 0 && <button
+                    onClick={openModalAdd}
+                    className='add-data'
+                >Add
+                </button>}
             </div>
             {isLoading ?
                 (
