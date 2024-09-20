@@ -5,8 +5,11 @@ import './usermanagement.style.css'
 import { DeletePetugas, getAllPetugas, InsertPetugas, UpdatePetugas } from '../../services/api'
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
+import Cookies from 'js-cookie';
 
 const UserManagement = () => {
+    const userCookie = Cookies.get('userdata')
+    const userInfo = JSON.parse(userCookie)
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
     const [isShowModalDelete, setIsShowModalDelete] = useState(false)
@@ -364,7 +367,7 @@ const UserManagement = () => {
                 <td>{row?.petugas?.tanggal_lahir}</td>
                 <td>{row?.jabatan?.nama_jabatan}</td>
                 <td>{row?.role === 0 ? "Super Admin" : row?.role === 1 ? "admin" : "user"}</td>
-                <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>
+                {userInfo.role == 0 && <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>}
             </>
         )
     };
@@ -432,13 +435,15 @@ const UserManagement = () => {
                     </div>
                 </div>
             </div>
-            <div className='submit-face-reg'>
-                <button
+            <div className='submit-buttons'>
+                {userInfo.role == 0 && <button
                     onClick={openModalAdd}
+                    className='add-data'
                 >Add
-                </button>
+                </button>}
                 <button
                     onClick={getAllPetugasData}
+                    className='search-data'
                 >Search
                 </button>
 
@@ -451,7 +456,7 @@ const UserManagement = () => {
                 ) : (
                     <>
                         <TableLog
-                            tHeader={['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action']}
+                            tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
                             tBody={dataPetugas}
                             onEdit={editModal}
                             onDelete={deleteModal}

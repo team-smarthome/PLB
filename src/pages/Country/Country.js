@@ -5,8 +5,11 @@ import './country.style.css'
 import { DeleteNegara, DeletePetugas, getAllNegaraData, getAllPetugas, InsertNegara, InsertPetugas, UpdateNegara, UpdatePetugas } from '../../services/api'
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
+import Cookies from 'js-cookie';
 
 const Country = () => {
+    const userCookie = Cookies.get('userdata')
+    const userInfo = JSON.parse(userCookie)
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
     const [isShowModalDelete, setIsShowModalDelete] = useState(false)
@@ -194,7 +197,10 @@ const Country = () => {
             <>
                 <td>{row?.nama_negara}</td>
 
-                <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>
+                {userInfo.role == 0 && <td className='button-action'>
+                    <button onClick={() => editModal(row)}>Edit</button>
+                    <button onClick={() => deleteModal(row)}>Delete</button>
+                </td>}
             </>
         )
     };
@@ -240,7 +246,7 @@ const Country = () => {
                     </div>
                     <button onClick={getAllNegara}>Search</button>
                 </div>
-                <button onClick={openModalAdd}>Tambah</button>
+                {userInfo.role == 0 && <button onClick={openModalAdd}>Tambah</button>}
             </div>
             {isLoading ?
                 (
@@ -250,7 +256,7 @@ const Country = () => {
                 ) : (
                     <>
                         <TableLog
-                            tHeader={['no', 'nama', 'action']}
+                            tHeader={userInfo.role == 0 ? ['no', 'nama', 'action'] : ['no', 'nama']}
                             tBody={dataPetugas}
                             onEdit={editModal}
                             onDelete={deleteModal}

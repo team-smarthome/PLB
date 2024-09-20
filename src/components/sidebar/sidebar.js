@@ -5,10 +5,12 @@ import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired,
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp } from "react-icons/io5";
-
+import Cookies from 'js-cookie';
 
 
 const Sidebar = ({ isOpen }) => {
+    const userCookie = Cookies.get('userdata')
+    const userInfo = JSON.parse(userCookie)
     const location = useLocation()
     // console.log(location, "location")
     const navigate = useNavigate()
@@ -96,7 +98,7 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
-                <li>
+                {userInfo.role == 0 && <li>
                     <div
                         className="icon-link"
                         onClick={() => handleSettingToggle("setting")}
@@ -117,8 +119,8 @@ const Sidebar = ({ isOpen }) => {
                             style={{ cursor: 'pointer' }}
                         />
                     </div>
-                </li>
-                {menuSetting.setting && (
+                </li>}
+                {userInfo.role == 0 && menuSetting.setting && (
                     <ul
                         className="sub-menu-link"
                     >

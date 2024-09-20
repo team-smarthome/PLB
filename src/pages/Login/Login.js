@@ -14,11 +14,7 @@ const Login = () => {
   const tooglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
   const [loading, isLoading] = useState(false);
-
-
-
   const version = "1.0.0";
 
   const isAuthenticated = () => {
@@ -47,15 +43,11 @@ const Login = () => {
           icon: "success",
           title: "Berhasil Masuk",
         });
-
-        console.log(dataRes?.user?.role, "roleANninggg");
-
-        if (dataRes?.user?.role === 2) {
-          navigate("/home");
-        } else {
+        if (dataRes.user.role == 0 || dataRes.user.role == 1) {
           navigate("/cpanel");
+        } else {
+          navigate("/home");
         }
-
       }
     } catch (error) {
       isLoading(false);
