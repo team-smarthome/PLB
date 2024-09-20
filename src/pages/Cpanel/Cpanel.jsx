@@ -84,7 +84,7 @@ const Cpanel = () => {
                     <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/setting-server" element={<SettingServer />} />
                     <Route path="/setting-camera" element={<SettingIp />} />
-                    <Route path="/country" element={<Country />} />
+                    <Route path="/destination-location" element={<Country />} />
                 </ReactRoutes>
             </div>
         </div>
