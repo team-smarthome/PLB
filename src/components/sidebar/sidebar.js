@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
-import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaFlag, FaServer } from "react-icons/fa";
+import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp } from "react-icons/io5";
@@ -101,12 +101,36 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
-                <li>
+                {userInfo.role === 0 && (
+                    <li>
+                        <div className="icon-link" onClick={() => handleSettingToggle("master")}>
+                            <a>
+                                <FaDatabase size={30} color="#fff" style={{ marginRight: '10px' }} />
+                                <span className="link_name">Master Data</span>
+                            </a>
+                            <FaChevronDown color="#fff" size={25} style={{ cursor: 'pointer' }} />
+                        </div>
+                    </li>
+                )}
+                {userInfo.role == 0 && menuSetting.master && (
+                    <ul
+                        className="sub-menu-link"
+                    >
+                        <Link to='/cpanel/destination-location' className={`link ${isActive('/cpanel/destination-location') ? 'active' : ''}`}>
+                            <FaMapMarkerAlt
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <a>Destination Location</a>
+                        </Link>
+                    </ul>
+                )}
+                {/* <li>
                     <Link to='/cpanel/country' className={`link ${isActive('/cpanel/country') ? 'active' : ''}`}>
                         <FaFlag size={30} style={{ marginRight: '10px' }} />
                         <span className="link_name">Country Master</span>
                     </Link>
-                </li>
+                </li> */}
             </ul>
         </div>
     );
