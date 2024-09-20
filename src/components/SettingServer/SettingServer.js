@@ -16,6 +16,7 @@ const SettingServer = () => {
             socket_server_4010.on('connect', () => {
                 console.log('Connected to server');
                 setLoading(false);
+                localStorage.setItem('serverIPSocket', newWifiResults);
                 Toast.fire({
                     icon: 'success',
                     title: 'Successfully connected to the server',
@@ -38,15 +39,6 @@ const SettingServer = () => {
             });
         }
     };
-
-    useEffect(() => {
-        return () => {
-            if (socket_server_4010) {
-                socket_server_4010.disconnect();
-                console.log('Disconnected from server');
-            }
-        };
-    }, []);
 
     return (
         <div className='container-server'>
