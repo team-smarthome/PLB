@@ -151,7 +151,7 @@ const LogRegister = () => {
                 />
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                {/* <button onClick={() => openModalEdit(row)}>Edit</button> */}
+                <button onClick={() => openModalEdit(row)}>Edit</button>
                 <button onClick={() => deleteModal(row)} style={{ background: 'red' }}>Delete</button>
             </td>
         </>
@@ -425,40 +425,42 @@ const LogRegister = () => {
     }
 
     const handleEdit = async () => {
+        setStatus("loading")
+        setShowModalEdit(false)
+        let paramsToSendEdit = {
+            method: "addfaceinfonotify",
+            params: {
+                data: [],
+            },
+        };
         try {
             const res = await editDataUserPlb(detailData, detailData.no_passport)
-            const dataEdit = {
-                method: "addfaceinfonotify",
-                params: {
-                    data: [
-                        {
-                            personId: detailData.passport_number,
-                            personNum: detailData.register_code,
-                            passStrategyId: "",
-                            personIDType: 1,
-                            personName: detailData.full_name,
-                            personGender: detailData.gender === "M" ? 1 : 0,
-                            validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
-                            validEndTime: Math.floor(new Date(`${detailData.expiry_date}T23:59:00`).getTime() / 1000).toString(),
-                            personType: 1,
-                            identityType: 1,
-                            identityId: detailData.passport_number,
-                            identitySubType: 1,
-                            identificationTimes: -1,
-                            identityDataBase64: detailData.profile_image ? detailData.profile_image : "",
-                            status: 0,
-                            reserve: "",
-                        }
-                    ],
-                }
-            }
+            console.log(res, "res edit")
+            paramsToSendEdit.params.data.push({
+                personId: detailData?.no_passport,
+                personNum: detailData?.no_passport,
+                passStrategyId: "",
+                personIDType: 1,
+                personName: detailData?.name,
+                personGender: detailData?.gender === "M" ? 1 : 0,
+                validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+                validEndTime: Math.floor(new Date(`${detailData.expired_date}T23:59:00`).getTime() / 1000).toString(),
+                personType: 1,
+                identityType: 1,
+                identityId: detailData?.no_passport,
+                identitySubType: 1,
+                identificationTimes: -1,
+                identityDataBase64: detailData?.profile_image ? detailData?.profile_image : "",
+                status: 0,
+                reserve: "",
+            })
             if (res.status == 200) {
-                socket_IO_4010.emit('editDataUser', dataEdit)
+                socket_IO_4010.emit('editDataUser', { paramsToSendEdit });
                 socket_IO_4010.on('responseEditDataUser', (data) => {
                     console.log(data, "res socket")
-                    if (data == "Successfully") {
+                    if (data === "Successfully") {
                         getLogRegister()
-                        setShowModalDelete(false)
+                        setStatus("success")
                     }
                 })
             }
