@@ -34,8 +34,8 @@ const Synchronize = () => {
             userId: dataUserIp?.petugas?.id,
         };
         if (ipServerSynch) {
-            // socket_server_4010 = io(`http://${ipServerSynch}:4010`);
-            socket_server_4010 = io(`http://127.0.0.1:4010`);
+            socket_server_4010 = io(`http://${ipServerSynch}:4010`);
+            // socket_server_4010 = io(`http://127.0.0.1:4010`);
             try {
                 const res = await apiGetDataLogRegister();
                 const dataApi = res.data.data;
@@ -62,13 +62,6 @@ const Synchronize = () => {
                             reserve: "",
                         });
                     });
-
-                    // socket_server_4010.emit('sync', { paramsToSend, nilaiIp }, () => {
-                    //     Toast.fire({
-                    //         icon: 'success',
-                    //         title: 'Successfully synchronized',
-                    //     });
-                    // });
 
                     socket_server_4010.emit('sync', { paramsToSend, nilaiIp });
 
