@@ -74,6 +74,7 @@
   },
   "devDependencies": {
     "@types/video.js": "^7.3.57",
+    "tailwindcss": "^3.4.12",
     "video.js": "^8.10.0"
   }
 }

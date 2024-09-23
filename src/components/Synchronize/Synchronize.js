@@ -74,7 +74,7 @@ const Synchronize = () => {
                         if (data === "Successfully") {
                             const insertIpKamera = apiInsertIP(dataApiKemera);
                             insertIpKamera.then((res) => {
-                                if (res.status == 200) {
+                                if (res.status === 200) {
                                     Toast.fire({
                                         icon: 'success',
                                         title: 'Successfully synchronized',
