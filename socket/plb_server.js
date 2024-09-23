@@ -61,6 +61,7 @@ const handleSendDataToApi = async (socket, dataUser) => {
     }
 };
 
+
 const handleDeleteDataUser = async (socket, data) => {
     try {
         const deleteRequest = ipCamera.map(async (ip) => {
@@ -136,6 +137,7 @@ const handleEditDataUser = async (socket, dataUser) => {
 
 
 io.on("connection", (socket) => {
+
     socket.emit("message", "Welcome to the RTSP to HLS stream");
 
     // ============================ADD CAMERA============================
@@ -219,10 +221,23 @@ io.on("connection", (socket) => {
         socket.emit("saveDataCamera", "successfully");
     });
 
-    // socket.emit("DataIPCamera", {
-    //     ipCamera: ipCamera,
-    //     ipServerPC: ipCamera,
-    // });
+    socket.on("checkStatusKamera", async () => {
+        let results = [];
+        for (let ip of ipCamera) {
+            try {
+                const res = await ping.promise.probe(ip)
+                if (!res.alive) {
+                    results.push({ ip, status: "error" });
+                } else {
+                    results.push({ ip, status: "ok" });
+                }
+            } catch (error) {
+                results.push({ ip, status: "error" });
+            }
+        }
+        socket.emit("statusKameraResponse", results);
+    })
+
 
     socket.on("deleteDataUser", (data) => {
         console.log("DatayangditerimaDelete", data);
@@ -244,4 +259,21 @@ io.on("connection", (socket) => {
             ipCamera: ipCamera,
         });
     });
+
+    socket.on('sync', async (data) => {
+        const { paramsToSend, nilaiIp } = data;
+        console.log('Data:', paramsToSend);
+        console.log('IP:', nilaiIp);
+        try {
+            const syncRequest = await axios.post(`http://${nilaiIp}/facial_api/aiot_call`, paramsToSend);
+            if (syncRequest?.data?.status === 0) {
+                socket.emit("responseSync", "Successfully");
+            } else {
+                socket.emit("responseSync", "Failed");
+            }
+        } catch (error) {
+            socket.emit("responseSync", "Failed");
+        }
+    })
+
 });

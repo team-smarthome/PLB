@@ -38,7 +38,7 @@
 
 input {
   flex: 1;
-  height: 10px;
+  height: 15px;
   border: 1px solid #ccc;
   padding: 10px;
   font-size: 15px;
@@ -46,6 +46,12 @@ input {
   border-radius: 4px;
   background-color: rgba(217, 217, 217, 0.75);
   font-family: "Roboto", Arial, sans-serif;
+}
+
+.nomor-passport {
+
+  font-size: 30px;
+  max-height: 20%;
 }
 
 .checkbox-container {

@@ -3,10 +3,13 @@ import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './country.style.css'
 import { DeleteNegara, DeletePetugas, getAllNegaraData, getAllPetugas, InsertNegara, InsertPetugas, UpdateNegara, UpdatePetugas } from '../../services/api'
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
+import Cookies from 'js-cookie';
 
 const Country = () => {
+    const userCookie = Cookies.get('userdata')
+    const userInfo = JSON.parse(userCookie)
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
     const [isShowModalDelete, setIsShowModalDelete] = useState(false)
@@ -194,7 +197,10 @@ const Country = () => {
             <>
                 <td>{row?.nama_negara}</td>
 
-                <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>
+                {userInfo.role == 0 && <td className='button-action'>
+                    <button onClick={() => editModal(row)}>Edit</button>
+                    <button onClick={() => deleteModal(row)}>Delete</button>
+                </td>}
             </>
         )
     };
@@ -227,20 +233,33 @@ const Country = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="input-search-container">
+            <div className="input-search-container search-country"
+                style={{ display: 'flex', justifyContent: 'flex-end' }}
+            >
                 <div className="search-table-list" style={{ alignItems: 'center' }}>
                     <div className="search-table">
-                        <span>Negara : </span>
-                        <input
+                        {/* <span>Negara : </span> */}
+                        <div className="input-icon-wrapper-country">
+                            <FaSearch className="input-icon" />
+                            <input type="text" placeholder="Search" onChange={(e) => setSearch({ ...search, nama_negara: e.target.value })} />
+                        </div>
+                        {/* <input
                             type="text"
                             placeholder="Masukkan nama negara"
                             onChange={(e) => setSearch({ ...search, nama_negara: e.target.value })}
                             value={search.nama_petugas}
-                        />
+                        /> */}
                     </div>
-                    <button onClick={getAllNegara}>Search</button>
+                    <button onClick={getAllNegara}
+                        style={{
+                            backgroundColor: '#4F70AB'
+                        }}
+                    >Search</button>
                 </div>
-                <button onClick={openModalAdd}>Tambah</button>
+                {userInfo.role == 0 && <button style={{
+                    marginRight: 10,
+                    marginLeft: 10,
+                }} onClick={openModalAdd}>Add</button>}
             </div>
             {isLoading ?
                 (
@@ -250,7 +269,7 @@ const Country = () => {
                 ) : (
                     <>
                         <TableLog
-                            tHeader={['no', 'nama', 'action']}
+                            tHeader={userInfo.role == 0 ? ['no', 'nama', 'action'] : ['no', 'nama']}
                             tBody={dataPetugas}
                             onEdit={editModal}
                             onDelete={deleteModal}

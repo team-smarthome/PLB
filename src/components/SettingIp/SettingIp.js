@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from "react-select";
 import Cookies from 'js-cookie';
-import { apiDeleteIp, apiEditIp, apiGetIp, apiInsertIP } from '../../services/api';
+import { apiDeleteIp, apiEditIp, apiGetAllIp, apiGetIp, apiInsertIP } from '../../services/api';
 import './settingip.style.css'
 import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import TableLog from '../TableLog/TableLog';
@@ -26,6 +26,8 @@ const SettingIp = () => {
     const [status, setStatus] = useState("loading")
     const [kirimData, setSetKirimData] = useState(false)
     const [ipEdit, setIpEdit] = useState("")
+    const [statusKamera, SetStatusKamera] = useState([])
+    const [IpserverWebsocket, setIpserverWebsocket] = useState("")
 
     const handleSubmitIpServer = () => {
         setStatus("loading")
@@ -59,12 +61,13 @@ const SettingIp = () => {
             });
         }
     }
-    const handleSubmitCrudKameraToServer = (params, dataApiKemera, action) => {
+    const handleSubmitCrudKameraToServer = (action, params, dataApiKemera) => {
         closeModalAdd()
         closeModalDelete()
         setStatus("loading")
-        if (newWifiResults) {
-            const socket_server_4010 = io(`http://${newWifiResults}:4010`);
+        const websocketIp = localStorage.getItem('serverIPSocket')
+        if (websocketIp) {
+            const socket_server_4010 = io(`http://${websocketIp}:4010`);
             const sendDataToWs = {
                 ipServerCamera: [params]
             }
@@ -100,7 +103,7 @@ const SettingIp = () => {
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
-                            title: "Gagal menyimpan data",
+                            title: "IP Kamera Not Found",
                         });
                     }
                 })
@@ -167,13 +170,38 @@ const SettingIp = () => {
             }
         } else {
             setStatus("success")
-            canAddIpKamerea(false);
+            setCanAddIpKamerea(false)
             Toast.fire({
                 icon: 'error',
                 title: 'Please Input Ip Server'
             });
         }
     }
+
+    const handleCheckStatus = () => {
+        setStatus("loading")
+        const websocketIp = localStorage.getItem('serverIPSocket')
+        if (websocketIp) {
+            const socket = io(`http://${websocketIp}:4010`);
+
+            socket.emit("checkStatusKamera")
+
+            socket.on("statusKameraResponse", (data) => {
+                setStatus("success")
+                SetStatusKamera(data)
+                console.log("HASILDARISTATUSKAMERA", data)
+            })
+
+        } else {
+            setStatus("success")
+            setCanAddIpKamerea(false);
+            Toast.fire({
+                icon: 'error',
+                title: 'Please Input Ip Server'
+            });
+        }
+    }
+
 
     const optionCameras = [...Array(10)].map((_, index) => ({
         value: index + 1,
@@ -183,7 +211,8 @@ const SettingIp = () => {
 
     const fetchAllIp = async () => {
         try {
-            const res = await apiGetIp(dataUserIp?.petugas?.id);
+            // const res = await apiGetIp(dataUserIp?.petugas?.id);
+            const res = await apiGetAllIp();
             console.log(res, 'res');
             setListCamera(res.data.data)
             if (res.data.data.length === 0) {
@@ -215,14 +244,75 @@ const SettingIp = () => {
         }
     }, [dataUserIp?.petugas?.id, totalCameras]);
 
+    useEffect(() => {
+        handleCheckStatus()
+        const websocketIp = localStorage.getItem('serverIPSocket');
+        setIpserverWebsocket(websocketIp);
+        console.log("nilaidariwebsocket", websocketIp);
 
-    // useEffect(() => {
-    //     setDataUserIp(JSON.parse(getUserdata));
+        if (websocketIp) {
+            const socket_server_4010 = io(`http://${websocketIp}:4010`);
+            socket_server_4010.emit('getCameraData');
+            socket_server_4010.on('DataIPCamera', (data) => {
+                if (data?.ipCamera.length === 0) {
+                    console.log('DataIPCamera', data?.ipCamera.length);
+                    socket_server_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs });
+                }
+            });
 
-    //     if (dataUserIp?.petugas?.id) {
+            socket_server_4010.on('connect', () => {
+                console.log('connect to server');
+                setCanAddIpKamerea(true);
+                setStatus("success");
+                // Toast.fire({
+                //     icon: 'success',
+                //     title: 'Success Connect to Server'
+                // });
+            });
+            socket_server_4010.on('connect_error', (error) => {
+                console.error('Connection error:', error);
+                // Toast.fire({
+                //     icon: 'error',
+                //     title: 'Failed to connect to the websocket server',
+                // });
+            });
+        }
 
+    }, [cameraIPs])
+
+
+
+    // useEffect(async () => {
+    //     await fetchAllIp();
+    //     const websocketIp = localStorage.getItem('serverIPSocket')
+    //     setIpserverWebsocket(websocketIp)
+    //     console.log("nilaidariwebsocket", websocketIp);
+    //     if (websocketIp) {
+    //         const socket_server_4010 = io(`http://${websocketIp}:4010`);
+    //         socket_server_4010.emit('getCameraData')
+    //         socket_server_4010.on('DataIPCamera', (data) => {
+    //             if (data?.ipCamera.length === 0) {
+    //                 console.log('DataIPCamera', data?.ipCamera.length);
+    //                 socket_server_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs })
+    //             }
+    //         });
+    //         socket_server_4010.on('connect', () => {
+    //             console.log('connect to server');
+    //             setCanAddIpKamerea(true);
+    //             setStatus("success")
+    //             Toast.fire({
+    //                 icon: 'success',
+    //                 title: 'Success Connect to Server'
+    //             });
+    //         });
+    //         socket_server_4010.on('connect_error', (error) => {
+    //             console.error('Connection error:', error);
+    //             Toast.fire({
+    //                 icon: 'error',
+    //                 title: 'Failed to connect to the websocket server',
+    //             });
+    //         });
     //     }
-
     // }, []);
 
 
@@ -273,7 +363,7 @@ const SettingIp = () => {
             userId: dataUserIp?.petugas?.id,
         };
 
-        handleSubmitCrudKameraToServer(detailData?.ipAddress, dataApiKemera, "add");
+        handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
 
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
@@ -285,7 +375,7 @@ const SettingIp = () => {
             ...detailData,
             userId: dataUserIp?.petugas?.id,
         };
-        handleSubmitCrudKameraToServer(ipEdit, dataApiKemera, "delete");
+        handleSubmitCrudKameraToServer("edit", ipEdit, dataApiKemera);
 
         // console.log(dataApiKemera, 'dataApiKemera');
         // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
@@ -302,7 +392,7 @@ const SettingIp = () => {
     };
 
     const handleDelete = () => {
-        handleSubmitCrudKameraToServer(detailData?.ipAddress, detailData, "delete");
+        handleSubmitCrudKameraToServer("delete", detailData?.ipAddress, detailData);
     }
 
     const openModalAdd = () => {
@@ -333,26 +423,66 @@ const SettingIp = () => {
         setDetailData({})
         setModalDelete(false)
     }
-    const customRowRenderer = (row) =>
-    (
-        <>
-            <td>{row.namaKamera}</td>
-            <td>{row.ipAddress}</td>
-            {canAddIpKamerea && (
-                <>
-                    <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                        <button
-                            onClick={() => openModalEdit(row)}
-                        >Edit</button>
-                        <button
-                            onClick={() => openModalDelete(row)}
-                            style={{ background: 'red' }}>Delete</button>
-                    </td>
-                </>
-            )}
+    const customRowRenderer = (row) => {
+        const kameraStatus = statusKamera.find(item => item.ip === row.ipAddress);
 
-        </>
-    );
+        return (
+            <>
+                <td>{row.namaKamera}</td>
+                <td>{row.ipAddress}</td>
+                <td>
+                    {kameraStatus ? (
+                        <div style={{ color: kameraStatus.status === 'error' ? 'red' : 'green' }}>
+                            {kameraStatus.status === 'error' ? 'Inactive' : 'Active'}
+                        </div>
+                    ) : (
+                        <div style={{ color: 'gray' }}>Unknown</div>
+                    )}
+                </td>
+                {/* <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
+                    <button
+                        onClick={() => openModalEdit(row)}
+                        disabled={!canAddIpKamerea}
+                        style={{
+                            background: canAddIpKamerea ? 'initial' : 'gray',
+                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
+                            color: canAddIpKamerea ? 'yellow' : 'white',
+                        }}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        onClick={() => openModalDelete(row)}
+                        disabled={!canAddIpKamerea}
+                        style={{
+                            background: canAddIpKamerea ? 'red' : 'gray',
+                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
+                            color: 'white',
+                        }}
+                    >
+                        Delete
+                    </button>
+                </td> */}
+
+                <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
+                    <button
+                        onClick={() => openModalEdit(row)}
+                        disabled={!canAddIpKamerea}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        onClick={() => openModalDelete(row)}
+                        style={{ background: 'red' }}
+                        disabled={!canAddIpKamerea}
+                    >
+                        Delete
+                    </button>
+                </td>
+
+            </>
+        );
+    };
 
     const modalAddLayout = () => (
         <div className="modal-edit-container">
@@ -403,27 +533,17 @@ const SettingIp = () => {
     return (
         <>
             <div className='config-container'>
-                <div className='face-reg-filter-name'>
-                    <div className='label-filter-name' style={{ width: "20%", paddingTop: '2.5%' }} >
-                        <p>Input Ip Server</p>
-                    </div>
-                    <div className='value-filter-name'>
-                        <input type="text"
-                            placeholder='Input Ip Server'
-                            value={
-                                newWifiResults
-                            }
-                            onChange={(e) =>
-                                setNewWifiResults(
-                                    e.target
-                                        .value
-                                )
-                            }
-
-                        />
-                    </div>
-                </div>
                 <div className='submit-face-reg'>
+                    <button
+                        style={{
+                            backgroundColor: '#3DBB6F',
+                            width: '10%',
+
+                        }}
+                        onClick={handleCheckStatus}
+                    >Check Status
+                    </button>
+
                     {canAddIpKamerea && (
                         <>
                             <button
@@ -433,10 +553,7 @@ const SettingIp = () => {
                         </>
                     )}
 
-                    <button
-                        onClick={handleSubmitIpServer}
-                    >Submit
-                    </button>
+
 
                 </div>
                 {status === "loading" && (
@@ -447,7 +564,7 @@ const SettingIp = () => {
                 {status === "success" &&
                     <>
                         <TableLog
-                            tHeader={['no', 'Nama Kamera', "Ip Address", "Action"]}
+                            tHeader={['no', 'Nama Kamera', "Ip Address", "Status", "Action"]}
                             tBody={listCamera}
                             rowRenderer={customRowRenderer}
                         />

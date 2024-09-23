@@ -3,10 +3,13 @@ import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './usermanagement.style.css'
 import { DeletePetugas, getAllPetugas, InsertPetugas, UpdatePetugas } from '../../services/api'
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
+import Cookies from 'js-cookie';
 
 const UserManagement = () => {
+    const userCookie = Cookies.get('userdata')
+    const userInfo = JSON.parse(userCookie)
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
     const [isShowModalDelete, setIsShowModalDelete] = useState(false)
@@ -35,7 +38,7 @@ const UserManagement = () => {
     const getAllPetugasData = async (page = 1) => {
         try {
             setIsLoading(true)
-            const response = await getAllPetugas(search, page)
+            const response = await getAllPetugas({ nama_petugas: search.nama_petugas }, page)
             if (response.status === 200) {
                 console.log(response.data.data)
                 setDataPetugas(response?.data?.data)
@@ -364,7 +367,7 @@ const UserManagement = () => {
                 <td>{row?.petugas?.tanggal_lahir}</td>
                 <td>{row?.jabatan?.nama_jabatan}</td>
                 <td>{row?.role === 0 ? "Super Admin" : row?.role === 1 ? "admin" : "user"}</td>
-                <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>
+                {userInfo.role == 0 && <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>}
             </>
         )
     };
@@ -397,7 +400,7 @@ const UserManagement = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="userManagement-header ">
+            {/* <div className="userManagement-header ">
                 <div className='face-reg-filter-name'>
                     <div className='label-filter-name' style={{ width: "15%", paddingTop: '2.5%' }} >
                         <p>Input Name</p>
@@ -431,41 +434,56 @@ const UserManagement = () => {
                         />
                     </div>
                 </div>
-            </div>
-            <div className='submit-face-reg'>
-                <button
-                    onClick={openModalAdd}
-                >Add
-                </button>
+            </div> */}
+            <div className='submit-buttons'>
+                <div className="input-icon-wrapper">
+                    <FaSearch className="input-icon" />
+                    <input type="text" placeholder="Search by Name or NIP" onChange={(e) => setSearch({ ...search, nama_petugas: e.target.value })} />
+                </div>
                 <button
                     onClick={getAllPetugasData}
+                    className='search-data'
+                    style={{ 
+                        backgroundColor: "#4F70AB"
+                     }}
                 >Search
-                </button>
-
-            </div>
-            {isLoading ?
-                (
-                    <div className="loading">
-                        <span className="loader-loading-table"></span>
-                    </div>
-                ) : (
-                    <>
-                        <TableLog
-                            tHeader={['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action']}
-                            tBody={dataPetugas}
-                            onEdit={editModal}
-                            onDelete={deleteModal}
-                            rowRenderer={customRowRenderer}
-                        />
-                        {renderPaginationControls()}
-                    </>
-                )}
+            </button>
+            {userInfo.role == 0 && <button
+                onClick={openModalAdd}
+                className='add-data'
+                style={{
+                    backgroundColor: '#11375C',
+                    marginRight: 10,
+                }}
+            >Add
+            </button>}
+        </div>
+            {
+        isLoading ?
+            (
+                <div className="loading">
+                    <span className="loader-loading-table"></span>
+                </div>
+            ) : (
+                <>
+                    <TableLog
+                        tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
+                        tBody={dataPetugas}
+                        onEdit={editModal}
+                        onDelete={deleteModal}
+                        rowRenderer={customRowRenderer}
+                    />
+                    {renderPaginationControls()}
+                </>
+            )
+    }
             <Modals
                 showModal={isShowModalAdd}
                 closeModal={closeModalAdd}
                 headerName="Add User"
                 buttonName="Confirm"
                 onConfirm={handleAddPetugas}
+                width="500px"
             >
                 {addModalContent()}
             </Modals>
@@ -475,6 +493,7 @@ const UserManagement = () => {
                 headerName="Edit User"
                 buttonName="Confirm"
                 onConfirm={handleEditPetugas}
+                width="500px"
             >
                 {editModalContent()}
             </Modals>
@@ -488,7 +507,7 @@ const UserManagement = () => {
                 {deleteModalContent()}
             </Modals>
 
-        </div>
+        </div >
     )
 }
 

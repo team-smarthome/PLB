@@ -3,7 +3,7 @@ import TableLog from '../../components/TableLog/TableLog'
 import { useNavigate } from 'react-router-dom'
 import { addPendingRequest4020, initiateSocket4020 } from '../../utils/socket'
 import './logfacereg.style.css'
-import { apiGetIp, apiInsertLog, getDataLogApi } from '../../services/api'
+import { apiGetAllIp, apiGetIp, apiInsertLog, getDataLogApi } from '../../services/api'
 import axios from 'axios'
 import Cookies from 'js-cookie';
 import Select from "react-select";
@@ -235,7 +235,8 @@ const LogFaceReg = () => {
 
         setStatus('loading')
         const getDataIp = Cookies.get('userdata');
-        const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
+        // const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
+        const getAllIp = apiGetAllIp();
         getAllIp.then(res => {
             if (res.data.status === 200) {
                 const dataOptions = res.data.data.map(item => ({
@@ -605,6 +606,9 @@ const LogFaceReg = () => {
                 </button>
                 <button
                     onClick={handleSearch}
+                    style={{
+                        backgroundColor: '#4F70AB',
+                    }}
                 >Search
                 </button>
 

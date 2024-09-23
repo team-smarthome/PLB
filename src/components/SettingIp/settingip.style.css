@@ -41,11 +41,17 @@
 
 .config-container {
     /* width: 100vw; */
-    /* background-color: red; */
     display: flex;
     justify-content: space-between;
     padding: 20px;
 }
+
+.submit-face-reg {
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 99.4%;
+}
+
 
 .wrapper-form .wrapper-input {
     width: 40%;

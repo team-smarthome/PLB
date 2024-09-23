@@ -38,6 +38,10 @@
     width: 100%;
     /* Full width of the container */
     box-sizing: border-box;
+    max-width: 335px;
+    min-width: 250px;
+    max-height: 15px;
+    min-height: 50px;
 }
 
 .edit-container input:focus,
@@ -56,7 +60,12 @@
     background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KPHBhdGggZD0iTTEuNzY4IDExLjc4NCAxLjE5OSAxMC41MTYgMTcuNjA1IiBzdHJva2U9IiM2QzA4MDkiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjY2xhc3M9InJvdW5kIiBzdHJva2UtZGFzaGFycm93PSIxMjAwIi8+Cjwvc3ZnPgo=') no-repeat right center;
     background-size: 16px;
     padding-right: 40px;
+    /* max-width: 335px; */
     /* Space for the custom arrow */
+}
+
+.button-search-user-management {
+    background-color: important #11375c;
 }
 
 .delete-container {
@@ -186,4 +195,66 @@
     display: flex;
     width: 100%;
     height: 5vh;
+}
+
+.submit-buttons {
+    display: flex;
+    padding-top: 1%;
+    justify-content: end;
+    align-items: center;
+    gap: 2%;
+    margin-bottom: 1.5rem;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.input-icon-wrapper input {
+    padding-left: 35px;
+    max-width: 350px;
+    min-width: 250px;
+    height: 30px;
+    width: 100%;
+}
+
+.input-icon {
+    position: absolute;
+    left: 10px;
+    /* Adjust the position of the icon */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    /* Adjust color as needed */
+    font-size: 18px;
+    /* Adjust size of the icon */
+}
+
+.submit-buttons input {
+    height: 30px;
+    width: 30%;
+}
+
+.submit-buttons button {
+    width: 7%;
+    height: 50px;
+    background-color: #11375c;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+}
+
+.submit-buttons .add-data {
+    background-color: #3dbb6f;
+}
+
+.submit-buttons .add-data:hover {
+    background-color: #5de693;
+}
+
+.submit-buttons .search:hover {
+    background-color: #1a5189;
 }

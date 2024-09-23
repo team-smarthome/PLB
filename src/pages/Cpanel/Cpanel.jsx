@@ -10,6 +10,8 @@ import ario from '../../assets/images/ario.jpeg'
 import UserManagement from '../UserManagement/UserManagement';
 import SettingIp from '../../components/SettingIp/SettingIp';
 import Country from '../Country/Country';
+import SettingServer from '../../components/SettingServer/SettingServer';
+import Synchronize from '../../components/Synchronize/Synchronize';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -81,8 +83,10 @@ const Cpanel = () => {
                     <Route path="/log-register" element={<LogRegister />} />
                     <Route path="/log-facereg" element={<LogFaceReg />} />
                     <Route path="/user-management" element={<UserManagement />} />
-                    <Route path="/setting-ip" element={<SettingIp />} />
-                    <Route path="/country" element={<Country />} />
+                    <Route path="/setting-server" element={<SettingServer />} />
+                    <Route path="/setting-camera" element={<SettingIp />} />
+                    <Route path="/destination-location" element={<Country />} />
+                    <Route path="/synchronize" element={<Synchronize />} />
                 </ReactRoutes>
             </div>
         </div>

@@ -321,6 +321,18 @@
     font-weight: 600;
 }
 
+.link.active {
+    background: #fbaf17;
+    /* Same as hover background */
+    color: #fff;
+    /* Adjust text color if needed */
+}
+
+.nav-links li:hover .link {
+    background: #fbaf17;
+    /* Ensure hover works with active */
+}
+
 @media (max-width: 420px) {
     .sidebar.close .nav-links li .sub-menu {
         display: none;

@@ -808,7 +808,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	const getStatusHeaderText = () => {
 		switch (statusCardBox) {
 			case "iddle":
-				return ["Scan your PLB passport"];
+				return ["Scan Document PLB"];
 			case "success":
 				return ["Passport has successfully", "scanned"];
 			case "errorchecksum":

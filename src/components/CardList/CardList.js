@@ -4,7 +4,7 @@ import DataContext from "../../context/DataContext";
 
 const CardList = ({ status }) => {
   const { data } = useContext(DataContext);
-  const [listData, setListData] = useState(["Scan Passport", "Take Photo"]);
+  const [listData, setListData] = useState(["Scan Document", "Take Photo"]);
   // console.log("DataStatus", data);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const CardList = ({ status }) => {
         // console.log("DataCheck", dataCheck);
         setListData([]);
       } else {
-        setListData(["Scan Passport", "Take Photo"]);
+        setListData(["Scan Document", "Take Photo"]);
       }
     }
   }, [status]);
