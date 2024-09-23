@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
 import { FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
+import { FcSynchronize } from "react-icons/fc";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp } from "react-icons/io5";
@@ -99,6 +100,14 @@ const Sidebar = ({ isOpen }) => {
                             />
                             <a >Camera</a>
                         </Link>
+                        <Link to='/cpanel/synchronize' className={`link ${isActive('/cpanel/synchronize') ? 'active' : ''}`}>
+                            <FcSynchronize
+                                size={25}
+                                style={{ marginRight: '10px', color: 'white' }}
+                                color="#fff"
+                            />
+                            <a >Sycnhronize</a>
+                        </Link>
                     </ul>
                 )}
                 {userInfo.role === 0 && (
@@ -125,6 +134,7 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
+
                 {/* <li>
                     <Link to='/cpanel/country' className={`link ${isActive('/cpanel/country') ? 'active' : ''}`}>
                         <FaFlag size={30} style={{ marginRight: '10px' }} />
