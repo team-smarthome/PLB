@@ -63,12 +63,14 @@ const Synchronize = () => {
                         });
                     });
 
-                    socket_server_4010.emit('sync', { paramsToSend, nilaiIp }, () => {
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Successfully synchronized',
-                        });
-                    });
+                    // socket_server_4010.emit('sync', { paramsToSend, nilaiIp }, () => {
+                    //     Toast.fire({
+                    //         icon: 'success',
+                    //         title: 'Successfully synchronized',
+                    //     });
+                    // });
+
+                    socket_server_4010.emit('sync', { paramsToSend, nilaiIp });
 
                     socket_server_4010.on('responseSync', (data) => {
                         if (data === "Successfully") {
@@ -129,7 +131,7 @@ const Synchronize = () => {
             )}
             <div className='container-dalam'>
                 <div className='bagian-atas-server'>
-                    <p>Set IP Server To Synchronize</p>
+                    <p className='text-red-500'>Set IP Server To Synchronize</p>
                 </div>
                 <div className='bagian-bawah-server'>
                     <label htmlFor="cameraName">Camera Name</label>
