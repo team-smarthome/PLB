@@ -129,39 +129,43 @@ const Synchronize = () => {
             )}
             <div className='container-dalam'>
                 <div className='bagian-atas-server'>
-                    <p>Set IP Server To Synchronize</p>
+                    <p className=''>Set IP Server To Synchronize</p>
                 </div>
-                <div className='bagian-bawah-server'>
-                    <label htmlFor="cameraName">Camera Name</label>
+                <div className='bagian-bawah-server flex gap-6'>
+                    <div className="w-full flex items-center ">
+                    <label htmlFor="cameraName" className='w-[30%]'>Camera Name</label>
                     <input
                         type="text"
                         name="cameraName"
                         id="cameraName"
                         // value={newWifiResults}
                         value={detailData?.namaKamera}
-                        style={{
-                            width: '50%',
-                            borderRadius: '5px',
-                            border: '1px solid #ccc',
-                        }}
+                        // style={{
+                        //     width: '50%',
+                        //     borderRadius: '5px',
+                        //     border: '1px solid #ccc',
+                        // }}
                         onChange={(e) => setDetailData({ ...detailData, namaKamera: e.target.value })}
                     // onChange={({ target: { value } }) => setNewWifiResults(value)}
                     />
-                    <label htmlFor="ipCamera">IP Camera</label>
+                    </div>
+                    <div className="w-full flex items-center">
+                    <label htmlFor="ipCamera" className='w-[30%]'>IP Camera</label>
                     <input
                         type="text"
                         name="ipCamera"
                         id="ipCamera"
                         // value={newWifiResults}
                         value={detailData?.ipAddress}
-                        style={{
-                            width: '50%',
-                            borderRadius: '5px',
-                            border: '1px solid #ccc',
-                        }}
+                        // style={{
+                        //     // width: '50%',
+                        //     borderRadius: '5px',
+                        //     border: '1px solid #ccc',
+                        // }}
                         onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                     // onChange={(e) => setNewWifiResults(e.target.value)}
                     />
+                    </div>
                     <button className="ok-button" onClick={handleSubmit}>
                         Synchronize
                     </button>
