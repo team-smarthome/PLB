@@ -68,7 +68,7 @@ const BodyContentValidation = ({
           </div>
           <div className="left-panel-bottom">
             <CardStatusValidation
-              passportImage={dataLogs?.photo_passport}
+              passportImage={dataLogs?.profile_image}
               status={tabStatus}
             />
           </div>

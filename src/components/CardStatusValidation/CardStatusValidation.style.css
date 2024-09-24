@@ -90,6 +90,32 @@ p {
   font-family: "Roboto", Arial, sans-serif;
 }
 
+.background-img {
+  width: 50%;
+  height: 80%;
+  border-radius: 10px;
+  background-color: rgba(109, 96, 96, 0.621);
+  overflow: hidden;
+  /* Ensures the image doesn't overflow the container */
+  display: flex;
+  /* Add this */
+  justify-content: center;
+  /* Center the image horizontally */
+  align-items: center;
+  /* Center the image vertically */
+}
+
+.background-img img {
+
+  object-fit: cover;
+  /* Ensures the image covers the container while maintaining aspect ratio */
+  border-radius: 10px;
+  /* Ensures the image also has rounded corners */
+}
+
+
+
+
 .input-email {
   display: flex;
   justify-content: center;

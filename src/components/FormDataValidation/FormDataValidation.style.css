@@ -95,14 +95,24 @@ input {
   opacity: 0.5;
 }
 
-.photo {
+.photo-validation {
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 0.75);
   border-radius: 8px;
-  width: 100px;
-  height: 140px;
-  margin-top: 6px;
+  width: 250px;
+  height: 200px;
+  /* margin-top: 6px; */
+}
+
+.empty-photo-validation {
+  display: flex;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 0.75);
+  border-radius: 8px;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
 }
 
 .photo-box {
@@ -110,8 +120,8 @@ input {
 }
 
 .photo-box img {
-  width: 100%;
-  height: 100%;
+  /* width: 100%;
+  height: 100%; */
   border-radius: 8px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

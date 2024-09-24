@@ -18,7 +18,7 @@ import { useAtom } from "jotai";
 import { imageToSend, resultDataScan, caputedImageAfter } from "../../utils/atomStates";
 import { initiateSocket, addPendingRequest } from "../../utils/socket";
 
-const parse = require("mrz").parse;
+// const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
@@ -375,9 +375,9 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			setCheckSum(true);
 		}
 		try {
-			const mrzParsed = parse(mrz);
+			// const mrzParsed = parse(mrz);
 			// console.log("mrz: ", mrzParsed.fields);
-			sendDataToParent2(mrzParsed.fields);
+			// sendDataToParent2(mrzParsed.fields);
 			setCheckSum(false);
 		} catch (error) {
 			console.log(error.message);

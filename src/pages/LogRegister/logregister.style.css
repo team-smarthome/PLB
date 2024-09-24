@@ -16,16 +16,21 @@
     cursor: pointer;
     border-radius: 6px;
     border: none;
+    font-weight: 600;
 }
 
-.submit-buttons-registers .add-data {
+.submit-buttons-registers .search-data {
     background-color: #3dbb6f;
 }
 
-.submit-buttons-registers .add-data:hover {
+.submit-buttons-registers .search-data:hover {
     background-color: #5de693;
 }
 
-.submit-buttons-registers .search:hover {
+/* .submit-buttons-registers .search:hover {
     background-color: #1a5189;
+} */
+
+.submit-buttons-registers .add-data {
+    background-color: green;
 }
