@@ -6,7 +6,7 @@ import { DataProvider } from "./context/DataContext";
 const App = () => {
   return (
     <DataProvider>
-      <Router>
+      <Router basename="/pos-lintas-batas">
         <Routes />
       </Router>
     </DataProvider>
