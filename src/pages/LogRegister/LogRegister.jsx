@@ -392,9 +392,9 @@ const LogRegister = () => {
                     <span>Nationality</span>
                     <select value={detailData.nationality} name='nationality' onChange={handleChange}>
                         <option value="">Pilih Negara</option>
-                        {countryData.map((negara) => {
+                        {dataNegara.data.map((negara) => {
                             return (
-                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                                <option value={negara.id_negara}>{`${negara.id_negara} - ${negara.deskripsi_negara}`}</option>
                             )
                         })}
                     </select>
