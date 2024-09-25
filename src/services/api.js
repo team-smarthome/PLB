@@ -71,7 +71,7 @@ export async function apiPblAddFaceRec(header, body) {
 export async function apiInsertDataUser(body, url) {
   try {
     const response = await axios.post(
-      `http://${url}:8000/api/datauser`,
+      `${url_devel}api/datauser`,
       body,
       {
         headers: {
@@ -102,7 +102,7 @@ export async function apiGetDataLogRegister(params) {
 }
 export const getDataPetugas = async (url, searchName) => {
   try {
-    const response = await axios.get(`http://${url}:8000/api/users`, {
+    const response = await axios.get(`${url_devel}api/users`, {
       params: {
         name: searchName
       },

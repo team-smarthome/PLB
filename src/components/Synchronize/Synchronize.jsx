@@ -27,6 +27,11 @@ const Synchronize = () => {
                 data: [],
             },
         };
+
+        const sendDataToWsSynch = {
+            ipServerCamera: [nilaiIp]
+        }
+
         const getDataUserCookie = Cookies.get('userdata');
         const dataUserIp = JSON.parse(getDataUserCookie);
         const dataApiKemera = {
@@ -37,59 +42,70 @@ const Synchronize = () => {
             socket_server_4010 = io(`http://${ipServerSynch}:4010`);
             // socket_server_4010 = io(`http://127.0.0.1:4010`);
             try {
-                const res = await apiGetDataLogRegister();
-                const dataApi = res.data.data;
+                socket_server_4010.emit('saveCameraData', sendDataToWsSynch);
+                await socket_server_4010.on('saveDataCamera', async (data) => {
+                    if (data === "successfully") {
+                        const res = await apiGetDataLogRegister();
+                        const dataApi = res.data.data;
 
-                if (res.data.status === 200) {
-                    dataApi.forEach(item => {
-                        paramsToSend.params.data.push({
-                            personId: item?.no_passport,
-                            personNum: item?.no_passport,
-                            passStrategyId: "",
-                            personIDType: 1,
-                            personName: item?.name,
-                            personGender: item?.gender === "M" ? 1 : 0,
-                            validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
-                            validEndTime: Math.floor(new Date(`${item.expired_date}T23:59:00`).getTime() / 1000).toString(),
-                            personType: 1,
-                            identityType: 1,
-                            identityId: item?.no_passport,
-                            identitySubType: 1,
-                            identificationTimes: -1,
-                            // identityDataBase64: "database64",
-                            identityDataBase64: item?.profile_image,
-                            status: 0,
-                            reserve: "",
-                        });
-                    });
+                        if (res.data.status === 200) {
+                            dataApi.forEach(item => {
+                                paramsToSend.params.data.push({
+                                    personId: item?.no_passport,
+                                    personNum: item?.no_passport,
+                                    passStrategyId: "",
+                                    personIDType: 1,
+                                    personName: item?.name,
+                                    personGender: item?.gender === "M" ? 1 : 0,
+                                    validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+                                    validEndTime: Math.floor(new Date(`${item.expired_date}T23:59:00`).getTime() / 1000).toString(),
+                                    personType: 1,
+                                    identityType: 1,
+                                    identityId: item?.no_passport,
+                                    identitySubType: 1,
+                                    identificationTimes: -1,
+                                    // identityDataBase64: "database64",
+                                    identityDataBase64: item?.profile_image,
+                                    status: 0,
+                                    reserve: "",
+                                });
+                            });
 
-                    socket_server_4010.emit('sync', { paramsToSend, nilaiIp });
+                            socket_server_4010.emit('sync', { paramsToSend, nilaiIp });
 
-                    socket_server_4010.on('responseSync', (data) => {
-                        if (data === "Successfully") {
-                            const insertIpKamera = apiInsertIP(dataApiKemera);
-                            insertIpKamera.then((res) => {
-                                if (res.status === 200) {
+                            socket_server_4010.on('responseSync', (data) => {
+                                if (data === "Successfully") {
+                                    const insertIpKamera = apiInsertIP(dataApiKemera);
+                                    insertIpKamera.then((res) => {
+                                        if (res.status === 200) {
+                                            Toast.fire({
+                                                icon: 'success',
+                                                title: 'Successfully synchronized',
+                                            });
+                                        }
+                                    }).catch((err) => {
+                                        Toast.fire({
+                                            icon: "error",
+                                            title: "Gagal menyimpan data ke API",
+                                        })
+                                        console.log(err);
+                                    });
+                                } else {
                                     Toast.fire({
-                                        icon: 'success',
-                                        title: 'Successfully synchronized',
+                                        icon: 'error',
+                                        title: 'Failed to synchronize',
                                     });
                                 }
-                            }).catch((err) => {
-                                Toast.fire({
-                                    icon: "error",
-                                    title: "Gagal menyimpan data ke API",
-                                })
-                                console.log(err);
-                            });
-                        } else {
-                            Toast.fire({
-                                icon: 'error',
-                                title: 'Failed to synchronize',
                             });
                         }
-                    });
-                }
+                    } else {
+                        setStatus("success")
+                        Toast.fire({
+                            icon: "error",
+                            title: "IP Kamera Not Found",
+                        });
+                    }
+                })
             } catch (error) {
                 Toast.fire({
                     icon: 'error',
@@ -133,15 +149,8 @@ const Synchronize = () => {
                             type="text"
                             name="cameraName"
                             id="cameraName"
-                            // value={newWifiResults}
                             value={detailData?.namaKamera}
-                            // style={{
-                            //     width: '50%',
-                            //     borderRadius: '5px',
-                            //     border: '1px solid #ccc',
-                            // }}
                             onChange={(e) => setDetailData({ ...detailData, namaKamera: e.target.value })}
-                        // onChange={({ target: { value } }) => setNewWifiResults(value)}
                         />
                     </div>
                     <div className="w-full flex items-center">
@@ -150,15 +159,8 @@ const Synchronize = () => {
                             type="text"
                             name="ipCamera"
                             id="ipCamera"
-                            // value={newWifiResults}
                             value={detailData?.ipAddress}
-                            // style={{
-                            //     // width: '50%',
-                            //     borderRadius: '5px',
-                            //     border: '1px solid #ccc',
-                            // }}
                             onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
-                        // onChange={(e) => setNewWifiResults(e.target.value)}
                         />
                     </div>
                     <button className="ok-button" onClick={handleSubmit}>

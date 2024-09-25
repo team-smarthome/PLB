@@ -98,6 +98,7 @@ const LogRegister = () => {
     }
 
     const handleDelete = async () => {
+        setShowModalDelete(false)
         try {
             const res = await deleteDataUserPlb(detailData.no_passport)
             console.log(res, "res delete")

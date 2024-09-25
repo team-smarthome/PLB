@@ -4,10 +4,10 @@ import viteTsconfigPaths from 'vite-tsconfig-paths'
 
 // Ensure you're using `import` syntax
 export default defineConfig({
-  base: '/',
+  base: '/pos-lintas-batas',
   plugins: [
     react(),
-    viteTsconfigPaths()
+    viteTsconfigPaths(),
   ],
   server: {
     open: true,
