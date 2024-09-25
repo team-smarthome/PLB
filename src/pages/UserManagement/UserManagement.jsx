@@ -353,7 +353,7 @@ const UserManagement = () => {
     const deleteModalContent = () => {
         return (
             <div className="delete-container">
-                <h3>Are You Sure Want Delete {formData?.petugas?.nama_petugas} ?</h3>
+                <h3>Are You Sure Want Delete <span style={{ fontWeight: "bold" }}>{formData?.petugas?.nama_petugas}</span> ?</h3>
             </div>
         )
     }
