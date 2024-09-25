@@ -20,6 +20,20 @@ const Synchronize = () => {
     }, []);
     const handleSubmit = async () => {
         setLoading(true);
+        if (!detailData?.ipAddress) {
+            Toast.fire({
+                icon: 'error',
+                title: 'Please input the IP camera',
+            });
+            return
+        } else if (!detailData?.namaKamera) {
+            Toast.fire({
+                icon: 'error',
+                title: 'Please input the camera name',
+            });
+            return
+        }
+        console.log("MASUKKESINI");
         const nilaiIp = detailData?.ipAddress;
         let paramsToSend = {
             method: "addfaceinfonotify",
@@ -42,9 +56,12 @@ const Synchronize = () => {
             socket_server_4010 = io(`http://${ipServerSynch}:4010`);
             // socket_server_4010 = io(`http://127.0.0.1:4010`);
             try {
+                setLoading(true);
+                console.log("ApakahMasukSINI1");
                 socket_server_4010.emit('saveCameraData', sendDataToWsSynch);
                 await socket_server_4010.on('saveDataCamera', async (data) => {
                     if (data === "successfully") {
+                        console.log("ApakahMasukSINI2");
                         const res = await apiGetDataLogRegister();
                         const dataApi = res.data.data;
 
@@ -78,6 +95,7 @@ const Synchronize = () => {
                                     const insertIpKamera = apiInsertIP(dataApiKemera);
                                     insertIpKamera.then((res) => {
                                         if (res.status === 200) {
+                                            setLoading(false);
                                             Toast.fire({
                                                 icon: 'success',
                                                 title: 'Successfully synchronized',
@@ -88,6 +106,7 @@ const Synchronize = () => {
                                             icon: "error",
                                             title: "Gagal menyimpan data ke API",
                                         })
+                                        setLoading(false);
                                         console.log(err);
                                     });
                                 } else {
@@ -95,11 +114,13 @@ const Synchronize = () => {
                                         icon: 'error',
                                         title: 'Failed to synchronize',
                                     });
+                                    setLoading(false);
                                 }
                             });
                         }
                     } else {
-                        setStatus("success")
+                        console.log("ApakahMasukSINI3");
+                        setLoading(false);
                         Toast.fire({
                             icon: "error",
                             title: "IP Kamera Not Found",
@@ -111,7 +132,6 @@ const Synchronize = () => {
                     icon: 'error',
                     title: 'Failed to Get Data from API',
                 });
-            } finally {
                 setLoading(false);
             }
         } else {
