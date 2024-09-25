@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
-import { apiGetDataLogRegister, deleteDataUserPlb, editDataUserPlb } from '../../services/api'
+import { apiGetDataLogRegister, deleteDataUserPlb, editDataUserPlb, getAllNegaraData } from '../../services/api'
 import { url_devel } from '../../services/env'
 import Modals from '../../components/Modal/Modal'
 import dataNegara from '../../utils/dataNegara'
@@ -44,6 +44,7 @@ const LogRegister = () => {
     const refInputPassport = useRef()
     const [imageFace, setImageFace] = useState(null)
     const [imagePassport, setImagePassport] = useState(null)
+    const [countryData, setCountryData] = useState([])
 
     const getLogRegister = async () => {
         try {
@@ -59,8 +60,18 @@ const LogRegister = () => {
             console.log(error)
         }
     }
+    const getCountryData = async () => {
+        try {
+            const res = await getAllNegaraData()
+            setCountryData(res.data.data)
+            // console.log("getAllNegaraData", res)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     useEffect(() => {
         getLogRegister()
+        getCountryData()
     }, [])
 
     const deleteModal = (row) => {
@@ -243,9 +254,9 @@ const LogRegister = () => {
                     <span>Nationality</span>
                     <select value={detailData.nationality} name='nationality' onChange={handleChange}>
                         <option value="">Pilih Negara</option>
-                        {dataNegara.data.map((negara) => {
+                        {countryData.map((negara) => {
                             return (
-                                <option value={negara.id_negara}>{`${negara.id_negara} - ${negara.deskripsi_negara}`}</option>
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
                             )
                         })}
                     </select>
@@ -260,7 +271,15 @@ const LogRegister = () => {
                 </div>
                 <div className="register-input" style={{ marginBottom: '5rem' }}>
                     <span>Destination Location</span>
-                    <input type="text" name="destination_location" id="" value={detailData.destination_location} onChange={handleChange} />
+                    {/* <input type="text" name="destination_location" id="" value={detailData.destination_location} onChange={handleChange} /> */}
+                    <select value={detailData.destination_location} name='destination_location' onChange={handleChange}>
+                        <option value="">Pilih Negara</option>
+                        {countryData.map((negara) => {
+                            return (
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                            )
+                        })}
+                    </select>
                 </div>
                 <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
                     <span>Face</span>
@@ -372,9 +391,9 @@ const LogRegister = () => {
                     <span>Nationality</span>
                     <select value={detailData.nationality} name='nationality' onChange={handleChange}>
                         <option value="">Pilih Negara</option>
-                        {dataNegara.data.map((negara) => {
+                        {countryData.map((negara) => {
                             return (
-                                <option value={negara.id_negara}>{`${negara.id_negara} - ${negara.deskripsi_negara}`}</option>
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
                             )
                         })}
                     </select>
@@ -389,7 +408,14 @@ const LogRegister = () => {
                 </div>
                 <div className="register-input" style={{ marginBottom: '5rem' }}>
                     <span>Destination Location</span>
-                    <input type="text" name="destination_location" id="" value={detailData.destination_location} onChange={handleChange} />
+                    <select value={detailData.destination_location} name='destination_location' onChange={handleChange}>
+                        <option value="">Pilih Negara</option>
+                        {countryData.map((negara) => {
+                            return (
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                            )
+                        })}
+                    </select>
                 </div>
                 <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
                     <span>Face</span>
@@ -543,11 +569,11 @@ const LogRegister = () => {
                     className='add-data'
                 >Export
                 </button>
-                {userInfo.role == 0 && <button
+                {/* {userInfo.role == 0 && <button
                     className='search'
                     onClick={() => setShowModalAdd(true)}
                 >Add
-                </button>}
+                </button>} */}
                 <button
                     className='search'
                     onClick={getLogRegister}
@@ -569,7 +595,7 @@ const LogRegister = () => {
                 // handler={getDetailData}
                 rowRenderer={customRowRenderer}
             />}
-            <Modals
+            {/* <Modals
                 showModal={showModalAdd}
                 buttonName="Submit"
                 width={800}
@@ -577,7 +603,7 @@ const LogRegister = () => {
                 closeModal={closeModalAdd}
             >
                 {modalAddInput()}
-            </Modals>
+            </Modals> */}
             <Modals
                 showModal={showModalEdit}
                 buttonName="Submit"
