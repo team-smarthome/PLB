@@ -109,6 +109,7 @@ const LogRegister = () => {
     }
 
     const handleDelete = async () => {
+        setStatus("loading")
         setShowModalDelete(false)
         try {
             const res = await deleteDataUserPlb(detailData.no_passport)
@@ -122,6 +123,7 @@ const LogRegister = () => {
                     if (data === "Successfully") {
                         getLogRegister()
                         setShowModalDelete(false)
+                        setStatus("success")
                     }
                 })
             }
