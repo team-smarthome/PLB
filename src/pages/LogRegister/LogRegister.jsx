@@ -451,6 +451,7 @@ const LogRegister = () => {
     }
 
     const handleEdit = async () => {
+        // console.log(detailData)
         setStatus("loading")
         setShowModalEdit(false)
         let paramsToSendEdit = {
