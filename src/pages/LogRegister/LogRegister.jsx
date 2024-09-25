@@ -503,8 +503,8 @@ const LogRegister = () => {
         return (
             <div className="" >
                 <span
-                    style={{ fontSize: 25, fontWeight: '400' }}
-                >Are You Sure Want Delete <span style={{ fontWeight: "bold" }}>{detailData.name}</span> with passport <span style={{ fontWeight: "bold" }}>{detailData.no_passport}</span> ?</span>
+                    style={{ fontSize: 22, fontWeight: '400' }}
+                >Are You Sure Want Delete <span style={{ fontWeight: "bold" }}>{detailData.name}</span> with PLB number <span style={{ fontWeight: "bold" }}>{detailData.no_passport}</span> ?</span>
             </div>
         )
     }
