@@ -2,8 +2,8 @@ const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
 let ipCamera = [''];
-let ipServerPC = '';
 const axios = require("axios");
+const ping = require('ping');
 
 const server = http.createServer(function (request, response) {
     const headers = {
@@ -91,15 +91,42 @@ const handleTakePhoto = async (socket) => {
 };
 
 io.on("connection", (socket) => {
-    socket.on("saveCameraData", (data) => {
-        ipServerPC = data.ipServerPC;
-        ipCamera = data?.ipServerCamera;
-        console.log("# IPCAMERA: ", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
-        if (data) {
-            socket.emit("saveDataCamera", "successfully");
+    socket.on("saveCameraData", async (data) => {
+        const ipToCheck = data?.ipServerCamera;
+        console.log("NilaiIp: ", ipToCheck);
+        if (ipToCheck && ipToCheck.length > 0) {
+            let allIpsReachable = true;
+            for (const ip of ipToCheck) {
+                const res = await ping.promise.probe(ip);
+                if (res.alive) {
+                    console.log(`IP ${ip} is reachable`);
+                } else {
+                    console.log(`IP ${ip} is not reachable`);
+                    allIpsReachable = false;
+                }
+            }
+
+            if (allIpsReachable) {
+                ipCamera = data?.ipServerCamera;
+                console.log("# IPCAMERA: ", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
+                socket.emit("saveDataCamera", "successfully");
+            } else {
+                console.log("IPs are not reachable2");
+                socket.emit("saveDataCamera", "notConnectedIp");
+            }
         } else {
-            socket.emit("saveDataCamera", "failed");
+            socket.emit("saveDataCamera", "failed - no IPs provided");
         }
+
+
+
+        // ipCamera = data?.ipServerCamera;
+        // console.log("# IPCAMERA: ", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
+        // if (data) {
+        //     socket.emit("saveDataCamera", "successfully");
+        // } else {
+        //     socket.emit("saveDataCamera", "failed");
+        // }
     });
 
     socket.on("take_photo", () => {
@@ -107,10 +134,26 @@ io.on("connection", (socket) => {
         handleTakePhoto(socket);
     });
 
-    socket.emit("DataIPCamera", {
-        ipServerPC: ipServerPC,
-        ipCamera: ipCamera[0],
+    socket.on("DataIPCamera", async () => {
+        console.log("MasukKesini");
+        const ipToCheckCDetail = ipCamera[0];
+        const resDetail = await ping.promise.probe(ipToCheckCDetail);
+        console.log("MasukKesini");
+        try {
+            if (resDetail.alive) {
+                console.log(`IP ${ipToCheckCDetail} is reachable`);
+                socket.emit("ResponseDataIPCamera", { 'ipCamera': ipToCheckCDetail, 'status': 'connected' });
+            } else {
+                console.log(`IP ${ipToCheckCDetail} is not reachable`);
+                socket.emit("ResponseDataIPCamera", { 'ipCamera': ipToCheckCDetail, 'status': 'not_connected' });
+            }
+        } catch (error) {
+            console.log("IPs are not reachable");
+            socket.emit("ResponseDataIPCamera", { 'ipCamera': ipToCheckCDetail, 'status': 'not_connected' });
+        }
+
     });
+
 
     socket.on("disconnect", () => {
         console.log("Client disconnected");
