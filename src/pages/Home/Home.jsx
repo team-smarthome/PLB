@@ -16,8 +16,9 @@ const Home = () => {
   const [canApply, setCanApply] = useState(false);
   const [waitingHome, setWaitingHome] = useState(true)
   useEffect(() => {
+    socket2_IO_4000Home.emit("DataIPCamera")
     if (socket2_IO_4000Home.connected) {
-      socket2_IO_4000Home.emit("DataIPCamera")
+      setWaitingHome(true)
     } else {
       setWaitingHome(false)
     }
@@ -26,6 +27,7 @@ const Home = () => {
 
   useEffect(() => {
     socket2_IO_4000Home.on("ResponseDataIPCamera", (data) => {
+      console.log("dataUserKameraSettingHome", data);
       if (data.ipCamera.length > 0) {
         if (data.status === "connected") {
           setCanApply(true);
@@ -47,7 +49,6 @@ const Home = () => {
     }
   }, [socket2_IO_4000Home]);
 
-  const ipServer = localStorage.getItem("ipServer");
   const navigate = useNavigate();
   const btnOnClick_Apply = () => {
     if (!canApply) {
