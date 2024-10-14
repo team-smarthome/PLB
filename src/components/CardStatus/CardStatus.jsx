@@ -145,6 +145,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	const doRetake = () => {
 		// socket_IO_4000.emit("start_stream");
+		setCapturedImageAfter2(null);
+		setCapturedImage(null);
 		sendDataToInput({
 			statusCardBox: "lookCamera",
 			capturedImage: null,
