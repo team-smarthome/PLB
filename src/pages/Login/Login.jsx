@@ -50,6 +50,19 @@ const Login = () => {
         }
       }
     } catch (error) {
+      const errorResponse = error.response
+      if(errorResponse.status == 401){
+        Toast.fire({
+          icon: 'error',
+          title: "Username atau Password salah"
+        })
+      }else{
+        Toast.fire({
+          icon: 'error',
+          title: "Terjadi Kesalahan"
+        })
+
+      }
       isLoading(false);
     }
   };
