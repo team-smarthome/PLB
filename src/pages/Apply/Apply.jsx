@@ -13,6 +13,7 @@ import { imageToSend } from "../../utils/atomStates";
 import { apiInsertDataUser, getAllNegaraData, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import axios from "axios";
+import { ipAddressServer } from "../../services/env";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -36,7 +37,7 @@ const Apply = () => {
   const [meesageConfirm, setMessageConfirm] = useState(
     "Network / Card error / declined dll"
   );
-  const ipServer = localStorage.getItem("ipServer");
+  const ipServer = ipAddressServer;
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const dataTrueorFalse = localStorage.getItem("dataStatus");
   const [cardPaymentProps, setCardPaymentProps] = useState({
@@ -468,57 +469,6 @@ const Apply = () => {
     }
   }, []);
 
-  const handleLogin = async (sUserName, sPassword, ipCameraSet, cameraIndex) => {
-    console.log("LoginKamerake", cameraIndex, ipCameraSet)
-    try {
-      const encodedPassword = btoa(sPassword);
-      const response = await axios.put(`http://${ipCameraSet}/cgi-bin/entry.cgi/system/login`, {
-        sUserName,
-        sPassword: encodedPassword,
-      });
-      const dataRes = response.data;
-      let authUser = "";
-      console.log(dataRes, "responsehitapi");
-      if (dataRes.status.code === 200) {
-        if (dataRes.data.auth === 0) {
-          authUser = "admin";
-        } else {
-          authUser = "user";
-        }
-        const loginData = `Face-Token=${dataRes.data.token}; face-username=${authUser}; roleId=${dataRes.data.auth}; sidebarStatus=${dataRes.data.status}; token=${dataRes.data.token}`;
-        loginDataArray[cameraIndex] = loginData;
-
-        // Cek jika semua kamera sudah memiliki datanya
-        if (loginDataArray.filter(data => data !== undefined).length === ipKamera.length) {
-          const data = {
-            ipServerPC: ipServer,
-            ipServerCamera: ipKamera,
-            cookiesCamera: loginDataArray,
-          };
-          Toast.fire({
-            icon: "success",
-            title: "Data berhasil disimpan",
-          });
-          socket_IO_4010.emit("saveCameraData", data);
-          if (socket_IO_4010.connected) {
-            console.log("testWebsocket4010 connected");
-            socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera: objectCamera });
-          } else {
-            //connnect ulang ke socket_IO_4010
-            console.log("testWebsocket4010 not connected");
-            socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera: objectCamera });
-            socket_IO_4010.connect();
-          }
-        }
-      } else {
-        Swal.fire(dataRes.status.message);
-      }
-    } catch (error) {
-      Swal.fire("Gagal login");
-    }
-  };
-
-
 
   useEffect(() => {
     socket_IO_4010.on("DataIPCamera", (data) => {
@@ -550,48 +500,6 @@ const Apply = () => {
         }).catch((error) => {
           console.error("Error:", error);
         });
-      } else if (data === 'Your session has expired.') {
-        if (ipKamera.length > 0) {
-          const showLoginDialog = (callback, initialUsername = "") => {
-            Swal.fire({
-              title: `Login`,
-              html:
-                `<input id="swal-input1" class="swal2-input" placeholder="Username" value="${initialUsername}">` +
-                '<input id="swal-input2" type="password" class="swal2-input" placeholder="Password">',
-              focusConfirm: false,
-              showCancelButton: true,
-              confirmButtonText: "Kirim",
-              confirmButtonColor: "#3D5889",
-              cancelButtonText: "Batal",
-              cancelButtonColor: "#d33",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                const username = document.getElementById("swal-input1").value;
-                const password = document.getElementById("swal-input2").value;
-
-                if (username && password) {
-                  callback(username, password);
-                } else {
-                  Swal.fire("Harap masukkan username dan password");
-                  showLoginDialog(callback, username);
-                }
-              }
-            });
-          };
-          const loginAllCameras = (sUserName, sPassword) => {
-            ipKamera.forEach((ipCameraSet, index) => {
-              handleLogin(sUserName, sPassword, ipCameraSet, index);
-            });
-          };
-          showLoginDialog((sUserName, sPassword) => {
-            loginAllCameras(sUserName, sPassword);
-          });
-        } else {
-          Toast.fire({
-            icon: "error",
-            title: "Harap pilih jumlah kamera",
-          });
-        }
       } else {
         Toast.fire({
           icon: "error",

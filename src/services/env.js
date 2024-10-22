@@ -1,5 +1,7 @@
 // const currentOrigin = window.location.origin;
 const currentOrigin = "http://192.168.2.100";
+const url = new URL(currentOrigin);
+export const ipAddressServer = url.hostname;
 
 export const url_dev = `${currentOrigin}/PLB-API/public/`;
 export const url_production = `${currentOrigin}/PLB-API/public/api/`;

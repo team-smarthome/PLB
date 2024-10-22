@@ -82,6 +82,7 @@ const Information = () => {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
+		setIsWaiting(true);
 		console.log("cameraIPsTotallength", cameraIPs.length);
 		console.log("cameraIPsTotallength", cameraIPs);
 		if (cameraIPs.length > 0) {
@@ -111,18 +112,12 @@ const Information = () => {
 
 			} else {
 				const data = {
-					ipServerPC: newWifiResults,
 					ipServerCamera: cameraIPs,
 				};
-				Toast.fire({
-					icon: "success",
-					title: "Data berhasil disimpan",
-				});
 				if (socket2_IO_4000.connected) {
 					socket2_IO_4000.emit("saveCameraData", data);
 					socket2_IO_4000.on("saveDataCamera", (data) => {
 						if (data === "successfully") {
-							localStorage.setItem("ipServer", newWifiResults);
 							setIsWaiting(false);
 							Toast.fire({
 								icon: "success",
@@ -132,7 +127,7 @@ const Information = () => {
 							setIsWaiting(false);
 							Toast.fire({
 								icon: "error",
-								title: "Gagal menyimpan data",
+								title: "Ip Camera tidak terhubung",
 							});
 						}
 					});
@@ -145,9 +140,10 @@ const Information = () => {
 				}
 			}
 		} else {
+			setIsWaiting(false);
 			Toast.fire({
 				icon: "error",
-				title: "Harap pilih jumlah kamera",
+				title: "Please Insert IP Camera",
 			});
 		}
 	};
@@ -209,6 +205,9 @@ const Information = () => {
 
 	useEffect(() => {
 		const getUserdata = Cookies.get('userdata');
+		if (!getUserdata) {
+			navigate('/')
+		}
 		setDataUser(JSON.parse(getUserdata))
 		console.log(JSON.parse(getUserdata), 'hasildaricookie')
 	}, []);
@@ -220,11 +219,32 @@ const Information = () => {
 	};
 
 	useEffect(() => {
-		socket2_IO_4000.on("DataIPCamera", (data) => {
-			setCameraIPs(data.ipCamera);
-			setNewWifiResults(data.ipServerPC);
-			console.log("dataUserKameraSetting", data);
-			localStorage.setItem("ipServer", data.ipServerPC);
+		socket2_IO_4000.emit("DataIPCamera");
+		return () => {
+			socket2_IO_4000.off("DataIPCamera");
+		}
+	}, []);
+
+	useEffect(() => {
+		socket2_IO_4000.on("ResponseDataIPCamera", (data) => {
+			if (data.ipCamera.length > 0) {
+				if (data.status === "connected") {
+					setCameraIPs([data.ipCamera]);
+					console.log("dataUserKameraSetting", data);
+				} else {
+					setLoading(false)
+					Toast.fire({
+						icon: "error",
+						title: "Cannot connect to camera"
+					});
+				}
+			} else {
+				setLoading(false)
+				Toast.fire({
+					icon: "error",
+					title: "Cannot connect to camera"
+				});
+			}
 		});
 
 		socket2_IO_4000.on("photo_taken", (imageBase64) => {
@@ -241,7 +261,8 @@ const Information = () => {
 
 		return () => {
 			socket2_IO_4000.off("photo_taken");
-			socket2_IO_4000.off("DataIPCamera");
+			socket2_IO_4000.off("ResponseDataIPCamera");
+
 		}
 	}, [socket2_IO_4000]);
 
@@ -609,7 +630,7 @@ const Information = () => {
 														width: "120vh",
 													}}
 												>
-													<div className="form-group">
+													{/* <div className="form-group">
 														<div className="wrapper-form">
 															<div className="wrapper-input">
 																<label htmlFor="ip_server_pc">
@@ -636,7 +657,7 @@ const Information = () => {
 																}
 															/>
 														</div>
-													</div>
+													</div> */}
 													{dataUser.role === 1 ?
 														<div>
 															<div className="form-group">
