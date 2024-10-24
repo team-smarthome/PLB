@@ -37,7 +37,7 @@ const Printer = ({
   const displayTime = dataTime || formattedTime;
   const qrData = {
     fullname: datafromAtom?.passportData?.noRegister,
-    noRegister: datafromAtom?.passportData?.noRegister,
+    // noRegister: datafromAtom?.passportData?.noRegister,
     passportNumber: datafromAtom?.passportData?.passportNumber,
 
     // Tambahkan data lain sesuai kebutuhan
@@ -50,11 +50,6 @@ const Printer = ({
       <div className="wrappper-container">
         <h2>Date : {displayDate}</h2>
         <h2>Time : {displayTime}</h2>
-      </div>
-      <div className="wrappper-container">
-        <div className="h2-nol">
-          <h2>No Registrasion</h2>
-        </div>
       </div>
       <h2>{dataNumberPermohonanPropsVisa}</h2>
       <div className="wrappper-container">

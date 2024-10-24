@@ -33,3 +33,7 @@ package-lock.json*
 .contentlayer
 
 /SocketServer
+/dist
+dist
+api
+/api

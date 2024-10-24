@@ -42,9 +42,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     setOptionGender(dataGender);
 
     if (sharedData.passportData) {
-      const filteredNationality = dataNationality.filter(
-        (negara) => negara.value === sharedData.passportData.nationality
-      );
+      // const filteredNationality = dataNationality.filter(
+      //   (negara) => negara.value === sharedData.passportData.nationality
+      // );
 
       const filteredGender = dataGender.filter(
         (sex) => sex.value === sharedData.passportData.sex || ""
@@ -65,6 +65,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         destination_location: filteredCountry.length > 0 ? filteredCountry[0] : "",
       }));
 
+      setFormData((prevData) => ({
+        ...prevData,
+        nationality: filteredCountry.length > 0 ? filteredCountry[0] : "",
+      }));
+
 
 
 
@@ -74,8 +79,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         register_code: sharedData.passportData.noRegister || "",
         full_name: sharedData.passportData.fullName || "",
         date_of_birth: sharedData.passportData.formattedBirthDate || "",
-        nationality:
-          filteredNationality.length > 0 ? filteredNationality[0] : "",
+        // nationality:
+        //   filteredNationality.length > 0 ? filteredNationality[0] : "",
         expiry_date: sharedData.passportData.formattedExpiryDate || "",
         arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
       }));
@@ -103,6 +108,21 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
       passportData: {
         ...prevData.passportData,
         [name]: value,
+      },
+    }));
+  };
+
+  const handleSelectChangeNationality = (selectedOption) => {
+    setFormData({
+      ...formdata,
+      nationality: selectedOption.value,
+    });
+
+    setSharedData((prevData) => ({
+      ...prevData,
+      passportData: {
+        ...prevData.passportData,
+        nationality: selectedOption.value,
       },
     }));
   };
@@ -257,23 +277,24 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
               <label htmlFor="nationality">Nationality</label>
             </div>
             <Select
-              id="nationality"
-              name="nationality"
-              value={{
-                value: formdata.nationality.valueOf,
-                label: formdata.nationality.label,
-              }}
-              onChange={(selectedOption) =>
-                handleSelectChange(selectedOption, "nationality")
+              value={country.find(option => option.value === formdata.nationality)}
+              onChange={handleSelectChangeNationality}
+              options={
+                country?.map((option) => (
+                  {
+                    value: option.value,
+                    label: option.label
+                  }
+                ))
               }
-              options={optionNegara}
               className="basic-single"
               classNamePrefix="select"
               styles={{
                 container: (provided) => ({
                   ...provided,
+                  position: 'relative',
                   flex: 1,
-                  width: "100%",
+                  width: "91.7%",
                   borderRadius: "10px",
                   backgroundColor: "rgba(217, 217, 217, 0.75)",
                   fontFamily: "Roboto, Arial, sans-serif",
@@ -366,14 +387,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
                 }),
               }}
             />
-            {/* <input
-              type="text"
-              name="destinationLocation"
-              id="destination_location"
-              value={formdata.destination_location}
-              onChange={handleInputChange}
-              className="disabled-input"
-            /> */}
           </div>
         </div>
 

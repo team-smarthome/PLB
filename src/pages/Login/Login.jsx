@@ -15,7 +15,7 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
   const [loading, isLoading] = useState(false);
-  const version = "1.0.1";
+  const version = "1.0.2";
 
   const isAuthenticated = () => {
     return Cookies.get('token') !== undefined;
@@ -51,12 +51,12 @@ const Login = () => {
       }
     } catch (error) {
       const errorResponse = error.response
-      if(errorResponse.status == 401){
+      if (errorResponse.status == 401) {
         Toast.fire({
           icon: 'error',
           title: "Username atau Password salah"
         })
-      }else{
+      } else {
         Toast.fire({
           icon: 'error',
           title: "Terjadi Kesalahan"

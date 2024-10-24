@@ -29,7 +29,7 @@ const Apply = () => {
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
   const [statusPaymentCredit, setStatusPaymentCredit] = useState(false);
-  const [titleHeader, setTitleHeader] = useState("Apply PLB");
+  const [titleHeader, setTitleHeader] = useState("Registrasi Pas Lintas Batas");
   const [titleFooter, setTitleFooter] = useState("Next Step");
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
