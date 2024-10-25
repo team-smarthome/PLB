@@ -86,12 +86,9 @@ const LogFaceReg = () => {
             setDisablePaginate(false)
         }
         const ipCameraNew = localStorage.getItem('cameraIpNew');
-        console.log(selectedOption, "selectedOptionRow12312312312");
         if (ipCameraNew && selectedOption !== "192.2.1") {
             socket_IO_4020.on("responseHistoryLogs", (data) => {
-                console.log(data, "datayanddapatdariwes");
                 if (data.length > 0) {
-                    console.log(data, "datayanddapatdariwes");
                     setStatus("success");
                     setLogData(data);
 
@@ -127,7 +124,6 @@ const LogFaceReg = () => {
                         })
                         .catch(err => console.log(err));
                 } else {
-                    // console.log('masukkesinierror', selectedOption)
                     handleSubmit(selectedOption)
                     setStatus("success");
                 }
