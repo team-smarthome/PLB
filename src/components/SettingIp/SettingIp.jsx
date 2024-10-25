@@ -28,6 +28,7 @@ const SettingIp = () => {
     const [ipEdit, setIpEdit] = useState("")
     const [statusKamera, SetStatusKamera] = useState([])
     const [IpserverWebsocket, setIpserverWebsocket] = useState("")
+    const [operationalStatus, setOperationalStatus] = useState();
 
     const handleSubmitIpServer = () => {
         setStatus("loading")
@@ -65,6 +66,27 @@ const SettingIp = () => {
         closeModalAdd()
         closeModalDelete()
         setStatus("loading")
+
+        //keep it
+        // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
+        //                 return editIpKamera.then((res) => {
+        //                     if (res.status == 200) {
+        //                         fetchAllIp()
+        //                         setStatus("success")
+        //                         Toast.fire({
+        //                             icon: "success",
+        //                             title: "Data berhasil diubah",
+        //                         });
+        //                     }
+        //                 }).catch((err) => {
+        //                     setStatus("success")
+        //                     Toast.fire({
+        //                         icon: "error",
+        //                         title: "Gagal mengubah data",
+        //                     })
+        //                     console.log(err);
+        //                 });
+        
         const websocketIp = localStorage.getItem('serverIPSocket')
         if (websocketIp) {
             const socket_server_4010 = io(`http://${websocketIp}:4010`);
@@ -361,20 +383,24 @@ const SettingIp = () => {
         const dataApiKemera = {
             ...detailData,
             userId: dataUserIp?.petugas?.id,
+            is_depart: operationalStatus
         };
-
+        
         handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
-
+        
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
-
+    
     const handleEdit = (e) => {
         e.preventDefault();
         console.log(ipEdit, 'dataUserIp');
         const dataApiKemera = {
-            ...detailData,
+            namaKamera: detailData.namaKamera,
+            ipAddress: detailData.ipAddress,
             userId: dataUserIp?.petugas?.id,
+            is_depart: operationalStatus
         };
+
         handleSubmitCrudKameraToServer("edit", ipEdit, dataApiKemera);
 
         // console.log(dataApiKemera, 'dataApiKemera');
@@ -406,13 +432,19 @@ const SettingIp = () => {
     }
     const openModalEdit = (row) => {
         setIpEdit(row?.ipAddress)
-        setDetailData(row)
+        setDetailData({
+            id: row.id,
+            namaKamera: row.namaKamera,
+            ipAddress: row.ipAddress,
+        })
+        setOperationalStatus(row.is_depart)
         setModalEdit(true)
     }
 
     const closeModalEdit = () => {
         setDetailData({})
         setModalEdit(false)
+        setOperationalStatus(null)
     }
     const openModalDelete = (row) => {
         setDetailData(row)
@@ -423,13 +455,37 @@ const SettingIp = () => {
         setDetailData({})
         setModalDelete(false)
     }
+
+    const optionFilterStatus = [
+        {
+            value: '',
+            label: 'Pilih Status'
+        },
+        {
+            value: true,
+            label: 'Keberangkatan'
+        },
+        {
+            value: false,
+            label: 'Kepulangan'
+        },
+    ]
+
+    
+    const handleChangeStatus = (selectedOption) => {
+        if (selectedOption) {
+            setOperationalStatus(selectedOption.value);
+        }
+    };
+
+
     const customRowRenderer = (row) => {
         const kameraStatus = statusKamera.find(item => item.ip === row.ipAddress);
-
         return (
             <>
                 <td>{row.namaKamera}</td>
                 <td>{row.ipAddress}</td>
+                <td>{row.is_depart ? "Keberangkatan" : "Kepulangan"}</td>
                 <td>
                     {kameraStatus ? (
                         <div style={{ color: kameraStatus.status === 'error' ? 'red' : 'green' }}>
@@ -500,6 +556,38 @@ const SettingIp = () => {
                     onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                 />
             </div>
+            <div className="input-config">
+                <span>Operasional</span>
+                <Select
+                value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
+                onChange={handleChangeStatus}
+                options={optionFilterStatus}
+                className="basic-single"
+                classNamePrefix="select"
+                styles={{
+                    container: (provided) => ({
+                        ...provided,
+                        position: 'relative',
+                        flex: 1,
+                        width: "91.7%",
+                        borderRadius: "10px",
+                        backgroundColor: "rgba(217, 217, 217, 0.75)",
+                        fontFamily: "Roboto, Arial, sans-serif",
+                    }),
+                    valueContainer: (provided) => ({
+                        ...provided,
+                        flex: 1,
+                        width: "100%",
+                    }),
+                    control: (provided) => ({
+                        ...provided,
+                        flex: 1,
+                        width: "100%",
+                        backgroundColor: "rgba(217, 217, 217, 0.75)",
+                    }),
+                }}
+            />
+            </div>
         </div>
     )
     const modalEditLayout = () => (
@@ -517,6 +605,38 @@ const SettingIp = () => {
                     value={detailData?.ipAddress}
                     onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                 />
+            </div>
+            <div className="input-config">
+                <span>Operasional</span>
+                <Select
+                value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
+                onChange={handleChangeStatus}
+                options={optionFilterStatus}
+                className="basic-single"
+                classNamePrefix="select"
+                styles={{
+                    container: (provided) => ({
+                        ...provided,
+                        position: 'relative',
+                        flex: 1,
+                        width: "91.7%",
+                        borderRadius: "10px",
+                        backgroundColor: "rgba(217, 217, 217, 0.75)",
+                        fontFamily: "Roboto, Arial, sans-serif",
+                    }),
+                    valueContainer: (provided) => ({
+                        ...provided,
+                        flex: 1,
+                        width: "100%",
+                    }),
+                    control: (provided) => ({
+                        ...provided,
+                        flex: 1,
+                        width: "100%",
+                        backgroundColor: "rgba(217, 217, 217, 0.75)",
+                    }),
+                }}
+            />
             </div>
         </div>
     )
@@ -564,7 +684,7 @@ const SettingIp = () => {
                 {status === "success" &&
                     <>
                         <TableLog
-                            tHeader={['no', 'Nama Kamera', "Ip Address", "Status", "Action"]}
+                            tHeader={['no', 'Nama Kamera', "Ip Address", "Operational Status", "Status", "Action"]}
                             tBody={listCamera}
                             rowRenderer={customRowRenderer}
                         />
