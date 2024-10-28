@@ -192,8 +192,6 @@ const LogFaceReg = () => {
                 if (data.length > 0) {
                     setStatus("success");
                     setLogData(data);
-
-                    // Membuat array of objects untuk dikirim ke API
                     const dataInsertArray = data.map((item) => ({
                         personId: item.personId,
                         personCode: item.personCode,
@@ -206,12 +204,10 @@ const LogFaceReg = () => {
                     }));
 
                     try {
-                        // Kirim seluruh array of objects ke API
                         const res = await apiInsertLog(dataInsertArray);
                         console.log(res, "responInsert");
 
                         if (res.status === 201) {
-                            // Tunggu 2 detik sebelum memeriksa koneksi websocket
                             await new Promise(resolve => setTimeout(resolve, 2000));
                             if (socket_IO_4020.connected) {
                                 console.log("masuk_sini_socket");
@@ -241,8 +237,6 @@ const LogFaceReg = () => {
                     setStatus("success");
                 }
             });
-
-
 
             return () => {
                 socket_IO_4020.off('responseHistoryLogs');
