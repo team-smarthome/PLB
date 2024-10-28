@@ -68,7 +68,7 @@ const LogFaceReg = () => {
     const handleEpochToDate = (epoch) => {
         const date = new Date(epoch * 1000);
         const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-indexed month
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -87,47 +87,157 @@ const LogFaceReg = () => {
         }
         const ipCameraNew = localStorage.getItem('cameraIpNew');
         if (ipCameraNew && selectedOption !== "192.2.1") {
-            socket_IO_4020.on("responseHistoryLogs", (data) => {
+            // socket_IO_4020.on("responseHistoryLogs", (data) => {
+            //     if (data.length > 0) {
+            //         setStatus("success");
+            //         setLogData(data);
+
+            //         data.forEach((item) => {
+            //             const dataInsert = {
+            //                 personId: item.personId,
+            //                 personCode: item.personCode,
+            //                 name: item.name,
+            //                 similarity: item.images_info[0]?.similarity,
+            //                 passStatus: item.passStatus === 6 ? "Failed" : "Success",
+            //                 time: item.time,
+            //                 img_path: `http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`,
+            //                 ipCamera: ipCameraNew
+            //             };
+
+            //             apiInsertLog(dataInsert)
+            //                 .then(res => {
+            //                     console.log(res, "responInsert");
+            //                     if (res?.status === 201) {
+            //                         return setTimeout(() => {
+            //                             if (socket_IO_4020.connected) {
+            //                                 console.log("masuk_sini_socket");
+            //                                 socket_IO_4020.emit('historyLog');
+            //                             } else {
+            //                                 console.log("masuk_sini_socket_gagal");
+            //                                 addPendingRequest4020({ action: 'historyLog' });
+            //                                 socket_IO_4020.connect();
+            //                             }
+            //                         }, 2000);
+            //                     }
+            //                 })
+            //                 .catch(err => {
+            //                     return setTimeout(() => {
+            //                         if (socket_IO_4020.connected) {
+            //                             console.log("masuk_sini_socket");
+            //                             socket_IO_4020.emit('historyLog');
+            //                         } else {
+            //                             console.log("masuk_sini_socket_gagal");
+            //                             addPendingRequest4020({ action: 'historyLog' });
+            //                             socket_IO_4020.connect();
+            //                         }
+            //                     }, 2000);
+            //                 })
+            //         });
+            //     } else {
+            //         handleSubmit(selectedOption);
+            //         setStatus("success");
+            //     }
+            // });
+            // socket_IO_4020.on("responseHistoryLogs", (data) => {
+            //     if (data.length > 0) {
+            //         setStatus("success");
+            //         setLogData(data);
+
+            //         const dataInsert = {
+            //             personId: data[0]?.personId,
+            //             personCode: data[0]?.personCode,
+            //             name: data[0]?.name,
+            //             similarity: data[0]?.images_info[0]?.similarity,
+            //             passStatus: data[0]?.passStatus === 6 ? "Failed" : "Success",
+            //             time: data[0]?.time,
+            //             img_path: `http://${ipCameraNew}/ofsimage/${data[0]?.images_info[0]?.img_path}`,
+            //             ipCamera: ipCameraNew
+            //         };
+            //         apiInsertLog(dataInsert)
+            //             .then(res => {
+            //                 console.log(res, "responInsert");
+            //                 if (res.status === 201) {
+            //                     return setTimeout(() => {
+            //                         if (socket_IO_4020.connected) {
+            //                             console.log("masuk_sini_socket");
+            //                             socket_IO_4020.emit('historyLog');
+            //                         } else {
+            //                             console.log("masuk_sini_socket_gagal");
+            //                             addPendingRequest4020({ action: 'historyLog' });
+            //                             socket_IO_4020.connect();
+            //                         }
+            //                     }, 2000);
+            //                 } else {
+            //                     console.log("masuk_sini_gagal");
+            //                 }
+            //             })
+            //             .catch(err => {
+            //                 return setTimeout(() => {
+            //                     if (socket_IO_4020.connected) {
+            //                         console.log("masuk_sini_socket");
+            //                         socket_IO_4020.emit('historyLog');
+            //                     } else {
+            //                         console.log("masuk_sini_socket_gagal");
+            //                         addPendingRequest4020({ action: 'historyLog' });
+            //                         socket_IO_4020.connect();
+            //                     }
+            //                 }, 2000);
+            //             });
+            //     } else {
+            //         handleSubmit(selectedOption)
+            //         setStatus("success");
+            //     }
+            // });
+            socket_IO_4020.on("responseHistoryLogs", async (data) => {
                 if (data.length > 0) {
                     setStatus("success");
                     setLogData(data);
-
-                    const dataInsert = {
-                        personId: data[0]?.personId,
-                        personCode: data[0]?.personCode,
-                        name: data[0]?.name,
-                        similarity: data[0]?.images_info[0]?.similarity,
-                        passStatus: data[0]?.passStatus === 6 ? "Failed" : "Success",
-                        time: data[0]?.time,
-                        img_path: `http://${ipCameraNew}/ofsimage/${data[0]?.images_info[0]?.img_path}`,
+                    const dataInsertArray = data.map((item) => ({
+                        personId: item.personId,
+                        personCode: item.personCode,
+                        name: item.name,
+                        similarity: item.images_info[0]?.similarity,
+                        passStatus: item.passStatus === 6 ? "Failed" : "Success",
+                        time: item.time,
+                        img_path: `http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`,
                         ipCamera: ipCameraNew
-                    };
+                    }));
 
-                    // Kirim data ke API
-                    apiInsertLog(dataInsert)
-                        .then(res => {
-                            console.log(res, "responInsert");
-                            if (res.status === 201) {
-                                setTimeout(() => {
-                                    if (socket_IO_4020.connected) {
-                                        console.log("masuk_sini_socket");
-                                        socket_IO_4020.emit('historyLog');
-                                    } else {
-                                        console.log("masuk_sini_socket_gagal");
-                                        addPendingRequest4020({ action: 'historyLog' });
-                                        socket_IO_4020.connect();
-                                    }
-                                }, 2000);
+                    try {
+                        const res = await apiInsertLog(dataInsertArray);
+                        console.log(res, "responInsert");
+
+                        if (res.status === 201) {
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            if (socket_IO_4020.connected) {
+                                console.log("masuk_sini_socket");
+                                socket_IO_4020.emit('historyLog');
                             } else {
-                                console.log("masuk_sini_gagal");
+                                console.log("masuk_sini_socket_gagal");
+                                addPendingRequest4020({ action: 'historyLog' });
+                                socket_IO_4020.connect();
                             }
-                        })
-                        .catch(err => console.log(err));
+                        } else {
+                            console.log("masuk_sini_gagal");
+                        }
+                    } catch (err) {
+                        console.error("Error inserting data:", err);
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        if (socket_IO_4020.connected) {
+                            console.log("masuk_sini_socket");
+                            socket_IO_4020.emit('historyLog');
+                        } else {
+                            console.log("masuk_sini_socket_gagal");
+                            addPendingRequest4020({ action: 'historyLog' });
+                            socket_IO_4020.connect();
+                        }
+                    }
                 } else {
-                    handleSubmit(selectedOption)
+                    handleSubmit(selectedOption);
                     setStatus("success");
                 }
             });
+
             return () => {
                 socket_IO_4020.off('responseHistoryLogs');
                 socket_IO_4020.off('historyLog');
