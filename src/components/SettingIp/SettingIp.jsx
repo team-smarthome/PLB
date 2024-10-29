@@ -86,7 +86,7 @@ const SettingIp = () => {
         //                     })
         //                     console.log(err);
         //                 });
-        
+
         const websocketIp = localStorage.getItem('serverIPSocket')
         if (websocketIp) {
             const socket_server_4010 = io(`http://${websocketIp}:4010`);
@@ -385,12 +385,12 @@ const SettingIp = () => {
             userId: dataUserIp?.petugas?.id,
             is_depart: operationalStatus
         };
-        
+
         handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
-        
+
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
-    
+
     const handleEdit = (e) => {
         e.preventDefault();
         console.log(ipEdit, 'dataUserIp');
@@ -459,19 +459,19 @@ const SettingIp = () => {
     const optionFilterStatus = [
         {
             value: '',
-            label: 'Pilih Status'
+            label: 'Choose Status'
         },
         {
             value: true,
-            label: 'Keberangkatan'
+            label: 'Arrival'
         },
         {
             value: false,
-            label: 'Kepulangan'
+            label: 'Departure'
         },
     ]
 
-    
+
     const handleChangeStatus = (selectedOption) => {
         if (selectedOption) {
             setOperationalStatus(selectedOption.value);
@@ -543,50 +543,50 @@ const SettingIp = () => {
     const modalAddLayout = () => (
         <div className="modal-edit-container">
             <div className="input-config">
-                <span>Nama Kamera</span>
+                <span>Camera Name</span>
                 <input type="text"
                     value={detailData?.namaKamera}
                     onChange={(e) => setDetailData({ ...detailData, namaKamera: e.target.value })}
                 />
             </div>
             <div className="input-config">
-                <span>IP Kamera</span>
+                <span>Camera IP</span>
                 <input type="text"
                     value={detailData?.ipAddress}
                     onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                 />
             </div>
             <div className="input-config">
-                <span>Operasional</span>
+                <span>Depart Status</span>
                 <Select
-                value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
-                onChange={handleChangeStatus}
-                options={optionFilterStatus}
-                className="basic-single"
-                classNamePrefix="select"
-                styles={{
-                    container: (provided) => ({
-                        ...provided,
-                        position: 'relative',
-                        flex: 1,
-                        width: "91.7%",
-                        borderRadius: "10px",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                        fontFamily: "Roboto, Arial, sans-serif",
-                    }),
-                    valueContainer: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                    }),
-                    control: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                    }),
-                }}
-            />
+                    value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
+                    onChange={handleChangeStatus}
+                    options={optionFilterStatus}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    styles={{
+                        container: (provided) => ({
+                            ...provided,
+                            position: 'relative',
+                            flex: 1,
+                            width: "91.7%",
+                            borderRadius: "10px",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                            fontFamily: "Roboto, Arial, sans-serif",
+                        }),
+                        valueContainer: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                        }),
+                        control: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                        }),
+                    }}
+                />
             </div>
         </div>
     )
@@ -609,34 +609,34 @@ const SettingIp = () => {
             <div className="input-config">
                 <span>Operasional</span>
                 <Select
-                value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
-                onChange={handleChangeStatus}
-                options={optionFilterStatus}
-                className="basic-single"
-                classNamePrefix="select"
-                styles={{
-                    container: (provided) => ({
-                        ...provided,
-                        position: 'relative',
-                        flex: 1,
-                        width: "91.7%",
-                        borderRadius: "10px",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                        fontFamily: "Roboto, Arial, sans-serif",
-                    }),
-                    valueContainer: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                    }),
-                    control: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                    }),
-                }}
-            />
+                    value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
+                    onChange={handleChangeStatus}
+                    options={optionFilterStatus}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    styles={{
+                        container: (provided) => ({
+                            ...provided,
+                            position: 'relative',
+                            flex: 1,
+                            width: "91.7%",
+                            borderRadius: "10px",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                            fontFamily: "Roboto, Arial, sans-serif",
+                        }),
+                        valueContainer: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                        }),
+                        control: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                        }),
+                    }}
+                />
             </div>
         </div>
     )
