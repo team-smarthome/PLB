@@ -79,6 +79,22 @@ const LogFaceReg = () => {
         return formattedDate;
     };
 
+    async function fetchImageAsBase64(imageUrl) {
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (error) {
+            console.error("Error fetching image:", error);
+            return null;
+        }
+    }
+
     useEffect(() => {
         if (selectedOption !== "192.2.1") {
             setDisablePaginate(true)
@@ -87,121 +103,37 @@ const LogFaceReg = () => {
         }
         const ipCameraNew = localStorage.getItem('cameraIpNew');
         if (ipCameraNew && selectedOption !== "192.2.1") {
-            // socket_IO_4020.on("responseHistoryLogs", (data) => {
-            //     if (data.length > 0) {
-            //         setStatus("success");
-            //         setLogData(data);
-
-            //         data.forEach((item) => {
-            //             const dataInsert = {
-            //                 personId: item.personId,
-            //                 personCode: item.personCode,
-            //                 name: item.name,
-            //                 similarity: item.images_info[0]?.similarity,
-            //                 passStatus: item.passStatus === 6 ? "Failed" : "Success",
-            //                 time: item.time,
-            //                 img_path: `http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`,
-            //                 ipCamera: ipCameraNew
-            //             };
-
-            //             apiInsertLog(dataInsert)
-            //                 .then(res => {
-            //                     console.log(res, "responInsert");
-            //                     if (res?.status === 201) {
-            //                         return setTimeout(() => {
-            //                             if (socket_IO_4020.connected) {
-            //                                 console.log("masuk_sini_socket");
-            //                                 socket_IO_4020.emit('historyLog');
-            //                             } else {
-            //                                 console.log("masuk_sini_socket_gagal");
-            //                                 addPendingRequest4020({ action: 'historyLog' });
-            //                                 socket_IO_4020.connect();
-            //                             }
-            //                         }, 2000);
-            //                     }
-            //                 })
-            //                 .catch(err => {
-            //                     return setTimeout(() => {
-            //                         if (socket_IO_4020.connected) {
-            //                             console.log("masuk_sini_socket");
-            //                             socket_IO_4020.emit('historyLog');
-            //                         } else {
-            //                             console.log("masuk_sini_socket_gagal");
-            //                             addPendingRequest4020({ action: 'historyLog' });
-            //                             socket_IO_4020.connect();
-            //                         }
-            //                     }, 2000);
-            //                 })
-            //         });
-            //     } else {
-            //         handleSubmit(selectedOption);
-            //         setStatus("success");
-            //     }
-            // });
-            // socket_IO_4020.on("responseHistoryLogs", (data) => {
-            //     if (data.length > 0) {
-            //         setStatus("success");
-            //         setLogData(data);
-
-            //         const dataInsert = {
-            //             personId: data[0]?.personId,
-            //             personCode: data[0]?.personCode,
-            //             name: data[0]?.name,
-            //             similarity: data[0]?.images_info[0]?.similarity,
-            //             passStatus: data[0]?.passStatus === 6 ? "Failed" : "Success",
-            //             time: data[0]?.time,
-            //             img_path: `http://${ipCameraNew}/ofsimage/${data[0]?.images_info[0]?.img_path}`,
-            //             ipCamera: ipCameraNew
-            //         };
-            //         apiInsertLog(dataInsert)
-            //             .then(res => {
-            //                 console.log(res, "responInsert");
-            //                 if (res.status === 201) {
-            //                     return setTimeout(() => {
-            //                         if (socket_IO_4020.connected) {
-            //                             console.log("masuk_sini_socket");
-            //                             socket_IO_4020.emit('historyLog');
-            //                         } else {
-            //                             console.log("masuk_sini_socket_gagal");
-            //                             addPendingRequest4020({ action: 'historyLog' });
-            //                             socket_IO_4020.connect();
-            //                         }
-            //                     }, 2000);
-            //                 } else {
-            //                     console.log("masuk_sini_gagal");
-            //                 }
-            //             })
-            //             .catch(err => {
-            //                 return setTimeout(() => {
-            //                     if (socket_IO_4020.connected) {
-            //                         console.log("masuk_sini_socket");
-            //                         socket_IO_4020.emit('historyLog');
-            //                     } else {
-            //                         console.log("masuk_sini_socket_gagal");
-            //                         addPendingRequest4020({ action: 'historyLog' });
-            //                         socket_IO_4020.connect();
-            //                     }
-            //                 }, 2000);
-            //             });
-            //     } else {
-            //         handleSubmit(selectedOption)
-            //         setStatus("success");
-            //     }
-            // });
             socket_IO_4020.on("responseHistoryLogs", async (data) => {
                 if (data.length > 0) {
                     setStatus("success");
                     setLogData(data);
-                    const dataInsertArray = data.map((item) => ({
-                        personId: item.personId,
-                        personCode: item.personCode,
-                        name: item.name,
-                        similarity: item.images_info[0]?.similarity,
-                        passStatus: item.passStatus === 6 ? "Failed" : "Success",
-                        time: item.time,
-                        img_path: `http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`,
-                        ipCamera: ipCameraNew
+
+                    const dataInsertArray = await Promise.all(data.map(async (item) => {
+                        const base64Image = await fetchImageAsBase64(`http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`);
+                        return {
+                            personId: item.personId,
+                            personCode: item.personCode,
+                            name: item.name,
+                            similarity: item.images_info[0]?.similarity,
+                            passStatus: item.passStatus === 6 ? "Failed" : "Success",
+                            time: item.time,
+                            img_path: base64Image,
+                            ipCamera: ipCameraNew
+                        };
                     }));
+
+                    console.log(dataInsertArray, "dataInsertArray");
+
+                    // const dataInsertArray = data.map((item) => ({
+                    //     personId: item.personId,
+                    //     personCode: item.personCode,
+                    //     name: item.name,
+                    //     similarity: item.images_info[0]?.similarity,
+                    //     passStatus: item.passStatus === 6 ? "Failed" : "Success",
+                    //     time: item.time,
+                    //     img_path: `http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`,
+                    //     ipCamera: ipCameraNew
+                    // }));
 
                     try {
                         const res = await apiInsertLog(dataInsertArray);
@@ -406,7 +338,7 @@ const LogFaceReg = () => {
                         <td>{handleEpochToDate(row?.time)}</td>
                         <td>
                             <img
-                                src={`${row?.img_path}`}
+                                src={`data:image/jpeg;base64,${row?.image_base64}`}
                                 alt="result"
                                 width={100}
                                 height={100}
