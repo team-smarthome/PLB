@@ -267,7 +267,7 @@ export const apiInsertLog = async (data) => {
     })
     return res;
   } catch (error) {
-    console.log(error)
+    throw error
   }
 }
 
@@ -303,6 +303,27 @@ export const apiGetAllIp = async () => {
     console.log(error)
   }
 }
+
+// export const apiGetAllIpFilter = async (params) => {
+//   console.log("params", params)
+//   try {
+//     const res = await axios.get(`${url_devel}api/ipconfig`, {
+//       params
+//     });
+//     return res;
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
+
+export const apiGetAllIpFilter = async (config) => {
+  try {
+    const res = await axios.get('http://127.0.0.1:8000/api/ipconfig', config);
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+};
 
 
 export const apiEditIp = async (data, params) => {
