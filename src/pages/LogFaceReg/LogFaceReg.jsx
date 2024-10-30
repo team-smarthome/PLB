@@ -633,6 +633,10 @@ const LogFaceReg = () => {
                                     }
                                 ))
                             }
+                            defaultValue={{
+                                value: { ipAddress: '', isDepart: "" },
+                                label: `All Camera`
+                            }}
                             className="basic-single"
                             classNamePrefix="select"
                             styles={{
