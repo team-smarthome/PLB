@@ -386,6 +386,8 @@ const SettingIp = () => {
             is_depart: operationalStatus
         };
 
+
+
         handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
 
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
@@ -544,30 +546,6 @@ const SettingIp = () => {
                         <div style={{ color: 'gray' }}>Unknown</div>
                     )}
                 </td>
-                {/* <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                    <button
-                        onClick={() => openModalEdit(row)}
-                        disabled={!canAddIpKamerea}
-                        style={{
-                            background: canAddIpKamerea ? 'initial' : 'gray',
-                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
-                            color: canAddIpKamerea ? 'yellow' : 'white',
-                        }}
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={() => openModalDelete(row)}
-                        disabled={!canAddIpKamerea}
-                        style={{
-                            background: canAddIpKamerea ? 'red' : 'gray',
-                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
-                            color: 'white',
-                        }}
-                    >
-                        Delete
-                    </button>
-                </td> */}
 
                 <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
                     <button
