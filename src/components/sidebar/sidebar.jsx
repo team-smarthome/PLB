@@ -5,12 +5,12 @@ import {FaSync,FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetwork
 import { FcSynchronize } from "react-icons/fc";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { IoSettingsSharp } from "react-icons/io5";
+import { IoSettingsSharp, IoSpeedometer  } from "react-icons/io5";
 import Cookies from 'js-cookie';
 
 const Sidebar = ({ isOpen }) => {
     const userCookie = Cookies.get('userdata');
-    const userInfo = JSON.parse(userCookie);
+    const userInfo = JSON.parse(userCookie)
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState({});
@@ -134,6 +134,13 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
+
+                <li>
+                    <Link to='/cpanel/camera-settings' className={`link ${isActive('/cpanel/camera-settings') ? 'active' : ''}`}>
+                        <IoSpeedometer  size={30} style={{ marginRight: '10px' }} />
+                        <span className="link_name">Camera Settings</span>
+                    </Link>
+                </li>
 
                 {/* <li>
                     <Link to='/cpanel/country' className={`link ${isActive('/cpanel/country') ? 'active' : ''}`}>
