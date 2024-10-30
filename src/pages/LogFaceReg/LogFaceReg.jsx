@@ -17,6 +17,7 @@ const LogFaceReg = () => {
     const [optionIp, setOptionIp] = useState([])
     const [status, setStatus] = useState("loading")
     const ipCameraLocalStorage = localStorage.getItem('cameraIpNew')
+    const isDepartLocalStorage = localStorage.getItem('isDepart')
     const [selectedOption, setSelectedOption] = useState('192.2.1');
     const [selectedCondition, setSelectedCondition] = useState('personId');
     const [totalDataFilter, setTotalDataFilter] = useState(0);
@@ -102,6 +103,11 @@ const LogFaceReg = () => {
             setDisablePaginate(false)
         }
         const ipCameraNew = localStorage.getItem('cameraIpNew');
+        const isDepartNew = localStorage.getItem('isDepart');
+        console.log(isDepartNew, 'test1234')
+
+        console.log(selectedCondition, 'test1234')
+
         if (ipCameraNew && selectedOption !== "192.2.1") {
             socket_IO_4020.on("responseHistoryLogs", async (data) => {
                 if (data.length > 0) {
@@ -118,23 +124,12 @@ const LogFaceReg = () => {
                             passStatus: item.passStatus === 6 ? "Failed" : "Success",
                             time: item.time,
                             img_path: base64Image,
-                            ipCamera: ipCameraNew
+                            ipCamera: ipCameraNew,
+                            is_depart: isDepartNew,
                         };
                     }));
 
                     console.log(dataInsertArray, "dataInsertArray");
-
-                    // const dataInsertArray = data.map((item) => ({
-                    //     personId: item.personId,
-                    //     personCode: item.personCode,
-                    //     name: item.name,
-                    //     similarity: item.images_info[0]?.similarity,
-                    //     passStatus: item.passStatus === 6 ? "Failed" : "Success",
-                    //     time: item.time,
-                    //     img_path: `http://${ipCameraNew}/ofsimage/${item.images_info[0]?.img_path}`,
-                    //     ipCamera: ipCameraNew
-                    // }));
-
                     try {
                         const res = await apiInsertLog(dataInsertArray);
                         console.log(res, "responInsert");
@@ -175,7 +170,7 @@ const LogFaceReg = () => {
                 socket_IO_4020.off('historyLog');
             };
         } else {
-            setStatus("loading");
+            setStatus("loading")
             console.log("masuk_sini_noip");
         }
 
@@ -281,11 +276,11 @@ const LogFaceReg = () => {
         getAllIp.then(res => {
             if (res.data.status === 200) {
                 const dataOptions = res.data.data.map(item => ({
-                    value: item.ipAddress,
-                    label: item.namaKamera,
+                    value: { ipAddress: item.ipAddress, isDepart: item.is_depart },
+                    label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Arrival" : "Departure"} )`,
                 }));
                 const defaultOption = {
-                    value: '192.2.1',
+                    value: { ipAddress: '', isDepart: "" },
                     label: 'All Camera'
                 };
                 const updatedOptions = [defaultOption, ...dataOptions];
@@ -320,6 +315,32 @@ const LogFaceReg = () => {
         console.log('Selected_IP:', selected.value);
 
     };
+
+    const handleSelectChangeCustom = (selected) => {
+        setPage(1)
+        setParams(
+            {
+                page: 1,
+                name: "",
+                personId: "",
+                startDate: "",
+                endDate: "",
+                passStatus: ""
+            }
+        )
+        setSelectedCondition("personId")
+        setLogData([])
+        setStatus("loading")
+        console.log(logData, "selectedOptionRow123")
+        setStatus("loading")
+        localStorage.setItem('cameraIpNew', selected.value?.ipAddress)
+        localStorage.setItem('isDepart', selected.value?.isDepart)
+        handleSubmit(selected.value?.ipAddress)
+        setSelectedOption(selected.value?.ipAddress);
+        console.log('Selected_IP:', selected.value);
+
+    };
+
 
 
 
@@ -454,7 +475,7 @@ const LogFaceReg = () => {
     const prevImage = () => {
         setCurrentImage(currentImage - 1)
     }
-    // cons
+
     const handleSubmit = async (ipParams) => {
         try {
             if (ipParams !== "") {
@@ -603,7 +624,7 @@ const LogFaceReg = () => {
                         />
                         <Select
                             value={optionIp.find(option => option.value === selectedOption)}
-                            onChange={handleSelectChange}
+                            onChange={handleSelectChangeCustom}
                             options={
                                 optionIp?.map((option) => (
                                     {

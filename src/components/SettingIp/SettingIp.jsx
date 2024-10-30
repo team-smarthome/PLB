@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from "react-select";
 import Cookies from 'js-cookie';
-import { apiDeleteIp, apiEditIp, apiGetAllIp, apiGetIp, apiInsertIP } from '../../services/api';
+import { apiDeleteIp, apiEditIp, apiGetAllIp, apiGetIp, apiInsertIP, apiGetAllIpFilter } from '../../services/api';
 import './settingip.style.css'
 import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import TableLog from '../TableLog/TableLog';
@@ -86,7 +86,7 @@ const SettingIp = () => {
         //                     })
         //                     console.log(err);
         //                 });
-        
+
         const websocketIp = localStorage.getItem('serverIPSocket')
         if (websocketIp) {
             const socket_server_4010 = io(`http://${websocketIp}:4010`);
@@ -385,12 +385,14 @@ const SettingIp = () => {
             userId: dataUserIp?.petugas?.id,
             is_depart: operationalStatus
         };
-        
+
+
+
         handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
-        
+
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
-    
+
     const handleEdit = (e) => {
         e.preventDefault();
         console.log(ipEdit, 'dataUserIp');
@@ -459,24 +461,73 @@ const SettingIp = () => {
     const optionFilterStatus = [
         {
             value: '',
-            label: 'Pilih Status'
+            label: 'Choose Status'
         },
         {
             value: true,
-            label: 'Keberangkatan'
+            label: 'Arrival'
         },
         {
             value: false,
-            label: 'Kepulangan'
+            label: 'Departure'
         },
     ]
 
-    
+    const optionFilterStatus2 = [
+        {
+            value: true,
+            label: 'Arrival'
+        },
+        {
+            value: false,
+            label: 'Departure'
+        },
+    ]
+
+
+    const [formValues, setFormValues] = useState({
+        namaKamera: "",
+        ipAddress: "",
+        statusCamera: "",
+    });
+
     const handleChangeStatus = (selectedOption) => {
         if (selectedOption) {
             setOperationalStatus(selectedOption.value);
         }
     };
+
+    const handleSelectChange = (key, selected) => {
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            [key]: selected ? selected.value : "",
+        }));
+    };
+
+    const handleSubmitFilter = async () => {
+        setStatus("loading")
+        const params2 = {
+            namaKamera: formValues.namaKamera,
+            ipAddress: formValues.ipAddress,
+            is_depart: formValues.statusCamera,
+        };
+        // return console.log(params2, "paramsCheckFilter");
+        try {
+            const response = await apiGetAllIpFilter({
+                params: {
+                    namaKamera: formValues.namaKamera,
+                    ipAddress: formValues.ipAddress,
+                    is_depart: formValues.statusCamera,
+                }
+            });
+            setListCamera(response.data.data);
+            setStatus("success")
+        } catch (error) {
+            setStatus("success")
+            console.error("Error:", error);
+        }
+    };
+
 
 
     const customRowRenderer = (row) => {
@@ -495,30 +546,6 @@ const SettingIp = () => {
                         <div style={{ color: 'gray' }}>Unknown</div>
                     )}
                 </td>
-                {/* <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                    <button
-                        onClick={() => openModalEdit(row)}
-                        disabled={!canAddIpKamerea}
-                        style={{
-                            background: canAddIpKamerea ? 'initial' : 'gray',
-                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
-                            color: canAddIpKamerea ? 'yellow' : 'white',
-                        }}
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={() => openModalDelete(row)}
-                        disabled={!canAddIpKamerea}
-                        style={{
-                            background: canAddIpKamerea ? 'red' : 'gray',
-                            cursor: canAddIpKamerea ? 'pointer' : 'not-allowed',
-                            color: 'white',
-                        }}
-                    >
-                        Delete
-                    </button>
-                </td> */}
 
                 <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
                     <button
@@ -543,50 +570,50 @@ const SettingIp = () => {
     const modalAddLayout = () => (
         <div className="modal-edit-container">
             <div className="input-config">
-                <span>Nama Kamera</span>
+                <span>Camera Name</span>
                 <input type="text"
                     value={detailData?.namaKamera}
                     onChange={(e) => setDetailData({ ...detailData, namaKamera: e.target.value })}
                 />
             </div>
             <div className="input-config">
-                <span>IP Kamera</span>
+                <span>Camera IP</span>
                 <input type="text"
                     value={detailData?.ipAddress}
                     onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                 />
             </div>
             <div className="input-config">
-                <span>Operasional</span>
+                <span>Depart Status</span>
                 <Select
-                value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
-                onChange={handleChangeStatus}
-                options={optionFilterStatus}
-                className="basic-single"
-                classNamePrefix="select"
-                styles={{
-                    container: (provided) => ({
-                        ...provided,
-                        position: 'relative',
-                        flex: 1,
-                        width: "91.7%",
-                        borderRadius: "10px",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                        fontFamily: "Roboto, Arial, sans-serif",
-                    }),
-                    valueContainer: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                    }),
-                    control: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                    }),
-                }}
-            />
+                    value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
+                    onChange={handleChangeStatus}
+                    options={optionFilterStatus}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    styles={{
+                        container: (provided) => ({
+                            ...provided,
+                            position: 'relative',
+                            flex: 1,
+                            width: "91.7%",
+                            borderRadius: "10px",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                            fontFamily: "Roboto, Arial, sans-serif",
+                        }),
+                        valueContainer: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                        }),
+                        control: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                        }),
+                    }}
+                />
             </div>
         </div>
     )
@@ -609,34 +636,34 @@ const SettingIp = () => {
             <div className="input-config">
                 <span>Operasional</span>
                 <Select
-                value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
-                onChange={handleChangeStatus}
-                options={optionFilterStatus}
-                className="basic-single"
-                classNamePrefix="select"
-                styles={{
-                    container: (provided) => ({
-                        ...provided,
-                        position: 'relative',
-                        flex: 1,
-                        width: "91.7%",
-                        borderRadius: "10px",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                        fontFamily: "Roboto, Arial, sans-serif",
-                    }),
-                    valueContainer: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                    }),
-                    control: (provided) => ({
-                        ...provided,
-                        flex: 1,
-                        width: "100%",
-                        backgroundColor: "rgba(217, 217, 217, 0.75)",
-                    }),
-                }}
-            />
+                    value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
+                    onChange={handleChangeStatus}
+                    options={optionFilterStatus}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    styles={{
+                        container: (provided) => ({
+                            ...provided,
+                            position: 'relative',
+                            flex: 1,
+                            width: "91.7%",
+                            borderRadius: "10px",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                            fontFamily: "Roboto, Arial, sans-serif",
+                        }),
+                        valueContainer: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                        }),
+                        control: (provided) => ({
+                            ...provided,
+                            flex: 1,
+                            width: "100%",
+                            backgroundColor: "rgba(217, 217, 217, 0.75)",
+                        }),
+                    }}
+                />
             </div>
         </div>
     )
@@ -653,6 +680,221 @@ const SettingIp = () => {
     return (
         <>
             <div className='config-container'>
+                <div className='flex'>
+                    <div className='flex flex-1'>
+                        <div className='flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5 justify-center w-[25%]'>
+                            <p>Camera Name</p>
+                            <p>Camera IP</p>
+                        </div>
+                        <div className='w-[70%] flex flex-col gap-2'>
+                            <Select
+                                options={[
+                                    { value: "", label: "All Camera Name" },
+                                    ...listCamera.map((item) => ({
+                                        value: item.namaKamera,
+                                        label: item.namaKamera,
+                                    })),
+                                ]}
+                                placeholder="Select Camera Name"
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={{ value: "", label: "All Camera Name" }}
+                                onChange={(selected) => handleSelectChange("namaKamera", selected)}
+                                styles={{
+                                    container: (provided) => ({
+                                        ...provided,
+                                        height: '42px',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                    }),
+                                }}
+                            />
+                            <Select
+                                options={[
+                                    { value: "", label: "All Camera IP" },
+                                    ...listCamera.map((item) => ({
+                                        value: item.ipAddress,
+                                        label: item.ipAddress,
+                                    })),
+                                ]}
+                                placeholder="Select Camera IP"
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={{ value: "", label: "All Camera IP" }}
+                                onChange={(selected) => handleSelectChange("ipAddress", selected)}
+                                styles={{
+                                    container: (provided) => ({
+                                        ...provided,
+                                        height: '42px',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                    }),
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className='flex flex-1'>
+                        <div className='flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5 w-[25%]'>
+                            <p>Status Camera</p>
+                        </div>
+                        <div className='w-[70%] flex flex-col pt-1'>
+                            <Select
+                                options={[
+                                    { value: "", label: "All Status Camera" },
+                                    ...optionFilterStatus2,
+                                ]}
+                                placeholder="Select Status Camera"
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={{ value: "", label: "All Status Camera" }}
+                                onChange={(selected) => handleSelectChange("statusCamera", selected)}
+                                styles={{
+                                    container: (provided) => ({
+                                        ...provided,
+                                        height: '42px',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                    }),
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* <div className=' flex'>
+                    <div className='flex flex-1 '>
+                        <div className=' flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5 justify-center w-[25%] '>
+                            <p>Camera Name</p>
+                            <p>Camera IP</p>
+                        </div>
+                        <div className='w-[70%] flex  flex-col  gap-2'>
+                            <Select
+                                options={listCamera.map((item) => ({
+                                    value: item.ipAddress,
+                                    label: item.namaKamera,
+                                }))}
+                                placeholder="Select Camera Name"
+                                className="basic-single  "
+                                classNamePrefix="select"
+                                styles={{
+                                    container: (provided) => ({
+                                        ...provided,
+                                        height: '45px',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                    }),
+                                }}
+                            />
+                            <Select
+                                options={listCamera.map((item) => ({
+                                    value: item.ipAddress,
+                                    label: item.ipAddress,
+                                }))}
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="Select Camera IP"
+                                styles={{
+                                    container: (provided) => ({
+                                        ...provided,
+                                        height: '45px',
+                                        width: '100%',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+
+                                        width: '100%',
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '100%',
+                                        width: '100%',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                    }),
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className='flex flex-1 '>
+                        <div className=' flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5  w-[25%] '>
+                            <p>Status Camera</p>
+                        </div>
+                        <div className='w-[70%] flex  flex-col pt-1'>
+                            <Select
+                                options={optionFilterStatus2}
+                                placeholder="Select Status Camera"
+                                className="basic-single  "
+                                classNamePrefix="select"
+                                styles={{
+                                    container: (provided) => ({
+                                        ...provided,
+                                        height: '45px',
+                                        borderRadius: '10px',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    }),
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
+                                    }),
+                                }}
+                            />
+
+                        </div>
+                    </div>
+                </div > */}
                 <div className='submit-face-reg'>
                     <button
                         style={{
@@ -663,7 +905,13 @@ const SettingIp = () => {
                         onClick={handleCheckStatus}
                     >Check Status
                     </button>
-
+                    <button
+                        style={{
+                            backgroundColor: '#4F70AB',
+                        }}
+                        onClick={handleSubmitFilter}
+                    >Search
+                    </button>
                     {canAddIpKamerea && (
                         <>
                             <button
@@ -676,12 +924,15 @@ const SettingIp = () => {
 
 
                 </div>
-                {status === "loading" && (
-                    <div className="loading">
-                        <span className="loader-loading-table"></span>
-                    </div>
-                )}
-                {status === "success" &&
+                {
+                    status === "loading" && (
+                        <div className="loading">
+                            <span className="loader-loading-table"></span>
+                        </div>
+                    )
+                }
+                {
+                    status === "success" &&
                     <>
                         <TableLog
                             tHeader={['no', 'Nama Kamera', "Ip Address", "Operational Status", "Status", "Action"]}
@@ -831,7 +1082,7 @@ const SettingIp = () => {
             >
                 Delete
             </button> */}
-            </div>
+            </div >
         </>
     );
 };
