@@ -282,7 +282,7 @@ const LogFaceReg = () => {
             if (res.data.status === 200) {
                 const dataOptions = res.data.data.map(item => ({
                     value: item.ipAddress,
-                    label: item.namaKamera,
+                    label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Arrival" : "Departure"} )`,
                 }));
                 const defaultOption = {
                     value: '192.2.1',
