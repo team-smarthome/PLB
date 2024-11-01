@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import "./LoginStyle.css";
 import axios from "axios";
@@ -11,6 +11,18 @@ const Login = () => {
   const [sUserName, setUsername] = useState("");
   const [sPassword, setPassword] = useState("");
   const navigate = useNavigate();
+  const [dataUserLogin, setDataUserLogin] = useState(2)
+
+
+  useEffect(() => {
+    const getUserdata = Cookies.get('userdata');
+    if (!getUserdata) {
+      navigate('/')
+    }
+    setDataUserLogin(JSON.parse(getUserdata))
+  }, []);
+
+
   const tooglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -22,7 +34,10 @@ const Login = () => {
   };
 
   if (isAuthenticated()) {
-    return <Navigate to="/home" replace />;
+    if (dataUserLogin !== 2) {
+      return <Navigate to="/home" replace />;
+    }
+    return <Navigate to='/cpanel' replace />;
   }
 
   const handleLogin = async (e) => {
@@ -50,8 +65,7 @@ const Login = () => {
         }
       }
     } catch (error) {
-      const errorResponse = error.response
-      if (errorResponse.status == 401) {
+      if (error?.response?.status == 401) {
         Toast.fire({
           icon: 'error',
           title: "Username atau Password salah"
@@ -59,13 +73,14 @@ const Login = () => {
       } else {
         Toast.fire({
           icon: 'error',
-          title: "Terjadi Kesalahan"
+          title: "INTERNAL SERVER ERROR"
         })
-
       }
       isLoading(false);
     }
   };
+
+
 
   return (
     <>

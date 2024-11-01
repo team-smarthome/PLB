@@ -4,7 +4,7 @@ import { Toast } from "../../components/Toast/Toast";
 import './settingserver.css';
 
 const SettingServer = () => {
-    const [newWifiResults, setNewWifiResults] = useState("");
+    const [newWifiResults, setNewWifiResults] = useState(window.location.hostname);
     const [loading, setLoading] = useState(false);
     let socket_server_4010;
 

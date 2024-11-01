@@ -10,6 +10,7 @@ import { initiateSocket4010 } from '../../utils/socket'
 import axios from 'axios'
 import Cookies from 'js-cookie';
 import './logregister.style.css'
+import { MdOutlineBrokenImage } from "react-icons/md";
 
 const LogRegister = () => {
     const userCookie = Cookies.get('userdata')
@@ -19,6 +20,7 @@ const LogRegister = () => {
     const [showModalEdit, setShowModalEdit] = useState(false)
     const [showModalDelete, setShowModalDelete] = useState(false)
     const [status, setStatus] = useState("loading")
+    const [isErrorImage, setIsErrorImage] = useState(false);
     const [detailData, setDetailData] = useState({
         passport_number: "",
         // register_code: "",
@@ -153,16 +155,22 @@ const LogRegister = () => {
             <td>{row.no_passport}</td>
             {/* <td>{row.no_register}</td> */}
             <td>{row.name}</td>
-            <td>{row.gender === "M" ? "Laki-laki" : "Perempuan"}</td>
+            <td>{row.gender === "M" ? "Male" : "Female"}</td>
             <td>{row.nationality}</td>
             <td>
-                <img
-                    src={`data:image/jpeg;base64,${row.profile_image}`}
-                    alt="Profile"
-                    width={100}
-                    height={100}
-                    style={{ borderRadius: "50%" }}
-                />
+                {isErrorImage ? (<MdOutlineBrokenImage size={50} />
+                ) : (
+                    <>
+                        <img
+                            src={`data:image/jpeg;base64,${row.profile_image}`}
+                            alt="Profile"
+                            width={100}
+                            height={100}
+                            style={{ borderRadius: "50%" }}
+                            onError={() => setIsErrorImage(true)}
+                        />
+                    </>
+                )}
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
                 <button onClick={() => openModalEdit(row)}>Edit</button>
