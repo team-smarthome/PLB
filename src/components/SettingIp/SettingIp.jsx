@@ -536,7 +536,7 @@ const SettingIp = () => {
             <>
                 <td>{row.namaKamera}</td>
                 <td>{row.ipAddress}</td>
-                <td>{row.is_depart ? "Keberangkatan" : "Kepulangan"}</td>
+                <td>{row.is_depart ? "Arrival" : "Departure"}</td>
                 <td>
                     {kameraStatus ? (
                         <div style={{ color: kameraStatus.status === 'error' ? 'red' : 'green' }}>
@@ -935,7 +935,7 @@ const SettingIp = () => {
                     status === "success" &&
                     <>
                         <TableLog
-                            tHeader={['no', 'Nama Kamera', "Ip Address", "Operational Status", "Status", "Action"]}
+                            tHeader={['no', 'Nama Kamera', "Ip Address", "Depart Status", "Status", "Action"]}
                             tBody={listCamera}
                             rowRenderer={customRowRenderer}
                         />

@@ -26,6 +26,7 @@ const LogFaceReg = () => {
     const [disablePaginate, setDisablePaginate] = useState(false)
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
+    const [statusDepart, setStatusDepart] = useState('')
     const [params, setParams] = useState({
         page: page,
         name: "",
@@ -280,7 +281,7 @@ const LogFaceReg = () => {
                     label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Arrival" : "Departure"} )`,
                 }));
                 const defaultOption = {
-                    value: { ipAddress: '', isDepart: "" },
+                    value: { ipAddress: '192.2.1', isDepart: "" },
                     label: 'All Camera'
                 };
                 const updatedOptions = [defaultOption, ...dataOptions];
@@ -335,6 +336,7 @@ const LogFaceReg = () => {
         setStatus("loading")
         localStorage.setItem('cameraIpNew', selected.value?.ipAddress)
         localStorage.setItem('isDepart', selected.value?.isDepart)
+        setStatusDepart(selected.value?.isDepart)
         handleSubmit(selected.value?.ipAddress)
         setSelectedOption(selected.value?.ipAddress);
         console.log('Selected_IP:', selected.value);
@@ -357,6 +359,7 @@ const LogFaceReg = () => {
                         <td>{row?.similarity}</td>
                         <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
                         <td>{handleEpochToDate(row?.time)}</td>
+                        <td className={`${row?.is_depart ? 'text-green-400' : 'text-red-400'}`}>{row?.is_depart ? "Arrival" : "Departure"}</td>
                         <td>
                             <img
                                 src={`data:image/jpeg;base64,${row?.image_base64}`}
@@ -376,6 +379,7 @@ const LogFaceReg = () => {
                         <td>{row?.images_info?.[0]?.similarity ?? row?.similarity}</td>
                         <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
                         <td>{handleEpochToDate(row?.time)}</td>
+                        <td className={`${statusDepart ? 'text-green-400' : 'text-red-400'}`} >{statusDepart ? "Arrival" : "Departure"}</td>
                         <td>
                             <img
                                 src={row?.images_info?.[0]?.img_path ? `http://${ipCameraLocalStorage}/ofsimage/${row.images_info[0].img_path}` : ''}
@@ -532,7 +536,7 @@ const LogFaceReg = () => {
                     <div className='label-filter-name'>
                         <p>Filter By</p>
                         <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
-                        <p>Status</p>
+                        <p>Status Camera</p>
                     </div>
                     <div className='value-filter-name'>
                         <Select
@@ -687,7 +691,7 @@ const LogFaceReg = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Image Result", "IP Camera"]}
+                        tHeader={['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
                         tBody={logData}
                         handler={handleOpenImage}
                         rowRenderer={customRowRenderer}

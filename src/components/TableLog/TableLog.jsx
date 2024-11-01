@@ -1,14 +1,14 @@
 import React from 'react';
 import './tablelog.style.css';
 
-const TableLog = ({ 
-    tHeader, 
-    tBody, 
-    handler = () => {}, 
-    isAction = false, 
-    onEdit = () => {}, 
-    onDelete = () => {}, 
-    rowRenderer = null, 
+const TableLog = ({
+    tHeader,
+    tBody,
+    handler = () => {},
+    isAction = false,
+    onEdit = () => {},
+    onDelete = () => {},
+    rowRenderer = null,
     showIndex = true // New prop to control visibility of index column
 }) => {
 
