@@ -2,7 +2,6 @@ import React from 'react';
 import './tablelog.style.css';
 
 const TableLog = ({ tHeader, tBody, handler = () => { }, isAction = false, onEdit = () => { }, onDelete = () => { }, rowRenderer = null }) => {
-
     return (
         <div className="table-container">
             <table>
