@@ -9,7 +9,8 @@ import Cookies from 'js-cookie';
 
 const UserManagement = () => {
     const userCookie = Cookies.get('userdata')
-    const userInfo = JSON.parse(userCookie)
+    const userInfo = userCookie ? JSON.parse(userCookie) : { role: null }; // Default to role: null if no cookie
+
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
     const [isShowModalDelete, setIsShowModalDelete] = useState(false)
