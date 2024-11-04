@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import icon_kemenkumham from "../../assets/images/Kemenkumham_Imigrasi.png";
 import "./LoginStyle.css";
 import axios from "axios";
@@ -11,18 +11,38 @@ const Login = () => {
   const [sUserName, setUsername] = useState("");
   const [sPassword, setPassword] = useState("");
   const navigate = useNavigate();
-  const tooglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-  const [loading, isLoading] = useState(false);
-  const version = "1.0.2";
+  const [dataUserLogin, setDataUserLogin] = useState(null);
+
 
   const isAuthenticated = () => {
     return Cookies.get('token') !== undefined;
   };
 
-  if (isAuthenticated()) {
-    return <Navigate to="/home" replace />;
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const getUserdata = Cookies.get('userdata');
+      if (!getUserdata) {
+        navigate('/');
+      } else {
+        const parsedUserData = JSON.parse(getUserdata);
+        console.log(parsedUserData, "userdata");
+        setDataUserLogin(parsedUserData.role);
+      }
+    }
+  }, [navigate]);
+
+  const tooglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  const [loading, isLoading] = useState(false);
+  const version = "1.0.3-beta";
+
+  if (dataUserLogin !== null) {
+    if (dataUserLogin === 2) {
+      return <Navigate to="/home" replace />;
+    } else {
+      return <Navigate to="/cpanel" replace />;
+    }
   }
 
   const handleLogin = async (e) => {
@@ -50,8 +70,7 @@ const Login = () => {
         }
       }
     } catch (error) {
-      const errorResponse = error.response
-      if (errorResponse.status == 401) {
+      if (error?.response?.status == 401) {
         Toast.fire({
           icon: 'error',
           title: "Username atau Password salah"
@@ -59,13 +78,14 @@ const Login = () => {
       } else {
         Toast.fire({
           icon: 'error',
-          title: "Terjadi Kesalahan"
+          title: "INTERNAL SERVER ERROR"
         })
-
       }
       isLoading(false);
     }
   };
+
+
 
   return (
     <>

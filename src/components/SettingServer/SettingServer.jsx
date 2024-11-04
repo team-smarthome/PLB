@@ -4,9 +4,8 @@ import { Toast } from "../../components/Toast/Toast";
 import './settingserver.css';
 
 const SettingServer = () => {
-    const [newWifiResults, setNewWifiResults] = useState("");
+    const [newWifiResults, setNewWifiResults] = useState(window.location.hostname);
     const [loading, setLoading] = useState(false);
-    let socket_server_4010;
 
 
     useEffect(() => {
@@ -19,8 +18,7 @@ const SettingServer = () => {
     const handleSubmit = () => {
         setLoading(true);
         if (newWifiResults) {
-            socket_server_4010 = io(`http://${newWifiResults}:4010`);
-
+            const socket_server_4010 = io(`http://${newWifiResults}:4010`);
             socket_server_4010.on('connect', () => {
                 console.log('Connected to server');
                 setLoading(false);
@@ -31,13 +29,14 @@ const SettingServer = () => {
                 });
             });
 
-            socket_server_4010.on('connect_error', (error) => {
+            socket_server_4010.once('connect_error', (error) => {
                 console.error('Connection error:', error);
                 setLoading(false);
                 Toast.fire({
                     icon: 'error',
                     title: 'Failed to connect to the server',
                 });
+                socket_server_4010.close();
             });
         } else {
             setLoading(false);

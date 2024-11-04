@@ -9,7 +9,8 @@ import Cookies from 'js-cookie';
 
 const UserManagement = () => {
     const userCookie = Cookies.get('userdata')
-    const userInfo = JSON.parse(userCookie)
+    const userInfo = userCookie ? JSON.parse(userCookie) : { role: null }; // Default to role: null if no cookie
+
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
     const [isShowModalDelete, setIsShowModalDelete] = useState(false)
@@ -256,9 +257,9 @@ const UserManagement = () => {
                     <span>Role :</span>
                     <select value={formData.role} onChange={handleChange}>
                         <option value="">Pilih Role</option>
-                        <option value={0}>Super Admin</option>
-                        <option value={1}>Admin</option>
-                        <option value={2}>User</option>
+                        <option value={0}>Admin</option>
+                        <option value={1}>Pelintas</option>
+                        <option value={2}>Register</option>
                     </select>
                 </div>
             </div>
@@ -341,9 +342,9 @@ const UserManagement = () => {
                 <div>
                     <span>Role :</span>
                     <select value={formData.role || ''} onChange={handleChange}>
-                        <option value={0}>Super Admin</option>
-                        <option value={1}>Admin</option>
-                        <option value={2}>User</option>
+                        <option value={0}>Admin</option>
+                        <option value={1}>Pelintas</option>
+                        <option value={2}>Register</option>
                     </select>
                 </div>
             </div>
@@ -366,7 +367,7 @@ const UserManagement = () => {
                 <td>{row?.petugas?.gender == "M" ? "Laki-laki" : "Perempuan"}</td>
                 <td>{row?.petugas?.tanggal_lahir}</td>
                 <td>{row?.jabatan?.nama_jabatan}</td>
-                <td>{row?.role === 0 ? "Super Admin" : row?.role === 1 ? "admin" : "user"}</td>
+                <td>{row?.role === 0 ? "Admin" : row?.role === 1 ? "Pelintas" : "Register"}</td>
                 {userInfo.role == 0 && <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>}
             </>
         )
@@ -443,40 +444,40 @@ const UserManagement = () => {
                 <button
                     onClick={getAllPetugasData}
                     className='search-data'
-                    style={{ 
+                    style={{
                         backgroundColor: "#4F70AB"
-                     }}
+                    }}
                 >Search
-            </button>
-            {userInfo.role == 0 && <button
-                onClick={openModalAdd}
-                className='add-data'
-                style={{
-                    backgroundColor: '#11375C',
-                    marginRight: 10,
-                }}
-            >Add
-            </button>}
-        </div>
+                </button>
+                {userInfo.role == 0 && <button
+                    onClick={openModalAdd}
+                    className='add-data'
+                    style={{
+                        backgroundColor: '#11375C',
+                        marginRight: 10,
+                    }}
+                >Add
+                </button>}
+            </div>
             {
-        isLoading ?
-            (
-                <div className="loading">
-                    <span className="loader-loading-table"></span>
-                </div>
-            ) : (
-                <>
-                    <TableLog
-                        tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
-                        tBody={dataPetugas}
-                        onEdit={editModal}
-                        onDelete={deleteModal}
-                        rowRenderer={customRowRenderer}
-                    />
-                    {renderPaginationControls()}
-                </>
-            )
-    }
+                isLoading ?
+                    (
+                        <div className="loading">
+                            <span className="loader-loading-table"></span>
+                        </div>
+                    ) : (
+                        <>
+                            <TableLog
+                                tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
+                                tBody={dataPetugas}
+                                onEdit={editModal}
+                                onDelete={deleteModal}
+                                rowRenderer={customRowRenderer}
+                            />
+                            {renderPaginationControls()}
+                        </>
+                    )
+            }
             <Modals
                 showModal={isShowModalAdd}
                 closeModal={closeModalAdd}

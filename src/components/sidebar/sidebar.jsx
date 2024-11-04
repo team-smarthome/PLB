@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
-import {FaSync,FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
+import { FaSync, FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
 import { FcSynchronize } from "react-icons/fc";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { IoSettingsSharp } from "react-icons/io5";
+import { IoSettingsSharp, IoSpeedometer  } from "react-icons/io5";
 import Cookies from 'js-cookie';
 
 const Sidebar = ({ isOpen }) => {
     const userCookie = Cookies.get('userdata');
-    const userInfo = JSON.parse(userCookie);
+    const userInfo = JSON.parse(userCookie)
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState({});
@@ -71,7 +71,7 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
-                {userInfo.role === 0 && (
+                {userInfo.role === 0 || userInfo.role === 1 && (
                     <li>
                         <div className="icon-link" onClick={() => handleSettingToggle("setting")}>
                             <a>
@@ -82,34 +82,39 @@ const Sidebar = ({ isOpen }) => {
                         </div>
                     </li>
                 )}
-                {userInfo.role == 0 && menuSetting.setting && (
-                    <ul
-                        className="sub-menu-link"
-                    >
+                {(userInfo.role === 0 || userInfo.role === 1 && menuSetting.setting) && (
+                    <ul className="sub-menu-link">
                         <Link to='/cpanel/setting-server' className={`link ${isActive('/cpanel/setting-server') ? 'active' : ''}`}>
                             <FaServer
                                 size={25}
                                 style={{ marginRight: '10px' }}
                             />
-                            <a >Server</a>
+                            <span>Server</span>
                         </Link>
-                        <Link to='/cpanel/setting-camera' className={`link ${isActive('/cpanel/setting-camera') ? 'active' : ''}`}>
-                            <FaNetworkWired
-                                size={25}
-                                style={{ marginRight: '10px' }}
-                            />
-                            <a >Camera</a>
-                        </Link>
-                        <Link to='/cpanel/synchronize' className={`link ${isActive('/cpanel/synchronize') ? 'active' : ''}`}>
-                            <FaSync 
-                                size={25}
-                                style={{ marginRight: '10px'}}
-                                
-                            />
-                            <a >Sycnhronize</a>
-                        </Link>
+
+                        {/* Hanya tampilkan menu Camera dan Synchronize jika role === 0 */}
+                        {userInfo.role === 0 && (
+                            <>
+                                <Link to='/cpanel/setting-camera' className={`link ${isActive('/cpanel/setting-camera') ? 'active' : ''}`}>
+                                    <FaNetworkWired
+                                        size={25}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    <span>Camera</span>
+                                </Link>
+
+                                <Link to='/cpanel/synchronize' className={`link ${isActive('/cpanel/synchronize') ? 'active' : ''}`}>
+                                    <FaSync
+                                        size={25}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    <span>Synchronize</span>
+                                </Link>
+                            </>
+                        )}
                     </ul>
                 )}
+
                 {userInfo.role === 0 && (
                     <li>
                         <div className="icon-link" onClick={() => handleSettingToggle("master")}>
@@ -134,6 +139,13 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
+
+                <li>
+                    <Link to='/cpanel/camera-settings' className={`link ${isActive('/cpanel/camera-settings') ? 'active' : ''}`}>
+                        <IoSpeedometer  size={30} style={{ marginRight: '10px' }} />
+                        <span className="link_name">Camera Settings</span>
+                    </Link>
+                </li>
 
                 {/* <li>
                     <Link to='/cpanel/country' className={`link ${isActive('/cpanel/country') ? 'active' : ''}`}>

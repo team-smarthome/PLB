@@ -68,19 +68,39 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				statusCardBox: "takePhotoSucces",
 				capturedImage: imageBase64,
 				emailUser: null,
-				titleHeader: "Apply PLB",
+				titleHeader: "Registrasi Pas Lintas Batas",
 				titleFooter: "Next Step",
 			});
 		});
 		socket_IO_4000.on("error_photo", (error) => {
-			console.error("Error taking photo:", error);
+			console.log('error_photo', error)
+			const statusCardBoxMap = {
+				closed_eyes: "closedEyes",
+				glasses: "usingGlasses",
+				hat: "usingHat",
+				mask: "usingMask",
+				cannot_take_photo: 'errorPhoto',
+				glassesMask: 'usingMaskGlasses',
+				occlusion: 'occlusionImage'
+			};
+
+			const statusCardBoxRes = statusCardBoxMap[error] || "lookCamera";
 			sendDataToInput({
-				statusCardBox: "lookCamera",
+				statusCardBox: statusCardBoxRes,
 				capturedImage: null,
 				emailUser: null,
-				titleHeader: "Apply PLB",
-				titleFooter: "Next Step",
+				titleHeader: "Registrasi Pas Lintas Batas",
+				titleFooter: "Next Step"
 			});
+			setTimeout(() => {
+				sendDataToInput({
+					statusCardBox: "lookCamera",
+					capturedImage: null,
+					emailUser: null,
+					titleHeader: "Registrasi Pas Lintas Batas",
+					titleFooter: "Next Step"
+				});
+			}, 2000);
 		});
 
 		return () => {
@@ -100,7 +120,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				statusCardBox: "waiting2",
 				capturedImage: capturedImage,
 				emailUser: null,
-				titleHeader: "Apply PLB",
+				titleHeader: "Registrasi Pas Lintas Batas",
 				titleFooter: "Next Step",
 			});
 		} else {
@@ -109,7 +129,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				statusCardBox: "errorWebsocket",
 				capturedImage: null,
 				emailUser: null,
-				titleHeader: "Apply PLB",
+				titleHeader: "Registrasi Pas Lintas Batas",
 				titleFooter: "Next Step",
 			});
 			addPendingRequest({ action: 'take_photo' });
@@ -135,7 +155,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			statusCardBox: "lookCamera",
 			capturedImage: null,
 			emailUser: email,
-			titleHeader: "Apply PLB",
+			titleHeader: "Registrasi Pas Lintas Batas",
 			titleFooter: "Next Step",
 		});
 	};
@@ -151,7 +171,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			statusCardBox: "lookCamera",
 			capturedImage: null,
 			emailUser: email,
-			titleHeader: "Apply PLB",
+			titleHeader: "Registrasi Pas Lintas Batas",
 			titleFooter: "Next Step",
 		});
 	};
@@ -203,7 +223,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				statusCardBox: "emailSucces",
 				emailUser: email,
 				capturedImage: capturedImage,
-				titleHeader: "Apply PLB",
+				titleHeader: "Registrasi Pas Lintas Batas",
 				titleFooter: "Next Step",
 			});
 		}
@@ -234,7 +254,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				statusCardBox: "waiting",
 				capturedImage: capturedImage,
 				emailUser: null,
-				titleHeader: "Apply PLB",
+				titleHeader: "Registrasi Pas Lintas Batas",
 				titleFooter: "Next Step",
 			});
 
@@ -250,7 +270,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						statusCardBox: "notFoundPassport",
 						emailUser: email,
 						capturedImage: capturedImage,
-						titleHeader: "Apply PLB",
+						titleHeader: "Registrasi Pas Lintas Batas",
 						titleFooter: "Payment",
 					});
 					setTimeout(() => {
@@ -258,7 +278,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 							statusCardBox: "searchPassport",
 							capturedImage: capturedImage,
 							emailUser: null,
-							titleHeader: "Apply PLB",
+							titleHeader: "Registrasi Pas Lintas Batas",
 							titleFooter: "Next Step",
 						});
 					}, 2000);
@@ -269,7 +289,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					statusCardBox: "errorConnection",
 					emailUser: email,
 					capturedImage: capturedImage,
-					titleHeader: "Apply PLB",
+					titleHeader: "Registrasi Pas Lintas Batas",
 					titleFooter: "Payment",
 				});
 			}
@@ -296,7 +316,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				postalCode: kodePos,
 				city: kotaUser,
 				capturedImage: capturedImage,
-				titleHeader: "Apply PLB",
+				titleHeader: "Registrasi Pas Lintas Batas",
 				titleFooter: "Payment",
 			});
 		}
@@ -642,7 +662,26 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						</button>
 					</>
 				);
-
+			case "usingMask":
+			case "usingGlasses":
+			case "errorPhoto":
+			case "closedEyes":
+			case "usingHat":
+			case "usingMaskGlasses":
+			case "occlusionImage":
+				return (
+					<>
+						<h1 className="card-title">
+							{getStatusHeaderText().map((text, index) => (
+								<React.Fragment key={index}>
+									{text}
+									<br />
+								</React.Fragment>
+							))}
+						</h1>
+						<img src={Gambar3} alt="" className="card-image" />
+					</>
+				);
 			case "takePhotoSucces":
 				return (
 					<>
@@ -746,7 +785,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						</>
 					</>
 				);
-
 			default:
 				return (
 					<>
@@ -790,6 +828,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "photoNotMatch":
 			case "errorWebsocket":
 			case "notFoundPassport":
+			case 'usingMask':
+			case 'usingGlasses':
+			case 'errorPhoto':
+			case 'closedEyes':
+			case 'usingHat':
+			case 'usingMaskGlasses':
+			case 'occlusionImage':
 				return Gambar3;
 			case "lookCamera":
 				return Gambar6;
@@ -818,6 +863,20 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					"Passport has not successfully",
 					"scanned. Please rescan",
 				];
+			case "closedEyes":
+				return ["Please Open Your Eyes", "Before Take Photo"];
+			case "usingMask":
+				return ["Please Remove Mask", "Before Take Photo"];
+			case "usingGlasses":
+				return ["Please Remove Glasses", "Before Take Photo"];
+			case "errorPhoto":
+				return ["Error Taking Photo", "Please Try Again"];
+			case "usingHat":
+				return ["Please Remove Hat", "Before Take Photo"];
+			case "usingMaskGlasses":
+				return ["Please Remove Mask and Glasses", "Before Take Photo"];
+			case "occlusionImage":
+				return ["Photo Occlusion", "Please Try Again"];
 			case "errorVoa":
 				return ["Your Country is not eligible", "for Apply PLB"];
 			case "errorBulan":
