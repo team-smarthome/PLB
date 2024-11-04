@@ -11,33 +11,38 @@ const Login = () => {
   const [sUserName, setUsername] = useState("");
   const [sPassword, setPassword] = useState("");
   const navigate = useNavigate();
-  const [dataUserLogin, setDataUserLogin] = useState(2)
+  const [dataUserLogin, setDataUserLogin] = useState(null);
 
-
-  useEffect(() => {
-    const getUserdata = Cookies.get('userdata');
-    if (!getUserdata) {
-      navigate('/')
-    }
-    setDataUserLogin(JSON.parse(getUserdata))
-  }, []);
-
-
-  const tooglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-  const [loading, isLoading] = useState(false);
-  const version = "1.0.2";
 
   const isAuthenticated = () => {
     return Cookies.get('token') !== undefined;
   };
 
-  if (isAuthenticated()) {
-    if (dataUserLogin !== 2) {
-      return <Navigate to="/home" replace />;
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const getUserdata = Cookies.get('userdata');
+      if (!getUserdata) {
+        navigate('/');
+      } else {
+        const parsedUserData = JSON.parse(getUserdata);
+        console.log(parsedUserData, "userdata");
+        setDataUserLogin(parsedUserData.role);
+      }
     }
-    return <Navigate to='/cpanel' replace />;
+  }, [navigate]);
+
+  const tooglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  const [loading, isLoading] = useState(false);
+  const version = "1.0.3-beta";
+
+  if (dataUserLogin !== null) {
+    if (dataUserLogin === 2) {
+      return <Navigate to="/home" replace />;
+    } else {
+      return <Navigate to="/cpanel" replace />;
+    }
   }
 
   const handleLogin = async (e) => {

@@ -174,67 +174,67 @@ const Apply = () => {
 
   const [receiveTempData, setRecievedTempData] = useState([]);
 
-  const connectWebSocket = (ipAddress, socket_IO) => {
-    const socketURL = `ws://localhost:4488`;
-    socketRef.current = new WebSocket(socketURL);
+  // const connectWebSocket = (ipAddress, socket_IO) => {
+  //   const socketURL = `ws://localhost:4488`;
+  //   socketRef.current = new WebSocket(socketURL);
 
-    socketRef.current.onopen = () => {
-      console.log("WebSocket connection opened");
-      isCloseTimeoutSet = false;
-      setCardStatus("iddle"); // Start in 'iddle' state after connection opens
-      setIsConnected(true);
-    };
+  //   socketRef.current.onopen = () => {
+  //     console.log("WebSocket connection opened");
+  //     isCloseTimeoutSet = false;
+  //     setCardStatus("iddle"); // Start in 'iddle' state after connection opens
+  //     setIsConnected(true);
+  //   };
 
-    socketRef.current.onmessage = (event) => {
-      try {
-        const dataJson = JSON.parse(event.data);
-        console.log("Received data from server websocket:", dataJson);
+  //   socketRef.current.onmessage = (event) => {
+  //     try {
+  //       const dataJson = JSON.parse(event.data);
+  //       console.log("Received data from server websocket:", dataJson);
 
-        // Only attempt to decode if `dataJson.uvImage` exists
-        if (dataJson.visibleImage) {
-          setResDataScan(dataJson.visibleImage);
-        }
+  //       // Only attempt to decode if `dataJson.uvImage` exists
+  //       if (dataJson.visibleImage) {
+  //         setResDataScan(dataJson.visibleImage);
+  //       }
 
-        switch (dataJson.msgType) {
-          case "passportData":
-            break;
-          case "visibleImage":
-            setRecievedTempData((previous) => [...previous, dataJson]);
-            break;
-          case "DeviceController":
-            const { airportId, deviceId, jenisDeviceId } = dataJson;
-            localStorage.setItem("airportId", airportId);
-            localStorage.setItem("deviceId", deviceId);
-            localStorage.setItem("jenisDeviceId", jenisDeviceId);
-            break;
-          default:
-            break;
-        }
-      } catch (error) {
-        console.error("Failed to parse WebSocket message data:", error);
-      }
-    };
+  //       switch (dataJson.msgType) {
+  //         case "passportData":
+  //           break;
+  //         case "visibleImage":
+  //           setRecievedTempData((previous) => [...previous, dataJson]);
+  //           break;
+  //         case "DeviceController":
+  //           const { airportId, deviceId, jenisDeviceId } = dataJson;
+  //           localStorage.setItem("airportId", airportId);
+  //           localStorage.setItem("deviceId", deviceId);
+  //           localStorage.setItem("jenisDeviceId", jenisDeviceId);
+  //           break;
+  //         default:
+  //           break;
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to parse WebSocket message data:", error);
+  //     }
+  //   };
 
-    socketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
-      setIsConnected(false);
-      setCardStatus("errorConnection");
+  //   socketRef.current.onclose = () => {
+  //     console.log("WebSocket connection closed");
+  //     setIsConnected(false);
+  //     setCardStatus("errorConnection");
 
-      if (!isCloseTimeoutSet) {
-        setCardStatus("errorWebsocket");
-        setTimeout(() => {
-          isCloseTimeoutSet = true;
-        }, 3000);
-      } else {
-      }
-    };
+  //     if (!isCloseTimeoutSet) {
+  //       setCardStatus("errorWebsocket");
+  //       setTimeout(() => {
+  //         isCloseTimeoutSet = true;
+  //       }, 3000);
+  //     } else {
+  //     }
+  //   };
 
-    socketRef.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setCardStatus("errorConnection");
-      setIsConnected(false);
-    };
-  };
+  //   socketRef.current.onerror = (error) => {
+  //     console.error("WebSocket error:", error);
+  //     setCardStatus("errorConnection");
+  //     setIsConnected(false);
+  //   };
+  // };
 
   const closeWebSocket = () => {
     if (socketRef.current) {
@@ -242,12 +242,12 @@ const Apply = () => {
     }
   };
 
-  useEffect(() => {
-    connectWebSocket(null, socket_IO_4010);
-    return () => {
-      closeWebSocket();
-    };
-  }, []);
+  // useEffect(() => {
+  //   connectWebSocket(null, socket_IO_4010);
+  //   return () => {
+  //     closeWebSocket();
+  //   };
+  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -362,20 +362,22 @@ const Apply = () => {
             text: "Please check your data",
             confirmButtonColor: "#3d5889",
           });
-        } else if (
-          isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
-          isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
-          isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
-          isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
-          isEmptyOrNull(dataChecked.nationality) || !hasProperty(dataChecked, "nationality")
-        ) {
-          Swal.fire({
-            icon: "error",
-            title: "Have empty data",
-            text: "Please check your data",
-            confirmButtonColor: "#3d5889",
-          });
-        } else {
+        }
+        // else if (
+        //   isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
+        //   isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
+        //   isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
+        //   isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
+        //   isEmptyOrNull(dataChecked.nationality) || !hasProperty(dataChecked, "nationality")
+        // ) {
+        //   Swal.fire({
+        //     icon: "error",
+        //     title: "Have empty data",
+        //     text: "Please check your data",
+        //     confirmButtonColor: "#3d5889",
+        //   });
+        // } 
+        else {
           setCardStatus("lookCamera");
           setTabStatus(2);
         }

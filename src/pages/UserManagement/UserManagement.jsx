@@ -256,9 +256,9 @@ const UserManagement = () => {
                     <span>Role :</span>
                     <select value={formData.role} onChange={handleChange}>
                         <option value="">Pilih Role</option>
-                        <option value={0}>Super Admin</option>
-                        <option value={1}>Admin</option>
-                        <option value={2}>User</option>
+                        <option value={0}>Admin</option>
+                        <option value={1}>Pelintas</option>
+                        <option value={2}>Register</option>
                     </select>
                 </div>
             </div>
@@ -341,9 +341,9 @@ const UserManagement = () => {
                 <div>
                     <span>Role :</span>
                     <select value={formData.role || ''} onChange={handleChange}>
-                        <option value={0}>Super Admin</option>
-                        <option value={1}>Admin</option>
-                        <option value={2}>User</option>
+                        <option value={0}>Admin</option>
+                        <option value={1}>Pelintas</option>
+                        <option value={2}>Register</option>
                     </select>
                 </div>
             </div>
@@ -366,7 +366,7 @@ const UserManagement = () => {
                 <td>{row?.petugas?.gender == "M" ? "Laki-laki" : "Perempuan"}</td>
                 <td>{row?.petugas?.tanggal_lahir}</td>
                 <td>{row?.jabatan?.nama_jabatan}</td>
-                <td>{row?.role === 0 ? "Super Admin" : row?.role === 1 ? "admin" : "user"}</td>
+                <td>{row?.role === 0 ? "Admin" : row?.role === 1 ? "Pelintas" : "Register"}</td>
                 {userInfo.role == 0 && <td className='button-action'><button onClick={() => editModal(row)}>Edit</button><button onClick={() => deleteModal(row)}>Delete</button></td>}
             </>
         )

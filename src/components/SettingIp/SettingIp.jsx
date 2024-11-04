@@ -91,12 +91,14 @@ const SettingIp = () => {
         if (websocketIp) {
             const socket_server_4010 = io(`http://${websocketIp}:4010`);
             const sendDataToWs = {
-                ipServerCamera: [params]
+                ipServerCamera: [params],
+                operationalStatus: operationalStatus ? "Arrival" : "Departure"
             }
 
             const sendDataToWsEdit = {
                 oldIp: ipEdit,
-                newIp: dataApiKemera.ipAddress
+                newIp: dataApiKemera.ipAddress,
+                operationalStatus: operationalStatus ? "Arrival" : "Departure"
             }
 
             if (action === "add") {
@@ -198,6 +200,7 @@ const SettingIp = () => {
                 title: 'Please Input Ip Server'
             });
         }
+
     }
 
     const handleCheckStatus = () => {
