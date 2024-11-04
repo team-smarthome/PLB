@@ -1,12 +1,23 @@
 import React from 'react';
 import './tablelog.style.css';
 
-const TableLog = ({ tHeader, tBody, handler = () => { }, isAction = false, onEdit = () => { }, onDelete = () => { }, rowRenderer = null }) => {
+const TableLog = ({
+    tHeader,
+    tBody,
+    handler = () => {},
+    isAction = false,
+    onEdit = () => {},
+    onDelete = () => {},
+    rowRenderer = null,
+    showIndex = true // New prop to control visibility of index column
+}) => {
+
     return (
         <div className="table-container">
             <table>
                 <thead>
                     <tr>
+                        {showIndex && <th>No.</th>} {/* Conditional rendering of the "No." header */}
                         {tHeader.map((header, index) => (
                             <th key={index}>{header}</th>
                         ))}
@@ -15,12 +26,14 @@ const TableLog = ({ tHeader, tBody, handler = () => { }, isAction = false, onEdi
                 <tbody>
                     {tBody.length === 0 ? (
                         <tr>
-                            <td colSpan={tHeader.length} style={{ textAlign: 'center' }}>No data available</td>
+                            <td colSpan={tHeader.length + (showIndex ? 1 : 0)} style={{ textAlign: 'center' }}>
+                                No data available
+                            </td>
                         </tr>
                     ) : (
                         tBody.map((row, index) => (
                             <tr key={index} onClick={() => handler(row, index)} style={{ cursor: 'pointer' }}>
-                                <td>{index + 1}</td>
+                                {showIndex && <td>{index + 1}</td>} {/* Conditional rendering of the index cell */}
                                 {rowRenderer ? rowRenderer(row) : (
                                     <>
                                         {Object.keys(row).map((key, cellIndex) => (
