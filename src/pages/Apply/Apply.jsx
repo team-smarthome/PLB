@@ -7,7 +7,7 @@ import dataPasporImg from "../../utils/dataPhotoPaspor";
 import "./ApplyStyle.css";
 import Swal from "sweetalert2";
 import { Toast } from "../../components/Toast/Toast";
-import { formData, resultDataScan, caputedImageAfter } from "../../utils/atomStates";
+import { formData, resultDataScan, caputedImageAfter, ImageDocumentPLB } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
 import { apiInsertDataUser, getAllNegaraData, getUserbyPassport } from "../../services/api";
@@ -236,11 +236,11 @@ const Apply = () => {
   //   };
   // };
 
-  const closeWebSocket = () => {
-    if (socketRef.current) {
-      socketRef.current.close();
-    }
-  };
+  // const closeWebSocket = () => {
+  //   if (socketRef.current) {
+  //     socketRef.current.close();
+  //   }
+  // };
 
   // useEffect(() => {
   //   connectWebSocket(null, socket_IO_4010);
@@ -280,7 +280,7 @@ const Apply = () => {
   const updateSharedData = (newSharedData) => {
     setSharedData(newSharedData);
   };
-  const [resDataScan, setResDataScan] = useAtom(resultDataScan)
+  const [resDataScan, setResDataScan] = useAtom(ImageDocumentPLB)
   const [caputedImageAfter2, setCaputedImageAfter2] = useAtom(caputedImageAfter)
   const btnOnClick_Back = () => {
     setResDataScan("")
@@ -363,20 +363,20 @@ const Apply = () => {
             confirmButtonColor: "#3d5889",
           });
         }
-        // else if (
-        //   isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
-        //   isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
-        //   isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
-        //   isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
-        //   isEmptyOrNull(dataChecked.nationality) || !hasProperty(dataChecked, "nationality")
-        // ) {
-        //   Swal.fire({
-        //     icon: "error",
-        //     title: "Have empty data",
-        //     text: "Please check your data",
-        //     confirmButtonColor: "#3d5889",
-        //   });
-        // } 
+        else if (
+          isEmptyOrNull(dataChecked.docNumber) || !hasProperty(dataChecked, "docNumber") ||
+          isEmptyOrNull(dataChecked.fullName) || !hasProperty(dataChecked, "fullName") ||
+          isEmptyOrNull(dataChecked.formattedBirthDate) || !hasProperty(dataChecked, "formattedBirthDate") ||
+          isEmptyOrNull(dataChecked.sex) || !hasProperty(dataChecked, "sex") ||
+          isEmptyOrNull(dataChecked.nationality) || !hasProperty(dataChecked, "nationality")
+        ) {
+          Swal.fire({
+            icon: "error",
+            title: "Have empty data",
+            text: "Please check your data",
+            confirmButtonColor: "#3d5889",
+          });
+        }
         else {
           setCardStatus("lookCamera");
           setTabStatus(2);

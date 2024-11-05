@@ -15,13 +15,15 @@ import dataNegara from "../../utils/dataNegara";
 import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import { useAtom } from "jotai";
-import { imageToSend, resultDataScan, caputedImageAfter } from "../../utils/atomStates";
-import { initiateSocket, addPendingRequest } from "../../utils/socket";
+import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB } from "../../utils/atomStates";
+import { initiateSocket, addPendingRequest, initiateSocket4040 } from "../../utils/socket";
+import { FaRegIdCard } from "react-icons/fa";
 
 // const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
+	const [documentPLBImage, setDocumentPLBImage] = useAtom(ImageDocumentPLB)
 	const [capturedImageAfter2, setCapturedImageAfter2] = useAtom(caputedImageAfter);
 	const { data } = useContext(DataContext);
 	const [capturedImage, setCapturedImage] = useState(null);
@@ -56,9 +58,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	}));
 
 	const [numberPassport, setNumberPassport] = useState(null);
-	// const socket_IO_4000 = io("http://localhost:4000");
 
 	const socket_IO_4000 = initiateSocket();
+
+	const socket_IO_4040 = initiateSocket4040();
 
 	useEffect(() => {
 		socket_IO_4000.on("photo_taken", (imageBase64) => {
@@ -112,6 +115,51 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 
 
+	useEffect(() => {
+		socket_IO_4040.on("document-data", (data) => {
+			if (data.image) {
+				setDocumentPLBImage(data?.image)
+				sendDataToInput({
+					statusCardBox: 'getDocumentSucces',
+					capturedImage: null,
+					emailUser: null,
+					titleHeader: "Registrasi Pas Lintas Batas",
+					titleFooter: "Next Step",
+				});
+			} else if (data.error) {
+				sendDataToInput({
+					statusCardBox: data?.error,
+					capturedImage: null,
+					emailUser: null,
+					titleHeader: "Registrasi Pas Lintas Batas",
+					titleFooter: "Next Step",
+				});
+				setTimeout(() => {
+					sendDataToInput({
+						statusCardBox: 'iddle',
+						capturedImage: null,
+						emailUser: null,
+						titleHeader: "Registrasi Pas Lintas Batas",
+						titleFooter: "Next Step",
+					});
+				}, 3000)
+			} else {
+				console.error("test12345", data);
+			}
+			// console.log('document-data', imageBase64)
+
+			// setResDataScan(imageBase64);
+			// sendDataToInput({
+			// 	statusCardBox: "success",
+			// 	capturedImage: null,
+			// 	emailUser: null,
+			// 	titleHeader: "Registrasi Pas Lintas Batas",
+			// 	titleFooter: "Next Step",
+			// });
+		});
+	}, [socket_IO_4040]);
+
+
 	const handleTakePhoto = async () => {
 		if (socket_IO_4000.connected) {
 			console.log('testWebsocket Socket connected. Sending take_photo...');
@@ -124,7 +172,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				titleFooter: "Next Step",
 			});
 		} else {
-			console.log('testWebsocket Socket not connected. Retrying...');
 			sendDataToInput({
 				statusCardBox: "errorWebsocket",
 				capturedImage: null,
@@ -150,9 +197,46 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		}
 	};
 
+
+	const handleGetDocumnet = async () => {
+		console.log('testWebsocket Socket connected. Sending get_document...');
+		if (socket_IO_4040.connected) {
+			console.log('testWebsocket Socket connected. Sending get_document...');
+			socket_IO_4040.emit("get-document");
+			sendDataToInput({
+				statusCardBox: "waiting3",
+				capturedImage: capturedImage,
+				emailUser: null,
+				titleHeader: "Registrasi Pas Lintas Batas",
+				titleFooter: "Next Step",
+			});
+		} else {
+			sendDataToInput({
+				statusCardBox: "errorWebsocket",
+				capturedImage: null,
+				emailUser: null,
+				titleHeader: "Registrasi Pas Lintas Batas",
+				titleFooter: "Next Step",
+			});
+			addPendingRequest({ action: 'get-documnent' });
+
+			socket_IO_4040.connect();
+		}
+	};
+
 	const handleReloadPhoto = () => {
 		sendDataToInput({
 			statusCardBox: "lookCamera",
+			capturedImage: null,
+			emailUser: email,
+			titleHeader: "Registrasi Pas Lintas Batas",
+			titleFooter: "Next Step",
+		});
+	};
+
+	const handleReloadGetDocument = () => {
+		sendDataToInput({
+			statusCardBox: "iddle",
 			capturedImage: null,
 			emailUser: email,
 			titleHeader: "Registrasi Pas Lintas Batas",
@@ -169,6 +253,19 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		setCapturedImage(null);
 		sendDataToInput({
 			statusCardBox: "lookCamera",
+			capturedImage: null,
+			emailUser: email,
+			titleHeader: "Registrasi Pas Lintas Batas",
+			titleFooter: "Next Step",
+		});
+	};
+
+
+	const doRetakeDocument = () => {
+		// socket_IO_4000.emit("start_stream");
+		setDocumentPLBImage(null);
+		sendDataToInput({
+			statusCardBox: "iddle",
 			capturedImage: null,
 			emailUser: email,
 			titleHeader: "Registrasi Pas Lintas Batas",
@@ -628,6 +725,24 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						</button>
 					</>
 				);
+			case "waiting3":
+				return (
+					<>
+
+						<div className="w-[70%]  flex justify-center flex-col items-center gap-10">
+							<h1 className="card-title check-data-title">
+								Please wait...
+							</h1>
+							<button
+								className="ok-button"
+								onClick={handleReloadGetDocument}
+							>
+								Reload Get Document
+							</button>
+						</div>
+
+					</>
+				);
 			case "notFoundPassport":
 				return (
 					<>
@@ -635,7 +750,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						<img src={Gambar3} alt="" className="card-image" />
 					</>
 				);
-
 			case "lookCamera":
 				return (
 					<>
@@ -643,19 +757,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 							Please look at the camera
 						</h1>
 						<div style={{ height: "180px" }}>
-							{/* <p>ini adalah {urlKamera}</p> */}
 							<VideoPlayer url={'http://localhost:4001/stream_.m3u8'} />
-							{/* {streamKamera ? (
-                <ReactPlayer
-                  className="react-player"
-                  url="http://localhost:4000/192.168.30.170_.m3u8"
-                  width="100%"
-                  height="100%"
-                  playing={true}
-                />
-              ) : (
-                <h1 className="card-title2 check-data-title">Please wait...</h1>
-              )} */}
 						</div >
 						<button className="ok-button" onClick={handleTakePhoto}>
 							Take a face photo
@@ -669,6 +771,34 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "usingHat":
 			case "usingMaskGlasses":
 			case "occlusionImage":
+				return (
+					<>
+						<h1 className="card-title">
+							{getStatusHeaderText().map((text, index) => (
+								<React.Fragment key={index}>
+									{text}
+									<br />
+								</React.Fragment>
+							))}
+						</h1>
+						<img src={Gambar3} alt="" className="card-image" />
+					</>
+				);
+			case "error_image":
+				return (
+					<>
+						<h1 className="card-title">
+							{getStatusHeaderText().map((text, index) => (
+								<React.Fragment key={index}>
+									{text}
+									<br />
+								</React.Fragment>
+							))}
+						</h1>
+						<img src={Gambar3} alt="" className="card-image" />
+					</>
+				);
+			case "error_folder":
 				return (
 					<>
 						<h1 className="card-title">
@@ -704,6 +834,36 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 								</div>
 								<button
 									onClick={doRetake}
+									className="retake-button"
+								>
+									Retake
+								</button>
+							</div>
+						)}
+					</>
+				);
+			case "getDocumentSucces":
+				return (
+					<>
+						{documentPLBImage && (
+							<div className="container-box-image">
+								<h1 className="card-title">
+									Succes Get Document
+								</h1>
+
+								<div className="box-image">
+									<img
+										style={{
+											width: "100vh",
+											height: "30vh",
+										}}
+										src={`data:image/jpeg;base64,${documentPLBImage ? documentPLBImage : ""}`}
+										alt="Captured Image"
+										className="potrait-image"
+									/>
+								</div>
+								<button
+									onClick={doRetakeDocument}
 									className="retake-button"
 								>
 									Retake
@@ -785,7 +945,38 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						</>
 					</>
 				);
+			case "errorWebsocket":
+				return (
+					<>
+						<h1 className="card-title">
+							{getStatusHeaderText().map((text, index) => (
+								<React.Fragment key={index}>
+									{text}
+									<br />
+								</React.Fragment>
+							))}
+						</h1>
+						<img src={Gambar1} alt="" className="card-image" />
+					</>
+				);
 			default:
+				return (
+					<>
+
+						<div className="h-64 w-[80%]  flex flex-col justify-center items-center">
+							<h1 className="card-title">
+								Scan Document PLB
+							</h1>
+							<FaRegIdCard className="h-[80%] w-[80%]" />
+						</div >
+						<p className="text-black text-md mt-2">
+							Please wait until scanning proccess is complete then clik the button below
+						</p>
+						<button className="ok-button" onClick={handleGetDocumnet}>
+							Get Document PLB
+						</button>
+					</>
+				);
 				return (
 					<>
 						<h1 className="card-title">
@@ -835,6 +1026,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case 'usingHat':
 			case 'usingMaskGlasses':
 			case 'occlusionImage':
+			case 'error_image':
+			case 'error_folder':
 				return Gambar3;
 			case "lookCamera":
 				return Gambar6;
@@ -863,6 +1056,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					"Passport has not successfully",
 					"scanned. Please rescan",
 				];
+			case "error_image":
+				return ["Image Not Found", "Please Scan Again"];
+			case "error_folder":
+				return ["Folder Not Found", "Please Check Your Directory"];
 			case "closedEyes":
 				return ["Please Open Your Eyes", "Before Take Photo"];
 			case "usingMask":
@@ -876,7 +1073,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "usingMaskGlasses":
 				return ["Please Remove Mask and Glasses", "Before Take Photo"];
 			case "occlusionImage":
-				return ["Photo Occlusion", "Please Try Again"];
+				return ["Invalid Capture", "Please Try Again"];
 			case "errorVoa":
 				return ["Your Country is not eligible", "for Apply PLB"];
 			case "errorBulan":
