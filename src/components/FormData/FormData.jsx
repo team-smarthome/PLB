@@ -22,7 +22,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     destination_location: "",
     photo: "",
   };
-
+ 
 
   const [formdata, setFormData] = useState(initialFormData);
 
@@ -334,12 +334,14 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="arrivalTime">Arrival Time</label>
+              <label htmlFor="arrivalTime">Registration Date</label>
             </div>
             <input
               type="date"
               name="arrivalTime"
               id="arrivalTime"
+              readOnly
+              defaultValue={new Date().toISOString().split('T')[0]}
               value={formdata.arrivalTime}
               onChange={handleInputChange}
               className="disabled-input"

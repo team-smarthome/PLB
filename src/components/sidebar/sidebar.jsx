@@ -24,6 +24,7 @@ const Sidebar = ({ isOpen }) => {
     };
 
     const handleSettingToggle = (menuKey) => {
+        console.log(menuKey, "jalan gk tan")
         setMenuSetting((prevState) => ({
             ...prevState,
             [menuKey]: !prevState[menuKey],
@@ -71,7 +72,7 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
                     </ul>
                 )}
-                {userInfo.role === 0 || userInfo.role === 1 && (
+                {(userInfo.role === 0 || userInfo.role === 1) && (
                     <li>
                         <div className="icon-link" onClick={() => handleSettingToggle("setting")}>
                             <a>
@@ -82,7 +83,7 @@ const Sidebar = ({ isOpen }) => {
                         </div>
                     </li>
                 )}
-                {(userInfo.role === 0 || userInfo.role === 1 && menuSetting.setting) && (
+                {((userInfo.role === 0 || userInfo.role === 1) && menuSetting.setting) && (
                     <ul className="sub-menu-link">
                         <Link to='/cpanel/setting-server' className={`link ${isActive('/cpanel/setting-server') ? 'active' : ''}`}>
                             <FaServer
@@ -140,12 +141,12 @@ const Sidebar = ({ isOpen }) => {
                     </ul>
                 )}
 
-                <li>
+                {/* <li>
                     <Link to='/cpanel/camera-settings' className={`link ${isActive('/cpanel/camera-settings') ? 'active' : ''}`}>
                         <IoSpeedometer  size={30} style={{ marginRight: '10px' }} />
                         <span className="link_name">Camera Settings</span>
                     </Link>
-                </li>
+                </li> */}
 
                 {/* <li>
                     <Link to='/cpanel/country' className={`link ${isActive('/cpanel/country') ? 'active' : ''}`}>
