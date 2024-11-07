@@ -11,6 +11,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie';
 import './logregister.style.css'
 import { MdOutlineBrokenImage } from "react-icons/md";
+import Pagination from '../../components/Pagination/Pagination'
 
 const LogRegister = () => {
     const userCookie = Cookies.get('userdata')
@@ -20,7 +21,9 @@ const LogRegister = () => {
     const [showModalEdit, setShowModalEdit] = useState(false)
     const [showModalDelete, setShowModalDelete] = useState(false)
     const [status, setStatus] = useState("loading")
+    const [totalDataFilter, setTotalDataFilter] = useState(0);
     const [isErrorImage, setIsErrorImage] = useState(false);
+    const [page, setPage] = useState(1);
     const [detailData, setDetailData] = useState({
         passport_number: "",
         // register_code: "",
@@ -34,6 +37,12 @@ const LogRegister = () => {
         profile_image: ""
 
     })
+    const [pagination, setPagination] = useState({
+        total: 0,
+        per_page: 10,
+        current_page: 1,
+        last_page: 1,
+    });
     const [search, setSearch] = useState({
         name: "",
         no_passport: "",
@@ -54,9 +63,11 @@ const LogRegister = () => {
                 ...search
             })
             if (res.status == 200) {
-                console.log(res.data.data, "res.data.data")
+                console.log(res.data, "consoleRegiste")
                 setStatus("success")
                 setLogData(res.data.data)
+                setPagination(response?.data?.pagination);
+                setTotalDataFilter(response?.data?.data?.length);
             }
         } catch (error) {
             console.log(error)
@@ -130,6 +141,9 @@ const LogRegister = () => {
                 })
             }
         } catch (error) {
+            getLogRegister()
+            setStatus("success")
+            setShowModalDelete(false)
             console.log(error)
         }
     }
@@ -150,27 +164,28 @@ const LogRegister = () => {
         }
     };
 
+    const handleError = () => {
+        setIsErrorImage(true);
+    };
+
     const customRowRenderer = (row) => (
         <>
             <td>{row.no_passport}</td>
-            {/* <td>{row.no_register}</td> */}
             <td>{row.name}</td>
             <td>{row.gender === "M" ? "Male" : "Female"}</td>
             <td>{row.nationality}</td>
             <td>
-                {isErrorImage ? (<MdOutlineBrokenImage size={50} />
-                ) : (
-                    <>
-                        <img
-                            src={`data:image/jpeg;base64,${row.profile_image}`}
-                            alt="Profile"
-                            width={100}
-                            height={100}
-                            style={{ borderRadius: "50%" }}
-                            onError={() => setIsErrorImage(true)}
-                        />
-                    </>
-                )}
+                <>
+                    <img
+                        src={`data:image/jpeg;base64,${row.profile_image}`}
+                        alt="Profile"
+                        width={100}
+                        height={100}
+                        style={{ borderRadius: '50%' }}
+                        onError={handleError}
+                    />
+
+                </>
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
                 <button onClick={() => openModalEdit(row)}>Edit</button>
@@ -601,12 +616,25 @@ const LogRegister = () => {
                     <span className="loader-loading-table"></span>
                 </div>
             )}
-            {status === "success" && logData && <TableLog
-                tHeader={['No', 'no plb', 'name', 'gender', 'nationality', 'profile image', "action"]}
-                tBody={logData}
-                // handler={getDetailData}
-                rowRenderer={customRowRenderer}
-            />}
+            {status === "success" && logData &&
+                <>
+                    <TableLog
+                        tHeader={['no plb', 'name', 'gender', 'nationality', 'profile image', "action"]}
+                        tBody={logData}
+                        page={page}
+                        showIndex={true}
+                        // handler={getDetailData}
+                        rowRenderer={customRowRenderer}
+                    />
+                    <div className="table-footer">
+                        <>Show {totalDataFilter} of {pagination?.total} entries</>
+                        <Pagination
+                            pageCount={pagination?.last_page}
+                            onPageChange={(selectedPage) => setPage(selectedPage)}
+                        />
+                    </div>
+                </>
+            }
             {/* <Modals
                 showModal={showModalAdd}
                 buttonName="Submit"

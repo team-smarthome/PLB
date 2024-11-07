@@ -66,6 +66,7 @@ const SettingIp = () => {
         closeModalAdd()
         closeModalDelete()
         setStatus("loading")
+        closeModalEdit()
 
         //keep it
         // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
@@ -103,7 +104,7 @@ const SettingIp = () => {
 
             if (action === "add") {
                 socket_server_4010.emit("saveCameraData", sendDataToWs);
-                socket_server_4010.on('saveDataCamera', (data) => {
+                socket_server_4010.once('saveDataCamera', (data) => {
                     if (data === "successfully") {
                         const insertIpKamera = apiInsertIP(dataApiKemera);
                         insertIpKamera.then((res) => {
@@ -693,9 +694,9 @@ const SettingIp = () => {
                             <Select
                                 options={[
                                     { value: "", label: "All Camera Name" },
-                                    ...listCamera.map((item) => ({
-                                        value: item.namaKamera,
-                                        label: item.namaKamera,
+                                    ...Array.from(new Set(listCamera.map(item => item.namaKamera))).map(namaKamera => ({
+                                        value: namaKamera,
+                                        label: namaKamera,
                                     })),
                                 ]}
                                 placeholder="Select Camera Name"
@@ -726,9 +727,11 @@ const SettingIp = () => {
                             <Select
                                 options={[
                                     { value: "", label: "All Camera IP" },
-                                    ...listCamera.map((item) => ({
-                                        value: item.ipAddress,
-                                        label: item.ipAddress,
+                                    ...Array.from(
+                                        new Set(listCamera.map((item) => item.ipAddress))
+                                    ).map((uniqueIp) => ({
+                                        value: uniqueIp,
+                                        label: uniqueIp,
                                     })),
                                 ]}
                                 placeholder="Select Camera IP"
@@ -938,8 +941,9 @@ const SettingIp = () => {
                     status === "success" &&
                     <>
                         <TableLog
-                            tHeader={['no', 'Nama Kamera', "Ip Address", "Depart Status", "Status", "Action"]}
+                            tHeader={['Nama Kamera', "Ip Address", "Depart Status", "Status", "Action"]}
                             tBody={listCamera}
+                            showIndex={true}
                             rowRenderer={customRowRenderer}
                         />
                     </>

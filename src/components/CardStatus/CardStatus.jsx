@@ -18,7 +18,7 @@ import { useAtom } from "jotai";
 import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB } from "../../utils/atomStates";
 import { initiateSocket, addPendingRequest, initiateSocket4040 } from "../../utils/socket";
 import { FaRegIdCard } from "react-icons/fa";
-
+import ImgsViewer from "react-images-viewer";
 // const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
@@ -59,6 +59,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	const [numberPassport, setNumberPassport] = useState(null);
 
+	const [isOpenImage, setIsOpenImage] = useState(false)
+	const [resultArray, setResultArray] = useState([])
+
+	const handlePreviewImage = (image) => {
+		setIsOpenImage(true)
+		setResultArray([{
+			src: image
+		}])
+	}
 	const socket_IO_4000 = initiateSocket();
 
 	const socket_IO_4040 = initiateSocket4040();
@@ -851,7 +860,9 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 									Succes Get Document
 								</h1>
 
-								<div className="box-image">
+								<div className="box-image cursor-pointer"
+									onClick={() => handlePreviewImage(`data:image/jpeg;base64,${documentPLBImage}`)}
+								>
 									<img
 										style={{
 											width: "100vh",
@@ -1116,6 +1127,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			<div className="card-container">
 				<div className="inner-card">{renderCardContent()}</div>
 			</div>
+			<ImgsViewer
+				imgs={resultArray}
+				isOpen={isOpenImage}
+				onClose={() => { setIsOpenImage(false) }}
+			/>
 		</div>
 	);
 };

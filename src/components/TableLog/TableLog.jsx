@@ -4,12 +4,14 @@ import './tablelog.style.css';
 const TableLog = ({
     tHeader,
     tBody,
-    handler = () => {},
+    handler = () => { },
     isAction = false,
-    onEdit = () => {},
-    onDelete = () => {},
+    onEdit = () => { },
+    onDelete = () => { },
     rowRenderer = null,
-    showIndex = true // New prop to control visibility of index column
+    showIndex = false,
+    page = 1,
+    perPage = 20 // jumlah data per halaman, default 20
 }) => {
 
     return (
@@ -33,7 +35,7 @@ const TableLog = ({
                     ) : (
                         tBody.map((row, index) => (
                             <tr key={index} onClick={() => handler(row, index)} style={{ cursor: 'pointer' }}>
-                                {showIndex && <td>{index + 1}</td>} {/* Conditional rendering of the index cell */}
+                                {showIndex && <td>{(page - 1) * perPage + index + 1}</td>} {/* Adjusted index */}
                                 {rowRenderer ? rowRenderer(row) : (
                                     <>
                                         {Object.keys(row).map((key, cellIndex) => (

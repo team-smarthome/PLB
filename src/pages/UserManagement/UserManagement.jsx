@@ -468,10 +468,11 @@ const UserManagement = () => {
                     ) : (
                         <>
                             <TableLog
-                                tHeader={userInfo.role == 0 ? ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
+                                tHeader={userInfo.role == 0 ? ['nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
                                 tBody={dataPetugas}
                                 onEdit={editModal}
                                 onDelete={deleteModal}
+                                showIndex={true}
                                 rowRenderer={customRowRenderer}
                             />
                             {renderPaginationControls()}
