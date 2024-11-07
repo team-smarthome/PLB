@@ -183,7 +183,7 @@ const LogFaceReg = () => {
         try {
             const response = await getDataLogApi(params);
             setStatus("success")
-            console.log(response.data.data, "dataLog")
+            console.log(response.data, "dataLog")
             setLogData(response.data.data)
             setTotalDataFilter(response?.data?.data?.length);
             setPagination(response?.data?.pagination);
@@ -197,7 +197,7 @@ const LogFaceReg = () => {
         try {
             const response = await getDataLogApi(params);
             setStatus("success")
-            console.log(response.data.data, "dataLog")
+            console.log(response.data, "dataLog2")
             setLogData(response.data.data)
             setTotalDataFilter(response?.data?.data?.length);
             console.log(response?.data?.pagination, "paginationyamase2");
@@ -354,7 +354,6 @@ const LogFaceReg = () => {
                 {!selectedOption.includes("192.168") ? (
                     <>
                         <td>{row?.personId}</td>
-                        {/* <td>{row?.personCode}</td> */}
                         <td>{row?.name}</td>
                         <td>{row?.similarity}</td>
                         <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
@@ -374,7 +373,6 @@ const LogFaceReg = () => {
                 ) : (
                     <>
                         <td>{row?.personId}</td>
-                        {/* <td>{row?.personCode}</td> */}
                         <td>{row?.name}</td>
                         <td>{row?.images_info?.[0]?.similarity ?? row?.similarity}</td>
                         <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
@@ -691,10 +689,12 @@ const LogFaceReg = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
+                        tHeader={['no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
                         tBody={logData}
                         handler={handleOpenImage}
                         rowRenderer={customRowRenderer}
+                        showIndex={true}
+                        page={page}
                     />
                     {!disablePaginate && (
                         <div className="table-footer">

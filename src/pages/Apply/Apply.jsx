@@ -285,13 +285,13 @@ const Apply = () => {
   const btnOnClick_Back = () => {
     setResDataScan("")
     navigate('/home')
-    if (!isOnline) {
-      Toast.fire({
-        icon: "error",
-        title: "No Internet Connection",
-      });
-      return;
-    }
+    // if (!isOnline) {
+    //   Toast.fire({
+    //     icon: "error",
+    //     title: "No Internet Connection",
+    //   });
+    //   return;
+    // }
 
     if (isEnableBack) {
       console.log("cardStatusSaatIni", cardStatus);
@@ -341,17 +341,22 @@ const Apply = () => {
     return Object.prototype.hasOwnProperty.call(obj, prop);
   }
 
+  useEffect(() => {
+    if (cardStatus === 'takePhotoSucces') {
+      setTitleFooter('Check Cekal')
+    }
+  }, [cardStatus])
 
   const btnOnClick_Step = () => {
-    if (!isOnline) {
-      Toast.fire({
-        icon: "error",
-        title: "No Internet Connection",
-      });
-      return;
-    }
+    // if (!isOnline) {
+    //   Toast.fire({
+    //     icon: "error",
+    //     title: "No Internet Connection",
+    //   });
+    //   return;
+    // }
     if (isEnableStep) {
-      if (cardStatus === "checkData" || cardStatus === "iddle") {
+      if (cardStatus === "checkData" || cardStatus === "iddle" || cardStatus === "getDocumentSucces") {
         const dataChecked = sharedData?.passportData;
         console.log("dataChecked", dataChecked);
 
@@ -382,6 +387,7 @@ const Apply = () => {
           setTabStatus(2);
         }
       } else if (cardStatus === "takePhotoSucces") {
+        //cek cekal
         setFormData(sharedData);
         setDataPermohonan(sharedData);
         doSaveRequestVoaPayment(sharedData);
@@ -397,6 +403,7 @@ const Apply = () => {
           isPyamentUrl: false,
           isPhoto: false,
         });
+
       } else if (titleFooter === "Payment" && !cardPaymentProps.isDoRetake) {
         setCardStatus("goPayment");
         setTitleHeader("Payment");
@@ -578,6 +585,15 @@ const Apply = () => {
 
 
   const doSaveRequestVoaPayment = async (sharedData) => {
+
+    //tinggal minta api ke topik
+
+    // const checkCekal 
+
+    return console.log("cekCekalDulu")
+
+
+
 
     const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
     console.log("checkDataUser", checkDataUser.data.data);
