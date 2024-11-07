@@ -4,6 +4,18 @@ import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
 import NoProfile from '../../assets/images/no-profile-picture.svg'
+import moment from 'moment';
+
+const localDate = new Date();
+
+// Format the date as YYYY-MM-DD
+const dateString = localDate.toISOString().split('T')[0];
+
+// Format the time as HH:MM (local time)
+const timeString = localDate.getHours().toString().padStart(2, '0') + ':' + localDate.getMinutes().toString().padStart(2, '0');
+
+// Combine both date and time for datetime-local input
+const dateTimeString = `${dateString}T${timeString}`;
 
 const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
 
@@ -18,13 +30,67 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     sex: "",
     nationality: "",
     expiry_date: "",
-    arrivaltime: new Date().toISOString().split('T')[0],
+    arrivaltime: dateTimeString,
     destination_location: "",
     photo: "",
   };
  
 
   const [formdata, setFormData] = useState(initialFormData);
+
+  const [rawDateInput, setRawDateInput] = useState(''); 
+  const [rawDateTimeInput, setRawDateTimeInput] = useState(''); // Separate state to hold raw input
+
+  const handleDateChange = (e) => {
+    const value = e.target.value;
+
+    // Regex to match partial or complete date in format YYYY-MM-DD
+    const datePattern = /^\d{0,4}(-\d{0,2})?(-\d{0,2})?$/;
+
+    // Update raw input for partial typing and restrict to pattern
+    if (datePattern.test(value)) {
+      setRawDateInput(value);
+
+      // Only update formdata when the input is a complete and valid date
+      if (moment(value, "YYYY-MM-DD", true).isValid()) {
+        // console.log(value)
+        setFormData({
+          ...formdata,
+          date_of_birth: value,
+        });
+      }
+    }
+  };
+  
+  const handleDateTimeChange = (e) => {
+    const value = e.target.value;
+
+    // Regex for validating the format: DD/MM/YYYY HH:MM, with a 4-digit year
+    const dateTimePattern = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
+
+    // Allow partial input and make sure we don't lose data
+    if (dateTimePattern.test(value) || value === '' || value.length <= 16) {
+      setRawDateTimeInput(value);
+
+      // Only update formdata when the input is a complete and valid datetime
+      // if (moment(value, "DD/MM/YYYY HH:mm", true).isValid()) {
+      
+        setFormData({
+          ...formdata,
+          expiry_date: value,
+        });
+      }
+    // } else if (value.length <= 16) {
+      
+      // Allow up to 16 characters (for DD/MM/YYYY HH:MM format)
+      setRawDateTimeInput(value);
+    // }
+  };
+  
+  // useEffect(() => {
+    
+  // }, [])
+  
 
   useEffect(() => {
     const dataNationality = dataNegara.data.map((negara) => ({
@@ -161,6 +227,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     e.preventDefault();
   };
 
+
   return (
     <div className="container-form">
       <form onSubmit={handleSubmit} className="full-width-form">
@@ -215,15 +282,15 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="date_of_birth">Date of Birth</label>
+              <label htmlFor="">Date of Birth (DD/MM/YYYY)</label>
             </div>
             <input
               type="date"
               name="formattedBirthDate"
               id="date_of_birth"
-              value={formdata.date_of_birth}
-              onChange={handleInputChange}
-              className="disabled-input"
+              value={rawDateInput} // Bind raw input value
+              onChange={handleDateChange}
+              className="enable-input"
             />
           </div>
         </div>
@@ -318,14 +385,15 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="expiry_date">Expired Date</label>
+              <label htmlFor="expiry_date">Expired Date <span className="">(DD/MM/YYYY HH:MM)</span></label>
             </div>
             <input
-              type="date"
+              type="datetime-local"
               name="formattedExpiryDate"
               id="expiry_date"
-              value={formdata.expiry_date}
-              onChange={handleInputChange}
+              placeholder="DD/MM/YYYY HH:MM"
+              value={rawDateTimeInput} // Bind raw input value
+              onChange={handleDateTimeChange}
               className="disabled-input"
             />
           </div>
@@ -337,11 +405,11 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
               <label htmlFor="arrivalTime">Registration Date</label>
             </div>
             <input
-              type="date"
+              type="datetime-local"
               name="arrivalTime"
               id="arrivalTime"
               readOnly
-              defaultValue={new Date().toISOString().split('T')[0]}
+              defaultValue={dateTimeString}
               value={formdata.arrivalTime}
               onChange={handleInputChange}
               className="disabled-input"
