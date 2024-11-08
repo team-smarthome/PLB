@@ -52,13 +52,13 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
       setRawDateInput(value);
 
       // Only update formdata when the input is a complete and valid date
-      if (moment(value, "YYYY-MM-DD", true).isValid()) {
+      // if (moment(value, "YYYY-MM-DD", true).isValid()) {
         // console.log(value)
         setFormData({
           ...formdata,
           date_of_birth: value,
         });
-      }
+      // }
     }
   };
   
@@ -88,7 +88,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
   };
   
   // useEffect(() => {
-    
+  //   console.log(formdata, "formData")  
   // }, [])
   
 
@@ -409,8 +409,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
               name="arrivalTime"
               id="arrivalTime"
               readOnly
-              // defaultValue={dateTimeString}
-              value={formdata.arrivalTime}
+              defaultValue={formdata.arrivalTime}
+              // value={formdata.arrivalTime}
               onChange={handleInputChange}
               className="disabled-input"
             />
