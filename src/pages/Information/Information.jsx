@@ -61,7 +61,7 @@ const Information = () => {
 			icon: FaRegUserCircle,
 		},
 		{
-			name: "Change Password",
+			name: "Ubah Password",
 			icon: RiLockPasswordLine,
 		},
 		{
@@ -69,7 +69,7 @@ const Information = () => {
 			icon: TbNetwork,
 		},
 		{
-			name: "Test Camera",
+			name: "Test Kamera",
 			icon: IoCameraOutline,
 		},
 		{
@@ -402,14 +402,14 @@ const Information = () => {
 														autoComplete="off"
 													>
 														<h2 className="custom-heading">
-															Change Password
+															Ganti Password
 														</h2>
 														<div className="custom-input-container">
 															<label
 																htmlFor="oldPassword"
 																className="custom-label"
 															>
-																Old Password
+																Password Lama
 															</label>
 															<div className="old-pasword">
 																<input
@@ -420,7 +420,7 @@ const Information = () => {
 																	}
 																	name="oldPassword"
 																	id="oldPassword"
-																	placeholder="Enter Old Password"
+																	placeholder="Masukkan Password Lama"
 																	onChange={
 																		handleOldPasswordChange
 																	}
@@ -467,16 +467,14 @@ const Information = () => {
 																			"-0.5rem",
 																	}}
 																>
-																	Old password
-																	must not be
-																	empty
+																	Password lama tidak boleh kosong
 																</p>
 															)}
 															<label
 																htmlFor="newPassword"
 																className="custom-label"
 															>
-																New Password
+																Password Baru
 															</label>
 															<div className="old-pasword">
 																<input
@@ -487,7 +485,7 @@ const Information = () => {
 																	}
 																	name="newPassword"
 																	id="newPassword"
-																	placeholder="Enter New Password"
+																	placeholder="Masukkan Password Baru"
 																	onChange={
 																		handleNewPasswordChange
 																	}
@@ -533,16 +531,14 @@ const Information = () => {
 																			"-0.5rem",
 																	}}
 																>
-																	New password
-																	must not be
-																	empty
+																	Password baru tidak boleh kosong
 																</p>
 															)}
 															<label
 																htmlFor="confirmPassword"
 																className="custom-label"
 															>
-																Confirm Password
+																Konfirmasi Password
 															</label>
 															<div className="old-pasword">
 																<input
@@ -553,7 +549,7 @@ const Information = () => {
 																	}
 																	name="confirmPassword"
 																	id="confirmPassword"
-																	placeholder="Enter Confirm Password"
+																	placeholder="Masukkan Konfirmasi Password"
 																	onChange={
 																		handleConfirmPasswordChange
 																	}
@@ -599,9 +595,7 @@ const Information = () => {
 																			"-0.5rem",
 																	}}
 																>
-																	Confirm password
-																	must not be
-																	empty
+																	Konfirmasi Password tidak boleh kosong
 																</p>
 															)}
 														</div>
@@ -614,7 +608,7 @@ const Information = () => {
 																className="custom-button"
 															>
 																<p className="custom-button-text">
-																	Save
+																	Simpan
 																</p>
 															</button>
 														</div>
@@ -758,7 +752,7 @@ const Information = () => {
 														<div className="wrapper-form">
 															<div className="wrapper-input">
 																<label htmlFor="ip_server_camera">
-																	IP Server Camera
+																	IP Server Kamera
 																</label>
 															</div>
 															<input
@@ -787,7 +781,7 @@ const Information = () => {
 														className="ok-button"
 														style={{ width: "100%" }}
 													>
-														Save
+														Simpan
 													</button>
 												</form>
 											</>
@@ -805,7 +799,7 @@ const Information = () => {
 														className="card-title"
 														style={{ paddingTop: "5%" }}
 													>
-														Test Camera Configuration
+														Test Konfigurasi Kamera
 													</h1>
 													{streamKamera ? (
 														<>
@@ -911,7 +905,7 @@ const Information = () => {
 																	startStream
 																}
 															>
-																Start Stream Camera
+																Mulai Stream Kamera
 															</button>
 														</>
 													)}
@@ -919,8 +913,8 @@ const Information = () => {
 											</>
 										) : (
 											<>
-												<h1>Test Printer Configuration</h1>
-												<h2>Please Wait...</h2>
+												<h1>Test Konfigurasi Printer</h1>
+												<h2>Mohon Tunggu...</h2>
 											</>
 										)}
 								</>
@@ -972,7 +966,7 @@ const Information = () => {
 							onClick={handleBackToApply}
 						>
 							<img src={BackIcons} alt="back_icons" />
-							{isOpen && <span>Back to Home</span>}
+							{isOpen && <span>Kembali ke Home</span>}
 						</div>
 					</div>
 				</div>

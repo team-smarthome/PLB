@@ -976,15 +976,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 						<div className="h-64 w-[80%]  flex flex-col justify-center items-center">
 							<h1 className="card-title">
-								Scan Document PLB
+								Scan Dokumen PLB
 							</h1>
 							<FaRegIdCard className="h-[80%] w-[80%]" />
 						</div >
 						<p className="text-black text-md mt-2">
-							Please wait until scanning proccess is complete then clik the button below
+							Tunggu sampai proses pemindaian selesai, lalu klik tombol di bawah ini
 						</p>
 						<button className="ok-button" onClick={handleGetDocumnet}>
-							Get Document PLB
+							Dapatkan Dokumen PLB
 						</button>
 					</>
 				);
@@ -1059,32 +1059,46 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	const getStatusHeaderText = () => {
 		switch (statusCardBox) {
 			case "iddle":
-				return ["Scan Document PLB"];
+				return ["Scan Dokumen PLB"];
 			case "success":
-				return ["Passport has successfully", "scanned"];
+				return ["Paspor berhasil dipindai"];
+				// return ["Passport has successfully", "scanned"];
 			case "errorchecksum":
 				return [
-					"Passport has not successfully",
-					"scanned. Please rescan",
+					"Paspor belum berhasil dipindai",
+					"belum berhasil dipindai. Coba pindai lagi",
 				];
+				// return [
+				// 	"Passport has not successfully",
+				// 	"scanned. Please rescan",
+				// ];
 			case "error_image":
-				return ["Image Not Found", "Please Scan Again"];
+				return ["Gambar Tidak Ditemukan", "Silakan Pindai Ulang"];
+				// return ["Image Not Found", "Please Scan Again"];
 			case "error_folder":
-				return ["Folder Not Found", "Please Check Your Directory"];
+				return ["Folder Tidak Ditemukan", "Periksa Direktori Anda"];
+				// return ["Folder Not Found", "Please Check Your Directory"];
 			case "closedEyes":
-				return ["Please Open Your Eyes", "Before Take Photo"];
+				return ["Silahkan buka mata Anda", "Sebelum Mengambil Foto Wajah"];
+				// return ["Please Open Your Eyes", "Before Take Photo"];
 			case "usingMask":
-				return ["Please Remove Mask", "Before Take Photo"];
+				return ["Silahkan buka masker Anda", "Sebelum Mengambil Foto Wajah"];
+				// return ["Please Remove Mask", "Before Take Photo"];
 			case "usingGlasses":
-				return ["Please Remove Glasses", "Before Take Photo"];
+				return ["Silahkan buka kacamata Anda", "Sebelum Mengambil Foto Wajah"];
+				// return ["Please Remove Glasses", "Before Take Photo"];
 			case "errorPhoto":
-				return ["Error Taking Photo", "Please Try Again"];
+				return ["Terjadi Kesalahan Saat Memotret", "Coba Lagi"];
+				// return ["Error Taking Photo", "Please Try Again"];
 			case "usingHat":
-				return ["Please Remove Hat", "Before Take Photo"];
+				return ["Silahkan buka topi Anda", "Sebelum Mengambil Foto Wajah"];
+				// return ["Please Remove Hat", "Before Take Photo"];
 			case "usingMaskGlasses":
-				return ["Please Remove Mask and Glasses", "Before Take Photo"];
+				return ["Silahkan buka masker dan kacamata Anda", "Sebelum Mengambil Foto Wajah"];
+				// return ["Please Remove Mask and Glasses", "Before Take Photo"];
 			case "occlusionImage":
-				return ["Invalid Capture", "Please Try Again"];
+				return ["Pengambilan Gambar Tidak Valid", "Coba Lagi"];
+				// return ["Invalid Capture", "Please Try Again"];
 			case "errorVoa":
 				return ["Your Country is not eligible", "for Apply PLB"];
 			case "errorBulan":

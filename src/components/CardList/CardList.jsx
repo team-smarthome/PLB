@@ -16,7 +16,7 @@ const CardList = ({ status }) => {
         // console.log("DataCheck", dataCheck);
         setListData([]);
       } else {
-        setListData(["Scan Document", "Take Photo"]);
+        setListData(["Scan Dokumen", "Ambil Foto"]);
       }
     }
   }, [status]);

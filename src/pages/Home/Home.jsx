@@ -53,7 +53,7 @@ const Home = () => {
   const btnOnClick_Apply = () => {
     if (!canApply) {
       Swal.fire({
-        title: "Please configure the server first",
+        title: "Silakan atur server terlebih dahulu",
         icon: "warning",
         confirmButtonColor: "#3D5889",
       });
@@ -84,11 +84,11 @@ const Home = () => {
 
   const handleLogout = async () => {
     const result = await Swal.fire({
-      title: "Are you sure want to logout?",
+      title: "Apakah Anda yakin ingin keluar?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "Ya",
+      cancelButtonText: "Tidak",
       confirmButtonColor: "#3D5889",
     });
 
@@ -111,8 +111,10 @@ const Home = () => {
         />
       </div>
       <div className="header-2-home">
-        <h1>Welcome to</h1>
-        <h1>Border Crossing Pass</h1>
+        <h1>Selamat Datang di</h1>
+        <h1>Pos Lintas Batas</h1>
+        {/* <h1>Welcome to</h1>
+        <h1>Border Crossing Pass</h1> */}
       </div>
 
       <div className="home-hero-style">
@@ -122,20 +124,22 @@ const Home = () => {
               onClick={!waitingHome ? btnOnClick_Apply : null}
               style={{ pointerEvents: waitingHome ? 'none' : 'auto' }}>
               <FaWpforms size={60} />
-              Apply
+              {/* Apply */}
+              Ajukan
             </div>
             <div className={`div-kanan-bawah-apply ${waitingHome ? 'disabled' : ''}`}
               onClick={!waitingHome ? btnOnClick_Search_Passport : null}
               style={{ pointerEvents: waitingHome ? 'none' : 'auto' }}>
               <IoSearchSharp size={60} />
-              History Register
+              Riwayat Pendaftaran
+              {/* History Register */}
             </div>
           </div>
           <div className={`div-kiri-apply ${waitingHome ? 'disabled' : ''}`}
             onClick={!waitingHome ? btnOnClick_Informasi : null}
             style={{ pointerEvents: waitingHome ? 'none' : 'auto' }}>
             <TbSettingsCog size={80} />
-            Configuration
+            Pengaturan
           </div>
         </div>
       </div>
@@ -145,7 +149,7 @@ const Home = () => {
             src={LogoutIcon}
             alt="logout-icon"
           />
-          Logout
+          Keluar
         </div>
       </div>
 

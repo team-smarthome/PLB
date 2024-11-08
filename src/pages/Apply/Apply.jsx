@@ -30,7 +30,7 @@ const Apply = () => {
   const [sharedData, setSharedData] = useState(null);
   const [statusPaymentCredit, setStatusPaymentCredit] = useState(false);
   const [titleHeader, setTitleHeader] = useState("Registrasi Pas Lintas Batas");
-  const [titleFooter, setTitleFooter] = useState("Next Step");
+  const [titleFooter, setTitleFooter] = useState("Tahap Selanjutnya");
   const [dataPermohonan, setDataPermohonan] = useState(null);
   const [isDisabled, setDisabled] = useState(false);
   const [confirm, setConfirm] = useState(false);
@@ -715,7 +715,7 @@ const Apply = () => {
         dataScan={dataScan}
       />
       <Footer
-        titleBack="Back"
+        titleBack="Kembali"
         titleStep={titleFooter}
         isEnableBack={isEnableBack}
         isEnableStep={isEnableStep}
