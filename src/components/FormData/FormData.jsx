@@ -30,7 +30,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     sex: "",
     nationality: "",
     expiry_date: "",
-    arrivaltime: dateTimeString,
+    arrivalTime: dateTimeString,
     destination_location: "",
     photo: "",
   };
@@ -234,7 +234,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="passport_number">PLB / BCP Number</label>
+              <label htmlFor="passport_number">Nomor PLB / BCP</label>
             </div>
             <input
               type="text"
@@ -266,7 +266,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="full_name">Full Name</label>
+              <label htmlFor="full_name">Nama Lengkap</label>
             </div>
             <input
               type="text"
@@ -282,7 +282,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="">Date of Birth (DD/MM/YYYY)</label>
+              <label htmlFor="">Tanggal Lahir (DD/MM/YYYY)</label>
             </div>
             <input
               type="date"
@@ -298,7 +298,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="gender">Gender</label>
+              <label htmlFor="gender">Jenis Kelamin</label>
             </div>
             <Select
               id="gender"
@@ -341,7 +341,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="nationality">Nationality</label>
+              <label htmlFor="nationality">Kewarganegaraan</label>
             </div>
             <Select
               value={country.find(option => option.value === formdata.nationality)}
@@ -385,7 +385,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="expiry_date">Expired Date <span className="">(DD/MM/YYYY HH:MM)</span></label>
+              <label htmlFor="expiry_date">Tanggal Expired <span className="">(DD/MM/YYYY HH:MM)</span></label>
             </div>
             <input
               type="datetime-local"
@@ -402,14 +402,14 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="arrivalTime">Registration Date</label>
+              <label htmlFor="arrivalTime">Tanggal Registrasi</label>
             </div>
             <input
               type="datetime-local"
               name="arrivalTime"
               id="arrivalTime"
               readOnly
-              defaultValue={dateTimeString}
+              // defaultValue={dateTimeString}
               value={formdata.arrivalTime}
               onChange={handleInputChange}
               className="disabled-input"
@@ -419,7 +419,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="destination_location">Destination Location</label>
+              <label htmlFor="destination_location">Tujuan Lokasi</label>
             </div>
             <Select
               value={country.find(option => option.value === formdata.destination_location)}
@@ -463,7 +463,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="photo">Face</label>
+              <label htmlFor="photo">Foto Wajah</label>
             </div>
             <div className="photo">
               <div className="photo-box">
