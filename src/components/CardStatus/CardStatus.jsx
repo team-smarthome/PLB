@@ -19,6 +19,7 @@ import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB } from
 import { initiateSocket, addPendingRequest, initiateSocket4040 } from "../../utils/socket";
 import { FaRegIdCard } from "react-icons/fa";
 import ImgsViewer from "react-images-viewer";
+import Modals from "../Modal/Modal";
 // const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
@@ -970,6 +971,22 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						<img src={Gambar1} alt="" className="card-image" />
 					</>
 				);
+			case 'kenaCekal':
+				return (
+					<>
+						<h1 className="card-title">
+							{getStatusHeaderText().map((text, index) => (
+								<React.Fragment key={index}>
+									{text}
+									<br />
+								</React.Fragment>
+							))}
+						</h1>
+						<button className="ok-button" >
+							Detail Cekal
+						</button>
+					</>
+				);
 			default:
 				return (
 					<>
@@ -1117,6 +1134,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				return ["Passport Data Successfully Found"];
 			case "notFoundPassport":
 				return ["Application Not Found"];
+			case "kenaCekal":
+				return ["Data Cekal Ditemukan", "Skor Kemiripan 90"];
 			default:
 				return [];
 		}
@@ -1132,6 +1151,20 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				isOpen={isOpenImage}
 				onClose={() => { setIsOpenImage(false) }}
 			/>
+			{/* <Modals
+				showModal={true}
+			>
+				<div>
+					<div className="flex flex-row justify-between items-center">
+						<h3>Nama Lengkap : </h3>
+						<h3>Ario Prima</h3>
+					</div>
+					<div className="flex flex-row justify-between items-center">
+						<h3>Kewarganegaraan : </h3>
+						<h3>Zimbabwe</h3>
+					</div>
+				</div>
+			</Modals> */}
 		</div>
 	);
 };

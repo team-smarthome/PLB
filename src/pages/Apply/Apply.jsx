@@ -10,9 +10,10 @@ import { Toast } from "../../components/Toast/Toast";
 import { formData, resultDataScan, caputedImageAfter, ImageDocumentPLB } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
-import { apiInsertDataUser, getAllNegaraData, getUserbyPassport } from "../../services/api";
+import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import axios from "axios";
+import Cookies from 'js-cookie';
 import { ipAddressServer } from "../../services/env";
 
 const Apply = () => {
@@ -24,7 +25,7 @@ const Apply = () => {
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
   const [tabStatus, setTabStatus] = useState(1);
-  const [cardStatus, setCardStatus] = useState("iddle");
+  const [cardStatus, setCardStatus] = useState("kenaCekal");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
   const [cardNumberPetugas, setCardNumberPetugas] = useState("");
   const [sharedData, setSharedData] = useState(null);
@@ -357,6 +358,7 @@ const Apply = () => {
     // }
     if (isEnableStep) {
       if (cardStatus === "checkData" || cardStatus === "iddle" || cardStatus === "getDocumentSucces") {
+        // doSaveRequestVoaPayment(sharedData);
         const dataChecked = sharedData?.passportData;
         console.log("dataChecked", dataChecked);
 
@@ -584,107 +586,157 @@ const Apply = () => {
   }, [cardPaymentProps]);
 
 
+  const formatBirthDateCekal = (formattedBirthDate) => {
+
+    const dateParts = formattedBirthDate.split("-");
+    const reformattedDate = dateParts.join("");
+    return reformattedDate;
+  };
+
+
+  const formatToYYYYMMDD = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}${month}${day}`;
+  };
+
+  const handleFormatDate = (params) => {
+    const result = formatToYYYYMMDD(params);
+    return result;
+  };
+
   const doSaveRequestVoaPayment = async (sharedData) => {
+    try {
 
-    //tinggal minta api ke topik
+      const sendDataTOKameraServer = async () => {
+        const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
+        console.log("checkDataUser", checkDataUser.data.data);
+        if (checkDataUser.data.data.length > 0) {
+          Swal.fire({
+            icon: "error",
+            title: "Data sudah ada",
+            text: "Silahkan periksa kembali data anda",
+            confirmButtonColor: "#3d5889",
+          });
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: false,
+            isFailed: false,
+            isPyamentUrl: false,
+            isPhoto: false,
+            isDoRetake: false,
+          });
+          setDisabled(false);
+          setIsEnableStep(true);
+          setCardStatus("takePhotoSucces");
+          return;
+        }
 
-    // const checkCekal 
-
-    return console.log("cekCekalDulu")
-
-
-
-
-    const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
-    console.log("checkDataUser", checkDataUser.data.data);
-    if (checkDataUser.data.data.length > 0) {
-      Swal.fire({
-        icon: "error",
-        title: "Data sudah ada",
-        text: "Silahkan periksa kembali data anda",
-        confirmButtonColor: "#3d5889",
-      });
-      setCardPaymentProps({
-        isWaiting: false,
-        isCreditCard: false,
-        isPaymentCredit: false,
-        isPaymentCash: false,
-        isPrinted: false,
-        isSuccess: false,
-        isFailed: false,
-        isPyamentUrl: false,
-        isPhoto: false,
-        isDoRetake: false,
-      });
-      setDisabled(false);
-      setIsEnableStep(true);
-      setCardStatus("takePhotoSucces");
-      return;
-    }
-
-    setCaputedImageAfter2(sharedData.photoFace);
-    const bodyParamsSendKamera = {
-      method: "addfaceinfonotify",
-      params: {
-        data: [
-          {
-            personId: sharedData.passportData.docNumber,
-            personNum: sharedData.passportData.docNumber,
-            passStrategyId: "",
-            personIDType: 1,
-            personName: sharedData.passportData.fullName,
-            personGender: sharedData.passportData.sex === "male" ? 1 : 0,
-            validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
-            validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
-            personType: 1,
-            identityType: 1,
-            identityId: sharedData.passportData.docNumber,
-            identitySubType: 1,
-            identificationTimes: -1,
-            identityDataBase64: sharedData.photoFace ? sharedData?.photoFace.split(',')[1] : "",
-            status: 0,
-            reserve: "",
+        setCaputedImageAfter2(sharedData.photoFace);
+        const bodyParamsSendKamera = {
+          method: "addfaceinfonotify",
+          params: {
+            data: [
+              {
+                personId: sharedData.passportData.docNumber,
+                personNum: sharedData.passportData.docNumber,
+                passStrategyId: "",
+                personIDType: 1,
+                personName: sharedData.passportData.fullName,
+                personGender: sharedData.passportData.sex === "male" ? 1 : 0,
+                validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+                validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}`).getTime() / 1000).toString(),
+                personType: 1,
+                identityType: 1,
+                identityId: sharedData.passportData.docNumber,
+                identitySubType: 1,
+                identificationTimes: -1,
+                identityDataBase64: sharedData.photoFace ? sharedData?.photoFace.split(',')[1] : "",
+                status: 0,
+                reserve: "",
+              }
+            ],
           }
-        ],
+        }
+        const dataTosendAPI = {
+          // no_register: sharedData.passportData.noRegister,
+          no_passport: sharedData.passportData.docNumber,
+          name: sharedData.passportData.fullName,
+          date_of_birth: sharedData.passportData.formattedBirthDate,
+          gender: sharedData.passportData.sex === "male" ? "M" : "F",
+          nationality: sharedData.passportData.nationality,
+          expired_date: `${sharedData.passportData.formattedExpiryDate}`,
+          arrival_time: new Date(),
+          destination_location: sharedData.passportData.destination_location,
+          profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+          photo_passport: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+        };
+        setObjectApi(dataTosendAPI);
+        setObjectCamera(bodyParamsSendKamera)
+
+        console.log("DataYNAAPIDIKIRIM", dataTosendAPI);
+
+        console.log("sharedDataTOSEndAPi", sharedData);
+
+        if (socket_IO_4010.connected) {
+          console.log("testWebsocket4010 connected");
+          socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera });
+        } else {
+          //connnect ulang ke socket_IO_4010
+          console.log("testWebsocket4010 not connected");
+          addPendingRequest4010({ action: "sendDataUser", data: { bodyParamsSendKamera } });
+          socket_IO_4010.connect();
+        }
+
+
+
+        console.log("nilaiBodyParamsSendKamera", bodyParamsSendKamera);
+
+
+        setIsEnableStep(false);
       }
+      const getDataUser = Cookies.get('userdata');
+      const parsedDataUser = JSON.parse(getDataUser);
+      const version = localStorage.getItem("version") || "1.0.0";
+
+      const DataCekCekal = {
+        nip: parsedDataUser.nip,
+        nama_lengkap: sharedData.passportData.fullName,
+        tanggal_lahir: formatBirthDateCekal(sharedData.passportData.formattedBirthDate),
+        kode_jenis_kelamin: sharedData.passportData.sex === "male" ? "M" : "F",
+        kode_kewarganegaraan: sharedData.passportData.nationality === "Indonesia" ? "IDN" : "PNG",
+        nomor_dokumen_perjalanan: sharedData.passportData.docNumber,
+        tanggal_habis_berlaku_dokumen_perjalanan: handleFormatDate(sharedData.passportData.formattedExpiryDate),
+        kode_negara_penerbit_dokumen_perjalanan: sharedData.passportData.nationality === "Indonesia" ? "IDN" : "PNG",
+        arah_perlintasan: sharedData.passportData.nationality === "Indonesia" ? "O" : "I",
+        apk_version: `versi ${version}`,
+        ip_address_client: ipAddressServer,
+        port_id: parsedDataUser.tpi_id,
+        user_nip: parsedDataUser.nip,
+        user_full_name: parsedDataUser?.petugas?.nama_petugas,
+      }
+
+
+      const CheckCekal = await GetDataCheckCekal(DataCekCekal);
+      if (CheckCekal.data?.response_code === "25") {
+        console.log("MasukKesini1");
+        await sendDataTOKameraServer();
+      } else if (CheckCekal.data?.response_code === "00") {
+        if (CheckCekal.data?.data) {
+          // console.log("MasukKesini2");
+          setCardStatus("kenaCekal");
+        }
+        console.log("CheckCekal1234", CheckCekal.data?.response_code);
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan di doSaveRequestVoaPayment:", error);
     }
-    const dataTosendAPI = {
-      // no_register: sharedData.passportData.noRegister,
-      no_passport: sharedData.passportData.docNumber,
-      name: sharedData.passportData.fullName,
-      date_of_birth: sharedData.passportData.formattedBirthDate,
-      gender: sharedData.passportData.sex === "male" ? "M" : "F",
-      nationality: sharedData.passportData.nationality,
-      expired_date: `${sharedData.passportData.formattedExpiryDate}`,
-      arrival_time: new Date(),
-      destination_location: sharedData.passportData.destination_location,
-      profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-      photo_passport: resDataScan ? `data:image/jpeg;base64,${resDataScan}` : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-    };
-    setObjectApi(dataTosendAPI);
-    setObjectCamera(bodyParamsSendKamera)
-
-    console.log("DataYNAAPIDIKIRIM", dataTosendAPI);
-
-    console.log("sharedDataTOSEndAPi", sharedData);
-
-    if (socket_IO_4010.connected) {
-      console.log("testWebsocket4010 connected");
-      socket_IO_4010.emit("sendDataUser", { bodyParamsSendKamera });
-    } else {
-      //connnect ulang ke socket_IO_4010
-      console.log("testWebsocket4010 not connected");
-      addPendingRequest4010({ action: "sendDataUser", data: { bodyParamsSendKamera } });
-      socket_IO_4010.connect();
-    }
-
-
-
-    console.log("nilaiBodyParamsSendKamera", bodyParamsSendKamera);
-
-
-    setIsEnableStep(false);
-
   };
 
 
