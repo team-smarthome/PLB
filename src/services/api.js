@@ -425,3 +425,16 @@ export const DeleteNegara = async (id) => {
     console.log(error)
   }
 }
+
+export const checkCountData = async(date) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/totaluser`,
+      params: date
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  } 
+}
