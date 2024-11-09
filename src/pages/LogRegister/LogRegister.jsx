@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,7 @@ import Cookies from 'js-cookie';
 import './logregister.style.css'
 import { MdOutlineBrokenImage } from "react-icons/md";
 import Pagination from '../../components/Pagination/Pagination'
+import { sampleData } from './sampleSynchronize'
 
 const LogRegister = () => {
     const userCookie = Cookies.get('userdata')
@@ -56,7 +57,6 @@ const LogRegister = () => {
     const [imageFace, setImageFace] = useState(null)
     const [imagePassport, setImagePassport] = useState(null)
     const [countryData, setCountryData] = useState([])
-
     const getLogRegister = async () => {
         try {
             const res = await apiGetDataLogRegister({
@@ -188,6 +188,7 @@ const LogRegister = () => {
                 </>
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
+                
                 <button onClick={() => openModalEdit(row)}>Edit</button>
                 <button onClick={() => deleteModal(row)} style={{ background: 'red' }}>Delete</button>
             </td>
@@ -531,6 +532,7 @@ const LogRegister = () => {
             </div>
         )
     }
+
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
             <div className="face-reg-header" style={{
@@ -591,6 +593,13 @@ const LogRegister = () => {
                 paddingTop: "1%",
                 paddingBottom: "1%",
             }}>
+                <button
+                style={{
+                    width: 150,
+                    cursor: 'pointer'
+                }}
+                onClick={() => navigate("/cpanel/synchronize-register")}
+                >Sinkronisasi Data</button>
                 <button
                     onClick={generateExcel}
                     className='add-data'
@@ -664,6 +673,7 @@ const LogRegister = () => {
             >
                 {modalDelete()}
             </Modals>
+           
         </div>
     )
 }

@@ -436,3 +436,16 @@ export const GetDataCheckCekal = async (params) => {
     throw error
   }
 }
+
+export const checkCountData = async (date) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/totaluser`,
+      params: date
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
