@@ -93,6 +93,8 @@ const handleCheckDataCount = async() => {
         });
       }else{
         setTotal(res?.data?.total_data_belum)
+        localStorage.setItem("date", JSON.stringify(date))
+        localStorage.setItem("totalData", res?.data?.total_data_belum)
       }
     }
   } catch (error) {
@@ -114,9 +116,6 @@ const handlePayload  = async() => {
   }
   // console.log(getUserdata)
 }
-useEffect(() => {
-  handlePayload()
-}, [])
 
 const handleIncrementCount = () => {
   setModalAlertSynchronize(false)
@@ -134,13 +133,29 @@ const handleIncrementCount = () => {
 };
 const percentage = Math.round((count / total) * 100);
 
+const handleGetTotalAndDate = async() => {
+
+const getDate = await localStorage.getItem("date")
+const convertDate = JSON.parse(getDate)
+const getTotal  = await localStorage.getItem("totalData")
+if (convertDate) {
+  setDate({...date, startDate: convertDate.startDate, endDate: convertDate.endDate})
+}
+if (getTotal) {
+  setTotal(getTotal)
+}
+
+}
+useEffect(() => {
+  handleGetTotalAndDate()
+}, [])
 return(
   <div
   className='p-8'
   >
    <h2>Sinkronisasi Data</h2>
 
-    {isCounted && total > 0 ? 
+    {(date.startDate && date.endDate) && total > 0 ? 
      (
       <>
     <div className="mb-8">
