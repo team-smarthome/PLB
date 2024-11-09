@@ -8,11 +8,16 @@ let socket4010;
 let socket4020;
 let socket4040;
 
+let socket4050;
+
 let pendingTakePhotoRequests = [];
 
 let pendingTakePhotoRequests4010 = [];
 
 let pendingTakePhotoRequests4020 = [];
+
+let pendingTakePhotoRequests4050 = [];
+
 let pendingGetDocumentRequests = [];
 
 export const initiateSocket = () => {
@@ -211,4 +216,33 @@ export const initiateSocket4040 = () => {
     console.log('testWebsocket40403')
     return socket4040;
 };
+
+//=========================================================================================================//
+
+export const initiateSocket4050 = () => {
+    if (!socket4050) {
+        if (!url_socket) {
+            return;
+        }
+        socket4050 = io(`${url_socket}:4050`);
+        socket4050.on('connect', () => {
+
+            while (pendingTakePhotoRequests4050.length > 0) {
+                const request = pendingTakePhotoRequests4050.shift();
+                if (request.action === 'check-progress') {
+                    if (socket4050) {
+                        socket4050.emit("check-progress", data);
+                    }
+                }
+            }
+        });
+    }
+    return socket4050;
+};
+
+export const addPendingRequest4050 = (request) => {
+    pendingTakePhotoRequests4050.push(request);
+
+};
+
 

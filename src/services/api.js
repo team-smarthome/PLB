@@ -425,3 +425,14 @@ export const DeleteNegara = async (id) => {
     console.log(error)
   }
 }
+
+
+export const GetDataCheckCekal = async (params) => {
+  try {
+    const res = await axios.post(`${url_devel}api/cek-cekal`, params);
+    return res;
+  } catch (error) {
+    console.log(error.response, 'ApakahErrorDisini')
+    throw error
+  }
+}

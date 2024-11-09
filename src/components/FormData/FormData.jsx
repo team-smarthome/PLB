@@ -12,6 +12,18 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
   const [rawDateInput, setRawDateInput] = useState('');
   const [rawDateTimeInput, setRawDateTimeInput] = useState('');
 
+  const [currentDateTime, setCurrentDateTime] = useState(
+    new Date().toISOString().slice(0, 19)
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDateTime(new Date().toISOString().slice(0, 19));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const initialFormData = {
     passport_number: "",
     register_code: "",
@@ -85,26 +97,21 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
       }));
     }
-    console.log("sharedDataFormData", sharedData);
     setFormData((prevData) => ({
       ...prevData,
       photo: sharedData.photoFace || "",
     }));
-    // }
   }, [sharedData]);
 
-  console.log("formdaFormData", formdata);
+
 
 
   const handleDateTimeChange = (e) => {
     const { name, value } = e.target;
+    const dateTimePattern = /^\d{0,4}(-\d{0,2})?(-\d{0,2})?$/;
 
-    const dateTimePattern = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
-
-    if (dateTimePattern.test(value) || value === '' || value.length <= 16) {
+    if (dateTimePattern.test(value)) {
       setRawDateTimeInput(value);
-
-
       setFormData({
         ...formdata,
         [name]: value,
@@ -118,8 +125,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         },
       }));
     }
-
   };
+
 
   const handleDateChange = (e) => {
     const { name, value } = e.target;
@@ -378,16 +385,16 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="expiry_date">Tanggal Kaduluarsa <span className="">(DD/MM/YYYY HH:MM)</span></label>
+              <label htmlFor="expiry_date">Tanggal Kaduluarsa <span className="">(DD/MM/YYYY)</span></label>
             </div>
             <input
-              type="datetime-local"
+              type="date"
               name="formattedExpiryDate"
               id="expiry_date"
-              placeholder="DD/MM/YYYY HH:MM"
+              placeholder="DD/MM/YYYY"
               value={rawDateTimeInput}
               onChange={handleDateTimeChange}
-              className="disabled-input"
+              className="enable-input"
             />
           </div>
         </div>
@@ -398,11 +405,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
               <label htmlFor="arrivalTime">Tanggal Registrasi</label>
             </div>
             <input
-              type="date"
-              name="arrivalTime"
-              id="arrivalTime"
-              value={formdata.arrivalTime}
-              onChange={handleInputChange}
+              type="datetime-local"
+              value={currentDateTime}
+              readOnly
               className="disabled-input"
             />
           </div>
