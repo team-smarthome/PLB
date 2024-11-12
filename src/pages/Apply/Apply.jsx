@@ -427,6 +427,26 @@ const Apply = () => {
             setDataPrimaryPassport(null);
           }
         }).catch((error) => {
+          Toast.fire({
+            icon: "error",
+            title: "Gagal mengirim data",
+          });
+          setCardPaymentProps({
+            isWaiting: false,
+            isCreditCard: false,
+            isPaymentCredit: false,
+            isPaymentCash: false,
+            isPrinted: false,
+            isSuccess: false,
+            isFailed: false,
+            isPyamentUrl: false,
+            isPhoto: false,
+            isDoRetake: false,
+          });
+          setDisabled(false);
+          setIsEnableStep(true);
+          setCardStatus("takePhotoSucces");
+          setTabStatus(2);
           console.error("Error:", error);
         });
       } else {
@@ -527,6 +547,9 @@ const Apply = () => {
 
   const sendDataTOKameraServer = async (sharedData) => {
     try {
+      const getDataUser123 = Cookies.get('userdata');
+      const parsedDataUser123 = JSON.parse(getDataUser123);
+
       console.log("sharedData1234", sharedData);
       setCardStatus("goPayment");
       setCardPaymentProps({
@@ -607,7 +630,10 @@ const Apply = () => {
         arrival_time: new Date(),
         destination_location: sharedData.passportData.destination_location,
         profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-        photo_passport: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+        photo_passport: resDataScan ? `data:image/jpeg;base64,${resDataScan}` : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+        petugas_id: parsedDataUser123.nip,
+        tpi_id: parsedDataUser123.tpi_id,
+        nama_tpi: parsedDataUser123.nama_tpi,
       };
 
       setObjectApi(dataTosendAPI);
@@ -670,17 +696,17 @@ const Apply = () => {
 
       const CheckCekal = await GetDataCheckCekal(DataCekCekal);
       if (CheckCekal.data?.response_code === "25") {
-        console.log("MasukKesini1");
         await sendDataTOKameraServer(sharedData);
       } else if (CheckCekal.data?.response_code === "00") {
         if (CheckCekal.data?.data.length > 0) {
           setDataCekal(CheckCekal.data?.data?.[0]);
           setCardStatus("kenaCekal");
+        } else {
+          await sendDataTOKameraServer(sharedData);
         }
-        console.log("CheckCekal1234", CheckCekal.data?.response_code);
       }
     } catch (error) {
-      setCardStatus("takePhotoSucces");
+      await sendDataTOKameraServer(sharedData);
       console.log('masukkesinigakya12345')
     }
   };

@@ -5,6 +5,17 @@ import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
 import NoProfile from '../../assets/images/no-profile-picture.svg'
 
+const localDate = new Date();
+
+// Format the date as YYYY-MM-DDt
+const dateString = localDate.toISOString().split('T')[0];
+
+// Format the time as HH:MM (local time)
+const timeString = localDate.getHours().toString().padStart(2, '0') + ':' + localDate.getMinutes().toString().padStart(2, '0');
+
+// Combine both date and time for datetime-local input
+const dateTimeString = `${dateString}T${timeString}`;
+
 const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
 
   const [optionNegara, setOptionNegara] = useState([]);
@@ -13,16 +24,18 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
   const [rawDateTimeInput, setRawDateTimeInput] = useState('');
 
   const [currentDateTime, setCurrentDateTime] = useState(
-    new Date().toISOString().slice(0, 19)
+    dateTimeString
   );
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDateTime(new Date().toISOString().slice(0, 19));
-    }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentDateTime(new Date().toLocaleString()); // Memperbarui waktu tiap detik
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const initialFormData = {
     passport_number: "",
@@ -238,23 +251,6 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
             />
           </div>
         </div>
-        {/* 
-        <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="register_code">Registrasion Number</label>
-            </div>
-            <input
-              type="text"
-              name="noRegister"
-              id="register_code"
-              value={formdata.register_code}
-              onChange={handleInputChange}
-              className="disabled-input"
-            />
-          </div>
-        </div> */}
-
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">

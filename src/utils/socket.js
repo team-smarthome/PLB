@@ -228,8 +228,8 @@ export const initiateSocket4050 = () => {
         socket4050.on('connect', () => {
 
             while (pendingTakePhotoRequests4050.length > 0) {
-                const request = pendingTakePhotoRequests4050.shift();
-                if (request.action === 'check-progress') {
+                const { action, data } = pendingTakePhotoRequests.shift();
+                if (action === 'check-progress') {
                     if (socket4050) {
                         socket4050.emit("check-progress", data);
                     }

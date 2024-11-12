@@ -377,7 +377,7 @@ const ModalCekal = ({ open, onClose, row, skorKemiripan }) => {
                         Batalkan
                     </button>
                     <button
-                        onClick={skorKemiripan === 100 ? HandleLanjutKirimData : null}
+                        onClick={skorKemiripan !== 100 ? HandleLanjutKirimData : null}
                         className={`text-base text-white px-4 py-3 bg-[#17C964] border-none rounded-lg hover:bg-[#1AAB4A] focus:outline-none hover:cursor-pointer ${skorKemiripan === 100 ? "cursor-pointer disabled" : "cursor-not-allowed"}`}
                         disabled={skorKemiripan === 100}
                     >

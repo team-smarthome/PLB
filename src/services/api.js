@@ -449,3 +449,18 @@ export const checkCountData = async (date) => {
     console.log(error)
   }
 }
+
+export const getAllTpiData = async () => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/tpi-data`,
+      params: {
+        alamat_tpi: "JAYAPURA"
+      }
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}

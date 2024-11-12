@@ -263,8 +263,6 @@ const SettingIp = () => {
     useEffect(() => {
         setDataUserIp(JSON.parse(getUserdata));
         console.log(JSON.parse(getUserdata), 'hasildaricookie');
-
-
         if (dataUserIp?.petugas?.id) {
             fetchAllIp();
         }
