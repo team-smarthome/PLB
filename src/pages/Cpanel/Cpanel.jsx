@@ -13,6 +13,7 @@ import Country from '../Country/Country';
 import SettingServer from '../../components/SettingServer/SettingServer';
 import Synchronize from '../../components/Synchronize/Synchronize';
 import CameraSetting from '../CameraSettings/CameraSetting';
+import SynchronizeRegister from '../SynchronizeRegister/SynchronizeRegister';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -88,6 +89,7 @@ const Cpanel = () => {
                     <Route path="/setting-camera" element={<SettingIp />} />
                     <Route path="/destination-location" element={<Country />} />
                     <Route path="/synchronize" element={<Synchronize />} />
+                    <Route path="/synchronize-register" element={<SynchronizeRegister />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}
                 </ReactRoutes>
             </div>

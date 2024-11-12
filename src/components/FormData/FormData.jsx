@@ -4,11 +4,10 @@ import Checklist from "../../assets/images/group.svg";
 import "./FormDataStyle.css";
 import dataNegara from "../../utils/dataNegara";
 import NoProfile from '../../assets/images/no-profile-picture.svg'
-import moment from 'moment';
 
 const localDate = new Date();
 
-// Format the date as YYYY-MM-DD
+// Format the date as YYYY-MM-DDt
 const dateString = localDate.toISOString().split('T')[0];
 
 // Format the time as HH:MM (local time)
@@ -21,6 +20,22 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
 
   const [optionNegara, setOptionNegara] = useState([]);
   const [optionGender, setOptionGender] = useState([]);
+  const [rawDateInput, setRawDateInput] = useState('');
+  const [rawDateTimeInput, setRawDateTimeInput] = useState('');
+
+  const [currentDateTime, setCurrentDateTime] = useState(
+    dateTimeString
+  );
+
+
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentDateTime(new Date().toLocaleString()); // Memperbarui waktu tiap detik
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const initialFormData = {
     passport_number: "",
@@ -30,67 +45,13 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     sex: "",
     nationality: "",
     expiry_date: "",
-    arrivaltime: dateTimeString,
+    arrivaltime: new Date().toISOString().split('T')[0],
     destination_location: "",
     photo: "",
   };
- 
+
 
   const [formdata, setFormData] = useState(initialFormData);
-
-  const [rawDateInput, setRawDateInput] = useState(''); 
-  const [rawDateTimeInput, setRawDateTimeInput] = useState(''); // Separate state to hold raw input
-
-  const handleDateChange = (e) => {
-    const value = e.target.value;
-
-    // Regex to match partial or complete date in format YYYY-MM-DD
-    const datePattern = /^\d{0,4}(-\d{0,2})?(-\d{0,2})?$/;
-
-    // Update raw input for partial typing and restrict to pattern
-    if (datePattern.test(value)) {
-      setRawDateInput(value);
-
-      // Only update formdata when the input is a complete and valid date
-      if (moment(value, "YYYY-MM-DD", true).isValid()) {
-        // console.log(value)
-        setFormData({
-          ...formdata,
-          date_of_birth: value,
-        });
-      }
-    }
-  };
-  
-  const handleDateTimeChange = (e) => {
-    const value = e.target.value;
-
-    // Regex for validating the format: DD/MM/YYYY HH:MM, with a 4-digit year
-    const dateTimePattern = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/;
-
-    // Allow partial input and make sure we don't lose data
-    if (dateTimePattern.test(value) || value === '' || value.length <= 16) {
-      setRawDateTimeInput(value);
-
-      // Only update formdata when the input is a complete and valid datetime
-      // if (moment(value, "DD/MM/YYYY HH:mm", true).isValid()) {
-      
-        setFormData({
-          ...formdata,
-          expiry_date: value,
-        });
-      }
-    // } else if (value.length <= 16) {
-      
-      // Allow up to 16 characters (for DD/MM/YYYY HH:MM format)
-      setRawDateTimeInput(value);
-    // }
-  };
-  
-  // useEffect(() => {
-    
-  // }, [])
-  
 
   useEffect(() => {
     const dataNationality = dataNegara.data.map((negara) => ({
@@ -145,21 +106,61 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         register_code: sharedData.passportData.noRegister || "",
         full_name: sharedData.passportData.fullName || "",
         date_of_birth: sharedData.passportData.formattedBirthDate || "",
-        // nationality:
-        //   filteredNationality.length > 0 ? filteredNationality[0] : "",
         expiry_date: sharedData.passportData.formattedExpiryDate || "",
         arrivalTime: sharedData.passportData.arrivalTime || new Date().toISOString().split('T')[0],
       }));
     }
-    console.log("sharedDataFormData", sharedData);
     setFormData((prevData) => ({
       ...prevData,
       photo: sharedData.photoFace || "",
     }));
-    // }
   }, [sharedData]);
 
-  console.log("formdaFormData", formdata);
+
+
+
+  const handleDateTimeChange = (e) => {
+    const { name, value } = e.target;
+    const dateTimePattern = /^\d{0,4}(-\d{0,2})?(-\d{0,2})?$/;
+
+    if (dateTimePattern.test(value)) {
+      setRawDateTimeInput(value);
+      setFormData({
+        ...formdata,
+        [name]: value,
+      });
+
+      setSharedData((prevData) => ({
+        ...prevData,
+        passportData: {
+          ...prevData.passportData,
+          [name]: value,
+        },
+      }));
+    }
+  };
+
+
+  const handleDateChange = (e) => {
+    const { name, value } = e.target;
+    const datePattern = /^\d{0,4}(-\d{0,2})?(-\d{0,2})?$/;
+
+    if (datePattern.test(value)) {
+      setRawDateInput(value);
+      setFormData({
+        ...formdata,
+        [name]: value,
+      });
+
+      setSharedData((prevData) => ({
+        ...prevData,
+        passportData: {
+          ...prevData.passportData,
+          [name]: value,
+        },
+      }));
+    }
+  };
 
 
   const handleInputChange = (e) => {
@@ -179,6 +180,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
   };
 
   const handleSelectChangeNationality = (selectedOption) => {
+    console.log('test1234', selectedOption.value);
     setFormData({
       ...formdata,
       nationality: selectedOption.value,
@@ -227,6 +229,9 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     e.preventDefault();
   };
 
+  useEffect(() => {
+    console.log('sharedData', sharedData);
+  }, [sharedData]);
 
   return (
     <div className="container-form">
@@ -234,7 +239,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="passport_number">PLB / BCP Number</label>
+              <label htmlFor="passport_number">Nomor PLB / BCP</label>
             </div>
             <input
               type="text"
@@ -246,27 +251,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
             />
           </div>
         </div>
-        {/* 
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="register_code">Registrasion Number</label>
-            </div>
-            <input
-              type="text"
-              name="noRegister"
-              id="register_code"
-              value={formdata.register_code}
-              onChange={handleInputChange}
-              className="disabled-input"
-            />
-          </div>
-        </div> */}
-
-        <div className="form-group">
-          <div className="wrapper-form">
-            <div className="wrapper-input">
-              <label htmlFor="full_name">Full Name</label>
+              <label htmlFor="full_name">Nama Lengkap</label>
             </div>
             <input
               type="text"
@@ -282,23 +270,31 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="">Date of Birth (DD/MM/YYYY)</label>
+              <label htmlFor="">Tanggal Lahir (DD/MM/YYYY)</label>
             </div>
             <input
               type="date"
               name="formattedBirthDate"
               id="date_of_birth"
-              value={rawDateInput} // Bind raw input value
+              value={rawDateInput}
               onChange={handleDateChange}
               className="enable-input"
             />
+            {/* <input
+              type="date"
+              name="formattedBirthDate"
+              id="date_of_birth"
+              value={formdata.date_of_birth}
+              onChange={handleInputChange}
+              className="disabled-input"
+            /> */}
           </div>
         </div>
 
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="gender">Gender</label>
+              <label htmlFor="gender">Jenis Kelamin</label>
             </div>
             <Select
               id="gender"
@@ -341,7 +337,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="nationality">Nationality</label>
+              <label htmlFor="nationality">Kewarganegaraan</label>
             </div>
             <Select
               value={country.find(option => option.value === formdata.nationality)}
@@ -385,16 +381,16 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="expiry_date">Expired Date <span className="">(DD/MM/YYYY HH:MM)</span></label>
+              <label htmlFor="expiry_date">Tanggal Kaduluarsa <span className="">(DD/MM/YYYY)</span></label>
             </div>
             <input
-              type="datetime-local"
+              type="date"
               name="formattedExpiryDate"
               id="expiry_date"
-              placeholder="DD/MM/YYYY HH:MM"
-              value={rawDateTimeInput} // Bind raw input value
+              placeholder="DD/MM/YYYY"
+              value={rawDateTimeInput}
               onChange={handleDateTimeChange}
-              className="disabled-input"
+              className="enable-input"
             />
           </div>
         </div>
@@ -402,16 +398,12 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="arrivalTime">Registration Date</label>
+              <label htmlFor="arrivalTime">Tanggal Registrasi</label>
             </div>
             <input
               type="datetime-local"
-              name="arrivalTime"
-              id="arrivalTime"
+              value={currentDateTime}
               readOnly
-              defaultValue={dateTimeString}
-              value={formdata.arrivalTime}
-              onChange={handleInputChange}
               className="disabled-input"
             />
           </div>
@@ -419,7 +411,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="destination_location">Destination Location</label>
+              <label htmlFor="destination_location">Tujuan Lokasi</label>
             </div>
             <Select
               value={country.find(option => option.value === formdata.destination_location)}
@@ -463,7 +455,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="photo">Face</label>
+              <label htmlFor="photo">Foto Wajah</label>
             </div>
             <div className="photo">
               <div className="photo-box">

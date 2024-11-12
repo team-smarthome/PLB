@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
 import ImgsViewer from "react-images-viewer";
+import ModalData from '../../components/Modal/ModalData'
 
 const LogFaceReg = () => {
     const navigate = useNavigate()
@@ -27,6 +28,7 @@ const LogFaceReg = () => {
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
     const [statusDepart, setStatusDepart] = useState('')
+    const [modalOpen, setModalOpen] = useState(false)
     const [params, setParams] = useState({
         page: page,
         name: "",
@@ -247,7 +249,32 @@ const LogFaceReg = () => {
     }, [page]);
 
 
+    const DoneProgress = async () => {
+        setStatus('loading')
+        console.log("bbiiiiiiiiiiiiiii")
+        const getDataIp = Cookies.get('userdata');
+        // const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
+        const getAllIp = apiGetAllIp();
+        getAllIp.then(res => {
+            if (res.data.status === 200) {
+                const dataOptions = res.data.data.map(item => ({
+                    value: { ipAddress: item.ipAddress, isDepart: item.is_depart },
+                    label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Arrival" : "Departure"} )`,
+                }));
+                const defaultOption = {
+                    value: { ipAddress: '192.2.1', isDepart: "" },
+                    label: 'All Camera'
+                };
+                const updatedOptions = [defaultOption, ...dataOptions];
+                setOptionIp(updatedOptions)
+                console.log(updatedOptions, "dataOptions");
+                setStatus("success")
+            }
+        }).catch(err => console.log(err.message))
+    }
+
     useEffect(() => {
+        DoneProgress();
         //=============GK PAKE INTERNET=============//
         // setStatus('success')
         // const dataOptinDummy = [
@@ -270,25 +297,7 @@ const LogFaceReg = () => {
 
         //=============PAKE INTERNET=============//
 
-        setStatus('loading')
-        const getDataIp = Cookies.get('userdata');
-        // const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
-        const getAllIp = apiGetAllIp();
-        getAllIp.then(res => {
-            if (res.data.status === 200) {
-                const dataOptions = res.data.data.map(item => ({
-                    value: { ipAddress: item.ipAddress, isDepart: item.is_depart },
-                    label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Arrival" : "Departure"} )`,
-                }));
-                const defaultOption = {
-                    value: { ipAddress: '192.2.1', isDepart: "" },
-                    label: 'All Camera'
-                };
-                const updatedOptions = [defaultOption, ...dataOptions];
-                setOptionIp(updatedOptions)
-                console.log(updatedOptions, "dataOptions");
-            }
-        }).catch(err => console.log(err.message))
+
         //=============STOP=============//
     }, [])
 
@@ -351,7 +360,7 @@ const LogFaceReg = () => {
         console.log(row, "selectedOptionRow");
         return (
             <>
-                {!selectedOption.includes("192.168") ? (
+                {selectedOption.includes("192.2.1") ? (
                     <>
                         <td>{row?.personId}</td>
                         <td>{row?.name}</td>
@@ -466,7 +475,8 @@ const LogFaceReg = () => {
         });
     };
 
-    const resultArray = logData.map(item => ({ src: !selectedOption.includes("192.168") ? item.img_path : `http://${ipCameraLocalStorage}${item.sSnapshotPath}` }));
+    const resultArray = logData.map(item => ({ src: !selectedOption.includes("192.2.1") ? `http://${ipCameraLocalStorage}${item.sSnapshotPath}` : `data:image/jpeg;base64,${item.image_base64}` }));
+
     const handleOpenImage = (row, index) => {
         setIsOpenImage(true)
         setCurrentImage(index)
@@ -667,12 +677,25 @@ const LogFaceReg = () => {
                     </div>
                 </div>
             </div>
-            <div className='submit-face-reg'>
+            <div className='submit-buttons-registers' style={{
+                width: "99.4%",
+                paddingTop: "1%",
+                paddingBottom: "1%",
+            }}>
+                <button
+                    style={{
+                        width: 150,
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => setModalOpen(true)}
+                >Input Data Manual</button>
                 <button
                     onClick={generateExcel}
+                    className='add-data'
                 >Export
                 </button>
                 <button
+                    className='search'
                     onClick={handleSearch}
                     style={{
                         backgroundColor: '#4F70AB',
@@ -715,6 +738,7 @@ const LogFaceReg = () => {
                 onClose={() => { setIsOpenImage(false) }}
                 currImg={currentImage}
             />
+            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} doneProgres={DoneProgress} />
         </div >
     )
 }

@@ -425,3 +425,42 @@ export const DeleteNegara = async (id) => {
     console.log(error)
   }
 }
+
+
+export const GetDataCheckCekal = async (params) => {
+  try {
+    const res = await axios.post(`${url_devel}api/cek-cekal`, params);
+    return res;
+  } catch (error) {
+    console.log(error.response, 'ApakahErrorDisini')
+    throw error
+  }
+}
+
+export const checkCountData = async (date) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/totaluser`,
+      params: date
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getAllTpiData = async () => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/tpi-data`,
+      params: {
+        alamat_tpi: "JAYAPURA"
+      }
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}
