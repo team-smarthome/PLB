@@ -8,6 +8,7 @@ import TableLog from '../TableLog/TableLog';
 import Modals from '../Modal/Modal';
 import { io } from 'socket.io-client';
 import { Toast } from "../../components/Toast/Toast";
+import { initiateSocket4010 } from '../../utils/socket';
 
 const SettingIp = () => {
     const [totalCameras, setTotalCameras] = useState(0);
@@ -29,204 +30,145 @@ const SettingIp = () => {
     const [statusKamera, SetStatusKamera] = useState([])
     const [IpserverWebsocket, setIpserverWebsocket] = useState("")
     const [operationalStatus, setOperationalStatus] = useState();
+    const socket_IO_4010 = initiateSocket4010();
 
-    const handleSubmitIpServer = () => {
-        setStatus("loading")
-        if (newWifiResults) {
-            const socket_server_4010 = io(`http://${newWifiResults}:4010`);
 
-            socket_server_4010.emit('getCameraData')
 
-            socket_server_4010.on('DataIPCamera', (data) => {
-                if (data?.ipCamera.length === 0) {
-                    console.log('DataIPCamera', data?.ipCamera.length);
-                    socket_server_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs })
-                }
-            });
-
-            socket_server_4010.on('connect', () => {
-                console.log('connect to server');
-                setCanAddIpKamerea(true);
-                setStatus("success")
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Success Connect to Server'
-                });
-            });
-        } else {
-            setStatus("success")
-            setCanAddIpKamerea(false);
-            Toast.fire({
-                icon: 'error',
-                title: 'Please Input Ip Server'
-            });
-        }
-    }
     const handleSubmitCrudKameraToServer = (action, params, dataApiKemera) => {
         closeModalAdd()
         closeModalDelete()
         setStatus("loading")
         closeModalEdit()
 
-        //keep it
-        // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
-        //                 return editIpKamera.then((res) => {
-        //                     if (res.status == 200) {
-        //                         fetchAllIp()
-        //                         setStatus("success")
-        //                         Toast.fire({
-        //                             icon: "success",
-        //                             title: "Data berhasil diubah",
-        //                         });
-        //                     }
-        //                 }).catch((err) => {
-        //                     setStatus("success")
-        //                     Toast.fire({
-        //                         icon: "error",
-        //                         title: "Gagal mengubah data",
-        //                     })
-        //                     console.log(err);
-        //                 });
+        const sendDataToWs = {
+            ipServerCamera: [params],
+            operationalStatus: operationalStatus ? "Arrival" : "Departure"
+        }
 
-        const websocketIp = localStorage.getItem('serverIPSocket')
-        if (websocketIp) {
-            const socket_server_4010 = io(`http://${websocketIp}:4010`);
-            const sendDataToWs = {
-                ipServerCamera: [params],
-                operationalStatus: operationalStatus ? "Arrival" : "Departure"
-            }
+        const sendDataToWsEdit = {
+            oldIp: ipEdit,
+            newIp: dataApiKemera.ipAddress,
+            operationalStatus: operationalStatus ? "Arrival" : "Departure"
+        }
 
-            const sendDataToWsEdit = {
-                oldIp: ipEdit,
-                newIp: dataApiKemera.ipAddress,
-                operationalStatus: operationalStatus ? "Arrival" : "Departure"
-            }
-
-            if (action === "add") {
-                socket_server_4010.emit("saveCameraData", sendDataToWs);
-                socket_server_4010.once('saveDataCamera', (data) => {
-                    if (data === "successfully") {
-                        const insertIpKamera = apiInsertIP(dataApiKemera);
-                        insertIpKamera.then((res) => {
-                            if (res.status == 200) {
-                                fetchAllIp()
-                                setStatus("success")
-                                Toast.fire({
-                                    icon: "success",
-                                    title: "Data berhasil disimpan",
-                                });
-                            }
-                        }).catch((err) => {
+        if (action === "add") {
+            socket_IO_4010.emit("saveCameraData", sendDataToWs);
+            socket_IO_4010.once('saveDataCamera', (data) => {
+                if (data === "successfully") {
+                    const insertIpKamera = apiInsertIP(dataApiKemera);
+                    insertIpKamera.then((res) => {
+                        if (res.status == 200) {
+                            fetchAllIp()
                             setStatus("success")
                             Toast.fire({
-                                icon: "error",
-                                title: "Gagal menyimpan data ke API",
-                            })
-                            console.log(err);
-                        });
-                    } else {
+                                icon: "success",
+                                title: "Data berhasil disimpan",
+                            });
+                        }
+                    }).catch((err) => {
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
-                            title: "IP Kamera Not Found",
-                        });
-                    }
-                })
-            } else if (action === "delete") {
-                socket_server_4010.emit("deleteCameraData", sendDataToWs);
-                socket_server_4010.on('deleteDataCamera', (data) => {
-                    if (data === "successfullyDeleted") {
-                        const deleteIpKamera = apiDeleteIp(dataApiKemera.id);
-                        deleteIpKamera.then((res) => {
-                            if (res.status == 200) {
-                                fetchAllIp()
-                                setStatus("success")
-                                Toast.fire({
-                                    icon: "success",
-                                    title: "Data berhasil dihapus",
-                                });
-                            }
-                        }).catch((err) => {
+                            title: "Gagal menyimpan data ke API",
+                        })
+                        console.log(err);
+                    });
+                } else {
+                    setStatus("success")
+                    Toast.fire({
+                        icon: "error",
+                        title: data,
+                    });
+                }
+            })
+        } else if (action === "delete") {
+            socket_IO_4010.emit("deleteCameraData", sendDataToWs);
+            socket_IO_4010.on('deleteDataCamera', (data) => {
+                if (data === "successfullyDeleted") {
+                    const deleteIpKamera = apiDeleteIp(dataApiKemera.id);
+                    deleteIpKamera.then((res) => {
+                        if (res.status == 200) {
+                            fetchAllIp()
                             setStatus("success")
                             Toast.fire({
-                                icon: "error",
-                                title: "Gagal menghapus data",
-                            })
-                            console.log(err);
-                        });
-                    } else {
+                                icon: "success",
+                                title: "Data berhasil dihapus",
+                            });
+                        }
+                    }).catch((err) => {
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
                             title: "Gagal menghapus data",
-                        });
-                    }
-                })
-            } else if (action === "edit") {
-                socket_server_4010.emit("editCameraData", sendDataToWsEdit);
-                socket_server_4010.on('editDataCamera', (data) => {
-                    if (data === "successfullyEdited") {
-                        const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
-                        editIpKamera.then((res) => {
-                            if (res.status == 200) {
-                                fetchAllIp()
-                                setStatus("success")
-                                Toast.fire({
-                                    icon: "success",
-                                    title: "Data berhasil diubah",
-                                });
-                            }
-                        }).catch((err) => {
+                        })
+                        console.log(err);
+                    });
+                } else {
+                    setStatus("success")
+                    Toast.fire({
+                        icon: "error",
+                        title: "Gagal menghapus data",
+                    });
+                }
+            })
+        } else if (action === "edit") {
+            socket_IO_4010.emit("editCameraData", sendDataToWsEdit);
+            socket_IO_4010.on('editDataCamera', (data) => {
+                if (data === "successfullyEdited") {
+                    const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
+                    editIpKamera.then((res) => {
+                        if (res.status == 200) {
+                            fetchAllIp()
                             setStatus("success")
                             Toast.fire({
-                                icon: "error",
-                                title: "Gagal mengubah data",
-                            })
-                            console.log(err);
-                        });
-                    } else {
+                                icon: "success",
+                                title: "Data berhasil diubah",
+                            });
+                        }
+                    }).catch((err) => {
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
                             title: "Gagal mengubah data",
-                        });
-                    }
-                })
-            }
-        } else {
-            setStatus("success")
-            setCanAddIpKamerea(false)
-            Toast.fire({
-                icon: 'error',
-                title: 'Please Input Ip Server'
-            });
+                        })
+                        console.log(err);
+                    });
+                } else {
+                    setStatus("success")
+                    Toast.fire({
+                        icon: "error",
+                        title: "Gagal mengubah data",
+                    });
+                }
+            })
         }
-
     }
+
 
     const handleCheckStatus = () => {
-        setStatus("loading")
-        const websocketIp = localStorage.getItem('serverIPSocket')
-        if (websocketIp) {
-            const socket = io(`http://${websocketIp}:4010`);
-
-            socket.emit("checkStatusKamera")
-
-            socket.on("statusKameraResponse", (data) => {
-                setStatus("success")
-                SetStatusKamera(data)
-                console.log("HASILDARISTATUSKAMERA", data)
-            })
-
-        } else {
-            setStatus("success")
-            setCanAddIpKamerea(false);
-            Toast.fire({
-                icon: 'error',
-                title: 'Please Input Ip Server'
+        return new Promise((resolve, reject) => {
+            setStatus("loading");
+            socket_IO_4010.emit("checkStatusKamera");
+            socket_IO_4010.once("statusKameraResponse", (data) => {
+                setStatus("success");
+                SetStatusKamera(data);
+                console.log("HASILDARISTATUSKAMERA", data);
+                resolve(data);
             });
-        }
-    }
+
+            socket_IO_4010.once('connect_error', (error) => {
+                console.log('Connection error:', error);
+                setStatus("success");
+                SetStatusKamera([]);
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Gagal terhubung ke server!',
+                });
+                reject(error);
+            });
+        });
+    };
+
 
 
     const optionCameras = [...Array(10)].map((_, index) => ({
@@ -237,29 +179,28 @@ const SettingIp = () => {
 
     const fetchAllIp = async () => {
         try {
-            // const res = await apiGetIp(dataUserIp?.petugas?.id);
             const res = await apiGetAllIp();
-            console.log(res, 'res');
             setListCamera(res.data.data)
             if (res.data.data.length === 0) {
+                await handleCheckStatus();
                 setCameraNames(new Array(totalCameras).fill(''));
                 setCameraIPs(new Array(totalCameras).fill(''));
                 setIsEditing(false);
-                setStatus("success")
             } else {
+                await handleCheckStatus();
                 const names = res.data.data.map(item => item.namaKamera);
                 const ips = res.data.data.map(item => item.ipAddress);
                 setTotalCameras(res.data.data.length);
                 setCameraNames(names);
                 setCameraIPs(ips);
                 setIsEditing(true);
-                setStatus("success")
             }
         } catch (err) {
             setStatus("success")
             console.log(err.message);
         }
     };
+
     useEffect(() => {
         setDataUserIp(JSON.parse(getUserdata));
         console.log(JSON.parse(getUserdata), 'hasildaricookie');
@@ -269,115 +210,21 @@ const SettingIp = () => {
     }, [dataUserIp?.petugas?.id, totalCameras]);
 
     useEffect(() => {
-        handleCheckStatus()
-        const websocketIp = localStorage.getItem('serverIPSocket');
-        setIpserverWebsocket(websocketIp);
-        console.log("nilaidariwebsocket", websocketIp);
+        socket_IO_4010.emit('getCameraData');
 
-        if (websocketIp) {
-            const socket_server_4010 = io(`http://${websocketIp}:4010`);
-            socket_server_4010.emit('getCameraData');
-            socket_server_4010.on('DataIPCamera', (data) => {
-                if (data?.ipCamera.length === 0) {
-                    console.log('DataIPCamera', data?.ipCamera.length);
-                    socket_server_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs });
-                }
-            });
-
-            socket_server_4010.on('connect', () => {
-                console.log('connect to server');
-                setCanAddIpKamerea(true);
-                setStatus("success");
-                // Toast.fire({
-                //     icon: 'success',
-                //     title: 'Success Connect to Server'
-                // });
-            });
-            socket_server_4010.on('connect_error', (error) => {
-                console.error('Connection error:', error);
-                // Toast.fire({
-                //     icon: 'error',
-                //     title: 'Failed to connect to the websocket server',
-                // });
-            });
-        }
+        socket_IO_4010.once('DataIPCamera', (data) => {
+            if (data?.ipCamera.length === 0) {
+                console.log('DataIPCamera', data?.ipCamera.length);
+                socket_IO_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs });
+            }
+        });
+        socket_IO_4010.once('connect', () => {
+            console.log('connect to server');
+            setCanAddIpKamerea(true);
+        });
 
     }, [cameraIPs])
 
-
-
-    // useEffect(async () => {
-    //     await fetchAllIp();
-    //     const websocketIp = localStorage.getItem('serverIPSocket')
-    //     setIpserverWebsocket(websocketIp)
-    //     console.log("nilaidariwebsocket", websocketIp);
-    //     if (websocketIp) {
-    //         const socket_server_4010 = io(`http://${websocketIp}:4010`);
-    //         socket_server_4010.emit('getCameraData')
-    //         socket_server_4010.on('DataIPCamera', (data) => {
-    //             if (data?.ipCamera.length === 0) {
-    //                 console.log('DataIPCamera', data?.ipCamera.length);
-    //                 socket_server_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs })
-    //             }
-    //         });
-    //         socket_server_4010.on('connect', () => {
-    //             console.log('connect to server');
-    //             setCanAddIpKamerea(true);
-    //             setStatus("success")
-    //             Toast.fire({
-    //                 icon: 'success',
-    //                 title: 'Success Connect to Server'
-    //             });
-    //         });
-    //         socket_server_4010.on('connect_error', (error) => {
-    //             console.error('Connection error:', error);
-    //             Toast.fire({
-    //                 icon: 'error',
-    //                 title: 'Failed to connect to the websocket server',
-    //             });
-    //         });
-    //     }
-    // }, []);
-
-
-    const handleTotalCamerasChange = (selectedOption) => {
-        if (selectedOption) {
-            const numCameras = selectedOption.value;
-            setTotalCameras(numCameras);
-            setCameraIPs(new Array(numCameras).fill(''));
-            setCameraNames(new Array(numCameras).fill(''));
-            setCurrentCameraIndex(0);
-        } else {
-            setTotalCameras(0);
-            setCameraNames([]);
-            setCameraIPs([]);
-            setCurrentCameraIndex(0);
-        }
-    };
-
-    const handleCameraNameChange = (e) => {
-        const newCameraNames = [...cameraNames];
-        newCameraNames[currentCameraIndex] = e.target.value;
-        setCameraNames(newCameraNames);
-    };
-
-    const handleIPChange = (e) => {
-        const newCameraIPs = [...cameraIPs];
-        newCameraIPs[currentCameraIndex] = e.target.value;
-        setCameraIPs(newCameraIPs);
-    };
-
-    const handleNextCamera = () => {
-        if (currentCameraIndex < totalCameras - 1) {
-            setCurrentCameraIndex(currentCameraIndex + 1);
-        }
-    };
-
-    const handlePrevCamera = () => {
-        if (currentCameraIndex > 0) {
-            setCurrentCameraIndex(currentCameraIndex - 1);
-        }
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -387,8 +234,6 @@ const SettingIp = () => {
             userId: dataUserIp?.petugas?.id,
             is_depart: operationalStatus
         };
-
-
 
         handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
 
@@ -407,17 +252,6 @@ const SettingIp = () => {
 
         handleSubmitCrudKameraToServer("edit", ipEdit, dataApiKemera);
 
-        // console.log(dataApiKemera, 'dataApiKemera');
-        // const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
-        // editIpKamera.then((res) => {
-        //     if (res.status == 200) {
-        //         closeModalEdit()
-        //         fetchAllIp()
-        //     }
-        // }).catch((err) => {
-        //     console.log(err.message);
-        // });
-
         console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
 
@@ -426,7 +260,6 @@ const SettingIp = () => {
     }
 
     const openModalAdd = () => {
-        // setDetailData(row)
         setModalAdd(true)
     }
 
@@ -513,7 +346,6 @@ const SettingIp = () => {
             ipAddress: formValues.ipAddress,
             is_depart: formValues.statusCamera,
         };
-        // return console.log(params2, "paramsCheckFilter");
         try {
             const response = await apiGetAllIpFilter({
                 params: {
@@ -973,120 +805,6 @@ const SettingIp = () => {
                 >
                     {modalDeleteLayout()}
                 </Modals>
-                {/* <form
-                // className=""
-                onSubmit={isEditing ? handleEdit : handleSubmit} // Adjust submit handler based on mode
-            // style={{ width: "120vh" }}
-            >
-                <div className="form-group">
-                    <div className="wrapper-form">
-                        <div className="wrapper-input">
-                            <label htmlFor="total_cameras">Jumlah Kamera</label>
-                        </div>
-                        <Select
-                            id="totalCameras"
-                            name="totalCameras"
-                            value={optionCameras.find(option => option.value === totalCameras)}
-                            onChange={handleTotalCamerasChange}
-                            options={optionCameras}
-                            className="basic-single"
-                            classNamePrefix="select"
-                            styles={{
-                                container: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: '100%',
-                                    borderRadius: '10px',
-                                    backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    fontFamily: 'Roboto, Arial, sans-serif',
-                                }),
-                                valueContainer: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: '100%',
-                                }),
-                                control: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: '100%',
-                                    backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                }),
-                            }}
-                        />
-                    </div>
-                </div>
-
-                {totalCameras > 0 && (
-                    <div className="form-group">
-                        <div className="wrapper-form">
-                            <div className="wrapper-input">
-                                <label htmlFor="cameraName">Masukkan Nama Kamera {currentCameraIndex + 1}</label>
-                            </div>
-                            <input
-                                type="text"
-                                id="cameraName"
-                                name="cameraName"
-                                placeholder={`Nama Kamera ${currentCameraIndex + 1}`}
-                                onChange={handleCameraNameChange}
-                                value={cameraNames[currentCameraIndex] || ''}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {totalCameras > 0 && (
-                    <div className="form-group">
-                        <div className="wrapper-form">
-                            <div className="wrapper-input">
-                                <label htmlFor="cameraIP">Masukkan IP untuk Kamera {currentCameraIndex + 1}</label>
-                            </div>
-                            <input
-                                type="text"
-                                id="cameraIP"
-                                name="cameraIP"
-                                onChange={handleIPChange}
-                                value={cameraIPs[currentCameraIndex] || ''}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                <div className='button-config-list'>
-                    <button
-                        type="button"
-                        onClick={handlePrevCamera}
-                        disabled={currentCameraIndex === 0}
-                    >
-                        <MdKeyboardDoubleArrowLeft
-                            size={16}
-                        />
-                        Sebelumnya
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleNextCamera}
-                        disabled={currentCameraIndex === totalCameras - 1}
-                    >
-                        Berikutnya
-                        <MdKeyboardDoubleArrowRight
-                            size={16}
-                        />
-                    </button>
-                </div>
-            </form> */}
-                {/* <div className="btn-submit">
-                <button
-                    type="submit"
-                // className="btn-submit"
-                >
-                    {isEditing ? 'Simpan Perubahan' : 'Simpan'}
-                </button>
-            </div> */}
-                {/* <button
-                onClick={handleDelete}
-            >
-                Delete
-            </button> */}
             </div >
         </>
     );

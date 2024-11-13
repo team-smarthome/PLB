@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from "react";
-import FormData from "../FormData/FormData";
-import CardList from "../CardList/CardList";
-import CardStatus from "../CardStatus/CardStatus";
-import CardPayment from "../CardPayment/CardPayment";
 import "./BodyContentValidation.style.css";
 import FormDataValidation from "../FormDataValidation/FormDataValidation";
 import CardStatusValidation from "../CardStatusValidation/CardStatusValidation";
@@ -55,7 +51,6 @@ const BodyContentValidation = ({
 
   useEffect(() => {
     setSharedData({ passportData: dataPrimaryPassport });
-    // console.log("dataPrimaryPassport", dataPrimaryPassport);
   }, [dataPrimaryPassport]);
 
 

@@ -452,7 +452,7 @@ const Apply = () => {
       } else {
         Toast.fire({
           icon: "error",
-          title: "Gagal mengirim data",
+          title: data,
         });
         setCardPaymentProps({
           isWaiting: false,
@@ -605,7 +605,7 @@ const Apply = () => {
               personIDType: 1,
               personName: sharedData.passportData.fullName,
               personGender: sharedData.passportData.sex === "male" ? 1 : 0,
-              validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
+              validStartTime: Math.floor(new Date().getTime() / 1000 - 86400).toString(),
               validEndTime: Math.floor(new Date(`${sharedData.passportData.formattedExpiryDate}T23:59:00`).getTime() / 1000).toString(),
               personType: 1,
               identityType: 1,
@@ -638,7 +638,7 @@ const Apply = () => {
 
       setObjectApi(dataTosendAPI);
       setObjectCamera(bodyParamsSendKamera);
-
+      console.log(bodyParamsSendKamera, 'bodyParamsSendKamera')
       console.log("DataYNAAPIDIKIRIM", dataTosendAPI);
       console.log("sharedDataTOSEndAPi", sharedData);
 

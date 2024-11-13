@@ -251,9 +251,7 @@ const LogFaceReg = () => {
 
     const DoneProgress = async () => {
         setStatus('loading')
-        console.log("bbiiiiiiiiiiiiiii")
         const getDataIp = Cookies.get('userdata');
-        // const getAllIp = apiGetIp(JSON.parse(getDataIp)?.petugas?.id);
         const getAllIp = apiGetAllIp();
         getAllIp.then(res => {
             if (res.data.status === 200) {
@@ -275,30 +273,6 @@ const LogFaceReg = () => {
 
     useEffect(() => {
         DoneProgress();
-        //=============GK PAKE INTERNET=============//
-        // setStatus('success')
-        // const dataOptinDummy = [
-        //     {
-        //         value: '192.2.1',
-        //         label: 'All Camera'
-        //     },
-        //     {
-        //         value: '192.168.2.166',
-        //         label: 'Camera 1'
-        //     },
-        //     {
-        //         value: '192.168.171',
-        //         label: 'Camera 2'
-        //     },
-        // ]
-
-        // setOptionIp(dataOptinDummy)
-        //=============STOP=============//
-
-        //=============PAKE INTERNET=============//
-
-
-        //=============STOP=============//
     }, [])
 
 
@@ -422,11 +396,6 @@ const LogFaceReg = () => {
         })
     }
 
-    const getDetailData = (row) => {
-        // console.log(row.personCode)
-        navigate('/validation', { state: { detailDataLog: row.personCode, isCp: true } })
-    }
-
     const generateExcel = () => {
         const Excel = require("exceljs");
         const workbook = new Excel.Workbook();
@@ -439,7 +408,6 @@ const LogFaceReg = () => {
             const row = [
                 index + 1,
                 item.personId,
-                // item.personCode,
                 item.name,
                 item?.similarity,
                 item?.passStatus === 6 ? "Failed" : "Success",
@@ -522,20 +490,6 @@ const LogFaceReg = () => {
             passStatus: selectedOption ? selectedOption.value : ""
         }));
     };
-
-    // const handleChangeStatus = (selectedOption) => {
-    //     setParams(prevState => {
-    //         const newState = {
-    //             ...prevState,
-    //             passStatus: selectedOption ? selectedOption.value : ""
-    //         };
-    //         console.log(newState, "updated params in setParams callback");
-    //         return newState;
-    //     });
-    //     console.log(selectedOption, "selectedOptionRowtest");
-    // };
-
-
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>

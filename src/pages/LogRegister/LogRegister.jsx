@@ -1,18 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
-import ario from '../../assets/images/ario.jpeg'
 import { useNavigate } from 'react-router-dom'
 import { apiGetDataLogRegister, deleteDataUserPlb, editDataUserPlb, getAllNegaraData } from '../../services/api'
 import { url_devel } from '../../services/env'
 import Modals from '../../components/Modal/Modal'
 import dataNegara from '../../utils/dataNegara'
 import { initiateSocket4010 } from '../../utils/socket'
-import axios from 'axios'
 import Cookies from 'js-cookie';
 import './logregister.style.css'
-import { MdOutlineBrokenImage } from "react-icons/md";
 import Pagination from '../../components/Pagination/Pagination'
-import { sampleData } from './sampleSynchronize'
+
 
 const LogRegister = () => {
     const userCookie = Cookies.get('userdata')
@@ -70,6 +67,7 @@ const LogRegister = () => {
                 setTotalDataFilter(response?.data?.data?.length);
             }
         } catch (error) {
+            setStatus("success")
             console.log(error)
         }
     }
@@ -121,32 +119,53 @@ const LogRegister = () => {
         setShowModalDelete(false)
     }
 
+
     const handleDelete = async () => {
         setStatus("loading")
         setShowModalDelete(false)
         try {
-            const res = await deleteDataUserPlb(detailData.no_passport)
-            console.log(res, "res delete")
-            if (res.status == 200) {
+            const respnse = await new Promise((resolve, reject) => {
                 socket_IO_4010.emit('deleteDataUser', {
                     no_passport: detailData.no_passport
                 })
-                socket_IO_4010.on('responseDeleteDataUser', (data) => {
-                    console.log(data, "res socket")
+
+                socket_IO_4010.once('responseDeleteDataUser', (data) => {
+                    console.log(data, "res_socket_delete")
                     if (data === "Successfully") {
-                        getLogRegister()
-                        setShowModalDelete(false)
-                        setStatus("success")
+                        resolve(data)
+                    } else {
+                        reject(data)
                     }
                 })
+            })
+
+            if (respnse === "Successfully") {
+                const { data } = await deleteDataUserPlb(detailData.no_passport)
+                if (data.status == 200) {
+                    getLogRegister()
+                    setShowModalDelete(false)
+                    setStatus("success")
+                } else {
+                    getLogRegister()
+                    setShowModalDelete(false)
+                    setStatus("success")
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Failed to delete data'
+                    })
+                }
             }
         } catch (error) {
             getLogRegister()
             setStatus("success")
             setShowModalDelete(false)
-            console.log(error)
+            Toast.fire({
+                icon: 'error',
+                title: 'Failed to delete data'
+            })
         }
     }
+
     const handleImageFace = (event) => {
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
@@ -188,7 +207,7 @@ const LogRegister = () => {
                 </>
             </td>
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                
+
                 <button onClick={() => openModalEdit(row)}>Edit</button>
                 <button onClick={() => deleteModal(row)} style={{ background: 'red' }}>Delete</button>
             </td>
@@ -594,11 +613,11 @@ const LogRegister = () => {
                 paddingBottom: "1%",
             }}>
                 <button
-                style={{
-                    width: 150,
-                    cursor: 'pointer'
-                }}
-                onClick={() => navigate("/cpanel/synchronize-register")}
+                    style={{
+                        width: 150,
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => navigate("/cpanel/synchronize-register")}
                 >Sinkronisasi Data</button>
                 <button
                     onClick={generateExcel}
@@ -673,7 +692,7 @@ const LogRegister = () => {
             >
                 {modalDelete()}
             </Modals>
-           
+
         </div>
     )
 }

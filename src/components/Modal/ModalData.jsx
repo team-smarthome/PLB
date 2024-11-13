@@ -186,7 +186,7 @@ const ModalData = ({ open, onClose, doneProgres }) => {
                                         />
                                     </div>
                                     <div>
-                                        <p className='text-black text-start'>Masukan Nomor PLB / BCP</p>
+                                        <p className='text-black text-start'>Pilih Status Keberangkatan</p>
                                         <Select
                                             onChange={(e) => setDepartStatus(e.value)}
                                             options={selectOptions}

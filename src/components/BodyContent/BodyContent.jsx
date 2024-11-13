@@ -61,7 +61,7 @@ const BodyContent = ({
   };
 
   const receiveDataFromChild = (data) => {
-    sendDataToParent1(data); // Send data to Component1
+    sendDataToParent1(data);
   };
 
 
@@ -134,15 +134,8 @@ const BodyContent = ({
 
   useEffect(() => {
     setSharedData({ passportData: dataPrimaryPassport });
-    // console.log("dataPrimaryPassport", dataPrimaryPassport);
   }, [dataPrimaryPassport]);
 
-
-  //useEffect setCardPaymentProps 
-
-  useEffect(() => {
-    // console.log("cardPaymentProps", cardPaymentProps);
-  }, [cardPaymentProps]);
 
   return (
     <div className="body-content">

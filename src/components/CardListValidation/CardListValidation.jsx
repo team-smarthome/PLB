@@ -1,11 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import "./CardListValidation.style.css";
-import DataContext from "../../context/DataContext";
 
 const CardListValidation = ({ status, setStatus }) => {
-  console.log(status, "status")
   const [listData, setListData] = useState(["Data User"]);
-  // console.log("DataStatus", data);
 
   return (
     <ul className="card-list-container">
