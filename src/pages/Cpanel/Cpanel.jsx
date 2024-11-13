@@ -41,6 +41,7 @@ const Cpanel = () => {
         }
     }
 
+    // console.log(userData)
     const handleLogout = () => {
         Cookies.remove('token')
         Cookies.remove('userdata')
@@ -67,15 +68,28 @@ const Cpanel = () => {
                         style={{ cursor: 'pointer' }}
                         onClick={handleSidebarToggle}
                     />
-                    <div className="user-profile" onClick={() => setShowUserButton(!showUserButton)}>
+                    <div className="user-profile" >
+                        {userData.role == 0 && (
+                            <>
+                        <button
+                        className='p-4 rounded-md bg-btnPrimary text-white font-semibold cursor-pointer hover:bg-[#0f2a43]'
+                        onClick={() => navigate("/home")}
+                        >
+                        Home
+                        </button>
+                            </>
+                        )}
                         {/* <img src={ario} alt="" width={55} height={55} /> */}
-                        <div className="circle-container">
+                        <div className="flex flex-row gap-4" onClick={() => setShowUserButton(!showUserButton)}>
+                        <div className="circle-container ml-4" >
                             <span className="circle">{handleSplitName(userData?.petugas?.nama_petugas)}</span>
                         </div>
 
                         <h4>{userData?.petugas?.nama_petugas ?? ""}</h4>
+                        </div>
                     </div>
-                    {showUserButton && <div className="user-button-list">
+                    {showUserButton && 
+                    <div className="user-button-list">
                         <button onClick={handleLogout}>Logout</button>
                     </div>}
                 </div>

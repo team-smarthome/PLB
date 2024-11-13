@@ -32,14 +32,18 @@ const Sidebar = ({ isOpen }) => {
     };
 
     const isActive = (path) => location.pathname === path;
-
+    const handleRedirectHome = () => {
+        if (userInfo.role == 0) {
+            navigate("/home")
+        }
+    }
     return (
         <div className={`sidebar ${isOpen ? "" : "close"}`}>
             {isOpen && (
                 <div
                     className="logo-details"
                     style={{ cursor: 'pointer' }}
-                    onClick={() => navigate('/home')}
+                    onClick={handleRedirectHome}
                 >
                     <img src={logo} alt="plb" />
                 </div>

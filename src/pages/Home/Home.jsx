@@ -8,10 +8,13 @@ import { TbSettingsCog } from "react-icons/tb";
 import LogoutIcon from "../../assets/images/logout.png";
 import Swal from "sweetalert2";
 import { initiateSocketConfig } from "../../utils/socket";
-
+import { RiAdminLine } from "react-icons/ri";
+import Cookies from 'js-cookie';
 
 
 const Home = () => {
+  const userCookie = Cookies.get('userdata');
+  const userInfo = JSON.parse(userCookie)
   const socket2_IO_4000Home = initiateSocketConfig();
   const [canApply, setCanApply] = useState(false);
   const [waitingHome, setWaitingHome] = useState(true)
@@ -51,16 +54,16 @@ const Home = () => {
 
   const navigate = useNavigate();
   const btnOnClick_Apply = () => {
-    if (!canApply) {
-      Swal.fire({
-        title: "Please configure the server first",
-        icon: "warning",
-        confirmButtonColor: "#3D5889",
-      });
-      navigate("/configuration");
-    } else {
+    // if (!canApply) {
+    //   Swal.fire({
+    //     title: "Please configure the server first",
+    //     icon: "warning",
+    //     confirmButtonColor: "#3D5889",
+    //   });
+    //   navigate("/configuration");
+    // } else {
       navigate("/apply");
-    }
+    // }
   };
 
   const btnOnClick_Informasi = () => {
@@ -69,6 +72,10 @@ const Home = () => {
 
   const btnOnClick_Search_Passport = () => {
     navigate("/history-register");
+  };
+
+  const btnOnClickCpanel = () => {
+    navigate("/cpanel");
   };
   const deleteAllCookies = () => {
     const cookies = document.cookie.split(';');
@@ -124,12 +131,24 @@ const Home = () => {
               <FaWpforms size={60} />
               Apply
             </div>
+            {userInfo.role == 0 ? 
+            <>
+            <div className={`div-kanan-bawah-apply ${waitingHome ? 'disabled' : ''}`}
+              onClick={!waitingHome ? btnOnClickCpanel : null}
+              style={{ pointerEvents: waitingHome ? 'none' : 'auto' }}>
+              <RiAdminLine size={60} />
+              Control Panel
+            </div>
+            </> :
+            <>
             <div className={`div-kanan-bawah-apply ${waitingHome ? 'disabled' : ''}`}
               onClick={!waitingHome ? btnOnClick_Search_Passport : null}
               style={{ pointerEvents: waitingHome ? 'none' : 'auto' }}>
               <IoSearchSharp size={60} />
               History Register
             </div>
+            </>
+            }
           </div>
           <div className={`div-kiri-apply ${waitingHome ? 'disabled' : ''}`}
             onClick={!waitingHome ? btnOnClick_Informasi : null}
