@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './usermanagement.style.css'
-import { DeletePetugas, getAllPetugas, InsertPetugas, UpdatePetugas } from '../../services/api'
+import { DeletePetugas, getAllPetugas, getAllTpiData, InsertPetugas, UpdatePetugas } from '../../services/api'
 import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
 import Cookies from 'js-cookie';
@@ -18,6 +18,7 @@ const UserManagement = () => {
     const [formData, setFormData] = useState({})
     const [dataPetugas, setDataPetugas] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [dataTpi, setDataTpi] = useState([])
     const [search, setSearch] = useState({
         nip: "",
         role: "",
@@ -53,9 +54,24 @@ const UserManagement = () => {
         }
     }
 
+    const handleGetAllTpiData = async (page = 1) => {
+        try {
+
+            const response = await getAllTpiData()
+            if (response.status === 200) {
+                console.log(response.data.data)
+                setDataTpi(response?.data?.data)
+            }
+        } catch (error) {
+
+            console.log(error)
+        }
+    }
+
 
     useEffect(() => {
         getAllPetugasData()
+        handleGetAllTpiData()
     }, [])
 
     const handleAddPetugas = async () => {
@@ -148,7 +164,9 @@ const UserManagement = () => {
             nip: data?.nip,
             gender: data?.petugas?.gender,
             tanggal_lahir: data?.petugas?.tanggal_lahir,
-            nama_jabatan: data?.jabatan?.nama_jabatan
+            nama_jabatan: data?.jabatan?.nama_jabatan,
+            tpi_id: data?.tpi_id,
+            nama_tpi: data?.nama_tpi
         }
         setFormData(editData)
         setIsShowModal(true)
@@ -191,6 +209,14 @@ const UserManagement = () => {
         const toggleShowPassword = () => {
             setShowPassword(!showPassword);
         };
+
+        const handleTpiChange = (e) => {
+            const value = e.target.value;
+            // console.log(object)
+            const findTpi = dataTpi.find(tpi => tpi.id_tpi == value);
+            // console.log(findTpi, "sini")
+            setFormData({ ...formData, tpi_id: findTpi.id_tpi, nama_tpi: findTpi.nama_tpi });
+        }
 
         return (
             <div className="edit-container">
@@ -262,11 +288,22 @@ const UserManagement = () => {
                         <option value={2}>Register</option>
                     </select>
                 </div>
+                <div>
+                    <span>TPI :</span>
+                    <select value={formData.id_tpi} onChange={handleTpiChange}>
+                        <option value="">Pilih Tpi</option>
+                        {dataTpi.map((tpi, index) => {
+                            return (
+                                <option key={index} value={tpi.id_tpi}>{tpi.nama_tpi}</option>)
+                        })}
+                    </select>
+                </div>
             </div>
         );
     };
 
     const editModalContent = () => {
+        console.log(formData, "sini")
         const handleChange = (e) => {
             setFormData({
                 ...formData,
@@ -294,6 +331,14 @@ const UserManagement = () => {
                 ...formData,
                 tanggal_lahir: e.target.value
             });
+        }
+
+        const handleTpiChange = (e) => {
+            const value = e.target.value;
+            // console.log(object)
+            const findTpi = dataTpi.find(tpi => tpi.id_tpi == value);
+            // console.log(findTpi, "sini")
+            setFormData({ ...formData, tpi_id: findTpi.id_tpi, nama_tpi: findTpi.nama_tpi });
         }
 
         return (
@@ -345,6 +390,16 @@ const UserManagement = () => {
                         <option value={0}>Admin</option>
                         <option value={1}>Pelintas</option>
                         <option value={2}>Register</option>
+                    </select>
+                </div>
+                <div>
+                    <span>TPI :</span>
+                    <select value={formData.tpi_id} onChange={handleTpiChange}>
+                        <option value="">Pilih Tpi</option>
+                        {dataTpi.map((tpi, index) => {
+                            return (
+                                <option key={index} value={tpi.id_tpi}>{tpi.nama_tpi}</option>)
+                        })}
                     </select>
                 </div>
             </div>

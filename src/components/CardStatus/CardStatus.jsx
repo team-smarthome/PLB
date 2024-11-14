@@ -15,14 +15,18 @@ import dataNegara from "../../utils/dataNegara";
 import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import { useAtom } from "jotai";
-import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB } from "../../utils/atomStates";
+import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB, DataHasilCekal } from "../../utils/atomStates";
 import { initiateSocket, addPendingRequest, initiateSocket4040 } from "../../utils/socket";
 import { FaRegIdCard } from "react-icons/fa";
 import ImgsViewer from "react-images-viewer";
+import Modals from "../Modal/Modal";
+import ModalCekal from "../Modal/ModalCekal";
 // const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
+	const [dataCekalAtom] = useAtom(DataHasilCekal);
+	const [skorKemiripan, setSkorKemiripan] = useState(0);
 	const [documentPLBImage, setDocumentPLBImage] = useAtom(ImageDocumentPLB)
 	const [capturedImageAfter2, setCapturedImageAfter2] = useAtom(caputedImageAfter);
 	const { data } = useContext(DataContext);
@@ -61,6 +65,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	const [isOpenImage, setIsOpenImage] = useState(false)
 	const [resultArray, setResultArray] = useState([])
+	const [openModakCekal, setOpenModalCekal] = useState(false)
 
 	const handlePreviewImage = (image) => {
 		setIsOpenImage(true)
@@ -81,7 +86,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				capturedImage: imageBase64,
 				emailUser: null,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 		});
 		socket_IO_4000.on("error_photo", (error) => {
@@ -123,6 +128,10 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	}, [socket_IO_4000, capturedImage]);
 
 
+	useEffect(() => {
+		setSkorKemiripan(dataCekalAtom?.skor_kemiripan || 0)
+	}, [dataCekalAtom]);
+
 
 	useEffect(() => {
 		socket_IO_4040.on("document-data", (data) => {
@@ -133,7 +142,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					capturedImage: null,
 					emailUser: null,
 					titleHeader: "Registrasi Pas Lintas Batas",
-					titleFooter: "Next Step",
+					titleFooter: "Lanjut",
 				});
 			} else if (data.error) {
 				sendDataToInput({
@@ -141,7 +150,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					capturedImage: null,
 					emailUser: null,
 					titleHeader: "Registrasi Pas Lintas Batas",
-					titleFooter: "Next Step",
+					titleFooter: "Lanjut",
 				});
 				setTimeout(() => {
 					sendDataToInput({
@@ -149,7 +158,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						capturedImage: null,
 						emailUser: null,
 						titleHeader: "Registrasi Pas Lintas Batas",
-						titleFooter: "Next Step",
+						titleFooter: "Lanjut",
 					});
 				}, 3000)
 			} else {
@@ -163,7 +172,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			// 	capturedImage: null,
 			// 	emailUser: null,
 			// 	titleHeader: "Registrasi Pas Lintas Batas",
-			// 	titleFooter: "Next Step",
+			// titleFooter: "Lanjut",
 			// });
 		});
 	}, [socket_IO_4040]);
@@ -178,7 +187,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				capturedImage: capturedImage,
 				emailUser: null,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 		} else {
 			sendDataToInput({
@@ -186,7 +195,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				capturedImage: null,
 				emailUser: null,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 			addPendingRequest({ action: 'take_photo' });
 
@@ -200,7 +209,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			// 		capturedImage: null,
 			// 		emailUser: null,
 			// 		titleHeader: "Apply PLB",
-			// 		titleFooter: "Next Step",
+			// 	titleFooter: "Lanjut",
 			// 	});
 			// });
 		}
@@ -217,7 +226,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				capturedImage: capturedImage,
 				emailUser: null,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 		} else {
 			sendDataToInput({
@@ -225,7 +234,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				capturedImage: null,
 				emailUser: null,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 			addPendingRequest({ action: 'get-documnent' });
 
@@ -239,7 +248,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			capturedImage: null,
 			emailUser: email,
 			titleHeader: "Registrasi Pas Lintas Batas",
-			titleFooter: "Next Step",
+			titleFooter: "Lanjut",
 		});
 	};
 
@@ -249,7 +258,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			capturedImage: null,
 			emailUser: email,
 			titleHeader: "Registrasi Pas Lintas Batas",
-			titleFooter: "Next Step",
+			titleFooter: "Lanjut",
 		});
 	};
 
@@ -265,7 +274,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			capturedImage: null,
 			emailUser: email,
 			titleHeader: "Registrasi Pas Lintas Batas",
-			titleFooter: "Next Step",
+			titleFooter: "Lanjut",
 		});
 	};
 
@@ -278,7 +287,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			capturedImage: null,
 			emailUser: email,
 			titleHeader: "Registrasi Pas Lintas Batas",
-			titleFooter: "Next Step",
+			titleFooter: "Lanjut",
 		});
 	};
 
@@ -330,7 +339,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				emailUser: email,
 				capturedImage: capturedImage,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 		}
 	};
@@ -361,7 +370,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				capturedImage: capturedImage,
 				emailUser: null,
 				titleHeader: "Registrasi Pas Lintas Batas",
-				titleFooter: "Next Step",
+				titleFooter: "Lanjut",
 			});
 
 			try {
@@ -385,7 +394,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 							capturedImage: capturedImage,
 							emailUser: null,
 							titleHeader: "Registrasi Pas Lintas Batas",
-							titleFooter: "Next Step",
+							titleFooter: "Lanjut",
 						});
 					}, 2000);
 				}
@@ -471,7 +480,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				break;
 			case "postalCode":
 				socket_IO_4000.emit("stop_stream");
-				// socket_IO_4000.emit("stop_stream");
 				break;
 			default:
 				console.log(`Unknown status: ${statusCardBox}`);
@@ -704,7 +712,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				return (
 					<>
 						<h1 className="card-title check-data-title">
-							Please Check Your Passport Data
+							Silakan Periksa Data Anda
 						</h1>
 						<p>Tap on checkbox if true.</p>
 						<p>Tap on edit icon if you want to correct the data.</p>
@@ -716,7 +724,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				return (
 					<>
 						<h1 className="card-title check-data-title">
-							Please wait...
+							Mohon Tunggu...
 						</h1>
 					</>
 				);
@@ -724,13 +732,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				return (
 					<>
 						<h1 className="card-title check-data-title">
-							Please wait...
+							Mohon Tunggu...
 						</h1>
 						<button
 							className="ok-button"
 							onClick={handleReloadPhoto}
 						>
-							Reload Camera
+							Muat Ulang
 						</button>
 					</>
 				);
@@ -740,13 +748,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 						<div className="w-[70%]  flex justify-center flex-col items-center gap-10">
 							<h1 className="card-title check-data-title">
-								Please wait...
+								Mohon Tunggu...
 							</h1>
 							<button
 								className="ok-button"
 								onClick={handleReloadGetDocument}
 							>
-								Reload Get Document
+								Muat Ulang
 							</button>
 						</div>
 
@@ -763,13 +771,13 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				return (
 					<>
 						<h1 className="card-title">
-							Please look at the camera
+							Mohon Lihat Kamera
 						</h1>
 						<div style={{ height: "180px" }}>
 							<VideoPlayer url={'http://localhost:4001/stream_.m3u8'} />
 						</div >
 						<button className="ok-button" onClick={handleTakePhoto}>
-							Take a face photo
+							Ambil Foto
 						</button>
 					</>
 				);
@@ -827,7 +835,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						{(capturedImage || capturedImageAfter2) && (
 							<div className="container-box-image">
 								<h1 className="card-title">
-									Take Photo Success
+									Berhasil Mengambil Foto
 								</h1>
 
 								<div className="box-image">
@@ -845,7 +853,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 									onClick={doRetake}
 									className="retake-button"
 								>
-									Retake
+									Ulangi
 								</button>
 							</div>
 						)}
@@ -857,7 +865,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						{documentPLBImage && (
 							<div className="container-box-image">
 								<h1 className="card-title">
-									Succes Get Document
+									Berhasil Mendapatkan Dokumen
 								</h1>
 
 								<div className="box-image cursor-pointer"
@@ -877,7 +885,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 									onClick={doRetakeDocument}
 									className="retake-button"
 								>
-									Retake
+									Ulangi
 								</button>
 							</div>
 						)}
@@ -970,24 +978,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 						<img src={Gambar1} alt="" className="card-image" />
 					</>
 				);
-			default:
-				return (
-					<>
-
-						<div className="h-64 w-[80%]  flex flex-col justify-center items-center">
-							<h1 className="card-title">
-								Scan Document PLB
-							</h1>
-							<FaRegIdCard className="h-[80%] w-[80%]" />
-						</div >
-						<p className="text-black text-md mt-2">
-							Please wait until scanning proccess is complete then clik the button below
-						</p>
-						<button className="ok-button" onClick={handleGetDocumnet}>
-							Get Document PLB
-						</button>
-					</>
-				);
+			case 'kenaCekal':
 				return (
 					<>
 						<h1 className="card-title">
@@ -998,20 +989,27 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 								</React.Fragment>
 							))}
 						</h1>
-						{/* <textarea
-							className="areaScan"
-							autoFocus
-							onChange={handleScanedArea}
-							value={inputValue}
-						></textarea> */}
-						{resDataScan && (
-							<img
-								src={`data:image/jpeg;base64,${resDataScan}`}
-								alt="image"
-								width={550}
-								height={350}
-							/>
-						)}
+						<button className="ok-button" onClick={() => setOpenModalCekal(true)} >
+							Detail Cekal
+						</button>
+					</>
+				);
+			default:
+				return (
+					<>
+
+						<div className="h-64 w-[80%]  flex flex-col justify-center items-center">
+							<h1 className="card-title">
+								Pindai Dokumen PLB
+							</h1>
+							<FaRegIdCard className="h-[80%] w-[80%]" />
+						</div >
+						<p className="text-black text-md mt-2">
+							Silakan tunggu hingga proses pemindaian selesai, lalu klik tombol di bawah ini.
+						</p>
+						<button className="ok-button" onClick={handleGetDocumnet}>
+							Dapatkan Dokumen
+						</button>
 					</>
 				);
 		}
@@ -1068,23 +1066,23 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					"scanned. Please rescan",
 				];
 			case "error_image":
-				return ["Image Not Found", "Please Scan Again"];
+				return ["Gambar Tidak Ditemukan", "Silahkan Coba Lagi"];
 			case "error_folder":
-				return ["Folder Not Found", "Please Check Your Directory"];
+				return ["Folder Tidak Ditemukan", "Harap Periksa Pengaturan"];
 			case "closedEyes":
-				return ["Please Open Your Eyes", "Before Take Photo"];
+				return ["Mata Tertutup", "Silahkan Buka Mata"];
 			case "usingMask":
-				return ["Please Remove Mask", "Before Take Photo"];
+				return ["Silahkan Lepas Masker", "Sebelum Foto"];
 			case "usingGlasses":
-				return ["Please Remove Glasses", "Before Take Photo"];
+				return ["Silahkan Lepas Kacamata", "Sebelum Foto"];
 			case "errorPhoto":
-				return ["Error Taking Photo", "Please Try Again"];
+				return ["Foto Tidak Valid", "Silahkan Coba Lagi"];
 			case "usingHat":
-				return ["Please Remove Hat", "Before Take Photo"];
+				return ["Silahkan Lepas Topi", "Sebelum Foto"];
 			case "usingMaskGlasses":
-				return ["Please Remove Mask and Glasses", "Before Take Photo"];
+				return ["Silahkan Lepas Masker dan Kacamata", "Sebelum Foto"];
 			case "occlusionImage":
-				return ["Invalid Capture", "Please Try Again"];
+				return ["Foto Tidak Valid", "Silahkan Coba Lagi"];
 			case "errorVoa":
 				return ["Your Country is not eligible", "for Apply PLB"];
 			case "errorBulan":
@@ -1107,16 +1105,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "errorConnection":
 				return ["Connecting Device", "Please wait..."];
 			case "errorWebsocket":
-				return ["Error Connecting Device", "Device connection failed"];
+				return ["Kesalahan Menghubungkan Perangkat", "Gagal menghubungkan perangkat"];
 			case "notconnectCamera":
 				return [
-					"Device Camera is not connected",
-					"Please check the device",
+					"Kamera Tidak Terhubung",
+					"Silahkan Hubungkan Kamera",
 				];
 			case "searchPassportSucces":
 				return ["Passport Data Successfully Found"];
 			case "notFoundPassport":
 				return ["Application Not Found"];
+			case "kenaCekal":
+				return ["Data Cekal Ditemukan", `Skor Kemiripan ${skorKemiripan}`];
 			default:
 				return [];
 		}
@@ -1132,6 +1132,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				isOpen={isOpenImage}
 				onClose={() => { setIsOpenImage(false) }}
 			/>
+
+			<ModalCekal open={openModakCekal} onClose={() => { setOpenModalCekal(false) }} onTutup={null} row={dataCekalAtom} skorKemiripan={skorKemiripan} />
 		</div>
 	);
 };

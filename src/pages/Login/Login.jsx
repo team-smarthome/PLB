@@ -6,12 +6,18 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Toast } from "../../components/Toast/Toast";
 import Cookies from 'js-cookie';
 import { url_devel } from "../../services/env";
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [sUserName, setUsername] = useState("");
   const [sPassword, setPassword] = useState("");
   const navigate = useNavigate();
   const [dataUserLogin, setDataUserLogin] = useState(null);
+  // const [version, setVersion] = useState("1.0.8-beta");
+  const version = "1.0.14-beta";
+
+
+  localStorage.setItem("version", version);
 
 
   const isAuthenticated = () => {
@@ -35,7 +41,6 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
   const [loading, isLoading] = useState(false);
-  const version = "1.0.3-beta";
 
   if (dataUserLogin !== null) {
     if (dataUserLogin === 2) {
