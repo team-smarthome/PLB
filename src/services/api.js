@@ -464,3 +464,64 @@ export const getAllTpiData = async () => {
     console.log(error)
   }
 }
+
+export const getAllJabatanData = async (params, page) => {
+  try {
+    const res = await axios({
+      method: "get",
+      url: `${url_devel}api/jabatan`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: { ...params, page }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const InsertJabatan = async (payload) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/jabatan`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const UpdateJabatan = async (id, payload) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${url_devel}api/jabatan/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const DeleteJabatan = async (id) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/jabatan/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}

@@ -14,6 +14,7 @@ import SettingServer from '../../components/SettingServer/SettingServer';
 import Synchronize from '../../components/Synchronize/Synchronize';
 import CameraSetting from '../CameraSettings/CameraSetting';
 import SynchronizeRegister from '../SynchronizeRegister/SynchronizeRegister';
+import JobTitle from '../JobTitle/JobTitle';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -102,6 +103,7 @@ const Cpanel = () => {
                     <Route path="/setting-server" element={<SettingServer />} />
                     <Route path="/setting-camera" element={<SettingIp />} />
                     <Route path="/destination-location" element={<Country />} />
+                    <Route path="/jabatan" element={<JobTitle />} />
                     <Route path="/synchronize" element={<Synchronize />} />
                     <Route path="/synchronize-register" element={<SynchronizeRegister />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}

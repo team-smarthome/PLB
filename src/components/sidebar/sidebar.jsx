@@ -7,6 +7,7 @@ import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp, IoSpeedometer  } from "react-icons/io5";
 import Cookies from 'js-cookie';
+import { FaUserTie } from "react-icons/fa6";
 
 const Sidebar = ({ isOpen }) => {
     const userCookie = Cookies.get('userdata');
@@ -141,6 +142,19 @@ const Sidebar = ({ isOpen }) => {
                                 style={{ marginRight: '10px' }}
                             />
                             <a>Destination Location</a>
+                        </Link>
+                    </ul>
+                )}
+                {userInfo.role == 0 && menuSetting.master && (
+                    <ul
+                        className="sub-menu-link"
+                    >
+                        <Link to='/cpanel/jabatan' className={`link ${isActive('/cpanel/jabatan') ? 'active' : ''}`}>
+                            <FaUserTie
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <a>Jabatan</a>
                         </Link>
                     </ul>
                 )}
