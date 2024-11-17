@@ -16,7 +16,7 @@ import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import { useAtom } from "jotai";
 import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB, DataHasilCekal } from "../../utils/atomStates";
-import { initiateSocket, addPendingRequest, initiateSocket4040 } from "../../utils/socket";
+import { initiateSocket, addPendingRequest } from "../../utils/socket";
 import { FaRegIdCard } from "react-icons/fa";
 import ImgsViewer from "react-images-viewer";
 import Modals from "../Modal/Modal";
