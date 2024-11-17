@@ -6,7 +6,6 @@ let socket;
 let socket4010;
 
 let socket4020;
-let socket4040;
 
 let socket4050;
 
@@ -178,44 +177,6 @@ export const addPendingRequest4020 = (request) => {
 
 };
 
-export const initiateSocket4040 = () => {
-    console.log('testWebsocket4040')
-    if (!socket4040) {
-        socket4040 = io('http://localhost:4040');
-        console.log('testWebsocket40402');
-
-        // Event handler untuk koneksi berhasil
-        socket4040.on('connect', () => {
-            console.log('testWebsocket Socket connection established');
-            while (pendingGetDocumentRequests.length > 0) {
-                const { action, data } = pendingGetDocumentRequests.shift();
-                socket.emit("get-documnent");
-            }
-        });
-
-        // Event handler untuk koneksi terputus
-        socket4040.on('disconnect', () => {
-            console.log('testWebsocket Socket disconnected. Attempting to reconnect...');
-        });
-
-        // Event handler untuk reconnect attempt
-        socket4040.on('reconnect_attempt', (attemptNumber) => {
-            console.log(`testWebsocket Reconnect attempt ${attemptNumber}`);
-        });
-
-        // Event handler untuk reconnect berhasil
-        socket4040.on('reconnect', () => {
-            console.log('testWebsocket Reconnected to socket server');
-        });
-
-        // Event handler untuk reconnect gagal
-        socket4040.on('reconnect_failed', () => {
-            console.log('testWebsocket Reconnect failed');
-        });
-    }
-    console.log('testWebsocket40403')
-    return socket4040;
-};
 
 //=========================================================================================================//
 

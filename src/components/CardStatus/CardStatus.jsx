@@ -21,7 +21,6 @@ import { FaRegIdCard } from "react-icons/fa";
 import ImgsViewer from "react-images-viewer";
 import Modals from "../Modal/Modal";
 import ModalCekal from "../Modal/ModalCekal";
-// const parse = require("mrz").parse;
 
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
@@ -75,8 +74,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	}
 	const socket_IO_4000 = initiateSocket();
 
-	const socket_IO_4040 = initiateSocket4040();
-
 	useEffect(() => {
 		socket_IO_4000.once("photo_taken", (imageBase64) => {
 			setCapturedImageAfter2(imageBase64);
@@ -121,26 +118,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			}, 2000);
 		});
 
-		return () => {
-			socket_IO_4000.off("photo_taken");
-			socket_IO_4000.off("error_photo");
-		}
-
-	}, [socket_IO_4000, capturedImage]);
-
-	useEffect(() => {
-		console.log(capturedImageAfter2, "asdasdasdsadsadsa")
-		console.log(capturedImage, "adasdasdsadadsadassad")
-	}, [CardStatus])
-
-
-	useEffect(() => {
-		setSkorKemiripan(dataCekalAtom?.skor_kemiripan || 0)
-	}, [dataCekalAtom]);
-
-
-	useEffect(() => {
-		socket_IO_4040.on("document-data", (data) => {
+		socket_IO_4000.once("document-data", (data) => {
 			if (data.image) {
 				setDocumentPLBImage(data?.image)
 				sendDataToInput({
@@ -170,18 +148,27 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			} else {
 				console.error("test12345", data);
 			}
-			// console.log('document-data', imageBase64)
-
-			// setResDataScan(imageBase64);
-			// sendDataToInput({
-			// 	statusCardBox: "success",
-			// 	capturedImage: null,
-			// 	emailUser: null,
-			// 	titleHeader: "Registrasi Pas Lintas Batas",
-			// titleFooter: "Lanjut",
-			// });
 		});
-	}, [socket_IO_4040]);
+
+		return () => {
+			socket_IO_4000.off("photo_taken");
+			socket_IO_4000.off("error_photo");
+			socket_IO_4000.off("document-data");
+		}
+
+	}, [socket_IO_4000, capturedImage]);
+
+	useEffect(() => {
+		console.log(capturedImageAfter2, "asdasdasdsadsadsa")
+		console.log(capturedImage, "adasdasdsadadsadassad")
+	}, [CardStatus])
+
+
+	useEffect(() => {
+		setSkorKemiripan(dataCekalAtom?.skor_kemiripan || 0)
+	}, [dataCekalAtom]);
+
+
 
 
 	const handleTakePhoto = async () => {
@@ -207,26 +194,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 
 			socket_IO_4000.connect();
-			// socket_IO_4000.once('connect', () => {
-			// 	console.log('testWebsocket clSocket reconnected. Resending take_photo...');
-			// 	socket_IO_4000.emit("take_photo");
-			// 	sendDataToInput({
-			// 		statusCardBox: "waiting2",
-			// 		capturedImage: null,
-			// 		emailUser: null,
-			// 		titleHeader: "Apply PLB",
-			// 	titleFooter: "Lanjut",
-			// 	});
-			// });
 		}
 	};
 
 
 	const handleGetDocumnet = async () => {
 		console.log('testWebsocket Socket connected. Sending get_document...');
-		if (socket_IO_4040.connected) {
+		if (socket_IO_4000.connected) {
 			console.log('testWebsocket Socket connected. Sending get_document...');
-			socket_IO_4040.emit("get-document");
+			socket_IO_4000.emit("get-document");
 			sendDataToInput({
 				statusCardBox: "waiting3",
 				capturedImage: capturedImage,
@@ -244,7 +220,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			});
 			addPendingRequest({ action: 'get-documnent' });
 
-			socket_IO_4040.connect();
+			socket_IO_4000.connect();
 		}
 	};
 
