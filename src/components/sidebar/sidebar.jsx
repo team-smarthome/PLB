@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
 import { FaSync, FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
 import { FcSynchronize } from "react-icons/fc";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { IoSettingsSharp, IoSpeedometer  } from "react-icons/io5";
+import { IoSettingsSharp, IoSpeedometer } from "react-icons/io5";
 import Cookies from 'js-cookie';
+import { FaUserTie } from "react-icons/fa6";
 
 const Sidebar = ({ isOpen }) => {
-    const userCookie = Cookies.get('userdata');
-    const userInfo = JSON.parse(userCookie)
+
+    const [userInfo, setUserInfo] = useState({});
+
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState({});
@@ -32,6 +34,17 @@ const Sidebar = ({ isOpen }) => {
     };
 
     const isActive = (path) => location.pathname === path;
+
+    useEffect(() => {
+        const userCookie = Cookies.get('userdata');
+        if (!userCookie) {
+            navigate('/');
+            //hapus semua local storage
+            localStorage.clear();
+        }
+        const dataCookie = JSON.parse(userCookie)
+        setUserInfo(dataCookie);
+    }, []);
 
     return (
         <div className={`sidebar ${isOpen ? "" : "close"}`}>
@@ -94,7 +107,7 @@ const Sidebar = ({ isOpen }) => {
                         </Link>
 
                         {/* Hanya tampilkan menu Camera dan Synchronize jika role === 0 */}
-                        {userInfo.role === 0 && (
+                        {userInfo.role !== 2 && (
                             <>
                                 <Link to='/cpanel/setting-camera' className={`link ${isActive('/cpanel/setting-camera') ? 'active' : ''}`}>
                                     <FaNetworkWired
@@ -116,7 +129,7 @@ const Sidebar = ({ isOpen }) => {
                     </ul>
                 )}
 
-                {userInfo.role === 0 && (
+                {userInfo.role !== 2 && (
                     <li>
                         <div className="icon-link" onClick={() => handleSettingToggle("master")}>
                             <a>
@@ -127,7 +140,7 @@ const Sidebar = ({ isOpen }) => {
                         </div>
                     </li>
                 )}
-                {userInfo.role == 0 && menuSetting.master && (
+                {userInfo.role !== 2 && menuSetting.master && (
                     <ul
                         className="sub-menu-link"
                     >
@@ -137,6 +150,19 @@ const Sidebar = ({ isOpen }) => {
                                 style={{ marginRight: '10px' }}
                             />
                             <a>Destination Location</a>
+                        </Link>
+                    </ul>
+                )}
+                {userInfo.role !== 2 && menuSetting.master && (
+                    <ul
+                        className="sub-menu-link"
+                    >
+                        <Link to='/cpanel/jabatan' className={`link ${isActive('/cpanel/jabatan') ? 'active' : ''}`}>
+                            <FaUserTie
+                                size={25}
+                                style={{ marginRight: '10px' }}
+                            />
+                            <a>Jabatan</a>
                         </Link>
                     </ul>
                 )}

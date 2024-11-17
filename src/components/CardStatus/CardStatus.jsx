@@ -78,8 +78,9 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	const socket_IO_4040 = initiateSocket4040();
 
 	useEffect(() => {
-		socket_IO_4000.on("photo_taken", (imageBase64) => {
+		socket_IO_4000.once("photo_taken", (imageBase64) => {
 			setCapturedImageAfter2(imageBase64);
+			console.log("base64sdasdas", imageBase64)
 			setCapturedImage(imageBase64);
 			sendDataToInput({
 				statusCardBox: "takePhotoSucces",
@@ -126,6 +127,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		}
 
 	}, [socket_IO_4000, capturedImage]);
+
+	useEffect(() => {
+		console.log(capturedImageAfter2, "asdasdasdsadsadsa")
+		console.log(capturedImage, "adasdasdsadadsadassad")
+	}, [CardStatus])
 
 
 	useEffect(() => {

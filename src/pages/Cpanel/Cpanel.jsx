@@ -14,6 +14,7 @@ import SettingServer from '../../components/SettingServer/SettingServer';
 import Synchronize from '../../components/Synchronize/Synchronize';
 import CameraSetting from '../CameraSettings/CameraSetting';
 import SynchronizeRegister from '../SynchronizeRegister/SynchronizeRegister';
+import JobTitle from '../JobTitle/JobTitle';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -41,6 +42,7 @@ const Cpanel = () => {
         }
     }
 
+    // console.log(userData)
     const handleLogout = () => {
         Cookies.remove('token')
         Cookies.remove('userdata')
@@ -67,17 +69,30 @@ const Cpanel = () => {
                         style={{ cursor: 'pointer' }}
                         onClick={handleSidebarToggle}
                     />
-                    <div className="user-profile" onClick={() => setShowUserButton(!showUserButton)}>
+                    <div className="user-profile" >
+                        {userData.role !== 2 && (
+                            <>
+                                <button
+                                    className='p-4 rounded-md bg-btnPrimary text-white font-semibold cursor-pointer hover:bg-[#0f2a43]'
+                                    onClick={() => navigate("/home")}
+                                >
+                                    Home
+                                </button>
+                            </>
+                        )}
                         {/* <img src={ario} alt="" width={55} height={55} /> */}
-                        <div className="circle-container">
-                            <span className="circle">{handleSplitName(userData?.petugas?.nama_petugas)}</span>
-                        </div>
+                        <div className="flex flex-row gap-4" onClick={() => setShowUserButton(!showUserButton)}>
+                            <div className="circle-container ml-4" >
+                                <span className="circle">{handleSplitName(userData?.petugas?.nama_petugas)}</span>
+                            </div>
 
-                        <h4>{userData?.petugas?.nama_petugas ?? ""}</h4>
+                            <h4>{userData?.petugas?.nama_petugas ?? ""}</h4>
+                        </div>
                     </div>
-                    {showUserButton && <div className="user-button-list">
-                        <button onClick={handleLogout}>Logout</button>
-                    </div>}
+                    {showUserButton &&
+                        <div className="user-button-list">
+                            <button onClick={handleLogout}>Logout</button>
+                        </div>}
                 </div>
                 <ReactRoutes >
                     <Route path="*" element={<NotFound />} />
@@ -88,6 +103,7 @@ const Cpanel = () => {
                     <Route path="/setting-server" element={<SettingServer />} />
                     <Route path="/setting-camera" element={<SettingIp />} />
                     <Route path="/destination-location" element={<Country />} />
+                    <Route path="/jabatan" element={<JobTitle />} />
                     <Route path="/synchronize" element={<Synchronize />} />
                     <Route path="/synchronize-register" element={<SynchronizeRegister />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}

@@ -95,10 +95,11 @@ const SynchronizeRegister = () => {
       console.log(res?.data)
       if (res?.status == 200) {
         if (res?.data?.total_data_belum == 0) {
-          return Toast.fire({
-            icon: "Error",
-            title: "Data Tidak Ditemukan",
+          Toast.fire({
+            icon: "error",
+            title: "Data Tidak Ditemukan atau Data Sudah Terproses",
           });
+          return
         } else {
           setTotal(res?.data?.total_data_belum)
           localStorage.setItem("date", JSON.stringify(date))
@@ -128,13 +129,16 @@ const SynchronizeRegister = () => {
     const getUserdata = await Cookies.get('userdata');
     const getIpServer = await localStorage.getItem("serverIPSocket")
     const userData = JSON.parse(getUserdata)
+    const version = await localStorage.getItem("version")
 
     const dataPayload = {
       ...date,
       ipServer: getIpServer,
       userNip: userData?.nip,
       userFullName: userData?.petugas?.nama_petugas,
-      jenis: "PLB-USER",
+      jenis: "PLB",
+      totalData: total,
+      version: version
     }
 
     setModalAlertSynchronize(false)
@@ -183,12 +187,30 @@ const SynchronizeRegister = () => {
     handleGetTotalAndDate()
   }, [])
 
+  const handleClearDate = () => {
+    setDate({
+      startDate: null,
+      endDate: null
+    })
+    setTotal(0)
+    localStorage.removeItem("date")
+    localStorage.removeItem("totalData")
+  }
+  console.log(date, total, "sini tan")
   return (
     <div
       className='p-8'
     >
-      <h2>Sinkronisasi Data</h2>
+      <div className="flex justify-between items-center">
+        <h2>Sinkronisasi Data</h2>
 
+        {(date.startDate && date.endDate) && total > 0 && <button
+          className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
+          onClick={handleClearDate}
+        >
+          Ganti Tanggal
+        </button>}
+      </div>
       {(date.startDate && date.endDate) && total > 0 ?
         (
           <>

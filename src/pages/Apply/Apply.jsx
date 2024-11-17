@@ -386,8 +386,6 @@ const Apply = () => {
   }, []);
 
   //console.log nilai image dari atom
-  console.log("imageFromAtom", image);
-
 
   useEffect(() => {
     const cardNumberPetugasFix = 11 + localStorage.getItem("cardNumberPetugas");
@@ -425,12 +423,35 @@ const Apply = () => {
             setDisabled(true);
             setRecievedTempData([]);
             setDataPrimaryPassport(null);
+          } else {
+            Toast.fire({
+              icon: "error",
+              title: "Gagal mengirim data",
+            });
+            setCardPaymentProps({
+              isWaiting: false,
+              isCreditCard: false,
+              isPaymentCredit: false,
+              isPaymentCash: false,
+              isPrinted: false,
+              isSuccess: false,
+              isFailed: false,
+              isPyamentUrl: false,
+              isPhoto: false,
+              isDoRetake: false,
+            });
+            setDisabled(false);
+            setIsEnableStep(true);
+            setCardStatus("takePhotoSucces");
+            setTabStatus(2);
+            console.error("Error:", error);
           }
         }).catch((error) => {
           Toast.fire({
             icon: "error",
             title: "Gagal mengirim data",
           });
+          setCaputedImageAfter2(sharedData?.photoFace)
           setCardPaymentProps({
             isWaiting: false,
             isCreditCard: false,
@@ -447,7 +468,6 @@ const Apply = () => {
           setIsEnableStep(true);
           setCardStatus("takePhotoSucces");
           setTabStatus(2);
-          console.error("Error:", error);
         });
       } else {
         Toast.fire({
@@ -707,7 +727,11 @@ const Apply = () => {
       }
     } catch (error) {
       await sendDataTOKameraServer(sharedData);
-      console.log('masukkesinigakya12345')
+      // setCardStatus("takePhotoSucces");
+      Toast.fire({
+        icon: "error",
+        title: "Gagal Melakukan Cek Cekal",
+      });
     }
   };
 

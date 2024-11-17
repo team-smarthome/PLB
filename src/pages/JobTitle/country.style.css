@@ -1,0 +1,217 @@
+.search-container {
+  display: flex;
+  justify-content: important flex-end;
+  align-items: important flex-end;
+}
+
+.input-icon-wrapper-country {
+  position: relative;
+  display: inline-block;
+}
+
+.input-icon-wrapper-country input {
+  padding-left: 35px;
+  max-width: 150px;
+  min-width: 100px;
+  height: 20px;
+  width: 100%;
+}
+
+.input-icon-wrapper-country .input-icon {
+  position: absolute;
+  left: 10px;
+  /* Adjust the position of the icon */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  /* Adjust color as needed */
+  font-size: 18px;
+  /* Adjust size of the icon */
+}
+
+.edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Increase gap for better spacing */
+  margin: 20px 0;
+}
+
+.edit-container div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.edit-container span {
+  flex: 1;
+  font-size: 16px;
+  color: #333;
+  margin-right: 10px;
+  /* Space between label and input/select */
+}
+
+.edit-container input,
+.edit-container select {
+  flex: 2;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  /* Rounded corners */
+  background: #f9f9f9;
+  /* Light background color */
+  font-size: 16px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  /* Smooth transitions */
+  width: 100%;
+  /* Full width of the container */
+  box-sizing: border-box;
+}
+
+.edit-container input:focus,
+.edit-container select:focus {
+  border-color: #007bff;
+  /* Highlight border on focus */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+  /* Enhanced shadow */
+  outline: none;
+  /* Remove default outline */
+}
+
+.edit-container select {
+  appearance: none;
+  /* Remove default styling for a modern look */
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KPHBhdGggZD0iTTEuNzY4IDExLjc4NCAxLjE5OSAxMC41MTYgMTcuNjA1IiBzdHJva2U9IiM2QzA4MDkiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjY2xhc3M9InJvdW5kIiBzdHJva2UtZGFzaGFycm93PSIxMjAwIi8+Cjwvc3ZnPgo=")
+    no-repeat right center;
+  background-size: 16px;
+  padding-right: 40px;
+  /* Space for the custom arrow */
+}
+
+.delete-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.delete-container h3 {
+  font-weight: 400;
+}
+
+.button-action {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.button-action button {
+  width: 100px;
+  height: 35px;
+  background-color: #fbaf17;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-weight: 600;
+}
+
+.button-action button:nth-child(2) {
+  background-color: #b21212;
+}
+
+.button-action button:hover {
+  /* background-color: #0056b3; */
+  /* Darker blue on hover */
+  transform: scale(1.05);
+  /* Slightly enlarge button on hover */
+}
+
+.button-action button:active {
+  transform: scale(0.95);
+  /* Shrink button when clicked */
+}
+
+/* Pagination Container */
+.pagination-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-controls span {
+  font-weight: 600;
+}
+
+/* Pagination Buttons */
+.pagination-controls button {
+  background-color: #11375c;
+  /* Primary color */
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+/* Pagination Buttons on Hover */
+/* .pagination-controls button:hover {
+    background-color: #0056b3;
+    /* Darker shade */
+/* } */
+
+/* */
+*/
+
+/* Disabled State */
+.pagination-controls button:disabled {
+  background-color: #cccccc;
+  /* Light gray for disabled */
+  cursor: not-allowed;
+}
+
+/* Active Page Indicator */
+.pagination-controls span {
+  font-size: 16px;
+  margin: 0 10px;
+}
+
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.loader-loading-table {
+  width: 70px;
+  height: 70px;
+  border: 5px solid #000;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+.loader-login-spin {
+  z-index: 9999;
+  position: absolute;
+  padding-top: 20%;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

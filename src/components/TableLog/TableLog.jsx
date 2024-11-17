@@ -11,7 +11,7 @@ const TableLog = ({
     rowRenderer = null,
     showIndex = false,
     page = 1,
-    perPage = 20 // jumlah data per halaman, default 20
+    perPage = 20
 }) => {
 
     return (
@@ -19,7 +19,7 @@ const TableLog = ({
             <table>
                 <thead>
                     <tr>
-                        {showIndex && <th>No.</th>} {/* Conditional rendering of the "No." header */}
+                        {showIndex && <th>No.</th>}
                         {tHeader.map((header, index) => (
                             <th key={index}>{header}</th>
                         ))}

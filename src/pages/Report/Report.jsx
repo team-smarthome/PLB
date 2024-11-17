@@ -301,6 +301,7 @@ function Report() {
               <Pagination
                 pageCount={pagination.last_page}
                 onPageChange={(selectedPage) => setPage(selectedPage)}
+                currentPage={page}
               />
             </div>
           </>

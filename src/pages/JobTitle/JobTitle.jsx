@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './country.style.css'
-import { DeleteNegara, DeletePetugas, getAllNegaraData, getAllPetugas, InsertNegara, InsertPetugas, UpdateNegara, UpdatePetugas } from '../../services/api'
+import { DeleteJabatan, DeleteNegara, DeletePetugas, getAllJabatanData, getAllNegaraData, getAllPetugas, InsertJabatan, InsertNegara, InsertPetugas, UpdateJabatan, UpdateNegara, UpdatePetugas } from '../../services/api'
 import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
 import Cookies from 'js-cookie';
 
-const Country = () => {
+const JobTitle = () => {
     const userCookie = Cookies.get('userdata')
     const userInfo = JSON.parse(userCookie)
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
@@ -18,7 +18,7 @@ const Country = () => {
     const [dataPetugas, setDataPetugas] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [search, setSearch] = useState({
-        nama_negara: "",
+        nama_jabatan: "",
     })
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -36,7 +36,7 @@ const Country = () => {
     const getAllNegara = async (page = 1) => {
         try {
             setIsLoading(true)
-            const response = await getAllNegaraData(search, page)
+            const response = await getAllJabatanData(search, page)
             if (response.status === 200) {
                 console.log(response.data.data)
                 setDataPetugas(response?.data?.data)
@@ -58,7 +58,7 @@ const Country = () => {
     const handleAddNegara = async () => {
         try {
             setIsLoading(true)
-            const res = await InsertNegara(formData);
+            const res = await InsertJabatan(formData);
             if (res.status == 201) {
                 Toast.fire({
                     icon: "success",
@@ -81,7 +81,7 @@ const Country = () => {
     const handleDeletePetugas = async () => {
         try {
             setIsLoading(true)
-            const res = await DeleteNegara(formData.id);
+            const res = await DeleteJabatan(formData.id);
             if (res.status === 200) {
                 Toast.fire({
                     icon: "success",
@@ -104,11 +104,11 @@ const Country = () => {
     const handleEditPetugas = async () => {
         try {
             setIsLoading(true)
-            const res = await UpdateNegara(formData.id, { nama_negara: formData.nama_negara });
+            const res = await UpdateJabatan(formData.id, { nama_jabatan: formData.nama_jabatan });
             if (res.status == 201) {
                 Toast.fire({
                     icon: "success",
-                    title: "Petugas berhasil diperbarui.",
+                    title: "Data Jabatan Berhasil Ditambahkan",
                 });
                 setIsLoading(false)
                 setIsShowModal(false);
@@ -119,7 +119,7 @@ const Country = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal memperbarui petugas. Silakan coba lagi.",
+                title: "Gagal Menambahkan Data Jabatan",
             });
         }
     };
@@ -140,7 +140,7 @@ const Country = () => {
     const editModal = (data) => {
         const editData = {
             id: data?.id,
-            nama_negara: data?.nama_negara,
+            nama_jabatan: data?.nama_jabatan,
         }
         setFormData(editData)
         setIsShowModal(true)
@@ -154,12 +154,12 @@ const Country = () => {
         return (
             <div className="edit-container">
                 <div>
-                    <span>Nama Negara :</span>
+                    <span>Nama Jabatan :</span>
                     <input
                         type="text"
-                        placeholder="Masukkan nama negara"
-                        value={formData.nama_negara}
-                        onChange={(e) => setFormData({ ...formData, nama_negara: e.target.value })}
+                        placeholder="Masukkan nama jabatan"
+                        value={formData.nama_jabatan}
+                        onChange={(e) => setFormData({ ...formData, nama_jabatan: e.target.value })}
                     />
                 </div>
             </div>
@@ -171,12 +171,12 @@ const Country = () => {
         return (
             <div className="edit-container">
                 <div>
-                    <span>Nama :</span>
+                    <span>Nama Jabatan :</span>
                     <input
                         type="text"
-                        placeholder="Masukkan nama negara"
-                        value={formData.nama_negara}
-                        onChange={(e) => setFormData({ ...formData, nama_negara: e.target.value })}
+                        placeholder="Masukkan nama jabatan"
+                        value={formData.nama_jabatan}
+                        onChange={(e) => setFormData({ ...formData, nama_jabatan: e.target.value })}
                     />
                 </div>
 
@@ -187,7 +187,7 @@ const Country = () => {
     const deleteModalContent = () => {
         return (
             <div className="delete-container">
-                <h3>Are You Sure Want Delete <span style={{ fontWeight: 'bold' }}>{formData?.nama_negara}</span> ?</h3>
+                <h3>Are You Sure Want Delete <span style={{ fontWeight: 'bold' }}>{formData?.nama_jabatan}</span> ?</h3>
             </div>
         )
     }
@@ -195,7 +195,7 @@ const Country = () => {
     const customRowRenderer = (row) => {
         return (
             <>
-                <td>{row?.nama_negara}</td>
+                <td>{row?.nama_jabatan}</td>
 
                 {userInfo.role == 0 && <td className='button-action'>
                     <button onClick={() => editModal(row)}>Edit</button>
@@ -241,12 +241,12 @@ const Country = () => {
                         {/* <span>Negara : </span> */}
                         <div className="input-icon-wrapper-country">
                             <FaSearch className="input-icon" />
-                            <input type="text" placeholder="Search" onChange={(e) => setSearch({ ...search, nama_negara: e.target.value })} />
+                            <input type="text" placeholder="Search" onChange={(e) => setSearch({ ...search, nama_jabatan: e.target.value })} />
                         </div>
                         {/* <input
                             type="text"
                             placeholder="Masukkan nama negara"
-                            onChange={(e) => setSearch({ ...search, nama_negara: e.target.value })}
+                            onChange={(e) => setSearch({ ...search, nama_jabatan: e.target.value })}
                             value={search.nama_petugas}
                         /> */}
                     </div>
@@ -281,7 +281,7 @@ const Country = () => {
             <Modals
                 showModal={isShowModalAdd}
                 closeModal={closeModalAdd}
-                headerName="Tambah Negara"
+                headerName="Tambah Jabatan"
                 buttonName="Confirm"
                 onConfirm={handleAddNegara}
             >
@@ -290,7 +290,7 @@ const Country = () => {
             <Modals
                 showModal={isShowModal}
                 closeModal={closeModal}
-                headerName="Edit Negara"
+                headerName="Edit Jabatan"
                 buttonName="Confirm"
                 onConfirm={handleEditPetugas}
             >
@@ -299,7 +299,7 @@ const Country = () => {
             <Modals
                 showModal={isShowModalDelete}
                 closeModal={closeModalDelete}
-                headerName="Hapus Negara"
+                headerName="Hapus Jabatan"
                 buttonName="delete"
                 onConfirm={handleDeletePetugas}
             >
@@ -310,4 +310,4 @@ const Country = () => {
     )
 }
 
-export default Country
+export default JobTitle

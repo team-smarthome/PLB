@@ -57,16 +57,16 @@ const Information = () => {
 	const [ipCameraRegister, setIpCameraRegister] = useState([])
 	const listConfiguration = [
 		{
+			name: "IP Config",
+			icon: TbNetwork,
+		},
+		{
 			name: "User",
 			icon: FaRegUserCircle,
 		},
 		{
 			name: "Change Password",
 			icon: RiLockPasswordLine,
-		},
-		{
-			name: "IP Config",
-			icon: TbNetwork,
 		},
 		{
 			name: "Test Camera",
@@ -87,14 +87,12 @@ const Information = () => {
 		console.log("cameraIPsTotallength", cameraIPs);
 		if (cameraIPs.length > 0) {
 			setIsWaiting(true);
-			if (dataUser.role === 1) {
-
-				const socket_server_4010 = io(`http://${newWifiResults}:4010`);
-				const data = {
-					ipServerCamera: cameraIPs,
-				};
-				socket_server_4010.emit("saveCameraData", data);
-				socket_server_4010.on('saveDataCamera', (data) => {
+			const data = {
+				ipServerCamera: cameraIPs,
+			};
+			if (socket2_IO_4000.connected) {
+				socket2_IO_4000.emit("saveCameraData", data);
+				socket2_IO_4000.on("saveDataCamera", (data) => {
 					if (data === "successfully") {
 						setIsWaiting(false);
 						Toast.fire({
@@ -102,43 +100,21 @@ const Information = () => {
 							title: "Data berhasil disimpan",
 						});
 					} else {
+						setIsWaiting(false);
 						Toast.fire({
 							icon: "error",
-							title: "Gagal menyimpan data",
+							title: "Ip Camera tidak terhubung",
 						});
 					}
-				})
-				setDataIPCameranya(cameraIPs);
-
+				});
 			} else {
-				const data = {
-					ipServerCamera: cameraIPs,
-				};
-				if (socket2_IO_4000.connected) {
-					socket2_IO_4000.emit("saveCameraData", data);
-					socket2_IO_4000.on("saveDataCamera", (data) => {
-						if (data === "successfully") {
-							setIsWaiting(false);
-							Toast.fire({
-								icon: "success",
-								title: "Data berhasil disimpan",
-							});
-						} else {
-							setIsWaiting(false);
-							Toast.fire({
-								icon: "error",
-								title: "Ip Camera tidak terhubung",
-							});
-						}
-					});
-				} else {
-					setIsWaiting(false);
-					Toast.fire({
-						icon: "error",
-						title: "Gagal menyimpan data websocket tidak terhubung",
-					});
-				}
+				setIsWaiting(false);
+				Toast.fire({
+					icon: "error",
+					title: "Gagal menyimpan data websocket tidak terhubung",
+				});
 			}
+
 		} else {
 			setIsWaiting(false);
 			Toast.fire({
@@ -374,27 +350,71 @@ const Information = () => {
 								<>
 									{currentTab === 0 ? (
 										<>
-											<div className="profile_atas">
-												<img src={Profile} alt="profile_icons" />
-											</div>
-											<div className="kotak-profile">
-												<div className="profile-key">
-													<div className="profile-title">Nip</div>
-													<div className="profile-title">Nama</div>
-													<div className="profile-title">Jabatan</div>
-												</div>
-												<div className="profile-value">
-													<div className="profile-name">: {DataUser.nip}</div>
-													<div className="profile-email">: {DataUser.fullName}</div>
-													<div className="profile-office-city">
-														: {DataUser.jabatan}
+											<form
+												className="full-width-form"
+												onSubmit={handleSubmit}
+												style={{
+													width: "120vh",
+												}}
+											>
+												<div className="wrapper-form">
+													<div className="wrapper-input">
+														<label htmlFor="ip_server_camera">
+															IP Kamera Ambil Foto
+														</label>
 													</div>
-
+													<input
+														type="text"
+														name="ipServerCamera"
+														id="ipServerCamera"
+														className={
+															newWifiResults
+																? ""
+																: ""
+														}
+														value={
+															cameraIPs
+														}
+														onChange={(e) =>
+															setCameraIPs(
+																[e.target
+																	.value]
+															)
+														}
+													/>
 												</div>
-											</div>
+												<button
+													className="ok-button"
+													style={{ width: "100%" }}
+												>
+													Save
+												</button>
+											</form>
 										</>
+
 									)
 										: currentTab === 1 ? (
+											<>
+												<div className="profile_atas">
+													<img src={Profile} alt="profile_icons" />
+												</div>
+												<div className="kotak-profile">
+													<div className="profile-key">
+														<div className="profile-title">Nip</div>
+														<div className="profile-title">Nama</div>
+														<div className="profile-title">Jabatan</div>
+													</div>
+													<div className="profile-value">
+														<div className="profile-name">: {DataUser.nip}</div>
+														<div className="profile-email">: {DataUser.fullName}</div>
+														<div className="profile-office-city">
+															: {DataUser.jabatan}
+														</div>
+
+													</div>
+												</div>
+											</>
+										) : currentTab === 2 ? (
 											<>
 												<div className="custom-container">
 													<form
@@ -621,176 +641,6 @@ const Information = () => {
 													</form>
 												</div>
 											</>
-										) : currentTab === 2 ? (
-											<>
-												<form
-													className="full-width-form"
-													onSubmit={handleSubmit}
-													style={{
-														width: "120vh",
-													}}
-												>
-													{/* <div className="form-group">
-														<div className="wrapper-form">
-															<div className="wrapper-input">
-																<label htmlFor="ip_server_pc">
-																	IP Server PC
-																</label>
-															</div>
-															<input
-																type="text"
-																name="ipServerPC"
-																id="ipServerPC"
-																className={
-																	newWifiResults
-																		? ""
-																		: ""
-																}
-																value={
-																	newWifiResults
-																}
-																onChange={(e) =>
-																	setNewWifiResults(
-																		e.target
-																			.value
-																	)
-																}
-															/>
-														</div>
-													</div> */}
-													{dataUser.role === 1 ?
-														<div>
-															<div className="form-group">
-																<div className="wrapper-form">
-																	<div className="wrapper-input">
-																		<label htmlFor="total_cameras">Jumlah Kamera</label>
-																	</div>
-																	<Select
-																		id="totalCameras"
-																		name="totalCameras"
-																		value={optionCameras.find(
-																			(option) => option.value === totalCameras
-																		)}
-																		onChange={handleTotalCamerasChange}
-																		options={optionCameras}
-																		className="basic-single"
-																		classNamePrefix="select"
-																		styles={{
-																			container: (provided) => ({
-																				...provided,
-																				flex: 1,
-																				width: '100%',
-																				borderRadius: '10px',
-																				backgroundColor:
-																					'rgba(217, 217, 217, 0.75)',
-																				fontFamily: 'Roboto, Arial, sans-serif',
-																			}),
-																			valueContainer: (provided) => ({
-																				...provided,
-																				flex: 1,
-																				width: '100%',
-																			}),
-																			control: (provided) => ({
-																				...provided,
-																				flex: 1,
-																				width: '100%',
-																				backgroundColor:
-																					'rgba(217, 217, 217, 0.75)',
-																			}),
-																		}}
-																	/>
-																</div>
-															</div>
-
-															{totalCameras > 0 && (
-																<div className="form-group">
-																	<div className="wrapper-form">
-																		<div className="wrapper-input">
-																			<label htmlFor="status_card_reader">Pilih Kamera</label>
-																		</div>
-																		<Select
-																			id="statusCardReader"
-																			name="statusCardReader"
-																			classNamePrefix="select"
-																			options={cameraOptions}
-																			onChange={handleCameraSelect}
-																			value={cameraOptions.find(option => option.value === selectedCamera)}
-																			placeholder="-- Pilih Kamera --"
-																			styles={{
-																				container: (provided) => ({
-																					...provided,
-																					flex: 1,
-																					width: "100%",
-																					borderRadius: "10px",
-																					backgroundColor: "rgba(217, 217, 217, 0.75)",
-																					fontFamily: "Roboto, Arial, sans-serif",
-																				}),
-																				control: (provided) => ({
-																					...provided,
-																					backgroundColor: "rgba(217, 217, 217, 0.75)",
-																				}),
-																			}}
-																		/>
-																	</div>
-																</div>
-															)}
-
-															{selectedCamera && (
-																<div className="form-group">
-																	<div className="wrapper-form">
-																		<div className="wrapper-input">
-																			<label htmlFor="status_camera">
-																				Masukkan IP untuk {selectedCamera}
-																			</label>
-																		</div>
-																		<input
-																			type="text"
-																			name="statusCamera"
-																			id="statusCamera"
-																			className="disabled-input"
-																			onChange={(e) => handleIPChange(e, selectedCameraIndex)}
-																			value={cameraIPs[selectedCameraIndex] || ''}
-																		/>
-																	</div>
-																</div>
-															)}
-														</div> :
-														<div className="wrapper-form">
-															<div className="wrapper-input">
-																<label htmlFor="ip_server_camera">
-																	IP Server Camera
-																</label>
-															</div>
-															<input
-																type="text"
-																name="ipServerCamera"
-																id="ipServerCamera"
-																className={
-																	newWifiResults
-																		? ""
-																		: ""
-																}
-																value={
-																	cameraIPs
-																}
-																onChange={(e) =>
-																	setCameraIPs(
-																		[e.target
-																			.value]
-																	)
-																}
-															/>
-														</div>
-
-													}
-													<button
-														className="ok-button"
-														style={{ width: "100%" }}
-													>
-														Save
-													</button>
-												</form>
-											</>
 										) : currentTab === 3 ? (
 											<>
 												<div
@@ -919,8 +769,8 @@ const Information = () => {
 											</>
 										) : (
 											<>
-												<h1>Test Printer Configuration</h1>
-												<h2>Please Wait...</h2>
+												<h1>Uji Coba Konfigurasi Printer</h1>
+												<h2>Mohon Tunggu...</h2>
 											</>
 										)}
 								</>

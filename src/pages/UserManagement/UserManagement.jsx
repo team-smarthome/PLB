@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './usermanagement.style.css'
-import { DeletePetugas, getAllPetugas, getAllTpiData, InsertPetugas, UpdatePetugas } from '../../services/api'
+import { DeletePetugas, getAllJabatanData, getAllPetugas, getAllTpiData, InsertPetugas, UpdatePetugas } from '../../services/api'
 import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
 import Cookies from 'js-cookie';
 
 const UserManagement = () => {
     const userCookie = Cookies.get('userdata')
-    const userInfo = userCookie ? JSON.parse(userCookie) : { role: null }; // Default to role: null if no cookie
+    const userInfo = userCookie ? JSON.parse(userCookie) : { role: null };
 
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
     const [isShowModal, setIsShowModal] = useState(false)
@@ -19,6 +19,7 @@ const UserManagement = () => {
     const [dataPetugas, setDataPetugas] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [dataTpi, setDataTpi] = useState([])
+    const [dataJabatan, setDataJabatan] = useState([])
     const [search, setSearch] = useState({
         nip: "",
         role: "",
@@ -54,12 +55,23 @@ const UserManagement = () => {
         }
     }
 
+    const handleGetallDataJabatan = async () => {
+        try {
+            const res = await getAllJabatanData()
+            if (res.status == 200) {
+                setDataJabatan(res?.data?.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const handleGetAllTpiData = async (page = 1) => {
         try {
 
             const response = await getAllTpiData()
             if (response.status === 200) {
-                console.log(response.data.data)
+                console.log(response.data.data, "ada gk")
                 setDataTpi(response?.data?.data)
             }
         } catch (error) {
@@ -72,6 +84,7 @@ const UserManagement = () => {
     useEffect(() => {
         getAllPetugasData()
         handleGetAllTpiData()
+        handleGetallDataJabatan()
     }, [])
 
     const handleAddPetugas = async () => {
@@ -89,6 +102,7 @@ const UserManagement = () => {
                 setFormData({});
             }
         } catch (error) {
+            console.log(error)
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
@@ -157,6 +171,7 @@ const UserManagement = () => {
         setIsShowModalDelete(false)
     }
     const editModal = (data) => {
+        console.log(data?.jabatan?.nama_jabatan, "tan")
         const editData = {
             id: data?.id,
             nama_petugas: data?.petugas?.nama_petugas,
@@ -275,8 +290,10 @@ const UserManagement = () => {
                     <span>Jabatan :</span>
                     <select value={formData.nama_jabatan} onChange={handleChangeJabatan}>
                         <option value="">Pilih Jabatan</option>
-                        <option value="kanim">kanim</option>
-                        <option value="wkanim">wakil kanim</option>
+                        {dataJabatan.map((item, index) => {
+                            return (
+                                <option key={index} value={item.nama_jabatan}>{item.nama_jabatan}</option>)
+                        })}
                     </select>
                 </div>
                 <div>
@@ -380,8 +397,10 @@ const UserManagement = () => {
                     <span>Jabatan :</span>
                     <select value={formData.nama_jabatan || ''} onChange={handleChangeJabatan}>
                         <option value="">Pilih Jabatan</option>
-                        <option value="kanim">kanim</option>
-                        <option value="wkanim">wakil kanim</option>
+                        {dataJabatan.map((item, index) => {
+                            return (
+                                <option key={index} value={item.nama_jabatan}>{item.nama_jabatan}</option>)
+                        })}
                     </select>
                 </div>
                 <div>
@@ -523,7 +542,7 @@ const UserManagement = () => {
                     ) : (
                         <>
                             <TableLog
-                                tHeader={userInfo.role == 0 ? ['nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['no', 'nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
+                                tHeader={userInfo.role == 0 ? ['nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role', 'action'] : ['nama', 'NIP', 'gender', 'Tanggal Lahir', 'jabatan', 'role']}
                                 tBody={dataPetugas}
                                 onEdit={editModal}
                                 onDelete={deleteModal}

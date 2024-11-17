@@ -9,11 +9,11 @@ import { initiateSocket4010 } from '../../utils/socket'
 import Cookies from 'js-cookie';
 import './logregister.style.css'
 import Pagination from '../../components/Pagination/Pagination'
-
+import Select from "react-select";
+import Excel from "exceljs";
+import { formatDateToIndonesian } from '../../utils/formatDate'
 
 const LogRegister = () => {
-    const userCookie = Cookies.get('userdata')
-    const userInfo = JSON.parse(userCookie)
     const socket_IO_4010 = initiateSocket4010();
     const [showModalAdd, setShowModalAdd] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
@@ -45,7 +45,9 @@ const LogRegister = () => {
         name: "",
         no_passport: "",
         startDate: "",
-        endDate: ""
+        endDate: "",
+        gender: "",
+        nationality: "",
     })
     const navigate = useNavigate()
     const [logData, setLogData] = useState([])
@@ -54,28 +56,54 @@ const LogRegister = () => {
     const [imageFace, setImageFace] = useState(null)
     const [imagePassport, setImagePassport] = useState(null)
     const [countryData, setCountryData] = useState([])
+    const [changePage, setChangePage] = useState(false)
+    const [dataNationality, setDataNationality] = useState([])
+
+
+    const dataGender = [
+        { value: "", label: "All Gender" },
+        { value: "M", label: "MALE" },
+        { value: "F", label: "FEMALE" },
+    ];
+
+    const getDataNationality = async () => {
+        try {
+            const { data } = await getAllNegaraData();
+            if (data.status === 200) {
+                console.log(data.data, "dataNegara")
+                setDataNationality(data.data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        getDataNationality();
+    }, []);
+
     const getLogRegister = async () => {
         try {
             const res = await apiGetDataLogRegister({
                 ...search
             })
-            if (res.status == 200) {
-                console.log(res.data, "consoleRegiste")
+            if (res.data.status == 200) {
+                console.log(res?.data, "consoleRegiste")
                 setStatus("success")
-                setLogData(res.data.data)
-                setPagination(response?.data?.pagination);
-                setTotalDataFilter(response?.data?.data?.length);
+                setLogData(res?.data?.data)
+                setPagination(res?.data?.pagination);
+                setTotalDataFilter(res.data?.data.length);
+                setChangePage(false)
             }
         } catch (error) {
             setStatus("success")
-            console.log(error)
+            console.log(error.message)
         }
     }
     const getCountryData = async () => {
         try {
             const res = await getAllNegaraData()
             setCountryData(res.data.data)
-            // console.log("getAllNegaraData", res)
         } catch (error) {
             console.log(error)
         }
@@ -84,6 +112,22 @@ const LogRegister = () => {
         getLogRegister()
         getCountryData()
     }, [])
+
+    useEffect(() => {
+        if (changePage) {
+            getLogRegister()
+        }
+
+    }, [changePage])
+
+
+    useEffect(() => {
+        setSearch(prevState => ({
+            ...prevState,
+            page: page
+        }));
+        setChangePage(true)
+    }, [page]);
 
     const deleteModal = (row) => {
         setDetailData({
@@ -206,6 +250,10 @@ const LogRegister = () => {
 
                 </>
             </td>
+            <td>
+                {formatDateToIndonesian(row.created_at)}
+            </td>
+
             <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
 
                 <button onClick={() => openModalEdit(row)}>Edit</button>
@@ -215,22 +263,25 @@ const LogRegister = () => {
     );
 
     const generateExcel = () => {
-        const Excel = require("exceljs");
         const workbook = new Excel.Workbook();
-        const worksheet = workbook.addWorksheet("Payment Report");
+        const worksheet = workbook.addWorksheet("Log Register");
 
         // Add column headers
-        const headers = ['No', 'no plb', 'name', 'gender', 'nationality']
+        const headers = ['No', 'No PLB/BCP', 'Nama', 'Tanggal Lahir', 'Gender', 'Nationality', 'Registration Date', 'Expired Date', 'Destination Location'];
         worksheet.addRow(headers);
 
         // Add data rows
-        logData.forEach((item, index) => {
+        logData?.forEach((item, index) => {
             const row = [
                 index + 1,
                 item.no_passport,
-                // item.no_register,
                 item.name,
+                item.date_of_birth,
                 item.gender === "M" ? "Laki-laki" : "Perempuan",
+                item.nationality,
+                item.created_at,
+                item.expired_date,
+                item.destination_location
             ];
             worksheet.addRow(row);
         });
@@ -554,40 +605,71 @@ const LogRegister = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="face-reg-header" style={{
-                height: "13vh"
-            }}>
-                <div className='face-reg-filter-name'>
+            <div className="face-reg-header h-20">
+                <div className='face-reg-filter-name '>
                     <div className='label-filter-name' style={{
-                        gap: "35%",
-                        paddingTop: "3%"
+                        gap: "20%",
+                        paddingTop: "3%",
                     }}>
                         <p>No. PLB</p>
                         <p>Full Name</p>
+                        <p>Gender</p>
+
                     </div>
                     <div className='value-filter-name' style={{
                         width: "65%"
                     }}>
                         <input type="text"
-                            value={search.no_passport}
-                            onChange={(e) => setSearch({ ...search, no_passport: e.target.value })}
-                            placeholder={`Enter No PLB`}
+                            value={search.no_passport.toUpperCase()}
+                            onChange={(e) => setSearch({ ...search, no_passport: e.target.value.toUpperCase() })}
+
                         />
 
                         <input type="text"
-                            value={search.name}
-                            onChange={(e) => setSearch({ ...search, name: e.target.value })}
+                            value={search.name.toUpperCase()}
+                            onChange={(e) => setSearch({ ...search, name: e.target.value.toUpperCase() })}
                             placeholder={`Enter Name`}
+                        />
+                        <Select
+
+                            onChange={(selectedOption) => setSearch({ ...search, gender: selectedOption.value })}
+                            options={dataGender}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            placeholder="Select Gender"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "100%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
                         />
                     </div>
                 </div>
                 <div className='face-reg-filter-kamera'>
                     <div className='label-filter-name' style={{
-                        gap: "35%",
+                        gap: "20%",
                         paddingTop: "3%"
                     }}>
                         <p>Start Date</p>
                         <p>End Date</p>
+                        <p>Nationality</p>
                     </div>
                     <div className='value-filter-name'>
                         <input type="datetime-local"
@@ -602,6 +684,40 @@ const LogRegister = () => {
                             onChange={(e) => setSearch({ ...search, endDate: e.target.value })}
                             style={{
                                 width: "88%",
+                            }}
+                        />
+                        <Select
+                            onChange={(selectedOption) => setSearch({ ...search, nationality: selectedOption.value })}
+                            options={[
+                                { value: "", label: "All Nationality" },
+                                ...countryData.map(country => ({
+                                    value: country.nama_negara,
+                                    label: country.nama_negara
+                                }))
+                            ]}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
                             }}
                         />
                     </div>
@@ -624,11 +740,6 @@ const LogRegister = () => {
                     className='add-data'
                 >Export
                 </button>
-                {/* {userInfo.role == 0 && <button
-                    className='search'
-                    onClick={() => setShowModalAdd(true)}
-                >Add
-                </button>} */}
                 <button
                     className='search'
                     onClick={getLogRegister}
@@ -647,7 +758,7 @@ const LogRegister = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['no plb', 'name', 'gender', 'nationality', 'profile image', "action"]}
+                        tHeader={['no plb', 'name', 'gender', 'nationality', 'profile image', 'registration date', "action"]}
                         tBody={logData}
                         page={page}
                         showIndex={true}
@@ -659,6 +770,7 @@ const LogRegister = () => {
                         <Pagination
                             pageCount={pagination?.last_page}
                             onPageChange={(selectedPage) => setPage(selectedPage)}
+                            currentPage={page}
                         />
                     </div>
                 </>

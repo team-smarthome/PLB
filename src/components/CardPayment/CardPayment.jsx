@@ -165,34 +165,7 @@ const CardPayment = ({
     // }
   };
 
-  useEffect(() => {
-    axios
-      .get(`${url_dev}TypeCard.php`)
-      .then((res) => {
-        const responseData = res.data;
 
-        if (
-          responseData &&
-          responseData.status === 200 &&
-          responseData.data &&
-          Array.isArray(responseData.data)
-        ) {
-          const creditTypes = responseData.data.map((item) => {
-            return {
-              value: item.value,
-              label: item.label,
-            };
-          });
-
-          setOptionCreditTypes(creditTypes);
-        } else {
-          // console.error("Invalid or unexpected API response format");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
 
 
   useEffect(() => {
@@ -876,9 +849,9 @@ const CardPayment = ({
               "Register Success"
             ) : isSuccess ? (
               <>
-                Your PLB has been issued
+                PLB Anda Telah Diterbitkan
                 <br />
-                Please Wait for the receipt
+                Harap Tunggu Tanda Terima
               </>
             ) : isFailed ? (
               "Payment Failed"
@@ -903,7 +876,7 @@ const CardPayment = ({
               <img src={Success} alt="" className="card-image-success1" />
               <div className="print-container1">
                 <h2>
-                  Please wait until receipt has been
+                  Harap tunggu sampai tanda terima telah diterima
                   <br />
                   printed
                 </h2>
@@ -915,13 +888,13 @@ const CardPayment = ({
               <img src={Success} alt="" className="card-image-issuccess1" />
               <div className="issusccess-register1">
                 <div className="issusccess-register2">
-                  <h3>Register Number: </h3>
+                  <h3>Nomor PLB / BCP: </h3>
                 </div>
                 <div className="issusccess-register2">
-                  <h3>{number}</h3>
+                  <h3>{passportNumber}</h3>
                 </div>
               </div>
-              <h4>Please capture this page when receipt not printed out</h4>
+              <h4>Harap abadikan halaman ini ketika tanda terima tidak dicetak</h4>
 
               <button onClick={handleBackHome}>
                 <h2>OK</h2>
@@ -1109,7 +1082,7 @@ const CardPayment = ({
             </form>
           ) : isWaiting ? (
             <div style={{ color: "#3d5889" }}>
-              <h1>Please wait...</h1>
+              <h1>Mohon Tunggu...</h1>
             </div>
           ) : isPhoto ? (
             <>

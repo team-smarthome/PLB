@@ -62,8 +62,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     setOptionNegara(dataNationality);
 
     const dataGender = [
-      { value: "male", label: "MALE" },
-      { value: "female", label: "FEMALE" },
+      { value: "male", label: "Laki-Laki" },
+      { value: "female", label: "Perempuan" },
     ];
 
     setOptionGender(dataGender);
@@ -167,14 +167,14 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     const { name, value } = e.target;
     setFormData({
       ...formdata,
-      [name]: value,
+      [name]: value.toUpperCase(),
     });
 
     setSharedData((prevData) => ({
       ...prevData,
       passportData: {
         ...prevData.passportData,
-        [name]: value,
+        [name]: value.toUpperCase(),
       },
     }));
   };
@@ -233,6 +233,8 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
     console.log('sharedData', sharedData);
   }, [sharedData]);
 
+  console.log('formdata', formdata);
+
   return (
     <div className="container-form">
       <form onSubmit={handleSubmit} className="full-width-form">
@@ -248,6 +250,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
               value={formdata.passport_number}
               onChange={handleInputChange}
               className="disabled-input"
+              style={{ textTransform: "uppercase" }}
             />
           </div>
         </div>
@@ -263,6 +266,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
               value={formdata.full_name}
               onChange={handleInputChange}
               className="disabled-input"
+              style={{ textTransform: "uppercase" }}
             />
           </div>
         </div>

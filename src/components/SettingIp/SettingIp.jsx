@@ -6,9 +6,9 @@ import './settingip.style.css'
 import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import TableLog from '../TableLog/TableLog';
 import Modals from '../Modal/Modal';
-import { io } from 'socket.io-client';
 import { Toast } from "../../components/Toast/Toast";
 import { initiateSocket4010 } from '../../utils/socket';
+
 
 const SettingIp = () => {
     const [totalCameras, setTotalCameras] = useState(0);
@@ -39,26 +39,26 @@ const SettingIp = () => {
         closeModalDelete()
         setStatus("loading")
         closeModalEdit()
-
         const sendDataToWs = {
             ipServerCamera: [params],
-            operationalStatus: operationalStatus ? "Arrival" : "Departure"
+            operationalStatus: operationalStatus ? "Departure" : "Arrival"
         }
 
         const sendDataToWsEdit = {
             oldIp: ipEdit,
-            newIp: dataApiKemera.ipAddress,
-            operationalStatus: operationalStatus ? "Arrival" : "Departure"
+            ipServerCamera: [dataApiKemera.ipAddress],
+            operationalStatus: operationalStatus ? "Departure" : "Arrival"
         }
 
         if (action === "add") {
+            console.log("sendDataToWs", sendDataToWs);
             socket_IO_4010.emit("saveCameraData", sendDataToWs);
             socket_IO_4010.once('saveDataCamera', (data) => {
                 if (data === "successfully") {
                     const insertIpKamera = apiInsertIP(dataApiKemera);
                     insertIpKamera.then((res) => {
                         if (res.status == 200) {
-                            fetchAllIp()
+                            fetchAllIpAction()
                             setStatus("success")
                             Toast.fire({
                                 icon: "success",
@@ -66,10 +66,12 @@ const SettingIp = () => {
                             });
                         }
                     }).catch((err) => {
+                        const { response } = err
+                        console.log("messsage12346", response?.data?.message)
                         setStatus("success")
                         Toast.fire({
                             icon: "error",
-                            title: "Gagal menyimpan data ke API",
+                            title: response?.data?.message || "Internal Server Error"
                         })
                         console.log(err);
                     });
@@ -82,43 +84,32 @@ const SettingIp = () => {
                 }
             })
         } else if (action === "delete") {
-            socket_IO_4010.emit("deleteCameraData", sendDataToWs);
-            socket_IO_4010.on('deleteDataCamera', (data) => {
-                if (data === "successfullyDeleted") {
-                    const deleteIpKamera = apiDeleteIp(dataApiKemera.id);
-                    deleteIpKamera.then((res) => {
-                        if (res.status == 200) {
-                            fetchAllIp()
-                            setStatus("success")
-                            Toast.fire({
-                                icon: "success",
-                                title: "Data berhasil dihapus",
-                            });
-                        }
-                    }).catch((err) => {
-                        setStatus("success")
-                        Toast.fire({
-                            icon: "error",
-                            title: "Gagal menghapus data",
-                        })
-                        console.log(err);
-                    });
-                } else {
+            const deleteIpKamera = apiDeleteIp(dataApiKemera.id);
+            deleteIpKamera.then((res) => {
+                if (res.status == 200) {
+                    fetchAllIpAction()
                     setStatus("success")
                     Toast.fire({
-                        icon: "error",
-                        title: "Gagal menghapus data",
+                        icon: "success",
+                        title: "Data berhasil dihapus",
                     });
                 }
-            })
+            }).catch((err) => {
+                setStatus("success")
+                Toast.fire({
+                    icon: "error",
+                    title: "Gagal menghapus data",
+                })
+                console.log(err);
+            });
         } else if (action === "edit") {
             socket_IO_4010.emit("editCameraData", sendDataToWsEdit);
-            socket_IO_4010.on('editDataCamera', (data) => {
-                if (data === "successfullyEdited") {
+            socket_IO_4010.once('editDataCamera', (data) => {
+                if (data === "successfully") {
                     const editIpKamera = apiEditIp(dataApiKemera, detailData?.id);
                     editIpKamera.then((res) => {
                         if (res.status == 200) {
-                            fetchAllIp()
+                            fetchAllIpAction()
                             setStatus("success")
                             Toast.fire({
                                 icon: "success",
@@ -145,10 +136,10 @@ const SettingIp = () => {
     }
 
 
-    const handleCheckStatus = () => {
+    const handleCheckStatus = (listCamera) => {
         return new Promise((resolve, reject) => {
             setStatus("loading");
-            socket_IO_4010.emit("checkStatusKamera");
+            socket_IO_4010.emit("checkStatusKamera", listCamera);
             socket_IO_4010.once("statusKameraResponse", (data) => {
                 setStatus("success");
                 SetStatusKamera(data);
@@ -170,24 +161,45 @@ const SettingIp = () => {
     };
 
 
+    useEffect(() => {
+        fetchAllIp();
+        const userCookie = Cookies.get('userdata');
+        const userInfo = JSON.parse(userCookie);
+        setDataUserIp(userInfo);
 
-    const optionCameras = [...Array(10)].map((_, index) => ({
-        value: index + 1,
-        label: `${index + 1} Kamera`,
-    }));
-    const getUserdata = Cookies.get('userdata');
+        if (socket_IO_4010.connected) {
+            console.log('Already connected to server');
+            setCanAddIpKamerea(true);
+            return;
+        }
+        socket_IO_4010.on('connect', () => {
+            console.log('Connected to server');
+            setCanAddIpKamerea(true);
+            return;
+        });
 
-    const fetchAllIp = async () => {
+    }, []);
+
+
+    const fetchAllIpAction = async () => {
+        const userCookie = Cookies.get('userdata');
+
+        if (!userCookie) {
+            console.error("No user cookie found");
+            return;
+        }
+
+        const userInfo = JSON.parse(userCookie);
+
         try {
-            const res = await apiGetAllIp();
+            const res = await apiGetAllIp(userInfo?.tpi_id);
             setListCamera(res.data.data)
             if (res.data.data.length === 0) {
-                await handleCheckStatus();
                 setCameraNames(new Array(totalCameras).fill(''));
                 setCameraIPs(new Array(totalCameras).fill(''));
                 setIsEditing(false);
+                setStatus("success")
             } else {
-                await handleCheckStatus();
                 const names = res.data.data.map(item => item.namaKamera);
                 const ips = res.data.data.map(item => item.ipAddress);
                 setTotalCameras(res.data.data.length);
@@ -201,29 +213,41 @@ const SettingIp = () => {
         }
     };
 
-    useEffect(() => {
-        setDataUserIp(JSON.parse(getUserdata));
-        console.log(JSON.parse(getUserdata), 'hasildaricookie');
-        if (dataUserIp?.petugas?.id) {
-            fetchAllIp();
+
+
+    const fetchAllIp = async () => {
+        const userCookie = Cookies.get('userdata');
+
+        if (!userCookie) {
+            console.error("No user cookie found");
+            return;
         }
-    }, [dataUserIp?.petugas?.id, totalCameras]);
 
-    useEffect(() => {
-        socket_IO_4010.emit('getCameraData');
+        const userInfo = JSON.parse(userCookie);
 
-        socket_IO_4010.once('DataIPCamera', (data) => {
-            if (data?.ipCamera.length === 0) {
-                console.log('DataIPCamera', data?.ipCamera.length);
-                socket_IO_4010.emit('saveCameraDataFirst', { ipServerCamera: cameraIPs });
+        try {
+            const res = await apiGetAllIp(userInfo?.tpi_id);
+            setListCamera(res.data.data)
+            if (res.data.data.length === 0) {
+                setCameraNames(new Array(totalCameras).fill(''));
+                setCameraIPs(new Array(totalCameras).fill(''));
+                setIsEditing(false);
+                setStatus("success")
+            } else {
+                await handleCheckStatus(res.data.data);
+                const names = res.data.data.map(item => item.namaKamera);
+                const ips = res.data.data.map(item => item.ipAddress);
+                setTotalCameras(res.data.data.length);
+                setCameraNames(names);
+                setCameraIPs(ips);
+                setIsEditing(true);
             }
-        });
-        socket_IO_4010.once('connect', () => {
-            console.log('connect to server');
-            setCanAddIpKamerea(true);
-        });
+        } catch (err) {
+            setStatus("success")
+            console.log(err.message);
+        }
+    };
 
-    }, [cameraIPs])
 
 
     const handleSubmit = (e) => {
@@ -231,22 +255,18 @@ const SettingIp = () => {
         console.log(dataUserIp, 'dataUserIp');
         const dataApiKemera = {
             ...detailData,
-            userId: dataUserIp?.petugas?.id,
+            tpi_id: dataUserIp?.tpi_id,
             is_depart: operationalStatus
         };
-
         handleSubmitCrudKameraToServer("add", detailData?.ipAddress, dataApiKemera);
-
-        console.log('Form_submitted:', { totalCameras, cameraNames, cameraIPs });
     };
 
     const handleEdit = (e) => {
         e.preventDefault();
-        console.log(ipEdit, 'dataUserIp');
         const dataApiKemera = {
             namaKamera: detailData.namaKamera,
             ipAddress: detailData.ipAddress,
-            userId: dataUserIp?.petugas?.id,
+            tpi_id: dataUserIp?.tpi_id,
             is_depart: operationalStatus
         };
 
@@ -299,22 +319,22 @@ const SettingIp = () => {
             label: 'Choose Status'
         },
         {
-            value: true,
+            value: false,
             label: 'Arrival'
         },
         {
-            value: false,
+            value: true,
             label: 'Departure'
         },
     ]
 
     const optionFilterStatus2 = [
         {
-            value: true,
+            value: false,
             label: 'Arrival'
         },
         {
-            value: false,
+            value: true,
             label: 'Departure'
         },
     ]
@@ -370,7 +390,7 @@ const SettingIp = () => {
             <>
                 <td>{row.namaKamera}</td>
                 <td>{row.ipAddress}</td>
-                <td>{row.is_depart ? "Arrival" : "Departure"}</td>
+                <td>{row.is_depart ? "Departure" : "Arrival"}</td>
                 <td>
                     {kameraStatus ? (
                         <div style={{ color: kameraStatus.status === 'error' ? 'red' : 'green' }}>
@@ -738,7 +758,7 @@ const SettingIp = () => {
                             width: '10%',
 
                         }}
-                        onClick={handleCheckStatus}
+                        onClick={fetchAllIp}
                     >Check Status
                     </button>
                     <button
