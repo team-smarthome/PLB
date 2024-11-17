@@ -81,7 +81,7 @@ export async function apiInsertDataUser(body, url) {
     );
     return response;
   } catch (error) {
-    console.error("Error:", error);
+    throw error;
   }
 }
 
@@ -282,7 +282,7 @@ export const apiInsertIP = async (data) => {
     })
     return res;
   } catch (error) {
-    console.log(error)
+    throw error;
   }
 }
 
@@ -295,9 +295,9 @@ export const apiGetIp = async (params) => {
   }
 }
 
-export const apiGetAllIp = async () => {
+export const apiGetAllIp = async (params) => {
   try {
-    const res = await axios.get(`${url_devel}api/ipconfig`);
+    const res = await axios.get(`${url_devel}api/ip-kamera/${params}`);
     return res;
   } catch (error) {
     console.log(error)
@@ -361,7 +361,7 @@ export const getDataLogApi = async (filterParams) => {
     });
     return response;
   } catch (error) {
-    console.error("Error:", error);
+    throw error;
   }
 }
 
@@ -460,6 +460,67 @@ export const getAllTpiData = async () => {
       }
     })
     return res
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getAllJabatanData = async (params, page) => {
+  try {
+    const res = await axios({
+      method: "get",
+      url: `${url_devel}api/jabatan`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: { ...params, page }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const InsertJabatan = async (payload) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/jabatan`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const UpdateJabatan = async (id, payload) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${url_devel}api/jabatan/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const DeleteJabatan = async (id) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/jabatan/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res;
   } catch (error) {
     console.log(error)
   }
