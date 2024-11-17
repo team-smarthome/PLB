@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ReactPaginate from "react-paginate";
 import "./Pagination.css";
 
-const Pagination = ({ onPageChange, pageCount }) => {
-
-
+const Pagination = ({ onPageChange, pageCount, currentPage }) => {
   return (
     <div>
       <ReactPaginate
@@ -19,6 +17,7 @@ const Pagination = ({ onPageChange, pageCount }) => {
         containerClassName={"pagination"}
         subContainerClassName={"pages pagination"}
         activeClassName={"active"}
+        forcePage={currentPage - 1}
       />
     </div>
   );

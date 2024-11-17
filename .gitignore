@@ -13,6 +13,8 @@ ecosystem.config.js
 # production
 /build
 
+/dist
+
 # misc
 .DS_Store
 .env.local
@@ -31,3 +33,7 @@ package-lock.json*
 .contentlayer
 
 /SocketServer
+/dist
+dist
+api
+/api

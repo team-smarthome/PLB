@@ -1,94 +1,64 @@
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
 import "./Table.css";
-import { IoMdPrint } from "react-icons/io";
-import { useReactToPrint } from "react-to-print";
-import Printer from "../Printer/Printer";
+import { useNavigate } from "react-router-dom";
+import dataNegara from "../../utils/dataNegara";
+import { url_devel } from "../../services/env";
 
-const Table = ({ data, page }) => {
-  console.log(data, "dataTable");
+const Table = ({ data, page, perPage }) => {
+  const navigate = useNavigate();
 
-  const printRef = useRef();
-  const [printData, setPrintData] = useState(null);
+  const handleRowClick = (item) => {
+    // Kirim data yang diklik ke halaman detail
+    navigate("/validation", { state: item });
+  };
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-  });
-
-  useEffect(() => {
-    if (printData) {
-      handlePrint();
-    }
-  }, [printData, handlePrint]);
-
-
-  // Check if data is not an array or is empty
   if (!Array.isArray(data) || data.length === 0) {
     return <div>No data available.</div>;
   }
-
-  // Calculate the start and end indices based on the page parameter
-  const startIndex = (page - 1) * 20;
-  const endIndex = Math.min(startIndex + 20, data.length);
-
-  // Display only the data within the calculated indices
-  const slicedData = data.slice(startIndex, endIndex);
-  const isLastPage = endIndex === data.length;
-
-  // Function to handle print icon click
-  const handlePrintClick = (item) => {
-    setPrintData(item);
-  };
-
-  const handleEpochToDate = (epoch) => {
-    const date = new Date(epoch * 1000);
-
-    // Format tanggal menjadi "dd-MM-yyyy HH:mm:ss"
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-indexed month
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-
-    const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-    console.log(formattedDate, "dataConvert");
-    return formattedDate;
-  };
-
   return (
     <div>
       <table className="custom-table">
         <thead>
           <tr>
             <th>No</th>
-            <th>Tanggal</th>
-            <th>PLB Number</th>
+            <th>No PLB</th>
+            {/* <th>No Register</th> */}
             <th>Nama</th>
-            <th>Panoramic Capture</th>
-            <th>Similarity</th>
-            <th>Status</th>
+            <th>Nationality</th>
+            <th>Arrival Time</th>
+            <th>Foto Profile</th>
           </tr>
         </thead>
         <tbody>
-          {slicedData.map((item, index) => (
-            <tr key={index}>
-              <td>{startIndex + index + 1}</td>
-              <td>{handleEpochToDate(item.time)}</td>
-              <td>{item.personCode}</td>
-              <td>{item.name}</td>
-              <td>
-                <img
-                  src={`http://192.168.2.127/ofsimage/${item.images_info[0].img_path}`}
-                  alt="Panoramic Capture"
-                  width="80"
-                  height="80"
-                  style={{ borderRadius: "100%" }}
-                />
-              </td>
-              <td>{item.images_info[0].similarity}</td>
-              <td>{item.passStatus === 6 ? "Failed" : "Success"}</td>
-            </tr>
-          ))}
+          {data.map((item, index) => {
+            const findNationality = dataNegara.data.find(
+              (dataNegaraItem) => dataNegaraItem?.id_negara === item?.nationality
+            );
+
+            return (
+              <tr
+                key={index}
+                onClick={() => handleRowClick(item)}
+                style={{ cursor: "pointer" }}
+              >
+                <td>{(page - 1) * perPage + index + 1}</td>
+                <td>{item.no_passport}</td>
+                {/* <td>{item.no_register}</td> */}
+                <td>{item.name}</td>
+                <td>{findNationality ? `${findNationality?.id_negara}-${findNationality?.deskripsi_negara}` : "Unknown"}</td>
+                <td>{item.arrival_time}</td>
+                <td>
+                  <img
+                    src={`data:image/jpeg;base64,${item.profile_image}`}
+                    alt="Foto Profile"
+                    width="80"
+                    height="80"
+                    style={{ borderRadius: "100%" }}
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

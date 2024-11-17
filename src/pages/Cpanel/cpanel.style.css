@@ -1,0 +1,138 @@
+.header-body {
+    background-color: #fff;
+    /* width: 100%; */
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: gray;
+
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+
+    font-weight: bold;
+
+}
+
+
+.user-profile h4 {
+    font-weight: 600;
+    font-size: 18px;
+    color: #11375c;
+}
+
+.user-profile img {
+    border-radius: 50%;
+}
+
+.cpanel-content {
+    transition: all 0.5s ease;
+}
+
+.input-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.input-search-container button {
+    width: auto;
+    padding: 10px 20px;
+    height: 40px;
+    font-size: 16px;
+    max-width: 100px;
+    min-width: 80px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    background-color: #11375c;
+    color: #fff;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+/* .input-search-container button:hover {
+    background-color: #11375c;
+    color: #fff;
+} */
+
+
+.search-table-list {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.search-table span {
+    font-weight: 600;
+}
+
+.search-table input {
+    background-color: #fff;
+}
+
+.user-button-list {
+    display: flex;
+    justify-content: space-between;
+    /* Creates space between buttons */
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    width: 13%;
+    /* Increased width for better visibility */
+    max-height: 150px;
+    position: absolute;
+    z-index: 99;
+    top: 13%;
+    right: 0;
+    border: solid .5% black;
+    border-radius: 6px;
+    padding: 5px;
+    /* Adds some padding for better content spacing */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Adds a subtle shadow for depth */
+}
+
+.user-button-list button {
+    width: 100%;
+    height: auto;
+    /* Allow the button height to adjust based on content */
+    padding: 10px;
+    /* Added padding for better touch targets */
+    font-weight: 600;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    /* Smooth background change on hover */
+}
+
+.user-button-list button:hover {
+    background-color: #f0f0f0;
+    /* Light gray background on hover */
+}

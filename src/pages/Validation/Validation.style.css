@@ -1,0 +1,13 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.background-apply-voa {
+  background-color: #3d5889;
+  height: 125vh;
+  overflow: hidden;
+  position: relative;
+}

@@ -2,6 +2,7 @@
   "name": "imi_kiosk",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/pos-lintas-batas",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
@@ -11,29 +12,33 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "axios": "^1.6.2",
     "cors": "^2.8.5",
     "exceljs": "^4.4.0",
-    "flowbite-react": "^0.7.2",
+    "flowbite-react": "^0.7.8",
     "hex2ascii": "^0.0.3",
     "hexify": "^1.0.4",
     "jotai": "^2.9.3",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.1",
+    "moment": "^2.30.1",
     "mrz": "^4.0.0",
+    "node-fetch": "^3.3.2",
     "node-tlv": "^1.5.14",
     "npm": "^10.2.5",
     "ping": "^0.4.4",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
-    "react-datepicker": "^6.9.0",
+    "react-datepicker": "^7.3.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.3.0",
     "react-iframe": "^1.8.5",
+    "react-images-viewer": "^1.7.1",
     "react-paginate": "^8.2.0",
     "react-player": "^2.15.0",
     "react-router-dom": "^6.20.0",
-    "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
     "react-to-print": "^2.14.15",
     "react-webcam": "^7.2.0",
@@ -42,14 +47,14 @@
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.4",
     "sweetalert2": "^11.10.1",
+    "vite": "^5.4.7",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -71,6 +76,10 @@
   },
   "devDependencies": {
     "@types/video.js": "^7.3.57",
-    "video.js": "^8.10.0"
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "video.js": "^8.10.0",
+    "vite-tsconfig-paths": "^5.0.1"
   }
 }

@@ -7,7 +7,6 @@ const VideoFeed = () => {
   const [player, setPlayer] = useState();
 
   useEffect(() => {
-    // make sure Video.js player is only initialized once
     if (!player) {
       const videoElement = videoRef.current;
       if (!videoElement) return;

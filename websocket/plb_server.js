@@ -64,41 +64,106 @@ const handleSendDataToApi = async (socket, dataUser) => {
         arrival_time: dataUser?.bodyParamsSendKamera?.arrivalTime,
         destination_location: dataUser?.bodyParamsSendKamera?.destinationLocation,
         profile_image: dataUser?.bodyParamsSendKamera?.photoFace,
-    }
+    };
+
+    const formData = new FormData();
+    formData.append('fileType', '0');
+    const base64Image = dataUser?.bodyParamsSendKamera?.photoFace;
+    const blob = await fetch(`${base64Image}`).then(res => res.blob());
+    formData.append('fileData', blob, `${dataUser?.bodyParamsSendKamera?.name}.jpg`);
+    const uploadUrls = ipCamera.map(camera => `http://${camera}/cgi-bin/entry.cgi/system/file-upload`);
 
     try {
-        // const response = await axios.post(
-        //     `http://${ipServer}/plb-api/data_user_insert.php`,
-        //     dataTosendAPI,
-        //     {
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         }
-        //     }
-        // );
+        const uploadRequests = uploadUrls.map(url =>
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'image/jpeg',
+                },
+            })
+        );
+        const uploadResponses = await Promise.all(uploadRequests);
+        const allUploadsSuccessful = uploadResponses.every(response => response.ok);
 
-        // if (response.data.status === "OK") {
-        const apiRequests = ipCamera.map((camera, index) => {
-            return axios.post(
-                `http://${camera}/cgi-bin/entry.cgi/event/person-info`,
-                dataUser?.bodyParamsSendKamera,
-                {
-                    headers: {
-                        'Cookie': cookiesCamera[index],
-                        'Content-Type': 'application/json'
+        if (allUploadsSuccessful) {
+            const apiRequests = ipCamera.map((camera, index) =>
+                axios.post(
+                    `http://${camera}/cgi-bin/entry.cgi/event/person-info`,
+                    dataUser?.bodyParamsSendKamera,
+                    {
+                        headers: {
+                            'Cookie': cookiesCamera[index],
+                            'Content-Type': 'application/json',
+                        },
                     }
-                }
+                )
             );
-        });
-        await Promise.all(apiRequests);
+            await Promise.all(apiRequests);
 
-        socket.emit("responseSendDataUserFromServer", "Successfully");
-        // }
+            socket.emit("responseSendDataUserFromServer", "Successfully");
+        } else {
+            throw new Error("Not all uploads were successful");
+        }
     } catch (error) {
         console.error('Error:', error);
         socket.emit("responseSendDataUserFromServer", "Failed to send data to all cameras.");
     }
 };
+
+
+// const handleSendDataToApi = async (socket, dataUser) => {
+//     const dataTosendAPI = {
+//         no_passport: dataUser?.bodyParamsSendKamera?.personNum,
+//         no_register: dataUser?.bodyParamsSendKamera?.personId,
+//         name: dataUser?.bodyParamsSendKamera?.name,
+//         date_of_birth: dataUser?.bodyParamsSendKamera?.dateOfBirth,
+//         gender: dataUser?.bodyParamsSendKamera?.sex,
+//         nationality: dataUser?.bodyParamsSendKamera?.nationalityCode,
+//         expired_date: dataUser?.bodyParamsSendKamera?.expiryDate,
+//         arrival_time: dataUser?.bodyParamsSendKamera?.arrivalTime,
+//         destination_location: dataUser?.bodyParamsSendKamera?.destinationLocation,
+//         profile_image: dataUser?.bodyParamsSendKamera?.photoFace,
+//     }
+//     const formData = new FormData();
+//     formData.append('fileType', '0');
+//     const base64Image = dataUser?.bodyParamsSendKamera?.photoFace;
+//     const blob = await fetch(`${base64Image}`).then(res => res.blob());
+//     formData.append('fileData', blob, `${dataUser?.bodyParamsSendKamera?.name}.jpg`);
+//     try {
+//         try {
+//             const responseUpload = await fetch('http://192.168.2.127/cgi-bin/entry.cgi/system/file-upload', {
+//                 method: 'POST',
+//                 body: formData,
+//                 headers: {
+//                     'Content-Type': ' image/jpeg',
+//                 },
+//             });
+//             if (responseUpload.data.status === 200) {
+//                 const apiRequests = ipCamera.map((camera, index) => {
+//                     return axios.post(
+//                         `http://${camera}/cgi-bin/entry.cgi/event/person-info`,
+//                         dataUser?.bodyParamsSendKamera,
+//                         {
+//                             headers: {
+//                                 'Cookie': cookiesCamera[index],
+//                                 'Content-Type': 'application/json'
+//                             }
+//                         }
+//                     );
+//                 });
+//                 await Promise.all(apiRequests);
+
+//                 socket.emit("responseSendDataUserFromServer", "Successfully");
+//             }
+//         } catch {
+//             console.log("error")
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         socket.emit("responseSendDataUserFromServer", "Failed to send data to all cameras.");
+//     }
+// };
 
 
 const handleGetDataFilter = async (socket) => {
