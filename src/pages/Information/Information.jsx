@@ -984,8 +984,10 @@ const Information = () => {
 				dataPrice="500.000"
 				dataLokasi="TEST"
 				passportumber="A0B0C0D001"
-				passportName="Udin Samsul Arifin"
+				passportName="Udin Samsul Prima"
 				passportUrl="https://www.google.com"
+				birthDate="31-12-2024"
+				nationality="Indonesia"
 			/>
 		</div>
 	);

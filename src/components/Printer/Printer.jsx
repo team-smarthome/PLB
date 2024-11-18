@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import { formData } from "../../utils/atomStates";
 import "./PrinterStyle.css";
 import QRCode from "qrcode.react";
+import Cookies from 'js-cookie';
 
 const Printer = ({
   dataNumberPermohonanPropsVisa,
@@ -14,11 +15,15 @@ const Printer = ({
   dataLokasi,
   passportumber,
   passportName,
-  passportUrl
+  passportUrl,
+  birthDate= "01/01/2000",
+  nationality = "Indonesia"
 }) => {
   const [datafromAtom] = useAtom(formData);
   const tanggal = new Date();
-
+  const userCookie = Cookies.get('userdata')
+  const userInfo = JSON.parse(userCookie);
+  console.log(userInfo, "dr printer")
   console.log(datafromAtom, "datatoPrinter");
 
 
@@ -48,16 +53,19 @@ const Printer = ({
   return (
     <div className="container-print" ref={printRefProps}>
       <div className="wrappper-container">
-        <h2>Date : {displayDate}</h2>
-        <h2>Time : {displayTime}</h2>
-      </div>
-      <h2>{dataNumberPermohonanPropsVisa}</h2>
-      <div className="wrappper-container">
-        <div className="qrcode">
-          <QRCode className="qrcode-image" value={combinedValue} />
-        </div>
+        <h2>Imigrasi Indonesia</h2>
+        <h4>PLBN {userInfo.nama_tpi}</h4>
       </div>
       <div className="wrappper-container">
+        {/* <h2>Date : {displayDate}</h2>
+        <h2>Time : {displayTime}</h2> */}
+        <h3>Nama : {passportName}</h3>
+        <h3>Date Birth : {birthDate}</h3>
+        <h3>No.PLB / TBC : {passportumber}</h3>
+        <h3>Kebangsaan : {nationality}</h3>
+      </div>
+      {/* <h2>{dataNumberPermohonanPropsVisa}</h2> */}
+      {/* <div className="wrappper-container">
         <div className="h2-dua">
           <div className="header-h2">
             <h2>PLB Number</h2>
@@ -69,6 +77,14 @@ const Printer = ({
             <h2 style={{ fontSize: "1em" }}>{passportName}</h2>
           </div>
         </div>
+      </div> */}
+      <div className="wrappper-container">
+        <div className="qrcode">
+          <QRCode className="qrcode-image" value={combinedValue} />
+        </div>
+      </div>
+      <div className="wrappper-container">
+        <h2>{displayDate}</h2>
       </div>
     </div>
   );
