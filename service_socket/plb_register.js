@@ -1,7 +1,7 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = ['192.168.2.210'];
+let ipCamera = [''];
 const axios = require("axios");
 const ping = require('ping');
 
@@ -54,7 +54,6 @@ const handleTakePhoto = async (socket) => {
                 method: "collect_cancel",
                 params: null,
             });
-            // return;
         }
 
         if (response.data.result === "ok") {
@@ -148,7 +147,7 @@ function clearFolder(folderPath) {
     }
 }
 
-function handleTakePhoto(socket) {
+function handleTakeDocument(socket) {
     console.log("Taking photo...");
     const folderPath = "C:/pos-lintas-batas/photo-document";
     const latestImageInfo = getLatestImageFromFolder(folderPath);
@@ -222,7 +221,7 @@ io.on("connection", (socket) => {
 
     socket.on("get-document", () => {
         console.log("# RECEIVED ACTION Get Document FROM FRONTEND #");
-        handleTakePhoto(socket);
+        handleTakeDocument(socket);
     });
 
 

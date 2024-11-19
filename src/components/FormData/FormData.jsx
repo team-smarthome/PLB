@@ -117,6 +117,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
   }, [sharedData]);
 
 
+  useEffect(() => {
+    console.log(sharedData, 'formdata');
+  }, [sharedData]);
+
 
 
   const handleDateTimeChange = (e) => {

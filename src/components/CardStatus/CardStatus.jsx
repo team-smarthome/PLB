@@ -90,11 +90,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		socket_IO_4000.on("error_photo", (error) => {
 			console.log('error_photo', error)
 			const statusCardBoxMap = {
+				cannot_take_photo: 'errorPhoto',
 				closed_eyes: "closedEyes",
 				glasses: "usingGlasses",
 				hat: "usingHat",
 				mask: "usingMask",
-				cannot_take_photo: 'errorPhoto',
 				glassesMask: 'usingMaskGlasses',
 				occlusion: 'occlusionImage'
 			};
@@ -118,7 +118,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			}, 2000);
 		});
 
-		socket_IO_4000.once("document-data", (data) => {
+		socket_IO_4000.on("document-data", (data) => {
 			if (data.image) {
 				setDocumentPLBImage(data?.image)
 				sendDataToInput({
@@ -153,7 +153,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		return () => {
 			socket_IO_4000.off("photo_taken");
 			socket_IO_4000.off("error_photo");
-			socket_IO_4000.off("document-data");
 		}
 
 	}, [socket_IO_4000, capturedImage]);
@@ -1052,7 +1051,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "error_folder":
 				return ["Folder Tidak Ditemukan", "Harap Periksa Pengaturan"];
 			case "closedEyes":
-				return ["Mata Tertutup", "Silahkan Buka Mata"];
+				return ["Gagal Ambil Foto", "Silahkan Coba Lagi"];
 			case "usingMask":
 				return ["Silahkan Lepas Masker", "Sebelum Foto"];
 			case "usingGlasses":

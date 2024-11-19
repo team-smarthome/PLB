@@ -34,8 +34,6 @@ const io = socketIo(server, {
 const handleSendDataToApi = async (dataUser, data) => {
     const ipCameraCheckSend = [...data];
 
-    console.log(ipCameraCheckSend.length, "totalIpKamera")
-
     if (ipCameraCheckSend.length === 0) {
         return { status: 500, message: "IP Kamera tidak ditemukan" };
     }
@@ -246,9 +244,7 @@ async function realtimeDataLog() {
     } catch (error) {
         console.log("error hit api");
     }
-
-    realtimeDataLog();
-    // setTimeout(realtimeDataLog, 1000);
+    setTimeout(realtimeDataLog, 1000);
 }
 
 realtimeDataLog();
@@ -412,5 +408,37 @@ io.on("connection", (socket) => {
             socket.emit("responseSync", "Failed");
         }
     })
+
+
+    socket.on("syncCamera", async (dataUser) => {
+        try {
+            console.log("MENJALANKAN SYNC DATA")
+            const responseDataKamera = await getDataKamera();
+            if (responseDataKamera?.data?.status === 500) {
+                socket.emit("responseSyncCamera", responseDataKamera.message);
+                return;
+            }
+            const ipData = responseDataKamera?.data?.data;
+            const checkIP = await checkIpAccessible(ipData);
+            if (!checkIP.reachable) {
+                socket.emit("responseSyncCamera", checkIP.error);
+                return;
+            }
+            const { status, message } = await handleSendDataToApi(dataUser, ipData);
+
+            if (status === 200) {
+                console.log("Berhasil Synch", message);
+                socket.emit("responseSyncCamera", message);
+                return;
+            } else {
+                console.log("Gagal Synch", message);
+                socket.emit("responseSyncCamera", message);
+                return;
+            }
+        } catch (error) {
+            console.log("error", error.message);
+            socket.emit("responseSyncCamera", error.message);
+        }
+    });
 
 });

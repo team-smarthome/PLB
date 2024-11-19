@@ -3,22 +3,20 @@ import { useAtom } from "jotai";
 import { formData } from "../../utils/atomStates";
 import "./PrinterStyle.css";
 import QRCode from "qrcode.react";
+import Cookies from 'js-cookie';
 
 const Printer = ({
-  dataNumberPermohonanPropsVisa,
-  dataNumberPermohonanPropsReceipt,
   printRefProps,
-  dataPrice,
-  dataDate,
-  dataTime,
-  dataLokasi,
   passportumber,
   passportName,
-  passportUrl
+  birthDate = "01/01/2000",
+  nationality = "Indonesia"
 }) => {
   const [datafromAtom] = useAtom(formData);
   const tanggal = new Date();
-
+  const userCookie = Cookies.get('userdata')
+  const userInfo = JSON.parse(userCookie);
+  console.log(userInfo, "dr printer")
   console.log(datafromAtom, "datatoPrinter");
 
 
@@ -33,8 +31,8 @@ const Printer = ({
 
   const formattedTime = `${hour}:${minute}:${second}`;
   const formattedDate = `${day}/${month}/${year}`;
-  const displayDate = dataDate || formattedDate;
-  const displayTime = dataTime || formattedTime;
+  const displayDate = formattedDate;
+  const displayTime = formattedTime;
   const qrData = {
     fullname: datafromAtom?.passportData?.noRegister,
     // noRegister: datafromAtom?.passportData?.noRegister,
@@ -48,27 +46,22 @@ const Printer = ({
   return (
     <div className="container-print" ref={printRefProps}>
       <div className="wrappper-container">
-        <h2>Date : {displayDate}</h2>
-        <h2>Time : {displayTime}</h2>
+        <h2>Imigrasi Indonesia</h2>
+        <h4>PLBN {userInfo.nama_tpi}</h4>
       </div>
-      <h2>{dataNumberPermohonanPropsVisa}</h2>
+      <div className="wrappper-container">
+        <h3>Nama : {passportName}</h3>
+        <h3>Date Birth : {birthDate}</h3>
+        <h3>No.PLB / TBC : {passportumber}</h3>
+        <h3>Kebangsaan : {nationality}</h3>
+      </div>
       <div className="wrappper-container">
         <div className="qrcode">
           <QRCode className="qrcode-image" value={combinedValue} />
         </div>
       </div>
       <div className="wrappper-container">
-        <div className="h2-dua">
-          <div className="header-h2">
-            <h2>PLB Number</h2>
-          </div>
-          <div className="header-h2">
-            <h2>{passportumber}</h2>
-          </div>
-          <div className="header-h2">
-            <h2 style={{ fontSize: "1em" }}>{passportName}</h2>
-          </div>
-        </div>
+        <h2>{`${displayDate} ${displayTime}`}</h2>
       </div>
     </div>
   );

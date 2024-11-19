@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import './logfacereg.style.css'
-import { apiGetAllIp, getDataLogApi } from '../../services/api'
+import { apiGetAllIp, getAllNegaraData, getDataLogApi } from '../../services/api'
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
@@ -22,6 +22,7 @@ const LogFaceReg = () => {
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
     const [modalOpen, setModalOpen] = useState(false)
+    const [dataNationality, setDataNationality] = useState([])
     const [params, setParams] = useState({
         page: page,
         name: "",
@@ -29,7 +30,9 @@ const LogFaceReg = () => {
         startDate: "",
         endDate: "",
         passStatus: "",
-        ipCamera: ""
+        ipCamera: "",
+        gender: "",
+        nationality: "",
     })
     const [pagination, setPagination] = useState({
         total: 0,
@@ -63,6 +66,13 @@ const LogFaceReg = () => {
             label: 'Failed'
         },
     ]
+
+
+    const dataGender = [
+        { value: "", label: "All Gender" },
+        { value: "M", label: "MALE" },
+        { value: "F", label: "FEMALE" },
+    ];
 
     //============================================ YANG DIGUNAKAN =============================================================//
 
@@ -124,6 +134,18 @@ const LogFaceReg = () => {
         }
     }
 
+    const getDataNationality = async () => {
+        try {
+            const { data } = await getAllNegaraData();
+            if (data.status === 200) {
+                console.log(data.data, "dataNegara")
+                setDataNationality(data.data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const handleEpochToDate = (epoch) => {
         const date = new Date(epoch * 1000);
         const day = String(date.getDate()).padStart(2, '0');
@@ -155,6 +177,8 @@ const LogFaceReg = () => {
                 <td>{row?.personId}</td>
                 <td>{row?.name}</td>
                 <td>{row?.similarity}</td>
+                <td>{row?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
+                <td>{row?.nationality || "Unkown"}</td>
                 <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
                 <td>{handleEpochToDate(row?.time)}</td>
                 <td className={`${row?.is_depart ? 'text-green-400' : 'text-red-400'}`}>{row?.is_depart ? "Departure" : "Arrival"}</td>
@@ -184,7 +208,7 @@ const LogFaceReg = () => {
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Payment Report");
 
-        const headers = ['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time"]
+        const headers = ['No', 'no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time"]
         worksheet.addRow(headers);
 
         logData.forEach((item, index) => {
@@ -193,6 +217,8 @@ const LogFaceReg = () => {
                 item.personId,
                 item.name,
                 item?.similarity,
+                item?.gender,
+                item?.nationality,
                 item?.passStatus === 6 ? "Failed" : "Success",
                 handleEpochToDate(item?.time),
             ];
@@ -250,7 +276,7 @@ const LogFaceReg = () => {
     useEffect(() => {
         localStorage.setItem('cameraIp', '')
         const fetchData = async () => {
-            await Promise.all([GetDataUserLog(), GetDataKamera()])
+            await Promise.all([GetDataUserLog(), GetDataKamera(), getDataNationality()])
             setStatus("success")
         }
         fetchData();
@@ -292,10 +318,11 @@ const LogFaceReg = () => {
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
             <div className="face-reg-header">
                 <div className='face-reg-filter-name'>
-                    <div className='label-filter-name'>
+                    <div className=' label-filter-name'>
                         <p>Filter By</p>
                         <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
                         <p>Recognition Status</p>
+                        <p>Gender</p>
                     </div>
                     <div className='value-filter-name'>
                         <Select
@@ -368,6 +395,37 @@ const LogFaceReg = () => {
                                 }),
                             }}
                         />
+                        <Select
+                            onChange={(selectedOption) => {
+                                setParams({ ...params, page: 1, gender: selectedOption.value })
+                            }}
+                            options={dataGender}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            defaultValue={dataGender[0]}
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
                     </div>
                 </div>
                 <div className='face-reg-filter-kamera'>
@@ -375,6 +433,7 @@ const LogFaceReg = () => {
                         <p>Start Date</p>
                         <p>End Date</p>
                         <p>Select Camera</p>
+                        <p>Nationality</p>
                     </div>
                     <div className='value-filter-name'>
                         <input type="datetime-local"
@@ -401,6 +460,40 @@ const LogFaceReg = () => {
                                 ...optionIp.map(item => ({ value: item.ipAddress, label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Departure" : "Arrival"} )` }))
                             ]}
                             defaultValue={{ value: '', label: 'All Camera' }}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
+                        <Select
+                            onChange={(selectedOption) => setParams({ ...params, nationality: selectedOption.value })}
+                            options={[
+                                { value: "", label: "All Nationality" },
+                                ...dataNationality.map(country => ({
+                                    value: country.nama_negara,
+                                    label: country.nama_negara
+                                }))
+                            ]}
                             className="basic-single"
                             classNamePrefix="select"
                             styles={{
@@ -465,7 +558,7 @@ const LogFaceReg = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
+                        tHeader={['no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
                         tBody={logData}
                         handler={handleOpenImage}
                         rowRenderer={customRowRenderer}

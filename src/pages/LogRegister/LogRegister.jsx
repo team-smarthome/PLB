@@ -12,6 +12,7 @@ import Pagination from '../../components/Pagination/Pagination'
 import Select from "react-select";
 import Excel from "exceljs";
 import { formatDateToIndonesian } from '../../utils/formatDate'
+import { Toast } from "../../components/Toast/Toast";
 
 const LogRegister = () => {
     const socket_IO_4010 = initiateSocket4010();
@@ -78,10 +79,6 @@ const LogRegister = () => {
         }
     }
 
-    useEffect(() => {
-        getDataNationality();
-    }, []);
-
     const getLogRegister = async () => {
         try {
             const res = await apiGetDataLogRegister({
@@ -108,26 +105,6 @@ const LogRegister = () => {
             console.log(error)
         }
     }
-    useEffect(() => {
-        getLogRegister()
-        getCountryData()
-    }, [])
-
-    useEffect(() => {
-        if (changePage) {
-            getLogRegister()
-        }
-
-    }, [changePage])
-
-
-    useEffect(() => {
-        setSearch(prevState => ({
-            ...prevState,
-            page: page
-        }));
-        setChangePage(true)
-    }, [page]);
 
     const deleteModal = (row) => {
         setDetailData({
@@ -162,6 +139,94 @@ const LogRegister = () => {
         })
         setShowModalDelete(false)
     }
+
+    const synchronizeDataUser = (row) => {
+        const bodyParamsSendKamera = {
+            method: "addfaceinfonotify",
+            params: {
+                data: [
+                    {
+                        personId: row?.no_passport,
+                        personNum: row?.no_passport,
+                        passStrategyId: "",
+                        personIDType: 1,
+                        personName: row?.name,
+                        personGender: row?.gender === "M" ? 1 : 0,
+                        validStartTime: Math.floor(new Date().getTime() / 1000 - 86400).toString(),
+                        validEndTime: Math.floor(new Date(`${row?.expired_date}T23:59:00`).getTime() / 1000).toString(),
+                        personType: 1,
+                        identityType: 1,
+                        identityId: row?.no_passport,
+                        identitySubType: 1,
+                        identificationTimes: -1,
+                        identityDataBase64: row?.profile_image ? row?.profile_image : "",
+                        status: 0,
+                        reserve: "",
+                    }
+                ],
+            }
+        };
+
+        if (socket_IO_4010.connected) {
+            setStatus("loading")
+            console.log("testWebsocket4010 connected");
+            socket_IO_4010.emit("syncCamera", { bodyParamsSendKamera });
+        } else {
+            console.log("testWebsocket4010 not connected");
+            addPendingRequest4010({ action: "syncCamera", data: { bodyParamsSendKamera } });
+            socket_IO_4010.connect();
+        }
+    }
+
+    useEffect(() => {
+        socket_IO_4010.on("responseSyncCamera", (response) => {
+            console.log("responseasdasdas", typeof response)
+            if (response === "Successfully") {
+                console.log("responseasdasdas1234", typeof response)
+                setStatus("success");
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Successfully synchronize data'
+                })
+            } else {
+                setStatus("success");
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Failed to synchronize data'
+                })
+            }
+        });
+        return () => {
+            socket_IO_4010.off("responseSyncCamera");
+        }
+    }, [socket_IO_4010])
+
+
+    useEffect(() => {
+        getDataNationality();
+    }, []);
+
+    useEffect(() => {
+        getLogRegister()
+        getCountryData()
+    }, [])
+
+    useEffect(() => {
+        if (changePage) {
+            getLogRegister()
+        }
+
+    }, [changePage])
+
+
+    useEffect(() => {
+        setSearch(prevState => ({
+            ...prevState,
+            page: page
+        }));
+        setChangePage(true)
+    }, [page]);
+
 
 
     const handleDelete = async () => {
@@ -254,11 +319,24 @@ const LogRegister = () => {
                 {formatDateToIndonesian(row.created_at)}
             </td>
 
-            <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-
-                <button onClick={() => openModalEdit(row)}>Edit</button>
-                <button onClick={() => deleteModal(row)} style={{ background: 'red' }}>Delete</button>
+            <td className='flex items-center justify-center gap-2' style={{ height: '100px' }}>
+                <button
+                    onClick={() => openModalEdit(row)}
+                    className='w-24  py-2 bg-[#fbaf17] text-base border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
+                    Edit
+                </button>
+                <button
+                    onClick={() => deleteModal(row)}
+                    className='w-24 py-2 text-base  bg-red-500 border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
+                    Delete
+                </button>
+                <button
+                    onClick={() => synchronizeDataUser(row)}
+                    className='w-24 py-2 px-3  text-base  bg-[#0056b3] border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
+                    Sync
+                </button>
             </td>
+
         </>
     );
 
@@ -605,10 +683,10 @@ const LogRegister = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="face-reg-header h-20">
+            <div className=" register-reg-header">
                 <div className='face-reg-filter-name '>
                     <div className='label-filter-name' style={{
-                        gap: "20%",
+                        gap: "15%",
                         paddingTop: "3%",
                     }}>
                         <p>No. PLB</p>
@@ -664,7 +742,7 @@ const LogRegister = () => {
                 </div>
                 <div className='face-reg-filter-kamera'>
                     <div className='label-filter-name' style={{
-                        gap: "20%",
+                        gap: "15%",
                         paddingTop: "3%"
                     }}>
                         <p>Start Date</p>

@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
 import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
-import axios from "axios";
 import Cookies from 'js-cookie';
 import { ipAddressServer } from "../../services/env";
 
@@ -318,7 +317,6 @@ const Apply = () => {
           setTabStatus(2);
         }
       } else if (cardStatus === "takePhotoSucces") {
-        //cek cekal
         setFormData(sharedData);
         setDataPermohonan(sharedData);
         doSaveRequestVoaPayment(sharedData);
@@ -351,9 +349,13 @@ const Apply = () => {
             isPhoto: false,
             isDoRetake: false,
           });
-          setStatusPaymentCredit(false);
+          setCaputedImageAfter2(null);
           setRecievedTempData([]);
           setDataPrimaryPassport(null);
+          setSharedData(null);
+          setDataPermohonan(null);
+          setSharedData2(null);
+          setStatusPaymentCredit(false);
         }, 3000);
       } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
         // console.log("ini dijalankan");
@@ -402,10 +404,7 @@ const Apply = () => {
       setIpKamera(data.ipCamera);
     });
     socket_IO_4010.on("responseSendDataUser", (data) => {
-      console.log("dataResponseSendDataUser", data);
       if (data === "Successfully") {
-        setCaputedImageAfter2(null);
-        console.log("sharedDataTOSEndAPi", sharedData);
         const response = apiInsertDataUser(objectApi, ipServer);
         response.then((res) => {
           if (res.data.status === 200) {
@@ -421,8 +420,6 @@ const Apply = () => {
               isPhoto: false,
             });
             setDisabled(true);
-            setRecievedTempData([]);
-            setDataPrimaryPassport(null);
           } else {
             Toast.fire({
               icon: "error",
@@ -728,10 +725,10 @@ const Apply = () => {
     } catch (error) {
       await sendDataTOKameraServer(sharedData);
       // setCardStatus("takePhotoSucces");
-      Toast.fire({
-        icon: "error",
-        title: "Gagal Melakukan Cek Cekal",
-      });
+      // Toast.fire({
+      //   icon: "error",
+      //   title: "Gagal Melakukan Cek Cekal",
+      // });
     }
   };
 

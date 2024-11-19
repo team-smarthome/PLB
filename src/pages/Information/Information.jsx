@@ -828,14 +828,11 @@ const Information = () => {
 				</div>
 			</div>
 			<Printer
-				dataNumberPermohonanPropsVisa="Z1A012002"
-				dataNumberPermohonanPropsReceipt="XA0188090"
 				printRefProps={printRef}
-				dataPrice="500.000"
-				dataLokasi="TEST"
 				passportumber="A0B0C0D001"
-				passportName="Udin Samsul Arifin"
-				passportUrl="https://www.google.com"
+				passportName="Udin Samsul Prima"
+				birthDate="31-12-2024"
+				nationality="Indonesia"
 			/>
 		</div>
 	);
