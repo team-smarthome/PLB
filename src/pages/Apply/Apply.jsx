@@ -10,7 +10,7 @@ import { Toast } from "../../components/Toast/Toast";
 import { formData, resultDataScan, caputedImageAfter, ImageDocumentPLB, DataHasilCekal, LanjutSendData } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
-import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData, getUserbyPassport } from "../../services/api";
+import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import Cookies from 'js-cookie';
 import { ipAddressServer } from "../../services/env";
@@ -581,33 +581,33 @@ const Apply = () => {
         isPhoto: false,
       });
 
-      const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
-      console.log("checkDataUser", checkDataUser.data.data);
+      // const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
+      // console.log("checkDataUser", checkDataUser.data.data);
 
-      if (checkDataUser.data.data.length > 0) {
-        Swal.fire({
-          icon: "error",
-          title: "Data sudah ada",
-          text: "Silahkan periksa kembali data anda",
-          confirmButtonColor: "#3d5889",
-        });
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPyamentUrl: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setDisabled(false);
-        setIsEnableStep(true);
-        setCardStatus("takePhotoSucces");
-        return;
-      }
+      // if (checkDataUser.data.data.length > 0) {
+      //   Swal.fire({
+      //     icon: "error",
+      //     title: "Data sudah ada",
+      //     text: "Silahkan periksa kembali data anda",
+      //     confirmButtonColor: "#3d5889",
+      //   });
+      //   setCardPaymentProps({
+      //     isWaiting: false,
+      //     isCreditCard: false,
+      //     isPaymentCredit: false,
+      //     isPaymentCash: false,
+      //     isPrinted: false,
+      //     isSuccess: false,
+      //     isFailed: false,
+      //     isPyamentUrl: false,
+      //     isPhoto: false,
+      //     isDoRetake: false,
+      //   });
+      //   setDisabled(false);
+      //   setIsEnableStep(true);
+      //   setCardStatus("takePhotoSucces");
+      //   return;
+      // }
 
       setCaputedImageAfter2(sharedData.photoFace);
 
@@ -723,12 +723,12 @@ const Apply = () => {
         }
       }
     } catch (error) {
-      await sendDataTOKameraServer(sharedData);
-      // setCardStatus("takePhotoSucces");
-      // Toast.fire({
-      //   icon: "error",
-      //   title: "Gagal Melakukan Cek Cekal",
-      // });
+      // await sendDataTOKameraServer(sharedData);
+      setCardStatus("takePhotoSucces");
+      Toast.fire({
+        icon: "error",
+        title: "Gagal Melakukan Cek Cekal",
+      });
     }
   };
 
