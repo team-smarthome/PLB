@@ -15,6 +15,8 @@ import Synchronize from '../../components/Synchronize/Synchronize';
 import CameraSetting from '../CameraSettings/CameraSetting';
 import SynchronizeRegister from '../SynchronizeRegister/SynchronizeRegister';
 import JobTitle from '../JobTitle/JobTitle';
+// import LogSimpanPelintas from '../LogSimpanPelintas/LogSimpanPelintas';
+import SynchronizeFaceReg from '../SynchronizeFaceReg/SynchronizeFaceReg';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -99,6 +101,7 @@ const Cpanel = () => {
                     <Route path="/" element={<Navigate to="/cpanel/user-management" />} />
                     <Route path="/log-register" element={<LogRegister />} />
                     <Route path="/log-facereg" element={<LogFaceReg />} />
+                    {/* <Route path="/log-simpan-pelintas" element={<LogSimpanPelintas />} /> */}
                     <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/setting-server" element={<SettingServer />} />
                     <Route path="/setting-camera" element={<SettingIp />} />
@@ -106,6 +109,7 @@ const Cpanel = () => {
                     <Route path="/jabatan" element={<JobTitle />} />
                     <Route path="/synchronize" element={<Synchronize />} />
                     <Route path="/synchronize-register" element={<SynchronizeRegister />} />
+                    <Route path="/synchronize-facereg" element={<SynchronizeFaceReg />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}
                 </ReactRoutes>
             </div>

@@ -9,8 +9,10 @@ import ImgsViewer from "react-images-viewer";
 import ModalData from '../../components/Modal/ModalData'
 import Excel from "exceljs";
 import { initiateSocket4010 } from '../../utils/socket';
+import { useNavigate } from 'react-router-dom';
 
 const LogFaceReg = () => {
+    const navigate = useNavigate()
     const socket = initiateSocket4010();
     const [logData, setLogData] = useState([])
     const [optionIp, setOptionIp] = useState([])
@@ -532,6 +534,14 @@ const LogFaceReg = () => {
                     style={{
                         width: 150,
                         cursor: 'pointer'
+                    }}
+                    onClick={() => navigate("/cpanel/synchronize-facereg")}
+                >Sinkronisasi Data</button>
+                <button
+                    style={{
+                        width: 150,
+                        cursor: 'pointer',
+                        backgroundColor: "blue"
                     }}
                     onClick={() => setModalOpen(true)}
                 >Input Data Manual</button>
