@@ -15,6 +15,7 @@ import Synchronize from '../../components/Synchronize/Synchronize';
 import CameraSetting from '../CameraSettings/CameraSetting';
 import SynchronizeRegister from '../SynchronizeRegister/SynchronizeRegister';
 import JobTitle from '../JobTitle/JobTitle';
+import SettingDepartStatusKamera from '../../components/SettingDepartStatusKamera/SettingDepartStatusKamera';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -106,6 +107,7 @@ const Cpanel = () => {
                     <Route path="/jabatan" element={<JobTitle />} />
                     <Route path="/synchronize" element={<Synchronize />} />
                     <Route path="/synchronize-register" element={<SynchronizeRegister />} />
+                    <Route path="/setting-status-depart" element={<SettingDepartStatusKamera />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}
                 </ReactRoutes>
             </div>
