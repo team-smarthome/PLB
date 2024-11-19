@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 import { addPendingRequest4050, initiateSocket4050 } from '../../utils/socket'
 import { useNavigate } from 'react-router-dom'
 
-const SynchronizeRegister = () => {
+const SynchronizeFaceReg = () => {
   const socket_IO_4050 = initiateSocket4050();
   const navigate = useNavigate();
   const [count, setCount] = useState(0)
@@ -202,7 +202,7 @@ const SynchronizeRegister = () => {
       className='p-8'
     >
       <div className="flex justify-between items-center">
-        <h2>Sinkronisasi Data Register</h2>
+        <h2>Sinkronisasi Data FaceReg</h2>
 
         {(date.startDate && date.endDate) && total > 0 && <button
           className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
@@ -318,4 +318,4 @@ const SynchronizeRegister = () => {
   )
 }
 
-export default SynchronizeRegister
+export default SynchronizeFaceReg

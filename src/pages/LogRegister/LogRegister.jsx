@@ -22,6 +22,7 @@ const LogRegister = () => {
     const [status, setStatus] = useState("loading")
     const [totalDataFilter, setTotalDataFilter] = useState(0);
     const [isErrorImage, setIsErrorImage] = useState(false);
+    const [exportStatus, setExportStatus] = useState("idle")
     const [page, setPage] = useState(1);
     const [detailData, setDetailData] = useState({
         passport_number: "",
@@ -340,7 +341,14 @@ const LogRegister = () => {
         </>
     );
 
-    const generateExcel = () => {
+    const generateExcel = async() => {
+        setExportStatus("loading")
+        const res = await apiGetDataLogRegister({
+            startDate: search.startDate,
+            endDate: search.endDate,
+            "not-paginate": true
+        })
+        const responseData = res?.data?.data
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Log Register");
 
@@ -349,7 +357,7 @@ const LogRegister = () => {
         worksheet.addRow(headers);
 
         // Add data rows
-        logData?.forEach((item, index) => {
+        responseData?.forEach((item, index) => {
             const row = [
                 index + 1,
                 item.no_passport,
@@ -379,13 +387,17 @@ const LogRegister = () => {
             };
 
             // Example usage
-            const baseFilename = "Log_Register.xlsx";
+            const date = new Date();
+            const formattedDate = date.toISOString().slice(0, 19).replace(/[-T:]/g, ""); // e.g., 20241119_123456
+                const baseFilename = `Log_Register_${formattedDate}.xlsx`;
             const filename = getFilenameWithDateTime(baseFilename);
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
                 // For IE
+                setExportStatus("success")
                 window.navigator.msSaveOrOpenBlob(blob, filename);
             } else {
                 // For other browsers
+                setExportStatus("success")
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
@@ -816,7 +828,11 @@ const LogRegister = () => {
                 <button
                     onClick={generateExcel}
                     className='add-data'
-                >Export
+                    disabled={exportStatus === "loading"} 
+                >
+                {exportStatus == "loading" ?
+                "Exporting..."
+                : "Export"}
                 </button>
                 <button
                     className='search'
