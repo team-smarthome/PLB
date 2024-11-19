@@ -16,9 +16,10 @@ const LogFaceReg = () => {
     const socket = initiateSocket4010();
     const [logData, setLogData] = useState([])
     const [optionIp, setOptionIp] = useState([])
-    const [status, setStatus] = useState("loading")
+    const [status, setStatus] = useState("idle")
     const [getPagination, setGetPagination] = useState(false)
     const [selectedCondition, setSelectedCondition] = useState('personId');
+    const [exportStatus, setExportStatus] = useState("idle")
     const [totalDataFilter, setTotalDataFilter] = useState(0);
     const [page, setPage] = useState(1);
     const [isOpenImage, setIsOpenImage] = useState(false)
@@ -206,21 +207,29 @@ const LogFaceReg = () => {
         })
     }
 
-    const generateExcel = () => {
+    const generateExcel = async() => {
+        setExportStatus("loading")
+        const res = await getDataLogApi({
+            startDate: params.startDate,
+            endDate: params.endDate,
+            "not-paginate": true,
+        });
+        const responseData = res?.data?.data
+        // return console.log(res?.data?.data)
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Payment Report");
 
         const headers = ['No', 'no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time"]
         worksheet.addRow(headers);
 
-        logData.forEach((item, index) => {
+        responseData.forEach((item, index) => {
             const row = [
                 index + 1,
                 item.personId,
-                item.name,
+                item.name ?? "unkown", 
                 item?.similarity,
-                item?.gender,
-                item?.nationality,
+                item?.gender ?? "unkown",
+                item?.nationality ?? "unkown",
                 item?.passStatus === 6 ? "Failed" : "Success",
                 handleEpochToDate(item?.time),
             ];
@@ -237,11 +246,16 @@ const LogFaceReg = () => {
                 const time = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
                 return `${baseFilename.replace('.xlsx', '')}_${date}_${time}.xlsx`;
             };
-            const baseFilename = "Log_FaceReg.xlsx";
+
+            const date = new Date();
+            const formattedDate = date.toISOString().slice(0, 19).replace(/[-T:]/g, ""); // e.g., 20241119_123456
+                const baseFilename = `Log_FaceReg_${formattedDate}.xlsx`;
             const filename = getFilenameWithDateTime(baseFilename);
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                setExportStatus("success")
                 window.navigator.msSaveOrOpenBlob(blob, filename);
             } else {
+                setExportStatus("success")
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
@@ -548,7 +562,10 @@ const LogFaceReg = () => {
                 <button
                     onClick={generateExcel}
                     className='add-data'
-                >Export
+                    disabled={exportStatus === "loading"} 
+                > {exportStatus == "loading" ?
+                    "Exporting..."
+                    : "Export"}
                 </button>
                 <button
                     className='search'
