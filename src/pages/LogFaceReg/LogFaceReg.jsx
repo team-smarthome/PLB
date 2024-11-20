@@ -247,7 +247,7 @@ const LogFaceReg = () => {
                 height={175}
               />
             ) : (
-              <span>Drag and Drop here </span>
+              <span>No Image </span>
             )}
           </div>
           <input
