@@ -195,6 +195,34 @@ async function checkStatusKamera(ipServerCamera, operationalStatus) {
     }
 }
 
+async function handleRenameCamera(ipServerCamera, operationalStatus) {
+    console.log(operationalStatus, "operationalStatus")
+    const res = await ping.promise.probe(ipServerCamera);
+                if (res.alive) {
+                    console.log(`IP ${ipServerCamera} is reachable`);
+                    try {
+                        console.log(ipServerCamera, 'adasasdasd')
+                        const response = await axios.post(`http://${ipServerCamera}/facial_api/aiot_call`, {
+                            method: "set_ui_display_tips",
+                            params: {
+                                show_contents: operationalStatus,
+                            }
+                        });
+                        if (response.data.status === 0) {
+                            return "successfully";
+                        }
+                    }
+                    catch (error) {
+                        console.log("sini1234")
+                        return error?.message;
+                    }
+                } else {
+                    console.log(`IP ${ipServerCamera} is not reachable`);
+                    return "notConnectedIp";
+                }
+}
+        
+
 
 async function getDataKamera() {
     try {
@@ -247,7 +275,7 @@ async function realtimeDataLog() {
     setTimeout(realtimeDataLog, 1000);
 }
 
-realtimeDataLog();
+// realtimeDataLog();
 
 
 io.on("connection", (socket) => {
@@ -272,7 +300,7 @@ io.on("connection", (socket) => {
         console.log('masuksini')
 
         const response = await checkStatusKamera(ipServerCamera, operationalStatus);
-        socket.emit("editDataCamera", response);
+        socket.emit("renameSuccess", response);
 
     });
 
@@ -440,5 +468,17 @@ io.on("connection", (socket) => {
             socket.emit("responseSyncCamera", error.message);
         }
     });
+
+    socket.on("changeName", async(data) => {
+        
+        console.log("masilsin")
+        const { ipServerCamera, operationalStatus } = data;
+
+        console.log('masuksini')
+
+        const response = await handleRenameCamera(ipServerCamera, operationalStatus);
+        socket.emit("renameSuccess", response);
+
+    })
 
 });
