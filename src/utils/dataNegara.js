@@ -5,18 +5,22 @@ const dataNegara = {
     {
       deskripsi_negara: "TIMOR LESTE",
       id_negara: "TLS",
+      value:"Timor Leste"
     },
     {
       deskripsi_negara: "PAPUA NEW GUINEA",
       id_negara: "PNG",
+      value:"Papua New Guinea"
     },
     {
       deskripsi_negara: "MALAYSIA",
       id_negara: "MYS",
+      value:"Malaysia"
     },
     {
       deskripsi_negara: "INDONESIA",
       id_negara: "IDN",
+      value:"Indonesia"
     },
   ],
 };

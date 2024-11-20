@@ -17,6 +17,7 @@ const LogRegister = () => {
     const socket_IO_4010 = initiateSocket4010();
     const [showModalAdd, setShowModalAdd] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
+    const [showModalDetail, setShowModalDetail] = useState(false)
     const [showModalDelete, setShowModalDelete] = useState(false)
     const [status, setStatus] = useState("loading")
     const [totalDataFilter, setTotalDataFilter] = useState(0);
@@ -233,11 +234,11 @@ const LogRegister = () => {
 
     const customRowRenderer = (row) => (
         <>
-            <td>{row.no_passport}</td>
-            <td>{row.name}</td>
-            <td>{row.gender === "M" ? "Male" : "Female"}</td>
-            <td>{row.nationality}</td>
-            <td>
+            <td onClick={() => openModalDetail(row)}>{row.no_passport}</td>
+            <td onClick={() => openModalDetail(row)}>{row.name}</td>
+            <td onClick={() => openModalDetail(row)}>{row.gender === "M" ? "Male" : "Female"}</td>
+            <td onClick={() => openModalDetail(row)}>{row.nationality}</td>
+            <td onClick={() => openModalDetail(row)}>
                 <>
                     <img
                         src={`data:image/jpeg;base64,${row.profile_image}`}
@@ -250,7 +251,7 @@ const LogRegister = () => {
 
                 </>
             </td>
-            <td>
+            <td onClick={() => openModalDetail(row)}>
                 {formatDateToIndonesian(row.created_at)}
             </td>
 
@@ -435,6 +436,27 @@ const LogRegister = () => {
         setShowModalEdit(true)
     }
 
+    const openModalDetail = (row) => {
+        console.log(row, "row")
+        setDetailData({
+            ...detailData,
+            no_passport: row.no_passport || "",
+            // no_register: row.no_register || "",
+            name: row.name || "",
+            date_of_birth: row.date_of_birth || "",
+            nationality: row.nationality || "",
+            expired_date: row.expired_date || "",
+            gender: row.gender || "",
+            arrival_time: row.arrival_time.split(':').slice(0, 2).join(':') || new Date().toISOString().split('T')[0],
+            destination_location: row.destination_location || "",
+            photo_passport: row.photo_passport || "",
+            profile_image: row.profile_image || "",
+        })
+        setShowModalDetail(true)
+    }
+
+    console.log(detailData,"ini detail");
+
     const closeModaledit = () => {
         setDetailData({
             no_passport: "",
@@ -450,6 +472,22 @@ const LogRegister = () => {
             profile_image: ""
         })
         setShowModalEdit(false)
+    }
+    const closeModalDetail = () => {
+        setDetailData({
+            no_passport: "",
+            // no_register: "",
+            name: "",
+            date_of_birth: "",
+            nationality: "",
+            expired_date: "",
+            gender: "",
+            arrival_time: "",
+            destination_location: "",
+            photo_passport: "",
+            profile_image: ""
+        })
+        setShowModalDetail(false)
     }
     const handleChange = (e) => {
         setDetailData({
@@ -490,7 +528,7 @@ const LogRegister = () => {
                         <option value="">Pilih Negara</option>
                         {dataNegara.data.map((negara) => {
                             return (
-                                <option value={negara.id_negara}>{`${negara.id_negara} - ${negara.deskripsi_negara}`}</option>
+                                <option value={negara.value}>{`${negara.id_negara} - ${negara.deskripsi_negara}`}</option>
                             )
                         })}
                     </select>
@@ -529,8 +567,98 @@ const LogRegister = () => {
                     <input type="file" name="profile_image" id="" style={{ display: 'none' }} ref={refInputFace} onChange={(e) => handleImageFace(e)} />
                 </div>
                 <div className="register-input input-file" style={{ paddingTop: '2rem' }}>
-                    <span>Passport Image</span>
+                    <span>Document PLB</span>
                     <div className="input-file-container" onClick={() => refInputPassport.current?.click()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        {detailData.photo_passport ?
+                            (
+                                <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
+                                    : detailData.photo_passport}
+                                    alt="" height={175} />
+                            )
+                            :
+                            (<span>Drag and Drop here </span>)}
+                    </div>
+                    <input type="file" name="photo_passport" id="" style={{ display: 'none' }} ref={refInputPassport} onChange={(e) => handleImageFace(e)} />
+                </div>
+
+            </div>
+        )
+    }
+
+    const modalDetailRow = () => {
+        return (
+            <div className="register-container">
+                <div className="register-input">
+                    <span>PLB / BCP Number</span>
+                    <input type="text" name="no_passport" id="" value={detailData.no_passport} onChange={handleChange} disabled />
+                </div>
+                {/* <div className="register-input">
+                    <span>Registration Number</span>
+                    <input type="text" name="no_register" id="" value={detailData.no_register} onChange={handleChange} />
+                </div> */}
+                <div className="register-input">
+                    <span>Full Name</span>
+                    <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} disabled/>
+                </div>
+                <div className="register-input">
+                    <span>Date of Birth</span>
+                    <input type="date" name="date_of_birth" id="" value={detailData.date_of_birth} onChange={handleChange} disabled/>
+                </div>
+                <div className="register-input">
+                    <span>Gender</span>
+                    <select value={detailData.gender} name='gender' onChange={handleChange} disabled>
+                        <option value="">Pilih Gender</option>
+                        <option value="M">Laki-Laki</option>
+                        <option value="F">Perempuan</option>
+                    </select>
+                </div>
+                <div className="register-input">
+                    <span>Nationality</span>
+                    <select value={detailData.nationality} name='nationality' onChange={handleChange} disabled>
+                        <option value="">Pilih Negara</option>
+                        {dataNegara.data.map((negara) => {
+                            return (
+                                <option value={negara.value}>{`${negara.id_negara} - ${negara.deskripsi_negara}`}</option>
+                            )
+                        })}
+                    </select>
+                </div>
+                <div className="register-input">
+                    <span>Expired Date</span>
+                    <input type="date" name="expired_date" id="" value={detailData.expired_date} onChange={handleChange} disabled/>
+                </div>
+                <div className="register-input">
+                    <span>Arrival Time</span>
+                    <input type="datetime-local" name="arrival_time" id="" value={detailData.arrival_time} onChange={handleChange} disabled/>
+                </div>
+                <div className="register-input" style={{ marginBottom: '5rem' }}>
+                    <span>Destination Location</span>
+                    <select value={detailData.destination_location} name='destination_location' onChange={handleChange} disabled>
+                        <option value="">Pilih Negara</option>
+                        {countryData.map((negara) => {
+                            return (
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                            )
+                        })}
+                    </select>
+                </div>
+                <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
+                    <span>Face</span>
+                    <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        {detailData.profile_image ?
+                            (
+                                <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
+                                    : detailData.profile_image}
+                                    alt="" height={175} />
+                            )
+                            :
+                            (<span>Drag and Drop here </span>)}
+                    </div>
+                    <input type="file" name="profile_image" id="" style={{ display: 'none' }} ref={refInputFace} onChange={(e) => handleImageFace(e)} />
+                </div>
+                <div className="register-input input-file" style={{ paddingTop: '2rem' }}>
+                    <span>Document PLB</span>
+                    <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         {detailData.photo_passport ?
                             (
                                 <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
@@ -793,6 +921,16 @@ const LogRegister = () => {
                 onConfirm={handleEdit}
             >
                 {modalEditInput()}
+            </Modals>
+            <Modals
+                showModal={showModalDetail}
+                buttonName="Submit"
+                width={800}
+                headerName="Detail Register"
+                closeModal={closeModalDetail}
+                // onConfirm={handleEdit}
+            >
+                {modalDetailRow()}
             </Modals>
             <Modals
                 showModal={showModalDelete}
