@@ -83,6 +83,10 @@ const Sidebar = ({ isOpen }) => {
                             <FaUserCircle size={25} style={{ marginRight: '10px' }} />
                             Log Facereg
                         </Link>
+                        <Link to='/cpanel/log-simpan-pelintas' className={`link ${isActive('/cpanel/log-simpan-pelintas') ? 'active' : ''}`}>
+                            <FaDatabase size={25} style={{ marginRight: '10px' }} />
+                            Log Simpan Pelintas
+                        </Link>
                     </ul>
                 )}
                 {(userInfo.role === 0 || userInfo.role === 1) && (

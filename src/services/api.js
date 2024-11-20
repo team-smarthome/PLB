@@ -525,3 +525,19 @@ export const DeleteJabatan = async (id) => {
     console.log(error)
   }
 }
+
+export const getAllSimpanPelintasApi = async (params) => {
+  try {
+    const res = await axios({
+      url: `${url_devel}api/log-simpan-pelintas`,
+      params,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+  }
+  
+}
