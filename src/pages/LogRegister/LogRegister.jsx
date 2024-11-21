@@ -188,7 +188,6 @@ const LogRegister = () => {
         socket_IO_4010.on("responseSyncCamera", (response) => {
             console.log("responseasdasdas", typeof response)
             if (response === "Successfully") {
-                console.log("responseasdasdas1234", typeof response)
                 setStatus("success");
                 Toast.fire({
                     icon: 'success',
@@ -304,10 +303,15 @@ const LogRegister = () => {
 
     const customRowRenderer = (row) => (
         <>
-            <td onClick={() => openModalDetail(row)}>{row.no_passport}</td>
-            <td onClick={() => openModalDetail(row)}>{row.name}</td>
+            <td className="max-w-32" onClick={() => openModalDetail(row)}>{row.no_passport}</td>
+            <td className="max-w-32" onClick={() => openModalDetail(row)}>{row.name}</td>
             <td onClick={() => openModalDetail(row)}>{row.gender === "M" ? "Male" : "Female"}</td>
-            <td onClick={() => openModalDetail(row)}>{row.nationality}</td>
+            <td className="w-auto" onClick={() => openModalDetail(row)}>{row.nationality}</td>
+            <td>
+                {row?.is_cekal
+                    ? `Cekal- ${row?.skor_kemiripan || ""}`
+                    : "No Cekal"}
+            </td>
             <td onClick={() => openModalDetail(row)}>
                 <>
                     <img
@@ -453,7 +457,7 @@ const LogRegister = () => {
         setShowModalDetail(true)
     }
 
-    console.log(detailData,"ini detail");
+    console.log(detailData, "ini detail");
 
     const closeModaledit = () => {
         setDetailData({
@@ -585,7 +589,7 @@ const LogRegister = () => {
     const closeModalAdd = () => {
         setShowModalAdd(false)
     }
-   
+
     const modalDetailRow = () => {
         return (
             <div className="register-container">
@@ -599,11 +603,11 @@ const LogRegister = () => {
                 </div> */}
                 <div className="register-input">
                     <span>Full Name</span>
-                    <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} disabled/>
+                    <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} disabled />
                 </div>
                 <div className="register-input">
                     <span>Date of Birth</span>
-                    <input type="date" name="date_of_birth" id="" value={detailData.date_of_birth} onChange={handleChange} disabled/>
+                    <input type="date" name="date_of_birth" id="" value={detailData.date_of_birth} onChange={handleChange} disabled />
                 </div>
                 <div className="register-input">
                     <span>Gender</span>
@@ -626,11 +630,11 @@ const LogRegister = () => {
                 </div>
                 <div className="register-input">
                     <span>Expired Date</span>
-                    <input type="date" name="expired_date" id="" value={detailData.expired_date} onChange={handleChange} disabled/>
+                    <input type="date" name="expired_date" id="" value={detailData.expired_date} onChange={handleChange} disabled />
                 </div>
                 <div className="register-input">
                     <span>Arrival Time</span>
-                    <input type="date" name="arrival_time" id="" value={detailData.arrival_time} onChange={handleChange} disabled/>
+                    <input type="date" name="arrival_time" id="" value={detailData.arrival_time} onChange={handleChange} disabled />
                 </div>
                 <div className="register-input" style={{ marginBottom: '5rem' }}>
                     <span>Destination Location</span>
@@ -677,49 +681,62 @@ const LogRegister = () => {
     }
 
     const handleEdit = async () => {
-        // console.log(detailData)
         setStatus("loading")
         setShowModalEdit(false)
-        let paramsToSendEdit = {
+        const bodyParamsSendKamera = {
             method: "addfaceinfonotify",
             params: {
-                data: [],
-            },
-        };
-        try {
-            const res = await editDataUserPlb(detailData, detailData.no_passport)
-            console.log(res, "res edit")
-            paramsToSendEdit.params.data.push({
-                personId: detailData?.no_passport,
-                personNum: detailData?.no_passport,
-                passStrategyId: "",
-                personIDType: 1,
-                personName: detailData?.name,
-                personGender: detailData?.gender === "M" ? 1 : 0,
-                validStartTime: Math.floor(new Date().getTime() / 1000).toString(),
-                validEndTime: Math.floor(new Date(`${detailData.expired_date}T23:59:00`).getTime() / 1000).toString(),
-                personType: 1,
-                identityType: 1,
-                identityId: detailData?.no_passport,
-                identitySubType: 1,
-                identificationTimes: -1,
-                identityDataBase64: detailData?.profile_image ? detailData?.profile_image : "",
-                status: 0,
-                reserve: "",
-            })
-            if (res.status == 200) {
-                socket_IO_4010.emit('editDataUser', { paramsToSendEdit });
-                socket_IO_4010.on('responseEditDataUser', (data) => {
-                    console.log(data, "res socket")
-                    if (data === "Successfully") {
-                        getLogRegister()
-                        setStatus("success")
+                data: [
+                    {
+                        personId: detailData?.no_passport,
+                        personNum: detailData?.no_passport,
+                        passStrategyId: "",
+                        personIDType: 1,
+                        personName: detailData?.name,
+                        personGender: detailData?.gender === "M" ? 1 : 0,
+                        validStartTime: Math.floor(new Date().getTime() / 1000 - 86400).toString(),
+                        validEndTime: Math.floor(new Date(`${detailData?.expired_date}T23:59:00`).getTime() / 1000).toString(),
+                        personType: 1,
+                        identityType: 1,
+                        identityId: detailData?.no_passport,
+                        identitySubType: 1,
+                        identificationTimes: -1,
+                        identityDataBase64: detailData?.profile_image ? detailData?.profile_image : "",
+                        status: 0,
+                        reserve: "",
                     }
-                })
+                ],
             }
-        } catch (error) {
-            console.log(error)
+        };
+
+        if (socket_IO_4010.connected) {
+            console.log("testWebsocket4010 connected");
+            socket_IO_4010.emit(
+                "editKeCamera",
+                { bodyParamsSendKamera },
+                async (response) => {
+                    if (response === "Successfully") {
+                        try {
+                            const { data: responseEdit } = await editDataUserPlb(detailData, detailData.no_passport)
+                            if (responseEdit.status == 200) {
+                                getLogRegister()
+                                setStatus("success")
+                            }
+                        } catch (error) {
+                            getLogRegister()
+                            setStatus("success")
+                            console.log(error)
+                        }
+                    }
+                }
+            );
+        } else {
+            console.log("testWebsocket4010 not connected");
+            addPendingRequest4010({ action: "editKeCamera", data: { bodyParamsSendKamera } });
         }
+
+        setShowModalEdit(false)
+        setStatus("success")
     }
 
     const modalDelete = () => {
@@ -951,7 +968,7 @@ const LogRegister = () => {
                 width={800}
                 headerName="Detail Register"
                 closeModal={closeModalDetail}
-                // onConfirm={handleEdit}
+            // onConfirm={handleEdit}
             >
                 {modalDetailRow()}
             </Modals>
