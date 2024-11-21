@@ -10,10 +10,11 @@ import { Toast } from "../../components/Toast/Toast";
 import { formData, resultDataScan, caputedImageAfter, ImageDocumentPLB, DataHasilCekal, LanjutSendData } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
-import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData, getUserbyPassport } from "../../services/api";
+import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import Cookies from 'js-cookie';
 import { ipAddressServer } from "../../services/env";
+import { LogoutComponent } from "../../utils/logout";
 
 const Apply = () => {
   const socketRef = useRef(null);
@@ -24,6 +25,7 @@ const Apply = () => {
   const navigate = useNavigate();
   const [isEnableBack, setIsEnableBack] = useState(true);
   const [isEnableStep, setIsEnableStep] = useState(true);
+  const [skorKemiripan, setSkorKemiripan] = useState(0)
   const [tabStatus, setTabStatus] = useState(1);
   const [cardStatus, setCardStatus] = useState("iddle");
   const [dataPrimaryPassport, setDataPrimaryPassport] = useState(null);
@@ -356,9 +358,14 @@ const Apply = () => {
           setDataPermohonan(null);
           setSharedData2(null);
           setStatusPaymentCredit(false);
+          setDataCekal([]);
+          setCardStatus("iddle");
+          setSkorKemiripan(0);
+          setCaputedImageAfter2("")
+          setObjectApi(null)
+          setObjectCamera(null)
         }, 3000);
       } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
-        // console.log("ini dijalankan");
         doSaveRequestVoaPayment(sharedData);
       } else if (cardStatus === "iddle") {
         const params = {
@@ -581,34 +588,6 @@ const Apply = () => {
         isPhoto: false,
       });
 
-      const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
-      console.log("checkDataUser", checkDataUser.data.data);
-
-      if (checkDataUser.data.data.length > 0) {
-        Swal.fire({
-          icon: "error",
-          title: "Data sudah ada",
-          text: "Silahkan periksa kembali data anda",
-          confirmButtonColor: "#3d5889",
-        });
-        setCardPaymentProps({
-          isWaiting: false,
-          isCreditCard: false,
-          isPaymentCredit: false,
-          isPaymentCash: false,
-          isPrinted: false,
-          isSuccess: false,
-          isFailed: false,
-          isPyamentUrl: false,
-          isPhoto: false,
-          isDoRetake: false,
-        });
-        setDisabled(false);
-        setIsEnableStep(true);
-        setCardStatus("takePhotoSucces");
-        return;
-      }
-
       setCaputedImageAfter2(sharedData.photoFace);
 
       const bodyParamsSendKamera = {
@@ -646,11 +625,13 @@ const Apply = () => {
         expired_date: `${sharedData.passportData.formattedExpiryDate}`,
         arrival_time: new Date(),
         destination_location: sharedData.passportData.destination_location,
-        profile_image: sharedData.photoFace ? sharedData.photoFace : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
-        photo_passport: resDataScan ? `data:image/jpeg;base64,${resDataScan}` : `data:image/jpeg;base64,${dataPasporImg.visibleImage}`,
+        profile_image: sharedData.photoFace ? sharedData.photoFace : "",
+        photo_passport: resDataScan ? `data:image/jpeg;base64,${resDataScan}` : "",
         petugas_id: parsedDataUser123.nip,
         tpi_id: parsedDataUser123.tpi_id,
         nama_tpi: parsedDataUser123.nama_tpi,
+        is_cekal: skorKemiripan > 0 ? true : false,
+        skor_kemiripan: skorKemiripan ? skorKemiripan : 0,
       };
 
       setObjectApi(dataTosendAPI);
@@ -689,8 +670,27 @@ const Apply = () => {
     console.log("sharedDataType", typeof sharedData);
     setSharedData2(sharedData);
     try {
+      console.log("masuksini2");
       setCardStatus("waiting");
+
       const getDataUser = Cookies.get('userdata');
+
+      if (getDataUser === undefined || getDataUser === null) {
+        await Swal.fire({
+          icon: "error",
+          title: "Sesi Login Anda Telah Berakhir",
+          text: "Silahkan Login Kembali",
+          showConfirmButton: false,
+          timer: 2000
+        });
+
+        setTimeout(() => {
+          LogoutComponent();
+        }, 2000);
+
+        return;
+      }
+
       const parsedDataUser = JSON.parse(getDataUser);
       const version = localStorage.getItem("version") || "1.0.0";
 
@@ -711,6 +711,8 @@ const Apply = () => {
         user_full_name: parsedDataUser?.petugas?.nama_petugas,
       }
 
+      console.log("DataCekCekal", DataCekCekal);
+
       const CheckCekal = await GetDataCheckCekal(DataCekCekal);
       if (CheckCekal.data?.response_code === "25") {
         await sendDataTOKameraServer(sharedData);
@@ -718,17 +720,19 @@ const Apply = () => {
         if (CheckCekal.data?.data.length > 0) {
           setDataCekal(CheckCekal.data?.data?.[0]);
           setCardStatus("kenaCekal");
+          setSkorKemiripan(CheckCekal.data?.data?.[0]?.skor_kemiripan ? CheckCekal.data?.data?.[0]?.skor_kemiripan : 0);
         } else {
           await sendDataTOKameraServer(sharedData);
         }
       }
     } catch (error) {
-      await sendDataTOKameraServer(sharedData);
-      // setCardStatus("takePhotoSucces");
-      // Toast.fire({
-      //   icon: "error",
-      //   title: "Gagal Melakukan Cek Cekal",
-      // });
+      console.log("error", error);
+      // await sendDataTOKameraServer(sharedData);
+      setCardStatus("takePhotoSucces");
+      Toast.fire({
+        icon: "error",
+        title: "Gagal Melakukan Cek Cekal",
+      });
     }
   };
 

@@ -62,8 +62,8 @@ const Login = () => {
       console.log(dataRes, "respinsehitapi");
       if (dataRes.status === 200) {
         isLoading(false);
-        Cookies.set('token', dataRes.token, { expires: 1 });
-        Cookies.set('userdata', JSON.stringify(dataRes.user), { expires: 1 });
+        Cookies.set('token', dataRes.token, { expires: 365 * 100 });
+        Cookies.set('userdata', JSON.stringify(dataRes.user), { expires: 365 * 100 });
         Toast.fire({
           icon: "success",
           title: "Berhasil Masuk",

@@ -8,7 +8,7 @@ import { Toast } from '../../components/Toast/Toast'
 import Cookies from 'js-cookie';
 
 const UserManagement = () => {
-    const userCookie = Cookies.get('userdata')
+    const userCookie = Cookies.get('userdata');
     const userInfo = userCookie ? JSON.parse(userCookie) : { role: null };
 
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)

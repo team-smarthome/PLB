@@ -541,3 +541,16 @@ export const getAllSimpanPelintasApi = async (params) => {
   }
   
 }
+
+export const checkCountDataFaceReg = async (date) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/total-userFacereg`,
+      params: date
+    })
+    return res
+  } catch (error) {
+    console.log(error)
+  }
+}

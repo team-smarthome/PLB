@@ -42,9 +42,6 @@
     margin-bottom: 10px;
   }
 
-
-
-
   .wrapper-container:nth-child(2) {
     display: flex;
     flex-direction: column;
@@ -54,7 +51,6 @@
 
   h2 {
     margin: 0;
-
   }
 
   .h2-satu {
@@ -73,5 +69,4 @@
     height: 5%;
     width: 5%;
   }
-
 }
