@@ -47,7 +47,7 @@ const Printer = ({
     <div className="container-print" ref={printRefProps}>
       <div className="wrappper-container">
         <h2>Imigrasi Indonesia</h2>
-        <h4>PLBN {userInfo.nama_tpi}</h4>
+        <h4 className="text-center">{userInfo.nama_tpi}</h4>
       </div>
       <div className="wrappper-container">
         <h3>Nama : {passportName}</h3>

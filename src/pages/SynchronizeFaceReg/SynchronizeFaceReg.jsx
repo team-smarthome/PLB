@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { sampleData } from '../LogRegister/sampleSynchronize'
-import { checkCountData } from '../../services/api'
+import { checkCountDataFaceReg } from '../../services/api'
 import Swal from 'sweetalert2'
 import { Toast } from '../../components/Toast/Toast'
 import Modals from '../../components/Modal/Modal'
@@ -91,7 +91,7 @@ const SynchronizeFaceReg = () => {
 
   const handleCheckDataCount = async () => {
     try {
-      const res = await checkCountData(date)
+      const res = await checkCountDataFaceReg(date)
       console.log(res?.data)
       if (res?.status == 200) {
         if (res?.data?.total_data_belum == 0) {
@@ -143,7 +143,7 @@ const SynchronizeFaceReg = () => {
 
     setModalAlertSynchronize(false)
     if (socket_IO_4050.connected) {
-      socket_IO_4050.emit("simpan-perlintasan", dataPayload);
+      socket_IO_4050.emit("simpan-perlintasan-face-reg", dataPayload);
     } else {
       addPendingRequest4050({ action: 'check-progress', data: dataPayload });
 

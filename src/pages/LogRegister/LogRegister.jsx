@@ -2,11 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import { useNavigate } from 'react-router-dom'
 import { apiGetDataLogRegister, deleteDataUserPlb, editDataUserPlb, getAllNegaraData } from '../../services/api'
-import { url_devel } from '../../services/env'
 import Modals from '../../components/Modal/Modal'
 import dataNegara from '../../utils/dataNegara'
 import { initiateSocket4010 } from '../../utils/socket'
-import Cookies from 'js-cookie';
 import './logregister.style.css'
 import Pagination from '../../components/Pagination/Pagination'
 import Select from "react-select";
@@ -16,7 +14,6 @@ import { Toast } from "../../components/Toast/Toast";
 
 const LogRegister = () => {
     const socket_IO_4010 = initiateSocket4010();
-    const [showModalAdd, setShowModalAdd] = useState(false)
     const [showModalEdit, setShowModalEdit] = useState(false)
     const [showModalDelete, setShowModalDelete] = useState(false)
     const [status, setStatus] = useState("loading")
@@ -50,6 +47,7 @@ const LogRegister = () => {
         endDate: "",
         gender: "",
         nationality: "",
+        is_cekal: "",
     })
     const navigate = useNavigate()
     const [logData, setLogData] = useState([])
@@ -66,6 +64,12 @@ const LogRegister = () => {
         { value: "", label: "All Gender" },
         { value: "M", label: "MALE" },
         { value: "F", label: "FEMALE" },
+    ];
+
+    const dataCekal = [
+        { value: "", label: "All Status" },
+        { value: true, label: "Cekal" },
+        { value: false, label: "No Cekal" },
     ];
 
     const getDataNationality = async () => {
@@ -299,10 +303,16 @@ const LogRegister = () => {
 
     const customRowRenderer = (row) => (
         <>
-            <td>{row.no_passport}</td>
-            <td>{row.name}</td>
+            <td className="max-w-32">{row.no_passport}</td>
+            <td className="max-w-32">{row.name}</td>
             <td>{row.gender === "M" ? "Male" : "Female"}</td>
-            <td>{row.nationality}</td>
+            <td className="w-auto">{row.nationality}</td>
+            <td>
+                {row?.is_cekal
+                    ? `Cekal- ${row?.skor_kemiripan || ""}`
+                    : "No Cekal"}
+            </td>
+
             <td>
                 <>
                     <img
@@ -310,38 +320,37 @@ const LogRegister = () => {
                         alt="Profile"
                         width={100}
                         height={100}
-                        style={{ borderRadius: '50%' }}
+                        className="rounded-full"
                         onError={handleError}
                     />
-
                 </>
             </td>
-            <td>
+            <td className="whitespace-normal break-words" title={row.created_at}>
                 {formatDateToIndonesian(row.created_at)}
             </td>
 
-            <td className='flex items-center justify-center gap-2' style={{ height: '100px' }}>
+            <td className="flex items-center justify-center gap-2" style={{ height: '100px' }}>
                 <button
                     onClick={() => openModalEdit(row)}
-                    className='w-24  py-2 bg-[#fbaf17] text-base border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
+                    className='w-24 py-2 bg-[#fbaf17] text-base border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
                     Edit
                 </button>
                 <button
                     onClick={() => deleteModal(row)}
-                    className='w-24 py-2 text-base  bg-red-500 border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
+                    className='w-24 py-2 text-base bg-red-500 border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
                     Delete
                 </button>
                 <button
                     onClick={() => synchronizeDataUser(row)}
-                    className='w-24 py-2 px-3  text-base  bg-[#0056b3] border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
+                    className='w-24 py-2 px-3 text-base bg-[#0056b3] border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
                     Sync
                 </button>
             </td>
-
         </>
+
     );
 
-    const generateExcel = async() => {
+    const generateExcel = async () => {
         setExportStatus("loading")
         const res = await apiGetDataLogRegister({
             startDate: search.startDate,
@@ -389,7 +398,7 @@ const LogRegister = () => {
             // Example usage
             const date = new Date();
             const formattedDate = date.toISOString().slice(0, 19).replace(/[-T:]/g, ""); // e.g., 20241119_123456
-                const baseFilename = `Log_Register_${formattedDate}.xlsx`;
+            const baseFilename = `Log_Register_${formattedDate}.xlsx`;
             const filename = getFilenameWithDateTime(baseFilename);
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
                 // For IE
@@ -410,100 +419,6 @@ const LogRegister = () => {
         });
     };
 
-    const modalAddInput = () => {
-        return (
-            <div className="register-container">
-                <div className="register-input">
-                    <span>PLB / BCP Number</span>
-                    <input type="text" name="no_passport" id="" value={detailData.no_passport} onChange={handleChange} />
-                </div>
-                {/* <div className="register-input">
-                    <span>Registration Number</span>
-                    <input type="text" name="no_register" id="" value={detailData.no_register} onChange={handleChange} />
-                </div> */}
-                <div className="register-input">
-                    <span>Full Name</span>
-                    <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} />
-                </div>
-                <div className="register-input">
-                    <span>Date of Birth</span>
-                    <input type="date" name="date_of_birth" id="" value={detailData.date_of_birth} onChange={handleChange} />
-                </div>
-                <div className="register-input">
-                    <span>Gender</span>
-                    <select value={detailData.gender} name='gender' onChange={handleChange}>
-                        <option value="">Pilih Gender</option>
-                        <option value="M">Laki-Laki</option>
-                        <option value="F">Perempuan</option>
-                    </select>
-                </div>
-                <div className="register-input">
-                    <span>Nationality</span>
-                    <select value={detailData.nationality} name='nationality' onChange={handleChange}>
-                        <option value="">Pilih Negara</option>
-                        {countryData.map((negara) => {
-                            return (
-                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
-                            )
-                        })}
-                    </select>
-                </div>
-                <div className="register-input">
-                    <span>Expired Date</span>
-                    <input type="date" name="expiry_date" id="" value={detailData.expiry_date} onChange={handleChange} />
-                </div>
-                <div className="register-input">
-                    <span>Arrival Time</span>
-                    <input type="datetime-local" name="arrival_time" id="" value={detailData.arrival_time} onChange={handleChange} />
-                </div>
-                <div className="register-input" style={{ marginBottom: '5rem' }}>
-                    <span>Destination Location</span>
-                    {/* <input type="text" name="destination_location" id="" value={detailData.destination_location} onChange={handleChange} /> */}
-                    <select value={detailData.destination_location} name='destination_location' onChange={handleChange}>
-                        <option value="">Pilih Negara</option>
-                        {countryData.map((negara) => {
-                            return (
-                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
-                            )
-                        })}
-                    </select>
-                </div>
-                <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
-                    <span>Face</span>
-                    <div className="input-file-container" onClick={() => refInputFace.current?.click()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        {detailData.profile_image ?
-                            (
-                                <img src={detailData.profile_image.includes('user_profile_images/') ? `${url_devel}storage/${detailData.profile_image}`
-                                    : detailData.profile_image}
-                                    alt="" height={175} />
-                            )
-                            :
-                            (<span>Drag and Drop here </span>)}
-                    </div>
-                    <input type="file" name="profile_image" id="" style={{ display: 'none' }} ref={refInputFace} onChange={(e) => handleImageFace(e)} />
-                </div>
-                <div className="register-input input-file" style={{ paddingTop: '2rem' }}>
-                    <span>Passport Image</span>
-                    <div className="input-file-container" onClick={() => refInputPassport.current?.click()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        {detailData.photo_passport ?
-                            (
-                                <img src={detailData.photo_passport.includes('user_photo_passport/') ? `${url_devel}storage/${detailData.photo_passport}`
-                                    : detailData.photo_passport}
-                                    alt="" height={175} />
-                            )
-                            :
-                            (<span>Drag and Drop here </span>)}
-                    </div>
-                    <input type="file" name="photo_passport" id="" style={{ display: 'none' }} ref={refInputPassport} onChange={(e) => handleImageFace(e)} />
-                </div>
-
-            </div>
-        )
-    }
-
-    const closeModalAdd = () => {
-        setShowModalAdd(false)
-    }
 
 
     const openModalEdit = (row) => {
@@ -511,7 +426,6 @@ const LogRegister = () => {
         setDetailData({
             ...detailData,
             no_passport: row.no_passport || "",
-            // no_register: row.no_register || "",
             name: row.name || "",
             date_of_birth: row.date_of_birth || "",
             nationality: row.nationality || "",
@@ -528,7 +442,6 @@ const LogRegister = () => {
     const closeModaledit = () => {
         setDetailData({
             no_passport: "",
-            // no_register: "",
             name: "",
             date_of_birth: "",
             nationality: "",
@@ -695,16 +608,16 @@ const LogRegister = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className=" register-reg-header">
+            <div className="flex w-full h-[30vh] ">
                 <div className='face-reg-filter-name '>
                     <div className='label-filter-name' style={{
-                        gap: "15%",
+                        gap: "13%",
                         paddingTop: "3%",
                     }}>
                         <p>No. PLB</p>
                         <p>Full Name</p>
                         <p>Gender</p>
-
+                        <p>Status Cekal</p>
                     </div>
                     <div className='value-filter-name' style={{
                         width: "65%"
@@ -721,7 +634,6 @@ const LogRegister = () => {
                             placeholder={`Enter Name`}
                         />
                         <Select
-
                             onChange={(selectedOption) => setSearch({ ...search, gender: selectedOption.value })}
                             options={dataGender}
                             className="basic-single"
@@ -750,11 +662,40 @@ const LogRegister = () => {
                                 }),
                             }}
                         />
+                        <Select
+                            onChange={(selectedOption) => setSearch({ ...search, is_cekal: selectedOption.value })}
+                            options={dataCekal}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            placeholder="Select Status Cekal"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "100%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
                     </div>
                 </div>
-                <div className='face-reg-filter-kamera'>
+                <div className='face-reg-filter-kamera h-[75%]'>
                     <div className='label-filter-name' style={{
-                        gap: "15%",
+                        gap: "18%",
                         paddingTop: "3%"
                     }}>
                         <p>Start Date</p>
@@ -828,11 +769,11 @@ const LogRegister = () => {
                 <button
                     onClick={generateExcel}
                     className='add-data'
-                    disabled={exportStatus === "loading"} 
+                    disabled={exportStatus === "loading"}
                 >
-                {exportStatus == "loading" ?
-                "Exporting..."
-                : "Export"}
+                    {exportStatus == "loading" ?
+                        "Exporting..."
+                        : "Export"}
                 </button>
                 <button
                     className='search'
@@ -852,11 +793,10 @@ const LogRegister = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['no plb', 'name', 'gender', 'nationality', 'profile image', 'registration date', "action"]}
+                        tHeader={['no plb', 'name', 'gender', 'nationality', 'status cekal', 'profile image', 'registration date', "action"]}
                         tBody={logData}
                         page={page}
                         showIndex={true}
-                        // handler={getDetailData}
                         rowRenderer={customRowRenderer}
                     />
                     <div className="table-footer">
@@ -869,15 +809,6 @@ const LogRegister = () => {
                     </div>
                 </>
             }
-            {/* <Modals
-                showModal={showModalAdd}
-                buttonName="Submit"
-                width={800}
-                headerName="Add Register"
-                closeModal={closeModalAdd}
-            >
-                {modalAddInput()}
-            </Modals> */}
             <Modals
                 showModal={showModalEdit}
                 buttonName="Submit"
