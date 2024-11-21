@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
 import { FaSync, FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCameraRotate } from "react-icons/fa6";
 import { FcSynchronize } from "react-icons/fc";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -83,6 +84,10 @@ const Sidebar = ({ isOpen }) => {
                             <FaUserCircle size={25} style={{ marginRight: '10px' }} />
                             Log Facereg
                         </Link>
+                        <Link to='/cpanel/log-simpan-pelintas' className={`link ${isActive('/cpanel/log-simpan-pelintas') ? 'active' : ''}`}>
+                            <FaDatabase size={25} style={{ marginRight: '10px' }} />
+                            Log Simpan Pelintas
+                        </Link>
                     </ul>
                 )}
                 {(userInfo.role === 0 || userInfo.role === 1) && (
@@ -115,6 +120,14 @@ const Sidebar = ({ isOpen }) => {
                                         style={{ marginRight: '10px' }}
                                     />
                                     <span>Camera</span>
+                                </Link>
+
+                                <Link to='/cpanel/setting-status-depart' className={`link ${isActive('/cpanel/setting-status-depart') ? 'active' : ''}`}>
+                                    <FaCameraRotate
+                                        size={25}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    <span>Status Depart Camera</span>
                                 </Link>
 
                                 <Link to='/cpanel/synchronize' className={`link ${isActive('/cpanel/synchronize') ? 'active' : ''}`}>

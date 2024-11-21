@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./CardStatusStyle.css";
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -26,6 +26,8 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	const [image, setImage] = useAtom(imageToSend);
 	const [dataCekalAtom] = useAtom(DataHasilCekal);
 	const [skorKemiripan, setSkorKemiripan] = useState(0);
+	const [documentResult, setDocumentResult] = useState([])
+	const canvasRef = useRef(null);
 	const [documentPLBImage, setDocumentPLBImage] = useAtom(ImageDocumentPLB)
 	const [capturedImageAfter2, setCapturedImageAfter2] = useAtom(caputedImageAfter);
 	const { data } = useContext(DataContext);
@@ -117,10 +119,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				});
 			}, 2000);
 		});
-
+		
 		socket_IO_4000.on("document-data", (data) => {
 			if (data.image) {
-				setDocumentPLBImage(data?.image)
+				setDocumentResult(prevResult => {
+					const updatedArray = [...prevResult, `data:image/jpeg;base64, ${data.image}`];
+					console.log('After Update:', updatedArray);
+					return updatedArray;
+				  });
+				// setDocumentPLBImage(data?.image)
 				sendDataToInput({
 					statusCardBox: 'getDocumentSucces',
 					capturedImage: null,
@@ -156,6 +163,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		}
 
 	}, [socket_IO_4000, capturedImage]);
+
+	useEffect(() => {
+		console.log(documentResult, "documentResult")
+
+	}, [documentResult])
 
 	useEffect(() => {
 		console.log(capturedImageAfter2, "asdasdasdsadsadsa")
@@ -262,6 +274,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	const doRetakeDocument = () => {
 		// socket_IO_4000.emit("start_stream");
+		setDocumentResult([])
 		setDocumentPLBImage(null);
 		sendDataToInput({
 			statusCardBox: "iddle",
@@ -270,6 +283,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			titleHeader: "Registrasi Pas Lintas Batas",
 			titleFooter: "Lanjut",
 		});
+	};
+
+	const doAddDocument = () => {
+		// socket_IO_4000.emit("start_stream");
+		// setDocumentPLBImage(null);
+		// sendDataToInput({
+		// 	statusCardBox: "iddle",
+		// 	capturedImage: null,
+		// 	emailUser: email,
+		// 	titleHeader: "Registrasi Pas Lintas Batas",
+		// 	titleFooter: "Lanjut",
+		// });
 	};
 
 	const handleEmailChange = (event) => {
@@ -501,6 +526,64 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		}
 	};
 
+
+	const combineImages = async () => {
+		// console.log(documentResult)
+		try {
+		  if (!documentResult || documentResult.length === 0) {
+			console.error("No documentResults provided.");
+			return;
+		  }
+	
+		  // Create Image objects for each Base64 string or URL
+		  const imageObjects = documentResult.map((src) => {
+			const img = new Image();
+			img.src = src;
+			return img;
+		  });
+	
+		  // Wait for all images to load
+		  const imageLoadPromises = imageObjects.map(
+			(img) =>
+			  new Promise((resolve, reject) => {
+				img.onload = resolve;
+				img.onerror = reject;
+			  })
+		  );
+	
+		  await Promise.all(imageLoadPromises);
+	
+		  // Combine images on the canvas
+		  const canvas = canvasRef.current;
+		  const ctx = canvas.getContext("2d");
+	
+		  // Calculate total canvas width and height
+		  const totalWidth = imageObjects.reduce((sum, img) => sum + img.width, 0);
+		  const maxHeight = Math.max(...imageObjects.map((img) => img.height));
+	
+		  canvas.width = totalWidth;
+		  canvas.height = maxHeight;
+	
+		  // Draw each image sequentially
+		  let xOffset = 0;
+		  imageObjects.forEach((img) => {
+			ctx.drawImage(img, xOffset, 0);
+			xOffset += img.width; // Move to the right for the next image
+		  });
+	
+		  // Export the combined image as a data URL
+		  const dataURL = canvas.toDataURL("image/jpeg");
+		  console.log(dataURL, "sini")
+		  setDocumentPLBImage(dataURL);
+		} catch (error) {
+		  console.error("Error combining images:", error);
+		}
+	  };
+
+	  useEffect(() => {
+		combineImages()
+	  }, [documentResult])
+	  
 	const renderCardContent = () => {
 		switch (statusCardBox) {
 			case "inputEmail":
@@ -850,24 +933,36 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 								</h1>
 
 								<div className="box-image cursor-pointer"
-									onClick={() => handlePreviewImage(`data:image/jpeg;base64,${documentPLBImage}`)}
+									onClick={() => handlePreviewImage(`${documentPLBImage}`)}
 								>
 									<img
 										style={{
+											minWidth: "500px",
 											width: "100vh",
 											height: "30vh",
 										}}
-										src={`data:image/jpeg;base64,${documentPLBImage ? documentPLBImage : ""}`}
+										src={`${documentPLBImage ? documentPLBImage : ""}`}
 										alt="Captured Image"
 										className="potrait-image"
 									/>
 								</div>
+								<div className="flex items-center justify-center gap-4">
 								<button
 									onClick={doRetakeDocument}
 									className="retake-button"
 								>
 									Ulangi
 								</button>
+								{documentResult.length < 2 && (
+									<button
+									onClick={handleGetDocumnet}
+									className="retake-button"
+									style={{backgroundColor: "blue"}}
+								>
+									Tambah Lagi
+								</button>
+								)}
+								</div>
 							</div>
 						)}
 					</>
@@ -1106,6 +1201,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	return (
 		<div className="card-status">
 			<div className="card-container">
+			<canvas ref={canvasRef} style={{ display: "none" }} />
 				<div className="inner-card">{renderCardContent()}</div>
 			</div>
 			<ImgsViewer

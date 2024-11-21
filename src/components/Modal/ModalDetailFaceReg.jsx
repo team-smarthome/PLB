@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./modalstyle.css";
 import { IoMdClose } from "react-icons/io";
 
-const Modals = ({
+const ModalDetailFaceReg = ({
   showModal,
   closeModal,
   headerName,
@@ -58,7 +58,7 @@ const Modals = ({
           <IoMdClose size={25} style={{ cursor: "pointer" }} onClick={close} />
         </div>
         {children}
-        <div className="button-container">
+        {/* <div className="button-container">
           {(headerName === "Delete Register" ||
             headerName === "Edit Register") && (
             <>
@@ -66,10 +66,10 @@ const Modals = ({
               <Button onClick={onConfirm}>{buttonName}</Button>
             </>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   ) : null;
 };
 
-export default Modals;
+export default ModalDetailFaceReg;
