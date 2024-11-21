@@ -9,7 +9,8 @@ const Modals = ({
   buttonName,
   width,
   children,
-  onConfirm = () => {},
+  onConfirm = () => { },
+  isDetail = false,
 }) => {
   const [animationState, setAnimationState] = useState(false);
 
@@ -59,13 +60,13 @@ const Modals = ({
         </div>
         {children}
         <div className="button-container">
-          {(headerName === "Delete Register" ||
-            headerName === "Edit Register") && (
+          {!isDetail && (
             <>
               <Button onClick={close}>Cancel</Button>
               <Button onClick={onConfirm}>{buttonName}</Button>
             </>
-          )}
+          )
+          }
         </div>
       </div>
     </div>
