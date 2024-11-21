@@ -309,7 +309,7 @@ const LogRegister = () => {
             <td className="w-auto" onClick={() => openModalDetail(row)}>{row.nationality}</td>
             <td>
                 {row?.is_cekal
-                    ? `Cekal- ${row?.skor_kemiripan || ""}`
+                    ? `Cekal - ${row?.skor_kemiripan || ""}`
                     : "No Cekal"}
             </td>
             <td onClick={() => openModalDetail(row)}>
@@ -361,7 +361,7 @@ const LogRegister = () => {
         const worksheet = workbook.addWorksheet("Log Register");
 
         // Add column headers
-        const headers = ['No', 'No PLB/BCP', 'Nama', 'Tanggal Lahir', 'Gender', 'Nationality', 'Registration Date', 'Expired Date', 'Destination Location'];
+        const headers = ['No', 'No PLB/BCP', 'Nama', 'Tanggal Lahir', 'Gender', 'Nationality', 'Status Cekal', 'Registration Date', 'Expired Date', 'Destination Location'];
         worksheet.addRow(headers);
 
         // Add data rows
@@ -373,6 +373,9 @@ const LogRegister = () => {
                 item.date_of_birth,
                 item.gender === "M" ? "Laki-laki" : "Perempuan",
                 item.nationality,
+                item?.is_cekal
+                ? `Cekal - ${item?.skor_kemiripan || ""}`
+                : "No Cekal",
                 item.created_at,
                 item.expired_date,
                 item.destination_location
@@ -491,9 +494,10 @@ const LogRegister = () => {
         setShowModalDetail(false)
     }
     const handleChange = (e) => {
+        const inputCondition = e.target.name == "no_passport" ||  e.target.name == "name" ? e.target.value.toUpperCase() : e.target.value
         setDetailData({
             ...detailData,
-            [e.target.name]: e.target.value
+            [e.target.name]: inputCondition
         })
     }
     const modalEditInput = () => {
@@ -682,7 +686,7 @@ const LogRegister = () => {
 
     const handleEdit = async () => {
         setStatus("loading")
-        setShowModalEdit(false)
+        
         const bodyParamsSendKamera = {
             method: "addfaceinfonotify",
             params: {
@@ -721,10 +725,20 @@ const LogRegister = () => {
                             if (responseEdit.status == 200) {
                                 getLogRegister()
                                 setStatus("success")
+                                setShowModalEdit(false)
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Data berhasil diubah.",
+                                });
                             }
                         } catch (error) {
                             getLogRegister()
                             setStatus("success")
+                            setShowModalEdit(false)
+                            Toast.fire({
+                                icon: "error",
+                                title: "Data gagal diubah.",
+                            });
                             console.log(error)
                         }
                     }
@@ -968,6 +982,7 @@ const LogRegister = () => {
                 width={800}
                 headerName="Detail Register"
                 closeModal={closeModalDetail}
+                isDetail
             // onConfirm={handleEdit}
             >
                 {modalDetailRow()}

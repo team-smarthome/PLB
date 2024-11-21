@@ -62,7 +62,7 @@ const Country = () => {
             if (res.status == 201) {
                 Toast.fire({
                     icon: "success",
-                    title: "Petugas berhasil ditambahkan.",
+                    title: "Destinasi lokasi berhasil ditambahkan.",
                 });
                 setIsLoading(false)
                 getAllNegara();
@@ -73,7 +73,7 @@ const Country = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal menambahkan petugas. Silakan coba lagi.",
+                title: "Gagal menambahkan destinasi lokasi. Silakan coba lagi.",
             });
         }
     };
@@ -85,7 +85,7 @@ const Country = () => {
             if (res.status === 200) {
                 Toast.fire({
                     icon: "success",
-                    title: "Petugas berhasil dihapus.",
+                    title: "Destinasi lokasi berhasil dihapus.",
                 });
                 setIsLoading(false)
                 getAllNegara();
@@ -96,7 +96,7 @@ const Country = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal menghapus petugas. Silakan coba lagi.",
+                title: "Gagal menghapus destinasi lokasi. Silakan coba lagi.",
             });
         }
     };
@@ -108,7 +108,7 @@ const Country = () => {
             if (res.status == 201) {
                 Toast.fire({
                     icon: "success",
-                    title: "Petugas berhasil diperbarui.",
+                    title: "Destinasi lokasi berhasil diperbarui.",
                 });
                 setIsLoading(false)
                 setIsShowModal(false);
@@ -119,7 +119,7 @@ const Country = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal memperbarui petugas. Silakan coba lagi.",
+                title: "Gagal memperbarui destinasi lokasi. Silakan coba lagi.",
             });
         }
     };
