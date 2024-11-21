@@ -244,7 +244,7 @@ async function realtimeDataLog() {
     } catch (error) {
         console.log("error hit api");
     }
-    setTimeout(realtimeDataLog, 1000);
+    setTimeout(realtimeDataLog, 100);
 }
 
 realtimeDataLog();
@@ -440,5 +440,38 @@ io.on("connection", (socket) => {
             socket.emit("responseSyncCamera", error.message);
         }
     });
+
+    // ============================Edit Data Camera============================
+    socket.on("editKeCamera", async (dataUser) => {
+        try {
+            console.log("MENJALANKAN EditCamera")
+            const responseDataKamera = await getDataKamera();
+            if (responseDataKamera?.data?.status === 500) {
+                socket.emit("responseEditKeCamera", responseDataKamera.message);
+                return;
+            }
+            const ipData = responseDataKamera?.data?.data;
+            const checkIP = await checkIpAccessible(ipData);
+            if (!checkIP.reachable) {
+                socket.emit("responseEditKeCamera", checkIP.error);
+                return;
+            }
+            const { status, message } = await handleSendDataToApi(dataUser, ipData);
+
+            if (status === 200) {
+                console.log("Berhasil Edit", message);
+                socket.emit("responseEditKeCamera", message);
+                return;
+            } else {
+                console.log("Gagal Synch", message);
+                socket.emit("responseEditKeCamera", message);
+                return;
+            }
+        } catch (error) {
+            console.log("error", error.message);
+            socket.emit("responseEditKeCamera", error.message);
+        }
+    });
+
 
 });
