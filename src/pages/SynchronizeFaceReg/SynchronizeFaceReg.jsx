@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { sampleData } from '../LogRegister/sampleSynchronize'
-import { checkCountDataFaceReg } from '../../services/api'
+import { checkCountDataFaceReg, getAllNegaraData } from '../../services/api'
 import Swal from 'sweetalert2'
 import { Toast } from '../../components/Toast/Toast'
 import Modals from '../../components/Modal/Modal'
@@ -18,6 +18,8 @@ const SynchronizeFaceReg = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCounted, setIsCounted] = useState(true)
   const [modalAlertSynchronize, setModalAlertSynchronize] = useState(false)
+  const [dataNationality, setDataNationality] = useState([])
+  const [nationality, setNationality] = useState("")
   const [status, setStatus] = useState("not started")
   const [date, setDate] = useState({
     startDate: null,
@@ -91,7 +93,11 @@ const SynchronizeFaceReg = () => {
 
   const handleCheckDataCount = async () => {
     try {
-      const res = await checkCountDataFaceReg(date)
+      const params = {
+        ...date,
+        nationality: nationality
+      }
+      const res = await checkCountDataFaceReg(params)
       console.log(res?.data)
       if (res?.status == 200) {
         if (res?.data?.total_data_belum == 0) {
@@ -102,8 +108,8 @@ const SynchronizeFaceReg = () => {
           return
         } else {
           setTotal(res?.data?.total_data_belum)
-          localStorage.setItem("date", JSON.stringify(date))
-          localStorage.setItem("totalData", res?.data?.total_data_belum)
+          localStorage.setItem("dateFaceReg", JSON.stringify(date))
+          localStorage.setItem("totalDataFaceReg", res?.data?.total_data_belum)
         }
       }
     } catch (error) {
@@ -161,8 +167,8 @@ const SynchronizeFaceReg = () => {
       setFailedCount(data?.failed);
 
       if (data?.status === "done") {
-        localStorage.setItem("totalData", 0)
-        localStorage.setItem("date", JSON.stringify({ startDate: null, endDate: null }))
+        localStorage.setItem("totalDataFaceReg", 0)
+        localStorage.setItem("dateFaceReg", JSON.stringify({ startDate: null, endDate: null }))
       }
     });
   }, [socket_IO_4050]);
@@ -172,9 +178,9 @@ const SynchronizeFaceReg = () => {
 
   const handleGetTotalAndDate = async () => {
 
-    const getDate = await localStorage.getItem("date")
+    const getDate = await localStorage.getItem("dateFaceReg")
     const convertDate = JSON.parse(getDate)
-    const getTotal = await localStorage.getItem("totalData")
+    const getTotal = await localStorage.getItem("totalDataFaceReg")
     if (convertDate) {
       setDate({ ...date, startDate: convertDate.startDate, endDate: convertDate.endDate })
     }
@@ -183,7 +189,20 @@ const SynchronizeFaceReg = () => {
     }
 
   }
+
+  const getDataNationality = async () => {
+    try {
+        const { data } = await getAllNegaraData();
+        if (data.status === 200) {
+            console.log(data.data, "dataNegara")
+            setDataNationality(data.data);
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
   useEffect(() => {
+    getDataNationality()
     handleGetTotalAndDate()
   }, [])
 
@@ -193,10 +212,13 @@ const SynchronizeFaceReg = () => {
       endDate: null
     })
     setTotal(0)
-    localStorage.removeItem("date")
-    localStorage.removeItem("totalData")
+    localStorage.removeItem("dateFacereg")
+    localStorage.removeItem("totalDataFaceReg")
   }
-  console.log(date, total, "sini tan")
+  const handleNationality = (e) => {
+    console.log(e.target.value)
+    setNationality(e?.target?.value)
+  }
   return (
     <div
       className='p-8'
@@ -284,6 +306,22 @@ const SynchronizeFaceReg = () => {
                       onChange={handleDateTimeChange}
                     />
                   </div>
+                </div>
+                <div className="flex flex-col gap-4">
+                <span
+                className='font-medium'
+                >Nationality</span>
+                <select 
+                className='w-full p-4 rounded-sm bg-[#D9D9D9BF]'
+                onChange={handleNationality}
+                >
+                        <option value="">Pilih Negara</option>
+                        {dataNationality.map((negara) => {
+                            return (
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                            )
+                        })}
+                    </select>
                 </div>
                 <div className="flex justify-center items-center w-full">
                   <button

@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { sampleData } from '../LogRegister/sampleSynchronize'
-import { checkCountData } from '../../services/api'
+import { checkCountData, getAllNegaraData } from '../../services/api'
 import Swal from 'sweetalert2'
 import { Toast } from '../../components/Toast/Toast'
 import Modals from '../../components/Modal/Modal'
@@ -19,6 +19,8 @@ const SynchronizeRegister = () => {
   const [isCounted, setIsCounted] = useState(true)
   const [modalAlertSynchronize, setModalAlertSynchronize] = useState(false)
   const [status, setStatus] = useState("not started")
+  const [dataNationality, setDataNationality] = useState([])
+  const [nationality, setNationality] = useState("")
   const [date, setDate] = useState({
     startDate: null,
     endDate: null
@@ -91,7 +93,11 @@ const SynchronizeRegister = () => {
 
   const handleCheckDataCount = async () => {
     try {
-      const res = await checkCountData(date)
+      const params = {
+        ...date,
+        nationality: nationality
+      }
+      const res = await checkCountData(params)
       console.log(res?.data)
       if (res?.status == 200) {
         if (res?.data?.total_data_belum == 0) {
@@ -181,10 +187,24 @@ const SynchronizeRegister = () => {
     if (getTotal) {
       setTotal(getTotal)
     }
-
+    
   }
+
+  const getDataNationality = async () => {
+    try {
+        const { data } = await getAllNegaraData();
+        if (data.status === 200) {
+            console.log(data.data, "dataNegara")
+            setDataNationality(data.data);
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
   useEffect(() => {
     handleGetTotalAndDate()
+    getDataNationality()
   }, [])
 
   const handleClearDate = () => {
@@ -196,7 +216,12 @@ const SynchronizeRegister = () => {
     localStorage.removeItem("date")
     localStorage.removeItem("totalData")
   }
-  console.log(date, total, "sini tan")
+
+  const handleNationality = (e) => {
+    console.log(e.target.value)
+    setNationality(e?.target?.value)
+  }
+  // console.log(date, total, "sini tan")
   return (
     <div
       className='p-8'
@@ -284,6 +309,22 @@ const SynchronizeRegister = () => {
                       onChange={handleDateTimeChange}
                     />
                   </div>
+                </div>
+                <div className="flex flex-col gap-4">
+                <span
+                className='font-medium'
+                >Nationality</span>
+                <select 
+                className='w-full p-4 rounded-sm bg-[#D9D9D9BF]'
+                onChange={handleNationality}
+                >
+                        <option value="">Pilih Negara</option>
+                        {dataNationality.map((negara) => {
+                            return (
+                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                            )
+                        })}
+                    </select>
                 </div>
                 <div className="flex justify-center items-center w-full">
                   <button
