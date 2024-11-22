@@ -79,29 +79,70 @@ const formatDate = (date) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
-const handleSimpanPerlintasan = async (data, socket) => {
+const handleSimpanPerlintasan = async (data, socket, action) => {
     console.log("Hit handleSimpanPerlintasan");
     onProgress = true;
-    const { ipServer, version, userNip, userFullName, jenis, totalData } = data;
-
+    const { version, userNip, userFullName, jenis, totalData, nationality } = data;
     const startDate = `${data.startDate}:00`;
     const endDate = `${data.endDate}:59`;
 
+    let records;
+    // const seenPersonIds = new Set();
+
     try {
-        const response = await axios.get(`http://localhost:8000/api/datauser`, {
-            params: {
-                startDate,
-                endDate,
-                sync_status: 0,
-                "not-paginate": true,
-            },
-        });
+        if (action === "log-register") {
+            const { data: logRegister } = await axios.get(`http://127.0.0.1:8000/api/datauser`, {
+                params: {
+                    startDate,
+                    endDate,
+                    nationality,
+                    sync_status: 0,
+                    "not-paginate": true,
+                },
+            });
+            if (logRegister.status === 200) {
+                records = logRegister.data;
+            } else {
+                throw new Error("Error while calling the API-1.");
+            }
 
-        const total = response.data.data.length
-        const records = response.data.data;
+        } else if (action === "log-face-reg") {
+            const { data: logFaceReg } = await axios.get(`http://127.0.0.1:8000/api/face-reg-simpan-pelintas`, {
+                params: {
+                    startDate,
+                    endDate,
+                    nationality,
+                },
+            });
 
+            if (logFaceReg.status === 200) {
+                const rawData = logFaceReg.data;
+                return console.log(rawData, "rawData");
+                // records = rawData.filter(item => {
+                //     if (!seenPersonIds.has(item?.personId)) {
+                //         seenPersonIds.add(item?.personId);
+                //         return true;
+                //     }
+                //     return false;
+                // }).map(item => {
+                //     return {
+                //         ...item,
+                //         no_passport: item?.personId,
+                //         profile_image: item?.image_base64,
+                //     };
+                // });
 
-        if (total === 0 || records.length === 0) {
+                records = rawData.map(item => {
+                    return {
+                        ...item,
+                        no_passport: item?.personId,
+                        profile_image: item?.image_base64,
+                    };
+                });
+            }
+        }
+
+        if (records.length === 0) {
             socket.emit("hasil-progress", {
                 status: "done",
                 completed,
@@ -120,6 +161,8 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 break;
             }
 
+            const hasilCekal = await CheckCekal(data, record);
+
             const paramsSimpanPerlintasan = {
                 "nama_aplikasi": jenis,
                 "waktu_kirim": formatDate(new Date()),
@@ -129,15 +172,15 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "id_sticker": "",
                 "refferal": "False",
                 "tanggal_perlintasan": formatDate(new Date()),
-                "kode_arah_perlintasan": record?.nationality === "Indonesia" ? "D" : "A",
-                "status_perlintasan": record?.nationality === "Indonesia" ? "D" : "A",
+                "kode_arah_perlintasan": record?.destination_location?.toUpperCase() === "INDONESIA" ? "D" : "A",
+                "status_perlintasan": "A",
                 "id_bagian": "",
                 "id_lokasi": record?.tpi_id.toUpperCase(),
                 "id_tpi": record?.tpi_id.toUpperCase(),
                 "kode_alat_angkut": "",
                 "kode_jenis_dokumen_perjalanan": jenis,
                 "nomor_dokumen_perjalanan": record?.no_passport,
-                "kode_negara_penerbit_dokumen_perjalanan": record?.nationality === "Indonesia" ? "IDN" : "PNG",
+                "kode_negara_penerbit_dokumen_perjalanan": record?.nationality?.toUpperCase() === "INDONESIA" ? "IDN" : "PNG",
                 "tanggal_akhir_berlaku_dokumen_perjalanan": record?.expired_date,
                 "id_tpi_luar_negeri": "",
                 "id_jenis_visa": "",
@@ -152,7 +195,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "nama_depan": record?.name,
                 "tanggal_lahir": record?.date_of_birth,
                 "kode_jenis_kelamin": record?.gender,
-                "kode_kewarganegaraan": record?.nationality === "Indonesia" ? "IDN" : "PNG",
+                "kode_kewarganegaraan": record?.nationality?.toUpperCase() === "INDONESIA" ? "IDN" : "PNG",
                 "id_alasan_rujukan": "",
                 "catatan_rujukan": "",
                 "waktu_penyelesaian_rujukan": "",
@@ -199,7 +242,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "foto_rfid": "",
                 "is_status_deportasi": "False",
                 "nomor_ijin_tinggal": "",
-                "status_cekal": "TIDAK HIT",
+                "status_cekal": hasilCekal,
                 "visa_dan_izin_tinggal": "MODE PLB",
                 "perlintasan_terakhir": "MODE PLB",
                 "interpol": "MODE PLB",
@@ -238,10 +281,14 @@ const handleSimpanPerlintasan = async (data, socket) => {
                         method: "post",
                         url: `http://10.18.14.246:1101/perlintasan/simpan`,
                         data: paramsSimpanPerlintasan,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Basic ZGV2ZWxvcGVyLTAxOkBiVEoxNXNDOVNiNA==",
+                        },
                     }
                 )
 
-                writeLog("logs", {
+                writeLog(`${action}`, {
                     record,
                     userNip,
                     params: paramsSimpanPerlintasan,
@@ -253,7 +300,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                         const apiUpdateDataUser = await axios(
                             {
                                 method: "patch",
-                                url: `http://localhost:8000/api/update-sync-status`,
+                                url: `http://127.0.0.1:8000/api/update-sync-status`,
                                 data: {
                                     no_passport: record.no_passport,
                                 },
@@ -268,6 +315,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                                 start_date: startDate,
                                 end_date: endDate,
                             }
+                            console.log(dataLogParams, "dataLogParams");
                             await InsertLogTODB(dataLogParams);
 
                         } else {
@@ -279,6 +327,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                                 start_date: startDate,
                                 end_date: endDate,
                             }
+                            console.log(dataLogParams, "dataLogParams");
                             await InsertLogTODB(dataLogParams);
                         }
                     } catch (error) {
@@ -290,6 +339,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                             start_date: startDate,
                             end_date: endDate,
                         }
+                        console.log(dataLogParams, "dataLogParams");
                         await InsertLogTODB(dataLogParams);
                     }
                 } else {
@@ -301,6 +351,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                         start_date: startDate,
                         end_date: endDate,
                     }
+                    console.log(dataLogParams, "dataLogParams");
                     await InsertLogTODB(dataLogParams);
                 }
 
@@ -314,7 +365,15 @@ const handleSimpanPerlintasan = async (data, socket) => {
                     start_date: startDate,
                     end_date: endDate,
                 }
+                console.log(dataLogParams, "dataLogParams");
                 await InsertLogTODB(dataLogParams);
+
+                writeLog(`${action}-error`, {
+                    record,
+                    userNip,
+                    params: paramsSimpanPerlintasan,
+                    response: error.message,
+                }, logFileName);
             }
 
             completed++;
@@ -323,7 +382,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 completed,
                 success,
                 failed,
-                message: `Processing record ${completed} of ${total} ...`,
+                message: `Processing record ${completed} of ${totalData} ...`,
             });
         }
 
@@ -354,7 +413,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
             failed,
             message: "Error while calling the API-1.",
         });
-        console.error("Error while calling the API:", error.message);
+        console.error("Error while calling the API:", error);
     }
 };
 
@@ -364,7 +423,7 @@ async function InsertLogTODB(params) {
         const apiLogPelintas = await axios(
             {
                 method: "post",
-                url: `http://localhost:8000/api/log-simpan-pelintas`,
+                url: `http://127.0.0.1:8000/api/log-simpan-pelintas`,
                 data: params,
             }
         )
@@ -380,6 +439,37 @@ async function InsertLogTODB(params) {
 
 }
 
+async function CheckCekal(data, params) {
+
+    const { version, userNip, userFullName } = data;
+    const DataCekCekal = {
+        nip: userNip,
+        nama_lengkap: params?.name,
+        tanggal_lahir: params?.date_of_birth,
+        kode_jenis_kelamin: params?.gender,
+        kode_kewarganegaraan: params?.nationality?.toUpperCase() === "INDONESIA" ? "IDN" : "PNG",
+        nomor_dokumen_perjalanan: params?.no_passport,
+        tanggal_habis_berlaku_dokumen_perjalanan: params?.expired_date,
+        kode_negara_penerbit_dokumen_perjalanan: params?.nationality?.toUpperCase() === "INDONESIA" ? "IDN" : "PNG",
+        arah_perlintasan: params?.destination_location?.toUpperCase() === "INDONESIA" ? "O" : "I",
+        apk_version: `versi ${version}`,
+        ip_address_client: "10.8.10.3",
+        port_id: params?.tpi_id?.toUpperCase(),
+        user_nip: userNip?.toUpperCase(),
+        user_full_name: userFullName?.toUpperCase(),
+    }
+
+    try {
+        const { data: checkCekal } = await axios.post('http://127.0.0.1:8000/api/cek-cekal', DataCekCekal);
+        if (checkCekal?.response_code === "00") {
+            return "HIT";
+        } else {
+            return "TIDAK HIT";
+        }
+    } catch (error) {
+        return "TIDAK TERHUBUNG"
+    }
+}
 
 
 io.on("connection", (socket) => {
@@ -390,9 +480,19 @@ io.on("connection", (socket) => {
         completed = 0;
         success = 0;
         failed = 0;
-        console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND #");
-        handleSimpanPerlintasan(data, socket);
+        console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND Log-Register #");
+        handleSimpanPerlintasan(data, socket, "log-register");
     });
+
+    socket.on("simpan-perlintasan-face-reg", (data) => {
+        onProgress = true;
+        completed = 0;
+        success = 0;
+        failed = 0;
+        console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND Log-FaceReg#");
+        handleSimpanPerlintasan(data, socket, "log-face-reg");
+    });
+
 
     socket.on("check-progress", () => {
         if (onProgress) {

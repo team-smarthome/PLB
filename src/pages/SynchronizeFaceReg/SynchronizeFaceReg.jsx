@@ -143,6 +143,7 @@ const SynchronizeFaceReg = () => {
       userNip: userData?.nip,
       userFullName: userData?.petugas?.nama_petugas,
       jenis: "PLB",
+      nationality: nationality,
       totalData: total,
       version: version
     }
@@ -192,15 +193,15 @@ const SynchronizeFaceReg = () => {
 
   const getDataNationality = async () => {
     try {
-        const { data } = await getAllNegaraData();
-        if (data.status === 200) {
-            console.log(data.data, "dataNegara")
-            setDataNationality(data.data);
-        }
+      const { data } = await getAllNegaraData();
+      if (data.status === 200) {
+        console.log(data.data, "dataNegara")
+        setDataNationality(data.data);
+      }
     } catch (error) {
-        console.log(error)
+      console.log(error)
     }
-}
+  }
   useEffect(() => {
     getDataNationality()
     handleGetTotalAndDate()
@@ -269,7 +270,7 @@ const SynchronizeFaceReg = () => {
             <div className="flex justify-center items-center w-full">
               {status == "done" ?
                 <button
-                  onClick={() => navigate("/cpanel/log-register")}
+                  onClick={() => navigate("/cpanel/log-facereg")}
                   className='w-[75%] p-2 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded'
                 >Kembali</button>
                 :
@@ -308,20 +309,20 @@ const SynchronizeFaceReg = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                <span
-                className='font-medium'
-                >Nationality</span>
-                <select 
-                className='w-full p-4 rounded-sm bg-[#D9D9D9BF]'
-                onChange={handleNationality}
-                >
-                        <option value="">Pilih Negara</option>
-                        {dataNationality.map((negara) => {
-                            return (
-                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
-                            )
-                        })}
-                    </select>
+                  <span
+                    className='font-medium'
+                  >Nationality</span>
+                  <select
+                    className='w-full p-4 rounded-sm bg-[#D9D9D9BF]'
+                    onChange={handleNationality}
+                  >
+                    <option value="">Pilih Negara</option>
+                    {dataNationality.map((negara) => {
+                      return (
+                        <option value={negara.nama_negara}>{negara.nama_negara}</option>
+                      )
+                    })}
+                  </select>
                 </div>
                 <div className="flex justify-center items-center w-full">
                   <button
