@@ -916,13 +916,13 @@ const LogRegister = () => {
                 paddingTop: "1%",
                 paddingBottom: "1%",
             }}>
-                <button
+                {/* <button
                     style={{
                         width: 150,
                         cursor: 'pointer'
                     }}
                     onClick={() => navigate("/cpanel/synchronize-register")}
-                >Sinkronisasi Data</button>
+                >Sinkronisasi Data</button> */}
                 <button
                     onClick={generateExcel}
                     className='add-data'

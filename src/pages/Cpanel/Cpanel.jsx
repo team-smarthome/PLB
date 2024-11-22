@@ -109,7 +109,7 @@ const Cpanel = () => {
                     <Route path="/destination-location" element={<Country />} />
                     <Route path="/jabatan" element={<JobTitle />} />
                     <Route path="/synchronize" element={<Synchronize />} />
-                    <Route path="/synchronize-register" element={<SynchronizeRegister />} />
+                    {/* <Route path="/synchronize-register" element={<SynchronizeRegister />} /> */}
                     <Route path="/synchronize-facereg" element={<SynchronizeFaceReg />} />
                     <Route path="/setting-status-depart" element={<SettingDepartStatusKamera />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}
