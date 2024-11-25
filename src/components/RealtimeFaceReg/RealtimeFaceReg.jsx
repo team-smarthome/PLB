@@ -7,6 +7,7 @@ import './realtimefacereg.css'
 import { FaImage } from 'react-icons/fa'
 import { initiateSocket4020 } from '../../utils/socket'
 import { Toast } from '../Toast/Toast'
+import ModalData from '../Modal/ModalData'
 
 const RealtimeFaceReg = () => {
     const socket = initiateSocket4020()
@@ -14,6 +15,9 @@ const RealtimeFaceReg = () => {
     const [ipCamera, setIpCamera] = useState("")
     const [listCamera, setListCamera] = useState([])
     const [selectedCamera, setSelectedCamera] = useState()
+    const [modalOpen, setModalOpen] = useState(false)
+    const [resData, setResData] = useState(null)
+    const [status, setStatus] = useState('idle')
     const [faceRegData, setFaceRegData] = useState({
         similiarity: null,
         // faceRegImage: "https://ftnews.co.id/storage/2024/09/Sumanto.jpg",
@@ -23,7 +27,6 @@ const RealtimeFaceReg = () => {
         // documentImage: "https://upload.wikimedia.org/wikipedia/commons/6/6d/Indonesian_passport_data_page.jpg",
         documentImage: null
     })
-    const [resData, setResData] = useState(null)
 
     const fetchAllIp = async () => {
         const userCookie = Cookies.get('userdata');
@@ -43,7 +46,7 @@ const RealtimeFaceReg = () => {
                 setListCamera(res?.data?.data)
             }
         } catch (err) {
-            setStatus("success")
+            // setStatus("success")
             console.log(err.message);
         }
     };
@@ -148,12 +151,22 @@ const RealtimeFaceReg = () => {
         >
             <div className="flex justify-between items-center">
                 <h2>Realtime FaceReg</h2>
+                <div className="flex flex-row gap-4">
+                {ipCamera && 
+                <button
+                className='
+                p-4 text-sm font-bold cursor-pointer border-0 text-white rounded bg-transparent bg-blue-500'
+                onClick={() => setModalOpen(true)}
+            >Input Data Manual</button>
+                }
                 {ipCamera && <button
                     className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
                     onClick={handleClearCamera}
+                    disabled={status == "loading"}
                 >
                     Ganti Kamera
                 </button>}
+                </div>
             </div>
             {
                 ipCamera ?
@@ -219,25 +232,29 @@ const RealtimeFaceReg = () => {
                                 <>
                                     <div className="flex justify-center gap-4">
                                         <button
-                                            className='p-2 text-lg text-white bg-red-800 hover:bg-red-900 w-32 rounded-xl border-none cursor-pointer'
+                                            className='p-2 text-lg text-white bg-red-800 hover:bg-red-900 min-w-36 rounded-xl border-none cursor-pointer'
+                                            disabled={status == "loading"}
                                         >Tolak</button>
                                         <button
-                                            className='p-2 text-lg text-white bg-btnPrimary w-32 rounded-xl border-1 border-black cursor-pointer'
+                                            className='p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] min-w-36 rounded-xl border-1 border-black cursor-pointer'
                                             onClick={functionCheckRealtime}
-                                        >Ulangi</button>
+                                            disabled={status == "loading"}
+                                        >{status == "loading" ? "Mohon Tunggu..." : "Ulangi"}</button>
                                         <button
-                                            disabled={score < 100}
-                                            className={`p-2 text-lg text-white ${score === 100 ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-6e00"} w-32 rounded-xl border-none ${score == 100 ? "cursor-pointer" : "cursor-not-allowed"}`}
+                                            // disabled={score < 100}
+                                            className={`p-2 text-lg text-white ${score === 100 ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-6e00"} min-w-36 rounded-xl border-none ${score == 100 ? "cursor-pointer" : "cursor-not-allowed"}`}
                                             onClick={insertDataLog}
+                                            disabled={status == "loading"}
                                         >Ijinkan</button>
                                     </div>
                                 </> :
                                 <>
                                     <div className="flex justify-center mb-8">
                                         <button
-                                            className={`p-2 text-lg text-white bg-btnPrimary w-40 rounded-xl border-none cursor-pointer`}
+                                            className={`p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] w-40 rounded-xl border-none cursor-pointer`}
                                             onClick={functionCheckRealtime}
-                                        >Periksa Data</button>
+                                            disabled={status == "loading"}
+                                        >{status == "loading" ? "Mohon Tunggu... " : "Periksa Data"}</button>
                                     </div>
                                 </>
                         }
@@ -278,7 +295,9 @@ const RealtimeFaceReg = () => {
                         </div>
                     </>
             }
-
+            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} 
+            // doneProgres={GetDataUserLog} 
+            />
         </div>
     )
 }
