@@ -18,6 +18,7 @@ import JobTitle from '../JobTitle/JobTitle';
 import LogSimpanPelintas from '../LogSimpanPelintas/LogSimpanPelintas';
 import SynchronizeFaceReg from '../SynchronizeFaceReg/SynchronizeFaceReg';
 import SettingDepartStatusKamera from '../../components/SettingDepartStatusKamera/SettingDepartStatusKamera';
+import RealtimeFaceReg from '../../components/RealtimeFaceReg/RealtimeFaceReg';
 const Cpanel = () => {
     const navigate = useNavigate()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -112,6 +113,7 @@ const Cpanel = () => {
                     {/* <Route path="/synchronize-register" element={<SynchronizeRegister />} /> */}
                     <Route path="/synchronize-facereg" element={<SynchronizeFaceReg />} />
                     <Route path="/setting-status-depart" element={<SettingDepartStatusKamera />} />
+                    <Route path="/realtime-facereg" element={<RealtimeFaceReg />} />
                     {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}
                 </ReactRoutes>
             </div>

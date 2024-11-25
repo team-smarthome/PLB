@@ -9,6 +9,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp, IoSpeedometer } from "react-icons/io5";
 import Cookies from 'js-cookie';
 import { FaUserTie } from "react-icons/fa6";
+import { TbUserScan } from "react-icons/tb";
 
 const Sidebar = ({ isOpen }) => {
 
@@ -63,6 +64,12 @@ const Sidebar = ({ isOpen }) => {
                     <Link to='/cpanel/user-management' className={`link ${isActive('/cpanel/user-management') ? 'active' : ''}`}>
                         <FaUsers size={30} style={{ marginRight: '10px' }} />
                         <span className="link_name">User Management</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link to='/cpanel/realtime-facereg' className={`link ${isActive('/cpanel/realtime-facereg') ? 'active' : ''}`}>
+                        <TbUserScan size={30} style={{ marginRight: '10px' }} />
+                        <span className="link_name">Realtime FaceReg</span>
                     </Link>
                 </li>
                 <li>
