@@ -119,14 +119,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 				});
 			}, 2000);
 		});
-		
+
 		socket_IO_4000.on("document-data", (data) => {
 			if (data.image) {
 				setDocumentResult(prevResult => {
 					const updatedArray = [...prevResult, `data:image/jpeg;base64, ${data.image}`];
 					console.log('After Update:', updatedArray);
 					return updatedArray;
-				  });
+				});
 				// setDocumentPLBImage(data?.image)
 				sendDataToInput({
 					statusCardBox: 'getDocumentSucces',
@@ -143,15 +143,27 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					titleHeader: "Registrasi Pas Lintas Batas",
 					titleFooter: "Lanjut",
 				});
-				setTimeout(() => {
-					sendDataToInput({
-						statusCardBox: 'iddle',
-						capturedImage: null,
-						emailUser: null,
-						titleHeader: "Registrasi Pas Lintas Batas",
-						titleFooter: "Lanjut",
-					});
-				}, 3000)
+				if (documentPLBImage) {
+					setTimeout(() => {
+						sendDataToInput({
+							statusCardBox: 'iddle',
+							capturedImage: null,
+							emailUser: null,
+							titleHeader: "Registrasi Pas Lintas Batas",
+							titleFooter: "Lanjut",
+						});
+					}, 3000)
+				} else {
+					setTimeout(() => {
+						sendDataToInput({
+							statusCardBox: 'getDocumentSucces',
+							capturedImage: null,
+							emailUser: null,
+							titleHeader: "Registrasi Pas Lintas Batas",
+							titleFooter: "Lanjut",
+						});
+					}, 3000)
+				}
 			} else {
 				console.error("test12345", data);
 			}
@@ -530,60 +542,60 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	const combineImages = async () => {
 		// console.log(documentResult)
 		try {
-		  if (!documentResult || documentResult.length === 0) {
-			console.error("No documentResults provided.");
-			return;
-		  }
-	
-		  // Create Image objects for each Base64 string or URL
-		  const imageObjects = documentResult.map((src) => {
-			const img = new Image();
-			img.src = src;
-			return img;
-		  });
-	
-		  // Wait for all images to load
-		  const imageLoadPromises = imageObjects.map(
-			(img) =>
-			  new Promise((resolve, reject) => {
-				img.onload = resolve;
-				img.onerror = reject;
-			  })
-		  );
-	
-		  await Promise.all(imageLoadPromises);
-	
-		  // Combine images on the canvas
-		  const canvas = canvasRef.current;
-		  const ctx = canvas.getContext("2d");
-	
-		  // Calculate total canvas width and height
-		  const totalWidth = imageObjects.reduce((sum, img) => sum + img.width, 0);
-		  const maxHeight = Math.max(...imageObjects.map((img) => img.height));
-	
-		  canvas.width = totalWidth;
-		  canvas.height = maxHeight;
-	
-		  // Draw each image sequentially
-		  let xOffset = 0;
-		  imageObjects.forEach((img) => {
-			ctx.drawImage(img, xOffset, 0);
-			xOffset += img.width; // Move to the right for the next image
-		  });
-	
-		  // Export the combined image as a data URL
-		  const dataURL = canvas.toDataURL("image/jpeg");
-		  console.log(dataURL, "sini")
-		  setDocumentPLBImage(dataURL);
-		} catch (error) {
-		  console.error("Error combining images:", error);
-		}
-	  };
+			if (!documentResult || documentResult.length === 0) {
+				console.error("No documentResults provided.");
+				return;
+			}
 
-	  useEffect(() => {
+			// Create Image objects for each Base64 string or URL
+			const imageObjects = documentResult.map((src) => {
+				const img = new Image();
+				img.src = src;
+				return img;
+			});
+
+			// Wait for all images to load
+			const imageLoadPromises = imageObjects.map(
+				(img) =>
+					new Promise((resolve, reject) => {
+						img.onload = resolve;
+						img.onerror = reject;
+					})
+			);
+
+			await Promise.all(imageLoadPromises);
+
+			// Combine images on the canvas
+			const canvas = canvasRef.current;
+			const ctx = canvas.getContext("2d");
+
+			// Calculate total canvas width and height
+			const totalWidth = imageObjects.reduce((sum, img) => sum + img.width, 0);
+			const maxHeight = Math.max(...imageObjects.map((img) => img.height));
+
+			canvas.width = totalWidth;
+			canvas.height = maxHeight;
+
+			// Draw each image sequentially
+			let xOffset = 0;
+			imageObjects.forEach((img) => {
+				ctx.drawImage(img, xOffset, 0);
+				xOffset += img.width; // Move to the right for the next image
+			});
+
+			// Export the combined image as a data URL
+			const dataURL = canvas.toDataURL("image/jpeg");
+			console.log(dataURL, "sini")
+			setDocumentPLBImage(dataURL);
+		} catch (error) {
+			console.error("Error combining images:", error);
+		}
+	};
+
+	useEffect(() => {
 		combineImages()
-	  }, [documentResult])
-	  
+	}, [documentResult])
+
 	const renderCardContent = () => {
 		switch (statusCardBox) {
 			case "inputEmail":
@@ -947,21 +959,21 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 									/>
 								</div>
 								<div className="flex items-center justify-center gap-4">
-								<button
-									onClick={doRetakeDocument}
-									className="retake-button"
-								>
-									Ulangi
-								</button>
-								{documentResult.length < 2 && (
 									<button
-									onClick={handleGetDocumnet}
-									className="retake-button"
-									style={{backgroundColor: "blue"}}
-								>
-									Tambah Lagi
-								</button>
-								)}
+										onClick={doRetakeDocument}
+										className="retake-button"
+									>
+										Ulangi
+									</button>
+									{documentResult.length < 2 && (
+										<button
+											onClick={handleGetDocumnet}
+											className="retake-button"
+											style={{ backgroundColor: "blue" }}
+										>
+											Tambah Lagi
+										</button>
+									)}
 								</div>
 							</div>
 						)}
@@ -1201,7 +1213,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	return (
 		<div className="card-status">
 			<div className="card-container">
-			<canvas ref={canvasRef} style={{ display: "none" }} />
+				<canvas ref={canvasRef} style={{ display: "none" }} />
 				<div className="inner-card">{renderCardContent()}</div>
 			</div>
 			<ImgsViewer

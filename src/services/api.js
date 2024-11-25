@@ -539,7 +539,7 @@ export const getAllSimpanPelintasApi = async (params) => {
   } catch (error) {
     console.error(error)
   }
-  
+
 }
 
 export const checkCountDataFaceReg = async (date) => {

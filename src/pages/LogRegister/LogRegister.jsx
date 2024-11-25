@@ -303,16 +303,16 @@ const LogRegister = () => {
 
     const customRowRenderer = (row) => (
         <>
-            <td className="max-w-32" onClick={() => openModalDetail(row)}>{row.no_passport}</td>
-            <td className="max-w-32" onClick={() => openModalDetail(row)}>{row.name}</td>
-            <td onClick={() => openModalDetail(row)}>{row.gender === "M" ? "Male" : "Female"}</td>
-            <td className="w-auto" onClick={() => openModalDetail(row)}>{row.nationality}</td>
+            <td className="max-w-32">{row.no_passport}</td>
+            <td className="max-w-32">{row.name}</td>
+            <td>{row.gender === "M" ? "Male" : "Female"}</td>
+            <td className="w-auto">{row.nationality}</td>
             <td>
                 {row?.is_cekal
                     ? `Cekal - ${row?.skor_kemiripan || ""}`
                     : "No Cekal"}
             </td>
-            <td onClick={() => openModalDetail(row)}>
+            <td>
                 <>
                     <img
                         src={`data:image/jpeg;base64,${row.profile_image}`}
@@ -324,23 +324,32 @@ const LogRegister = () => {
                     />
                 </>
             </td>
-            <td onClick={() => openModalDetail(row)}>
+            <td>
                 {formatDateToIndonesian(row.created_at)}
             </td>
 
             <td className="flex items-center justify-center gap-2" style={{ height: '100px' }}>
                 <button
-                    onClick={() => openModalEdit(row)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openModalEdit(row);
+                    }}
                     className='w-24 py-2 bg-[#fbaf17] text-base border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
                     Edit
                 </button>
                 <button
-                    onClick={() => deleteModal(row)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        deleteModal(row);
+                    }}
                     className='w-24 py-2 text-base bg-red-500 border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
                     Delete
                 </button>
                 <button
-                    onClick={() => synchronizeDataUser(row)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        synchronizeDataUser(row);
+                    }}
                     className='w-24 py-2 px-3 text-base bg-[#0056b3] border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer'>
                     Sync
                 </button>
@@ -374,8 +383,8 @@ const LogRegister = () => {
                 item.gender === "M" ? "Laki-laki" : "Perempuan",
                 item.nationality,
                 item?.is_cekal
-                ? `Cekal - ${item?.skor_kemiripan || ""}`
-                : "No Cekal",
+                    ? `Cekal - ${item?.skor_kemiripan || ""}`
+                    : "No Cekal",
                 item.created_at,
                 item.expired_date,
                 item.destination_location
@@ -442,7 +451,7 @@ const LogRegister = () => {
     }
 
     const openModalDetail = (row) => {
-        console.log(row, "row")
+        console.log(row, "row_1234")
         setDetailData({
             ...detailData,
             no_passport: row.no_passport || "",
@@ -494,7 +503,7 @@ const LogRegister = () => {
         setShowModalDetail(false)
     }
     const handleChange = (e) => {
-        const inputCondition = e.target.name == "no_passport" ||  e.target.name == "name" ? e.target.value.toUpperCase() : e.target.value
+        const inputCondition = e.target.name == "no_passport" || e.target.name == "name" ? e.target.value.toUpperCase() : e.target.value
         setDetailData({
             ...detailData,
             [e.target.name]: inputCondition
@@ -686,7 +695,7 @@ const LogRegister = () => {
 
     const handleEdit = async () => {
         setStatus("loading")
-        
+
         const bodyParamsSendKamera = {
             method: "addfaceinfonotify",
             params: {
@@ -955,6 +964,7 @@ const LogRegister = () => {
                         page={page}
                         showIndex={true}
                         rowRenderer={customRowRenderer}
+                        handler={openModalDetail}
                     />
                     <div className="table-footer">
                         <>Show {totalDataFilter} of {pagination?.total} entries</>

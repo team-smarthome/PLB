@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import './logfacereg.style.css'
 import { apiGetAllIp, getAllNegaraData, getDataLogApi } from '../../services/api'
@@ -77,11 +77,20 @@ const LogFaceReg = () => {
         { value: "F", label: "FEMALE" },
     ];
 
+
+    const paramsRef = useRef(params);
+
+    useEffect(() => {
+        paramsRef.current = params;
+    }, [params]);
     //============================================ YANG DIGUNAKAN =============================================================//
 
     const GetDataUserLog = async () => {
+        const currentParams = paramsRef.current;
+        console.log(currentParams, "paramsDariLog");
+
         try {
-            const { data } = await getDataLogApi(params);
+            const { data } = await getDataLogApi(currentParams);
             if (data.status === 200) {
                 setLogData(data?.data)
                 setTotalDataFilter(data?.data?.length);
@@ -104,7 +113,7 @@ const LogFaceReg = () => {
             ipCamera: dataIpKamera
         }
         try {
-            console.log(dataLog, "dataLog")
+            console.log(params, "paramsDariLog")
             const { data } = await getDataLogApi(dataLog);
             if (data.status === 200) {
                 setLogData(data?.data)
@@ -203,11 +212,13 @@ const LogFaceReg = () => {
     const handleChange = (e) => {
         setParams({
             ...params,
-            [selectedCondition]: e.target.value.toUpperCase()
+            [selectedCondition]: e.target.value.toUpperCase(),
+            page: 1
         })
+        handlePageChange(1)
     }
 
-    const generateExcel = async() => {
+    const generateExcel = async () => {
         setExportStatus("loading")
         const res = await getDataLogApi({
             startDate: params.startDate,
@@ -215,7 +226,6 @@ const LogFaceReg = () => {
             "not-paginate": true,
         });
         const responseData = res?.data?.data
-        // return console.log(res?.data?.data)
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Payment Report");
 
@@ -226,7 +236,7 @@ const LogFaceReg = () => {
             const row = [
                 index + 1,
                 item.personId,
-                item.name ?? "unkown", 
+                item.name ?? "unkown",
                 item?.similarity,
                 item?.gender ?? "unkown",
                 item?.nationality ?? "unkown",
@@ -249,7 +259,7 @@ const LogFaceReg = () => {
 
             const date = new Date();
             const formattedDate = date.toISOString().slice(0, 19).replace(/[-T:]/g, ""); // e.g., 20241119_123456
-                const baseFilename = `Log_FaceReg_${formattedDate}.xlsx`;
+            const baseFilename = `Log_FaceReg_${formattedDate}.xlsx`;
             const filename = getFilenameWithDateTime(baseFilename);
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
                 setExportStatus("success")
@@ -268,7 +278,12 @@ const LogFaceReg = () => {
         });
     };
 
-    const resultArray = logData.map(item => ({ src: `data:image/jpeg;base64,${item.image_base64}` }));
+    const resultArray = (logData || []).map(item => ({
+        src: item.image_base64
+            ? `data:image/jpeg;base64,${item.image_base64}`
+            : 'https://via.placeholder.com/150'
+    }));
+
 
     const handleOpenImage = (row, index) => {
         setIsOpenImage(true)
@@ -284,8 +299,10 @@ const LogFaceReg = () => {
     const handleChangeStatus = (selectedOption) => {
         setParams(prevState => ({
             ...prevState,
+            page: 1,
             passStatus: selectedOption ? selectedOption.value : ""
         }));
+        handlePageChange(1)
     };
 
 
@@ -300,7 +317,8 @@ const LogFaceReg = () => {
 
 
         socket.on('logDataUpdate', () => {
-            GetDataUserLogFilter()
+            console.log('123params1234', params)
+            GetDataUserLog()
         });
 
         return () => {
@@ -414,6 +432,7 @@ const LogFaceReg = () => {
                         <Select
                             onChange={(selectedOption) => {
                                 setParams({ ...params, page: 1, gender: selectedOption.value })
+                                handlePageChange(1)
                             }}
                             options={dataGender}
                             className="basic-single"
@@ -454,14 +473,20 @@ const LogFaceReg = () => {
                     <div className='value-filter-name'>
                         <input type="datetime-local"
                             value={params.startDate}
-                            onChange={(e) => setParams({ ...params, startDate: e.target.value })}
+                            onChange={(e) => {
+                                setParams({ ...params, startDate: e.target.value, page: 1 })
+                                handlePageChange(1)
+                            }}
                             style={{
                                 width: "88%",
                             }}
                         />
                         <input type="datetime-local"
                             value={params.endDate}
-                            onChange={(e) => setParams({ ...params, endDate: e.target.value })}
+                            onChange={(e) => {
+                                setParams({ ...params, endDate: e.target.value, page: 1 })
+                                handlePageChange(1)
+                            }}
                             style={{
                                 width: "88%",
                             }}
@@ -470,6 +495,7 @@ const LogFaceReg = () => {
                             onChange={(selectedOption) => {
                                 localStorage.setItem('cameraIp', selectedOption.value)
                                 setParams({ ...params, page: 1, ipCamera: selectedOption.value })
+                                handlePageChange(1)
                             }}
                             options={[
                                 { value: '', label: 'All Camera' },
@@ -502,7 +528,10 @@ const LogFaceReg = () => {
                             }}
                         />
                         <Select
-                            onChange={(selectedOption) => setParams({ ...params, nationality: selectedOption.value })}
+                            onChange={(selectedOption) => {
+                                setParams({ ...params, nationality: selectedOption.value, page: 1 })
+                                handlePageChange(1)
+                            }}
                             options={[
                                 { value: "", label: "All Nationality" },
                                 ...dataNationality.map(country => ({
@@ -562,7 +591,7 @@ const LogFaceReg = () => {
                 <button
                     onClick={generateExcel}
                     className='add-data'
-                    disabled={exportStatus === "loading"} 
+                    disabled={exportStatus === "loading"}
                 > {exportStatus == "loading" ?
                     "Exporting..."
                     : "Export"}
