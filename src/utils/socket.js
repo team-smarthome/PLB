@@ -133,18 +133,13 @@ export const initiateSocket4020 = () => {
             if (socket4020.connected) {
                 while (pendingTakePhotoRequests4020.length > 0) {
                     const { action, data } = pendingTakePhotoRequests4020.shift();
-                    if (action === 'logHistory2') {
+                    if (action === 'realtimeFR') {
                         console.log('testkesini')
-                        socket4020.emit("logHistory2", data);
-                    } else {
-                        socket4020.emit("logHistory");
+                        socket4020.emit("realtimeFR", data);
                     }
                 }
-                socket4020.emit("logHistory");
             } else {
-                console.log('coba connect 4030 fase 2')
                 socket4020.connect();
-                socket4020.emit("logHistory");
             }
         });
 
