@@ -72,39 +72,34 @@ const RealtimeFaceReg = () => {
     const functionCheckRealtime = async () => {
         if (socket.connected) {
             socket.emit("realtimeFR", { ipCamera });
-            // socket.emit("realtimeFR", { ipCamera }, async (res) => {
-            //     console.log(res, "Data12345")
-            //     const { status, data } = await res
-            //     console.log(status, data, "masukkesini1235")
-            //     con
-            //     if (status === 200) {
-            //         setResData(data)
-            //         setFaceRegData({
-            //             similiarity: data?.images_info[0]?.similarity,
-            //             faceRegImage: data.base64Image,
-            //             profile_image: data.profile_image,
-            //             documentImage: data.photo_passport
-            //         })
-            //     } else if (status === 404) {
-            //         console.log("masukkesini1235")
-            //         Toast.fire({
-            //             icon: 'error',
-            //             title: 'Data tidak ditemukan'
-            //         })
-
-            //         setResData(null)
-            //         setFaceRegData({
-            //             similiarity: null,
-            //             faceRegImage: null,
-            //             profile_image: null,
-            //             documentImage: null
-            //         })
-
-            //     }
-            // })
         } else {
             console.log("Socket not connected")
             socket.connect()
+        }
+    }
+
+    const insertDataLog = async () => {
+        const dataRes = [
+            {
+                personId: resData?.personId,
+                personCode: resData?.personCode,
+                name: resData?.name,
+                similarity: resData?.images_info[0]?.similarity || 0,
+                passStatus: resData?.passStatus === 6 ? "Failed" : "Success",
+                time: resData?.time,
+                img_path: resData?.base64Image,
+                ipCamera: ipCamera,
+                is_depart: resData?.is_depart,
+
+            }
+        ]
+        try {
+            const { data: resInsertLog } = await apiInsertLog(dataRes);
+            if (resInsertLog?.status == 200) {
+                console.log("Data berhasil diinsert")
+            }
+        } catch (error) {
+            console.error("Error inserting log data:", error);
         }
     }
 
@@ -121,13 +116,10 @@ const RealtimeFaceReg = () => {
                     documentImage: data.photo_passport
                 })
             } else if (status == 404) {
-                // console.log("masukkesini1235")
-
                 Toast.fire({
                     icon: 'error',
                     title: 'Data tidak ditemukan'
                 })
-
                 setResData(null)
                 setFaceRegData({
                     similiarity: null,
@@ -236,6 +228,7 @@ const RealtimeFaceReg = () => {
                                         <button
                                             disabled={score < 100}
                                             className={`p-2 text-lg text-white ${score === 100 ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-6e00"} w-32 rounded-xl border-none ${score == 100 ? "cursor-pointer" : "cursor-not-allowed"}`}
+                                            onClick={insertDataLog}
                                         >Ijinkan</button>
                                     </div>
                                 </> :
