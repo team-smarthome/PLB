@@ -109,8 +109,10 @@ const RealtimeFaceReg = () => {
 
     useEffect(() => {
         socket.on("realtimeFRResponse", (res) => {
+            setStatus('loading')
             const { status, data } = res
             if (status == 200) {
+                setStatus('success')
                 setResData(data)
                 setFaceRegData({
                     similiarity: data?.images_info[0]?.similarity,
@@ -119,6 +121,7 @@ const RealtimeFaceReg = () => {
                     documentImage: data.photo_passport
                 })
             } else if (status == 404) {
+                setStatus('failed')
                 Toast.fire({
                     icon: 'error',
                     title: 'Data tidak ditemukan'
@@ -130,8 +133,11 @@ const RealtimeFaceReg = () => {
                     profile_image: null,
                     documentImage: null
                 })
-
+                
+            }else{
+                setStatus('failed')
             }
+            setStatus('failed')
         })
     }, [socket])
 
