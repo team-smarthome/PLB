@@ -21,7 +21,7 @@ import { FaRegIdCard } from "react-icons/fa";
 import ImgsViewer from "react-images-viewer";
 import Modals from "../Modal/Modal";
 import ModalCekal from "../Modal/ModalCekal";
-
+import imageCompression from "browser-image-compression";
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
 	const [dataCekalAtom] = useAtom(DataHasilCekal);
@@ -540,57 +540,80 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 
 	const combineImages = async () => {
-		// console.log(documentResult)
-		try {
-			if (!documentResult || documentResult.length === 0) {
-				console.error("No documentResults provided.");
-				return;
-			}
-
-			// Create Image objects for each Base64 string or URL
-			const imageObjects = documentResult.map((src) => {
-				const img = new Image();
-				img.src = src;
-				return img;
-			});
-
-			// Wait for all images to load
-			const imageLoadPromises = imageObjects.map(
-				(img) =>
-					new Promise((resolve, reject) => {
-						img.onload = resolve;
-						img.onerror = reject;
-					})
-			);
-
-			await Promise.all(imageLoadPromises);
-
-			// Combine images on the canvas
-			const canvas = canvasRef.current;
-			const ctx = canvas.getContext("2d");
-
-			// Calculate total canvas width and height
-			const totalWidth = imageObjects.reduce((sum, img) => sum + img.width, 0);
-			const maxHeight = Math.max(...imageObjects.map((img) => img.height));
-
-			canvas.width = totalWidth;
-			canvas.height = maxHeight;
-
-			// Draw each image sequentially
-			let xOffset = 0;
-			imageObjects.forEach((img) => {
-				ctx.drawImage(img, xOffset, 0);
-				xOffset += img.width; // Move to the right for the next image
-			});
-
-			// Export the combined image as a data URL
-			const dataURL = canvas.toDataURL("image/jpeg");
-			console.log(dataURL, "sini")
-			setDocumentPLBImage(dataURL);
-		} catch (error) {
-			console.error("Error combining images:", error);
+	  try {
+		if (!documentResult || documentResult.length === 0) {
+		  console.error("No documentResults provided.");
+		  return;
 		}
+	
+		// Create Image objects for each Base64 string or URL
+		const imageObjects = documentResult.map((src) => {
+		  const img = new Image();
+		  img.src = src;
+		  return img;
+		});
+	
+		// Wait for all images to load
+		const imageLoadPromises = imageObjects.map(
+		  (img) =>
+			new Promise((resolve, reject) => {
+			  img.onload = resolve;
+			  img.onerror = reject;
+			})
+		);
+	
+		await Promise.all(imageLoadPromises);
+	
+		// Combine images on the canvas
+		const canvas = canvasRef.current;
+		const ctx = canvas.getContext("2d");
+	
+		// Calculate total canvas width and height
+		const totalWidth = imageObjects.reduce((sum, img) => sum + img.width, 0);
+		const maxHeight = Math.max(...imageObjects.map((img) => img.height));
+	
+		canvas.width = totalWidth;
+		canvas.height = maxHeight;
+	
+		// Draw each image sequentially
+		let xOffset = 0;
+		imageObjects.forEach((img) => {
+		  ctx.drawImage(img, xOffset, 0);
+		  xOffset += img.width; // Move to the right for the next image
+		});
+	
+		// Export the combined image as a data URL
+		const dataURL = canvas.toDataURL("image/jpeg");
+	
+		// Convert dataURL to Blob for compression
+		const blob = await (await fetch(dataURL)).blob();
+	
+		// Compress the Blob
+		const compressedBlob = await imageCompression(blob, {
+		  maxSizeMB: 1, // Adjust maximum file size (in MB)
+		  maxWidthOrHeight: 1920, // Optional: Set a max width/height
+		  useWebWorker: true, // Enable compression in a web worker
+		});
+	
+		// Convert the compressed Blob back to a data URL
+		const compressedDataURL = await imageCompression.getDataUrlFromFile(compressedBlob);
+	
+		// // Calculate percentage decrease in file size
+		// const originalSize = blob.size / 1024; // Convert to KB
+		// const compressedSize = compressedBlob.size / 1024; // Convert to KB
+		// const percentageDecrease = ((originalSize - compressedSize) / originalSize) * 100;
+	
+		// console.log(`Original size: ${originalSize.toFixed(2)} KB`);
+		// console.log(`Compressed size: ${compressedSize.toFixed(2)} KB`);
+		// console.log(`Percentage decrease: ${percentageDecrease.toFixed(2)}%`);
+	
+		// Set the compressed image
+		setDocumentPLBImage(compressedDataURL);
+	  } catch (error) {
+		console.error("Error combining or compressing images:", error);
+	  }
 	};
+	
 
 	useEffect(() => {
 		combineImages()
