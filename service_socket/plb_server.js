@@ -257,25 +257,27 @@ async function checkIpAccessible(params) {
 }
 
 
-async function realtimeDataLog() {
-    try {
-        const { data } = await axios.get('http://localhost:8000/api/total-facereg');
-        if (data.status === 200) {
-            const totalData = data.total;
-            if (totalData > totalFacereg) {
-                console.log("Data Baru Ditemukan");
-                totalFacereg = totalData;
-                io.emit("logDataUpdate");
-            }
-        }
+// async function realtimeDataLog() {
+//     try {
+//         const { data } = await axios.get('http://localhost:8000/api/total-facereg');
+//         if (data.status === 200) {
+//             const totalData = data.total;
+//             // if (totalData > totalFacereg) {
+//             console.log("DATA BARU DI TAMBAHKAN");
+//             //     totalFacereg = totalData;
 
-    } catch (error) {
-        console.log("error hit api");
-    }
-    setTimeout(realtimeDataLog, 100);
-}
+//             // }
+//             io.emit("logDataUpdate");
+//         }
+
+//     } catch (error) {
+//         console.log("error hit api");
+//     }
+//     setTimeout(realtimeDataLog, 1000);
+// }
 
 // realtimeDataLog();
+
 
 
 io.on("connection", (socket) => {
@@ -300,7 +302,7 @@ io.on("connection", (socket) => {
         console.log('masuksini')
 
         const response = await checkStatusKamera(ipServerCamera, operationalStatus);
-        socket.emit("renameSuccess", response);
+        socket.emit("editDataCamera", response);
 
     });
 
@@ -470,7 +472,7 @@ io.on("connection", (socket) => {
     });
 
     // ============================Edit Data Camera============================
-    socket.on("editKeCamera", async (dataUser) => {
+    socket.on("editKeCamera", async (dataUser, callback) => {
         try {
             console.log("MENJALANKAN EditCamera")
             const responseDataKamera = await getDataKamera();
@@ -488,7 +490,8 @@ io.on("connection", (socket) => {
 
             if (status === 200) {
                 console.log("Berhasil Edit", message);
-                socket.emit("responseEditKeCamera", message);
+                callback(message);
+                // socket.emit("responseEditKeCamera", message);
                 return;
             } else {
                 console.log("Gagal Synch", message);

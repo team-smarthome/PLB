@@ -30,7 +30,7 @@ const formatBirthDateCekal = (formattedBirthDate) => {
 async function getDataKamera() {
     try {
         ipCameraData = [];
-        const { data } = await axios.get('http://localhost:8000/api/ip-kamera/SKOW');
+        const { data } = await axios.get('http://127.0.0.1/PLB-API/public/api/ip-kamera/SKOW');
         if (data.status === 200) {
             ipCameraData = data.data.map((item) => ({
                 ipCamera: item.ipAddress,
@@ -158,7 +158,7 @@ async function updateDataCekalToApi() {
     }));
 
 
-    await axios.put("http://localhost:8000/api/update-user-cekal", dataUserCekal, {
+    await axios.put("http://127.0.0.1/PLB-API/public/api/update-user-cekal", dataUserCekal, {
         headers: {
             "Content-Type": "application/json",
         },
@@ -171,7 +171,7 @@ async function updateDataCekalToApi() {
 async function deleteDataCekalFromApi() {
     const dataUserCekalId = UserCekal.filter((item) => item.skor_kemiripan === 100).map(personId => personId?.id);
 
-    const { data } = await axios.delete("http://localhost:8000/api/delete-user-cekal", {
+    const { data } = await axios.delete("http://127.0.0.1/PLB-API/public/api/delete-user-cekal", {
         data: { id: dataUserCekalId },
         headers: {
             "Content-Type": "application/json",
@@ -183,7 +183,7 @@ async function deleteDataCekalFromApi() {
 
 async function startCheckCekal() {
     try {
-        const { data } = await axios.get("http://localhost:8000/api/datauser", {
+        const { data } = await axios.get("http://127.0.0.1/PLB-API/public/api/datauser", {
             params: {
                 "not-paginate": true,
             },
@@ -210,7 +210,7 @@ async function startCheckCekal() {
                 "user_full_name": record?.petugas_id.toUpperCase(),
             };
 
-            const { data: responseCekal } = await axios.post("http://localhost:8000/api/cek-cekal", paramsCekal);
+            const { data: responseCekal } = await axios.post("http://127.0.0.1/PLB-API/public/api/cek-cekal", paramsCekal);
 
             if (responseCekal?.response_code === "25") {
                 continue;
@@ -248,7 +248,7 @@ async function startCheckCekal() {
 }
 
 async function deleteDataFromKamera() {
-    const { data: delteData } = await axios.get("http://127.0.0.1:8000/api/datauser?deleted_at=true");
+    const { data: delteData } = await axios.get("http://127.0.0.1/PLB-API/public/api/datauser?deleted_at=true");
 
     if (delteData?.status === 200) {
         await DeleteUserCekalToKamera(delteData?.data);

@@ -128,7 +128,7 @@ const sendTakePhotoRequest4010 = (data) => {
 
 export const initiateSocket4020 = () => {
     if (!socket4020) {
-        socket4020 = io(`http://localhost:4030`);
+        socket4020 = io(`${url_socket}:4030`);
         socket4020.on('connect', () => {
             if (socket4020.connected) {
                 while (pendingTakePhotoRequests4020.length > 0) {
