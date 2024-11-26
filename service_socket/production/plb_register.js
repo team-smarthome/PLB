@@ -4,8 +4,6 @@ const socketIo = require("socket.io");
 let ipCamera = [''];
 const axios = require("axios");
 const ping = require('ping');
-const fs = require("fs");
-const path = require("path");
 
 const server = http.createServer(function (request, response) {
     const headers = {

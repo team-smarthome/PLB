@@ -9,7 +9,7 @@ const socketIo = require("socket.io");
 const server = http.createServer(function (request, response) {
     const headers = {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
+        "Access-Control-Allow-Methods": "OPTIONS, POST, GET, PUT, DELETE, PATCH",
         "Access-Control-Max-Age": 2592000,
         "Access-Control-Allow-Headers": "*",
     };
@@ -26,7 +26,7 @@ console.log("Listening on port " + webSocketsServerPort);
 const io = socketIo(server, {
     cors: {
         origin: "*",
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
     },
 });
 
@@ -64,19 +64,19 @@ async function handleHistoryLogs(ipCamera, cookiesCamera) {
             const base64Image = await fetchImageAsBase64(imageUrl);
             console.log("dataPerson", data.personId);
             const { data: getDataPassport } = await axios.get(`http://localhost:8000/api/datauser/${data.personId}`);
-            console.log("getDataPassport", getDataPassport);
             if (getDataPassport.data === null) {
                 console.log("Data tidak ditemukansaatget");
-                return { status: 404, message: "Data tidak ditemukan", data: null };
+                return { status: 404, message: "Data tidak ditemukan", data: { base64Image } };
             } else {
                 const { data: ResponseCamera } = await axios.get(`http://127.0.0.1:8000/api/ipconfig?ipAddress=${ipCamera}`);
+                console.log("ResponseCamera", ResponseCamera.data);
                 return {
                     status: 200,
                     data: {
                         ...getDataPassport.data,
                         ...response.data.data.matchList[0],
                         base64Image,
-                        is_depart: ResponseCamera.data.is_depart,
+                        is_depart: ResponseCamera.data[0]?.is_depart,
                     }
                 }
             }

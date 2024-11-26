@@ -3,6 +3,8 @@ const http = require("http");
 const socketIo = require("socket.io");
 const axios = require("axios");
 const { v4: uuidv4 } = require('uuid');
+const fs = require("fs");
+const path = require("path");
 
 let onProgress = false;
 let completed = 0;
@@ -34,6 +36,38 @@ const io = socketIo(server, {
     },
 });
 
+
+function writeLog(baseFolder, logData, fileName) {
+    const folderName = logData.userNip;
+    const folderPath = path.join(baseFolder, folderName);
+
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        id: logData.record.no_passport,
+        params: logData.params,
+        response: logData.response,
+    };
+
+    const filePath = path.join(folderPath, fileName);
+
+    fs.appendFile(filePath, JSON.stringify(logEntry, null, 2) + ",\n", (err) => {
+        if (err) {
+            console.error("Error writing to log file:", err.message);
+        } else {
+            console.log(`Log appended to: ${filePath}`);
+        }
+    });
+}
+
+const timestamp = new Date().toISOString().replace(/:/g, "-");
+const logFileName = `${timestamp}.log`;
+
+
+
 const formatDate = (date) => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -45,28 +79,56 @@ const formatDate = (date) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
-const handleSimpanPerlintasan = async (data, socket) => {
+const handleSimpanPerlintasan = async (data, socket, action) => {
+    console.log("Hit handleSimpanPerlintasan");
     onProgress = true;
-    const { ipServer, version, userNip, userFullName, jenis } = data;
+    const { version, userNip, userFullName, jenis, totalData } = data;
 
     const startDate = `${data.startDate}:00`;
     const endDate = `${data.endDate}:59`;
 
+    let records;
+
     try {
-        const response = await axios.get(`http://${ipServer}/PLB-API/public/api/datauser`, {
-            params: {
-                startDate,
-                endDate,
-                sync_status: 0,
-                "not-paginate": true,
-            },
-        });
+        if (action === "log-register") {
+            const { data: logRegister } = await axios.get(`http://127.0.0.1/PLB-API/public/api/datauser`, {
+                params: {
+                    startDate,
+                    endDate,
+                    sync_status: 0,
+                    "not-paginate": true,
+                },
+            });
+            if (logRegister.status === 200) {
+                records = logRegister.data;
+            } else {
+                throw new Error("Error while calling the API-1.");
+            }
 
-        const total = response.data.data.length
-        const records = response.data.data;
+        } else if (action === "log-face-reg") {
+            const { data: logFaceReg } = await axios.get(`http://127.0.0.1/PLB-API/public/api/datauser-face-reg`, {
+                params: {
+                    startDate,
+                    endDate,
+                    sync_status: 0,
+                    "not-paginate": true,
+                },
+            });
 
+            if (logFaceReg.status === 200) {
+                const rawData = logFaceReg.data;
 
-        if (total === 0 || records.length === 0) {
+                records = rawData.map(item => {
+                    return {
+                        ...item,
+                        no_passport: item?.personId,
+                        profile_image: item?.image_base64,
+                    };
+                });
+            }
+        }
+
+        if (records.length === 0) {
             socket.emit("hasil-progress", {
                 status: "done",
                 completed,
@@ -79,6 +141,12 @@ const handleSimpanPerlintasan = async (data, socket) => {
 
 
         for (const record of records) {
+
+            if (completed === totalData) {
+                console.log("All records have been processed.");
+                break;
+            }
+
             const paramsSimpanPerlintasan = {
                 "nama_aplikasi": jenis,
                 "waktu_kirim": formatDate(new Date()),
@@ -124,7 +192,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "id_aturan_rujukan_perlintasan": "",
                 "hasil_verifikasi_eac": "",
                 "wajib_simpan": "0",
-                "id_petugas": userNip.toUpperCase(),
+                "id_petugas": record?.petugas_id.toUpperCase(),
                 "Mrz1": "",
                 "Mrz2": "",
                 "pindai_foto": record?.profile_image,
@@ -184,19 +252,18 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "overstay_status_overstay": "",
                 "overstay_metode_pembayaran": "",
                 "apk_version": `versi ${version}` || "versi 1.0",
-                "ip_address_client": ipServer,
+                "ip_address_client": "10.8.10.3",
                 "port_id": record?.tpi_id.toUpperCase(),
                 "user_nip": userNip.toUpperCase(),
                 "user_full_name": userFullName.toUpperCase(),
                 "request_date_time": formatDate(new Date()),
                 "keterangan_perlintasan": ""
             };
-
             try {
                 const apiSimpanPerlintasan = await axios(
                     {
                         method: "post",
-                        url: `http://10.18.14.246:1101/perlintasan/simpan`,
+                        url: `https://api-molina.imigrasi.go.id/perlintasan/simpan`,
                         data: paramsSimpanPerlintasan,
                         headers: {
                             "Content-Type": "application/json",
@@ -206,12 +273,19 @@ const handleSimpanPerlintasan = async (data, socket) => {
                     }
                 )
 
+                writeLog("logs", {
+                    record,
+                    userNip,
+                    params: paramsSimpanPerlintasan,
+                    response: apiSimpanPerlintasan.data,
+                }, logFileName);
+
                 if (apiSimpanPerlintasan.data.response_code === "00") {
                     try {
                         const apiUpdateDataUser = await axios(
                             {
                                 method: "patch",
-                                url: `http://${ipServer}/PLB-API/public/api/update-sync-status`,
+                                url: `http://127.0.0.1/PLB-API/public/api/update-sync-status`,
                                 data: {
                                     no_passport: record.no_passport,
                                 },
@@ -219,18 +293,60 @@ const handleSimpanPerlintasan = async (data, socket) => {
                         )
                         if (apiUpdateDataUser.data.status === 200) {
                             success++;
+                            const dataLogParams = {
+                                no_passport: record.no_passport,
+                                id_petugas: userNip,
+                                is_success: true,
+                                start_date: startDate,
+                                end_date: endDate,
+                            }
+                            await InsertLogTODB(dataLogParams);
+
                         } else {
                             failed++;
+                            const dataLogParams = {
+                                no_passport: record.no_passport,
+                                id_petugas: userNip,
+                                is_success: false,
+                                start_date: startDate,
+                                end_date: endDate,
+                            }
+                            await InsertLogTODB(dataLogParams);
                         }
                     } catch (error) {
                         failed++;
+                        const dataLogParams = {
+                            no_passport: record.no_passport,
+                            id_petugas: userNip,
+                            is_success: false,
+                            start_date: startDate,
+                            end_date: endDate,
+                        }
+                        await InsertLogTODB(dataLogParams);
                     }
                 } else {
                     failed++;
+                    const dataLogParams = {
+                        no_passport: record.no_passport,
+                        id_petugas: userNip,
+                        is_success: false,
+                        start_date: startDate,
+                        end_date: endDate,
+                    }
+                    await InsertLogTODB(dataLogParams);
                 }
+
             } catch (error) {
                 console.error(`Error for record ID ${record.id}:`, error.message);
                 failed++;
+                const dataLogParams = {
+                    no_passport: record.no_passport,
+                    id_petugas: userNip,
+                    is_success: false,
+                    start_date: startDate,
+                    end_date: endDate,
+                }
+                await InsertLogTODB(dataLogParams);
             }
 
             completed++;
@@ -275,15 +391,50 @@ const handleSimpanPerlintasan = async (data, socket) => {
 };
 
 
+async function InsertLogTODB(params) {
+    try {
+        const apiLogPelintas = await axios(
+            {
+                method: "post",
+                url: `http://127.0.0.1/PLB-API/public/api/log-simpan-pelintas`,
+                data: params,
+            }
+        )
+
+        if (apiLogPelintas.data.status === 200) {
+            console.log("Success log pelintas");
+        } else {
+            console.log("Failed log pelintas");
+        }
+    } catch (error) {
+        console.log("Error Insert Log to DB", error);
+    }
+
+}
+
+
 
 io.on("connection", (socket) => {
     console.log("Client connected");
 
     socket.on("simpan-perlintasan", (data) => {
-        console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND #");
-        console.log(data, "data");
-        handleSimpanPerlintasan(data, socket);
+        onProgress = true;
+        completed = 0;
+        success = 0;
+        failed = 0;
+        console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND Log-Register #");
+        handleSimpanPerlintasan(data, socket, "log-register");
     });
+
+    socket.on("simpan-perlintasan-face-reg", (data) => {
+        onProgress = true;
+        completed = 0;
+        success = 0;
+        failed = 0;
+        console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND Log-FaceReg#");
+        handleSimpanPerlintasan(data, socket, "log-face-reg");
+    });
+
 
     socket.on("check-progress", () => {
         if (onProgress) {

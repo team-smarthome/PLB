@@ -3,7 +3,7 @@ const fs = require("fs");
 const webSocketsServerPort = 4001;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = "192.168.2.127";
+let ipCamera = "192.168.1.232";
 const ping = require("ping");
 let StatusCamera = "OFF";
 

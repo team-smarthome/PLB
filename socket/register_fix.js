@@ -1,11 +1,9 @@
 const webSocketsServerPort = 4000;
 const http = require("http");
 const socketIo = require("socket.io");
-let ipCamera = [''];
+let ipCamera = ['192.168.2.127'];
 const axios = require("axios");
 const ping = require('ping');
-const fs = require("fs");
-const path = require("path");
 
 const server = http.createServer(function (request, response) {
     const headers = {
@@ -56,52 +54,25 @@ const handleTakePhoto = async (socket) => {
                 method: "collect_cancel",
                 params: null,
             });
+            // return;
         }
 
         if (response.data.result === "ok") {
             console.log("# SUCCESS FETCH API TAKE PHOTO #");
+            const imagePath = response.data.params.image_path;
+            const imageUrl = `http://${ipCamera[0]}:80${imagePath}`;
 
-            const { eyes, glasses, hat, mask, occlusion, image_path } = response.data.params;
+            const imageResponse = await axios.get(imageUrl, {
+                responseType: "arraybuffer",
+            });
+            const base64Image = Buffer.from(
+                imageResponse.data,
+                "binary"
+            ).toString("base64");
+            const imageBase64 = `data:image/jpeg;base64,${base64Image}`;
 
-            const imagesMask = glasses !== 0 && mask !== 0;
-            console.log(glasses, 'glasses')
-            console.log(mask, 'mask')
-            console.log(hat, 'hat')
-            console.log(occlusion, 'occlusion')
-            console.log('imagesMask', imagesMask)
-
-            switch (true) {
-                case imagesMask:
-                    socket.emit("error_photo", "glassesMask");
-                case eyes === 0:
-                    socket.emit("error_photo", "closed_eyes");
-                    break;
-                case glasses !== 0:
-                    socket.emit("error_photo", "glasses");
-                    break;
-                case hat !== 0:
-                    socket.emit("error_photo", "hat");
-                    break;
-                case mask !== 0:
-                    socket.emit("error_photo", "mask");
-                    break;
-                case occlusion !== 0:
-                    socket.emit("error_photo", "occlusion");
-                    break;
-                default:
-                    const imageUrl = `http://${ipCamera[0]}:80${image_path}`;
-                    try {
-                        const imageResponse = await axios.get(imageUrl, { responseType: "arraybuffer" });
-                        const base64Image = Buffer.from(imageResponse.data, "binary").toString("base64");
-                        const imageBase64 = `data:image/jpeg;base64,${base64Image}`;
-
-                        socket.emit("photo_taken", imageBase64);
-                        console.log("# SENDING IMAGE TO FRONT-END #");
-                    } catch (error) {
-                        console.error("Error fetching image:", error);
-                        socket.emit("error_photo", "image_fetch_error");
-                    }
-            }
+            socket.emit("photo_taken", imageBase64);
+            console.log("# SENDING IMAGE TO FRONT-END #");
         } else {
             console.error("# ERROR CANNOT TAKE PHOTO #");
             socket.emit("error_photo", "cannot_take_photo");
@@ -118,54 +89,6 @@ const handleTakePhoto = async (socket) => {
         console.log("stop_handle_run");
     }
 };
-
-function getLatestImageFromFolder(folderPath) {
-    if (!fs.existsSync(folderPath)) {
-        return { error: "error_folder" };
-    }
-
-    const files = fs.readdirSync(folderPath);
-
-    const imageFiles = files
-        .filter(file => /\.(jpg|jpeg|png)$/i.test(file))
-        .map(file => ({
-            name: file,
-            time: fs.statSync(path.join(folderPath, file)).mtime.getTime(),
-        }))
-        .sort((a, b) => b.time - a.time);
-
-    if (imageFiles.length > 0) {
-        return { path: path.join(folderPath, imageFiles[0].name) };
-    }
-    return { error: "error_image" };
-}
-
-function clearFolder(folderPath) {
-    if (fs.existsSync(folderPath)) {
-        const files = fs.readdirSync(folderPath);
-        for (const file of files) {
-            fs.unlinkSync(path.join(folderPath, file));
-        }
-    }
-}
-
-function handleTakeDocument(socket) {
-    console.log("Taking photo...");
-    const folderPath = "C:/pos-lintas-batas/photo-document";
-    const latestImageInfo = getLatestImageFromFolder(folderPath);
-
-    if (latestImageInfo.error) {
-        console.log(latestImageInfo.error);
-        socket.emit("document-data", { error: latestImageInfo.error });
-    } else {
-        const imageBuffer = fs.readFileSync(latestImageInfo.path);
-        const base64Image = imageBuffer.toString("base64");
-
-        socket.emit("document-data", { image: base64Image });
-
-        clearFolder(folderPath);
-    }
-}
 
 io.on("connection", (socket) => {
     socket.on("saveCameraData", async (data) => {
@@ -194,6 +117,16 @@ io.on("connection", (socket) => {
         } else {
             socket.emit("saveDataCamera", "failed - no IPs provided");
         }
+
+
+
+        // ipCamera = data?.ipServerCamera;
+        // console.log("# IPCAMERA: ", `http://${ipCamera[0]}:6002/mvfacial_terminal`);
+        // if (data) {
+        //     socket.emit("saveDataCamera", "successfully");
+        // } else {
+        //     socket.emit("saveDataCamera", "failed");
+        // }
     });
 
     socket.on("take_photo", () => {
@@ -219,11 +152,6 @@ io.on("connection", (socket) => {
             socket.emit("ResponseDataIPCamera", { 'ipCamera': ipToCheckCDetail, 'status': 'not_connected' });
         }
 
-    });
-
-    socket.on("get-document", () => {
-        console.log("# RECEIVED ACTION Get Document FROM FRONTEND #");
-        handleTakeDocument(socket);
     });
 
 

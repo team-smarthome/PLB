@@ -79,15 +79,29 @@ const formatDate = (date) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
+const formatDeteEpoch = (epochTime) => {
+    const date = new Date(epochTime * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    // Gabungkan ke dalam format yang diinginkan
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return formattedDate;
+}
+
 const handleSimpanPerlintasan = async (data, socket, action) => {
     console.log("Hit handleSimpanPerlintasan");
     onProgress = true;
-    const { version, userNip, userFullName, jenis, totalData, nationality } = data;
+    const { version, userNip, userFullName, jenis, totalData, nationality, is_depart } = data;
     const startDate = `${data.startDate}:00`;
     const endDate = `${data.endDate}:59`;
 
     let records;
-    // const seenPersonIds = new Set();
 
     try {
         if (action === "log-register") {
@@ -112,31 +126,16 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                     startDate,
                     endDate,
                     nationality,
+                    is_depart,
                 },
             });
 
             if (logFaceReg.status === 200) {
                 const rawData = logFaceReg.data;
-                return console.log(rawData, "rawData");
-                // records = rawData.filter(item => {
-                //     if (!seenPersonIds.has(item?.personId)) {
-                //         seenPersonIds.add(item?.personId);
-                //         return true;
-                //     }
-                //     return false;
-                // }).map(item => {
-                //     return {
-                //         ...item,
-                //         no_passport: item?.personId,
-                //         profile_image: item?.image_base64,
-                //     };
-                // });
-
                 records = rawData.map(item => {
                     return {
                         ...item,
                         no_passport: item?.personId,
-                        profile_image: item?.image_base64,
                     };
                 });
             }
@@ -154,6 +153,7 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
         }
 
 
+
         for (const record of records) {
 
             if (completed === totalData) {
@@ -167,16 +167,16 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                 "nama_aplikasi": jenis,
                 "waktu_kirim": formatDate(new Date()),
                 "id_request": uuidv4(),
-                "kode_kantor_imigrasi": record?.tpi_id.toUpperCase(),
+                "kode_kantor_imigrasi": record?.tpi_id ? record?.tpi_id.toUpperCase() : "SKOW",
                 "id_perlintasan": "",
                 "id_sticker": "",
                 "refferal": "False",
-                "tanggal_perlintasan": formatDate(new Date()),
-                "kode_arah_perlintasan": record?.destination_location?.toUpperCase() === "INDONESIA" ? "D" : "A",
+                "tanggal_perlintasan": formatDeteEpoch(record?.time),
+                "kode_arah_perlintasan": record?.is_depart ? "D" : "A",
                 "status_perlintasan": "A",
                 "id_bagian": "",
-                "id_lokasi": record?.tpi_id.toUpperCase(),
-                "id_tpi": record?.tpi_id.toUpperCase(),
+                "id_lokasi": record?.tpi_id ? record?.tpi_id.toUpperCase() : "SKOW",
+                "id_tpi": record?.tpi_id ? record?.tpi_id.toUpperCase() : "SKOW",
                 "kode_alat_angkut": "",
                 "kode_jenis_dokumen_perjalanan": jenis,
                 "nomor_dokumen_perjalanan": record?.no_passport,
@@ -208,11 +208,11 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                 "id_aturan_rujukan_perlintasan": "",
                 "hasil_verifikasi_eac": "",
                 "wajib_simpan": "0",
-                "id_petugas": record?.petugas_id.toUpperCase(),
+                "id_petugas": record?.petugas_id ? record?.petugas_id.toUpperCase() : "SKOW",
                 "Mrz1": "",
                 "Mrz2": "",
                 "pindai_foto": record?.profile_image,
-                "pindai_paspor": "",
+                "pindai_paspor": record?.photo_passport ? record?.photo_passport : "",
                 "pindai_paspor_ultraviolet": "",
                 "pindai_paspor_infrared": "",
                 "pindai_jari_jempol_kiri": "",
@@ -269,7 +269,7 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                 "overstay_metode_pembayaran": "",
                 "apk_version": `versi ${version}` || "versi 1.0",
                 "ip_address_client": "10.8.10.3",
-                "port_id": record?.tpi_id.toUpperCase(),
+                "port_id": record?.tpi_id ? record?.tpi_id.toUpperCase() : "SKOW",
                 "user_nip": userNip.toUpperCase(),
                 "user_full_name": userFullName.toUpperCase(),
                 "request_date_time": formatDate(new Date()),
@@ -287,6 +287,7 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                         },
                     }
                 )
+                console.log("apiSimpanPerlintasan", apiSimpanPerlintasan.data);
 
                 writeLog(`${action}`, {
                     record,
@@ -294,19 +295,22 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                     params: paramsSimpanPerlintasan,
                     response: apiSimpanPerlintasan.data,
                 }, logFileName);
+                console.log('babianjinggg', typeof apiSimpanPerlintasan.data.response_code);
 
-                if (apiSimpanPerlintasan.data.response_code === "00") {
+                if (apiSimpanPerlintasan.data.response_code == '00') {
+                    console.log("masuksinibabooooooo");
                     try {
                         const apiUpdateDataUser = await axios(
                             {
                                 method: "patch",
-                                url: `http://127.0.0.1:8000/api/update-sync-status`,
+                                url: `http://127.0.0.1:8000/api/update-sync-status-fr`,
                                 data: {
-                                    no_passport: record.no_passport,
+                                    personId: record.no_passport,
                                 },
                             }
                         )
-                        if (apiUpdateDataUser.data.status === 200) {
+                        console.log("apiUpdateDataUser", apiUpdateDataUser.data);
+                        if (apiUpdateDataUser.data.status == 200) {
                             success++;
                             const dataLogParams = {
                                 no_passport: record.no_passport,
@@ -315,7 +319,9 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                                 start_date: startDate,
                                 end_date: endDate,
                             }
-                            console.log(dataLogParams, "dataLogParams");
+
+                            console.log(dataLogParams);
+
                             await InsertLogTODB(dataLogParams);
 
                         } else {
@@ -327,7 +333,6 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                                 start_date: startDate,
                                 end_date: endDate,
                             }
-                            console.log(dataLogParams, "dataLogParams");
                             await InsertLogTODB(dataLogParams);
                         }
                     } catch (error) {
@@ -339,7 +344,7 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                             start_date: startDate,
                             end_date: endDate,
                         }
-                        console.log(dataLogParams, "dataLogParams");
+
                         await InsertLogTODB(dataLogParams);
                     }
                 } else {
@@ -351,7 +356,7 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                         start_date: startDate,
                         end_date: endDate,
                     }
-                    console.log(dataLogParams, "dataLogParams");
+
                     await InsertLogTODB(dataLogParams);
                 }
 
@@ -365,7 +370,7 @@ const handleSimpanPerlintasan = async (data, socket, action) => {
                     start_date: startDate,
                     end_date: endDate,
                 }
-                console.log(dataLogParams, "dataLogParams");
+
                 await InsertLogTODB(dataLogParams);
 
                 writeLog(`${action}-error`, {

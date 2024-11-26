@@ -77,6 +77,10 @@ const handleHistoryLogs = async (socket) => {
 
 io.on("connection", (socket) => {
     socket.emit("message", "Welcome to the RTSP to HLS stream");
+    // socket.on("saveCameraData", (data) => {
+    //     ipCamera = data.ipServerCamera;
+    //     console.log("DataDariInformation", data);
+    // });
 
     socket.on("historyLog", () => {
         console.log("============masukkesinigksi============")

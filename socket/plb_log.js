@@ -20,7 +20,6 @@ const server = http.createServer(function (request, response) {
 
 
 async function handleHistoryLogs() {
-    console.log("MASUK KE FUNCTION HANDLE HISTORY LOGS")
     const timeNow = new Date();
     timeNow.setHours(23, 59, 59, 0);
     const epochTime = Math.floor(timeNow.getTime() / 1000);
@@ -123,11 +122,10 @@ async function processCameraData(log) {
 
 async function sendDataToAPI(data) {
     try {
-        console.log(data, 'sdadadasdasdasadas')
         const response = await axios.post("http://localhost:8000/api/face-reg", data);
         console.log("Data sent successfully:", response.data);
     } catch (error) {
-        console.error("Error sending data to API:", error);
+        console.error("Error sending data to API:", error.message);
     }
 }
 

@@ -20,7 +20,6 @@ const server = http.createServer(function (request, response) {
 
 
 async function handleHistoryLogs() {
-    console.log("MASUK KE FUNCTION HANDLE HISTORY LOGS")
     const timeNow = new Date();
     timeNow.setHours(23, 59, 59, 0);
     const epochTime = Math.floor(timeNow.getTime() / 1000);
@@ -123,11 +122,10 @@ async function processCameraData(log) {
 
 async function sendDataToAPI(data) {
     try {
-        console.log(data, 'sdadadasdasdasadas')
-        const response = await axios.post("http://localhost:8000/api/face-reg", data);
+        const response = await axios.post("http://127.0.0.1/PLB-API/public/api/face-reg", data);
         console.log("Data sent successfully:", response.data);
     } catch (error) {
-        console.error("Error sending data to API:", error);
+        console.error("Error sending data to API:", error.message);
     }
 }
 
@@ -162,7 +160,7 @@ async function fetchImageAsBase64(imageUrl) {
 
 async function getDataKamera() {
     try {
-        const { data } = await axios.get('http://localhost:8000/api/ip-kamera/SKOW');
+        const { data } = await axios.get('http://127.0.0.1/PLB-API/public/api/ip-kamera/SKOW');
         if (data.status === 200) {
             ipCameraData = data.data.map((item) => ({
                 ipCamera: item.ipAddress,

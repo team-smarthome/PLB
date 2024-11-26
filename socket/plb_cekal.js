@@ -191,18 +191,12 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "request_date_time": formatDate(new Date()),
                 "keterangan_perlintasan": ""
             };
-
             try {
                 const apiSimpanPerlintasan = await axios(
                     {
                         method: "post",
                         url: `http://10.18.14.246:1101/perlintasan/simpan`,
                         data: paramsSimpanPerlintasan,
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Basic ZGV2ZWxvcGVyLTAxOkBiVEoxNXNDOVNiNA==",
-                            "Cookie": "__gx=B1AFC189A44A49F38F601B308DC2F5AE",
-                        },
                     }
                 )
 

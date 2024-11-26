@@ -3,6 +3,8 @@ const http = require("http");
 const socketIo = require("socket.io");
 const axios = require("axios");
 const { v4: uuidv4 } = require('uuid');
+const fs = require("fs");
+const path = require("path");
 
 let onProgress = false;
 let completed = 0;
@@ -34,6 +36,84 @@ const io = socketIo(server, {
     },
 });
 
+
+function writeLog(baseFolder, logData, fileName) {
+    const folderName = logData.userNip;
+    const folderPath = path.join(baseFolder, folderName);
+
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        id: logData.record.no_passport,
+        params: logData.params,
+        response: logData.response,
+    };
+
+    const filePath = path.join(folderPath, fileName);
+
+    // Append log entry to the file
+    fs.appendFile(filePath, JSON.stringify(logEntry, null, 2) + ",\n", (err) => {
+        if (err) {
+            console.error("Error writing to log file:", err.message);
+        } else {
+            console.log(`Log appended to: ${filePath}`);
+        }
+    });
+}
+
+// Determine a single file name outside the loop
+const timestamp = new Date().toISOString().replace(/:/g, "-");
+const logFileName = `${timestamp}.log`;
+
+// function writeLog(baseFolder, logData) {
+//     const folderName = logData.userNip;
+//     const timestamp = new Date().toISOString().replace(/:/g, "-");
+//     const fileName = `${timestamp}.log`;
+//     const folderPath = path.join(baseFolder, folderName);
+
+//     if (!fs.existsSync(folderPath)) {
+//         fs.mkdirSync(folderPath, { recursive: true });
+//     }
+
+//     const logEntry = {
+//         timestamp: new Date().toISOString(),
+//         id: logData.record.no_passport,
+//         params: logData.params,
+//         response: logData.response,
+//     };
+
+//     const filePath = path.join(folderPath, fileName);
+
+//     fs.writeFile(filePath, JSON.stringify(logEntry, null, 2) + ",\n", (err) => {
+//         if (err) {
+//             console.error("Error writing to log file:", err.message);
+//         } else {
+//             console.log(`Log written to: ${filePath}`);
+//         }
+//     });
+// }
+
+
+
+// function writeLog(fileName, logData) {
+//     const logEntry = {
+//         timestamp: new Date().toISOString(),
+//         id: logData.id,
+//         params: logData.params,
+//         response: logData.response,
+//     };
+
+//     fs.appendFile(fileName, JSON.stringify(logEntry, null, 2) + ",\n", (err) => {
+//         if (err) {
+//             console.error("Error writing to log file:", err.message);
+//         }
+//     });
+// }
+
+
 const formatDate = (date) => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -46,14 +126,15 @@ const formatDate = (date) => {
 };
 
 const handleSimpanPerlintasan = async (data, socket) => {
+    console.log("Hit handleSimpanPerlintasan");
     onProgress = true;
-    const { ipServer, version, userNip, userFullName, jenis } = data;
+    const { ipServer, version, userNip, userFullName, jenis, totalData } = data;
 
     const startDate = `${data.startDate}:00`;
     const endDate = `${data.endDate}:59`;
 
     try {
-        const response = await axios.get(`http://${ipServer}/PLB-API/public/api/datauser`, {
+        const response = await axios.get(`http://localhost:8000/api/datauser`, {
             params: {
                 startDate,
                 endDate,
@@ -79,6 +160,12 @@ const handleSimpanPerlintasan = async (data, socket) => {
 
 
         for (const record of records) {
+
+            if (completed === totalData) {
+                console.log("All records have been processed.");
+                break;
+            }
+
             const paramsSimpanPerlintasan = {
                 "nama_aplikasi": jenis,
                 "waktu_kirim": formatDate(new Date()),
@@ -124,7 +211,7 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "id_aturan_rujukan_perlintasan": "",
                 "hasil_verifikasi_eac": "",
                 "wajib_simpan": "0",
-                "id_petugas": userNip.toUpperCase(),
+                "id_petugas": record?.petugas_id.toUpperCase(),
                 "Mrz1": "",
                 "Mrz2": "",
                 "pindai_foto": record?.profile_image,
@@ -184,34 +271,47 @@ const handleSimpanPerlintasan = async (data, socket) => {
                 "overstay_status_overstay": "",
                 "overstay_metode_pembayaran": "",
                 "apk_version": `versi ${version}` || "versi 1.0",
-                "ip_address_client": ipServer,
+                "ip_address_client": "10.8.10.3",
                 "port_id": record?.tpi_id.toUpperCase(),
                 "user_nip": userNip.toUpperCase(),
                 "user_full_name": userFullName.toUpperCase(),
                 "request_date_time": formatDate(new Date()),
                 "keterangan_perlintasan": ""
             };
-
             try {
                 const apiSimpanPerlintasan = await axios(
                     {
                         method: "post",
                         url: `http://10.18.14.246:1101/perlintasan/simpan`,
                         data: paramsSimpanPerlintasan,
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Basic ZGV2ZWxvcGVyLTAxOkBiVEoxNXNDOVNiNA==",
-                            "Cookie": "__gx=B1AFC189A44A49F38F601B308DC2F5AE",
-                        },
                     }
                 )
+
+                writeLog("logs", {
+                    record,
+                    userNip,
+                    params: paramsSimpanPerlintasan,
+                    response: apiSimpanPerlintasan.data,
+                }, logFileName);
+
+                // writeLog("logs", {
+                //     record,
+                //     userNip,
+                //     params: paramsSimpanPerlintasan,
+                //     response: apiSimpanPerlintasan.data,
+                // });
+                // writeLog("responses.log", {
+                //     id: record?.no_passport,
+                //     params: paramsSimpanPerlintasan,
+                //     response: apiSimpanPerlintasan.data,
+                // });
 
                 if (apiSimpanPerlintasan.data.response_code === "00") {
                     try {
                         const apiUpdateDataUser = await axios(
                             {
                                 method: "patch",
-                                url: `http://${ipServer}/PLB-API/public/api/update-sync-status`,
+                                url: `http://localhost:8000/api/update-sync-status`,
                                 data: {
                                     no_passport: record.no_passport,
                                 },
@@ -280,8 +380,11 @@ io.on("connection", (socket) => {
     console.log("Client connected");
 
     socket.on("simpan-perlintasan", (data) => {
+        onProgress = true;
+        completed = 0;
+        success = 0;
+        failed = 0;
         console.log("# RECEIVED ACTION Save Crossing FROM FRONTEND #");
-        console.log(data, "data");
         handleSimpanPerlintasan(data, socket);
     });
 
