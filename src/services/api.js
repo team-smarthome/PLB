@@ -131,7 +131,7 @@ export const getDataUserAPI = async (filterParams) => {
   }
 }
 
-export const getAllPetugas = async (params, page) => {
+export const getAllPetugas = async (params) => {
   try {
     const res = await axios({
       method: "get",
@@ -139,11 +139,11 @@ export const getAllPetugas = async (params, page) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      params: { ...params, page }
+      params
     })
     return res;
   } catch (error) {
-    console.log(error)
+    throw error
   }
 }
 
