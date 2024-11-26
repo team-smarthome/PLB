@@ -19,6 +19,7 @@ const SynchronizeFaceReg = () => {
   const [isCounted, setIsCounted] = useState(true)
   const [modalAlertSynchronize, setModalAlertSynchronize] = useState(false)
   const [dataNationality, setDataNationality] = useState([])
+  const [isDepart, setIsDepart] = useState("");
   const [nationality, setNationality] = useState("")
   const [status, setStatus] = useState("not started")
   const [date, setDate] = useState({
@@ -29,6 +30,11 @@ const SynchronizeFaceReg = () => {
     startDate: null,
     endDate: null
   })
+
+  const handleStatusChangeDepart = (event) => {
+    const value = event.target.value;
+    setIsDepart(value);
+  };
 
   const handleIncrement = useCallback(() => {
     if (isProcessing) return
@@ -92,10 +98,30 @@ const SynchronizeFaceReg = () => {
 
 
   const handleCheckDataCount = async () => {
+    if (!date.startDate && !date.endDate) {
+      Toast.fire({
+        icon: "error",
+        title: "Tanggal atau Negara atau status keberangkatan Harus Diisi",
+      });
+      return
+    } else if (nationality === "") {
+      Toast.fire({
+        icon: "error",
+        title: "Harap Pilih Negara",
+      });
+      return
+    } else if (isDepart === "") {
+      Toast.fire({
+        icon: "error",
+        title: "Harap Pilih Status Keberangkatan",
+      });
+      return
+    }
     try {
       const params = {
         ...date,
-        nationality: nationality
+        nationality: nationality,
+        is_depart: isDepart
       }
       const res = await checkCountDataFaceReg(params)
       console.log(res?.data)
@@ -145,7 +171,8 @@ const SynchronizeFaceReg = () => {
       jenis: "PLB",
       nationality: nationality,
       totalData: total,
-      version: version
+      version: version,
+      is_depart: isDepart
     }
 
     setModalAlertSynchronize(false)
@@ -322,6 +349,15 @@ const SynchronizeFaceReg = () => {
                         <option value={negara.nama_negara}>{negara.nama_negara}</option>
                       )
                     })}
+                  </select>
+                  <span className="font-medium">Status Keberangkatan</span>
+                  <select
+                    className="w-full p-4 rounded-sm bg-[#D9D9D9BF]"
+                    onChange={handleStatusChangeDepart}
+                  >
+                    <option value="">Pilih Status</option>
+                    <option value={false}>Arrival</option>
+                    <option value={true}>Departure</option>
                   </select>
                 </div>
                 <div className="flex justify-center items-center w-full">

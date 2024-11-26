@@ -134,7 +134,7 @@ const Sidebar = ({ isOpen }) => {
                                         size={25}
                                         style={{ marginRight: '10px' }}
                                     />
-                                    <span>Status Depart Camera</span>
+                                    <span>Change Camera Name</span>
                                 </Link>
 
                                 <Link to='/cpanel/synchronize' className={`link ${isActive('/cpanel/synchronize') ? 'active' : ''}`}>

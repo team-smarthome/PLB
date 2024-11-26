@@ -726,13 +726,13 @@ const Apply = () => {
         }
       }
     } catch (error) {
-      // console.log("error", error);
-      await sendDataTOKameraServer(sharedData);
-      // setCardStatus("takePhotoSucces");
-      // Toast.fire({
-      //  icon: "error",
-      //  title: "Gagal Melakukan Cek Cekal",
-      // });
+      console.log("error", error);
+      // await sendDataTOKameraServer(sharedData);
+      setCardStatus("takePhotoSucces");
+      Toast.fire({
+        icon: "error",
+        title: "Gagal Melakukan Cek Cekal",
+      });
     }
   };
 

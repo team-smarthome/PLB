@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ImageSample from '../../assets/images/register_sample.jpg'
 import Select from 'react-select'
-import { apiGetAllIp } from '../../services/api'
+import { apiGetAllIp, apiInsertLog } from '../../services/api'
 import Cookies from 'js-cookie'
 import './realtimefacereg.css'
 import { FaImage } from 'react-icons/fa'
@@ -74,14 +74,21 @@ const RealtimeFaceReg = () => {
 
     const functionCheckRealtime = async () => {
         if (socket.connected) {
+            setStatus('loading')
             socket.emit("realtimeFR", { ipCamera });
         } else {
+            Toast.fire({
+                icon: 'error',
+                title: 'Socket not connected'
+            })
             console.log("Socket not connected")
             socket.connect()
         }
     }
 
     const insertDataLog = async () => {
+        setStatus('loading')
+        console.log(resData, "resData")
         const dataRes = [
             {
                 personId: resData?.personId,
@@ -97,11 +104,29 @@ const RealtimeFaceReg = () => {
             }
         ]
         try {
+
             const { data: resInsertLog } = await apiInsertLog(dataRes);
-            if (resInsertLog?.status == 200) {
+            if (resInsertLog?.status == 201) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Data Log berhasil ditambahkan'
+                })
+                setResData(null)
+                setFaceRegData({
+                    similiarity: null,
+                    faceRegImage: null,
+                    profile_image: null,
+                    documentImage: null
+                })
+                setStatus('success')
                 console.log("Data berhasil diinsert")
             }
         } catch (error) {
+            Toast.fire({
+                icon: 'error',
+                title: 'Data Log gagal ditambahkan'
+            })
+            setStatus('success')
             console.error("Error inserting log data:", error);
         }
     }
@@ -129,12 +154,12 @@ const RealtimeFaceReg = () => {
                 setResData(null)
                 setFaceRegData({
                     similiarity: null,
-                    faceRegImage: null,
+                    faceRegImage: data.base64Image,
                     profile_image: null,
                     documentImage: null
                 })
-                
-            }else{
+
+            } else {
                 setStatus('failed')
             }
             setStatus('failed')
@@ -151,27 +176,37 @@ const RealtimeFaceReg = () => {
     }, [])
     const IsFaceRegDataNull = Object.values(faceRegData).every(value => value === null);
 
+    const handleTolak = () => {
+        setResData(null)
+        setFaceRegData({
+            similiarity: null,
+            faceRegImage: null,
+            profile_image: null,
+            documentImage: null
+        })
+    }
+
     return (
         <div
-            className='p-8'
+            className='p-8  '
         >
             <div className="flex justify-between items-center">
                 <h2>Realtime FaceReg</h2>
                 <div className="flex flex-row gap-4">
-                {ipCamera && 
-                <button
-                className='
+                    {ipCamera &&
+                        <button
+                            className='
                 p-4 text-sm font-bold cursor-pointer border-0 text-white rounded bg-transparent bg-blue-500'
-                onClick={() => setModalOpen(true)}
-            >Input Data Manual</button>
-                }
-                {ipCamera && <button
-                    className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
-                    onClick={handleClearCamera}
-                    disabled={status == "loading"}
-                >
-                    Ganti Kamera
-                </button>}
+                            onClick={() => setModalOpen(true)}
+                        >Input Data Manual</button>
+                    }
+                    {ipCamera && <button
+                        className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
+                        onClick={handleClearCamera}
+                        disabled={status == "loading"}
+                    >
+                        Ganti Kamera
+                    </button>}
                 </div>
             </div>
             {
@@ -189,7 +224,7 @@ const RealtimeFaceReg = () => {
                                             height={300}
                                         />
                                     ) : (
-                                        <div className="w-[450px] h-[300px] flex justify-center items-center bg-gray-200">
+                                        <div className="w-[400px] h-[300px] flex justify-center items-center bg-gray-200">
                                             <FaImage size={150} color="#aaa" />
                                         </div>
                                     )
@@ -206,7 +241,7 @@ const RealtimeFaceReg = () => {
                                             height={300}
                                         />
                                     ) : (
-                                        <div className="w-[450px] h-[300px] flex justify-center items-center bg-gray-200">
+                                        <div className="w-[400px] h-[300px] flex justify-center items-center bg-gray-200">
                                             <FaImage size={150} color="#aaa" />
                                         </div>
                                     )
@@ -223,7 +258,7 @@ const RealtimeFaceReg = () => {
                                             height={300}
                                         />
                                     ) : (
-                                        <div className="w-[450px] h-[300px] flex justify-center items-center bg-gray-200">
+                                        <div className="w-[400px] h-[300px] flex justify-center items-center bg-gray-200">
                                             <FaImage size={150} color="#aaa" />
                                         </div>
                                     )
@@ -240,6 +275,7 @@ const RealtimeFaceReg = () => {
                                         <button
                                             className='p-2 text-lg text-white bg-red-800 hover:bg-red-900 min-w-36 rounded-xl border-none cursor-pointer'
                                             disabled={status == "loading"}
+                                            onClick={handleTolak}
                                         >Tolak</button>
                                         <button
                                             className='p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] min-w-36 rounded-xl border-1 border-black cursor-pointer'
@@ -301,7 +337,7 @@ const RealtimeFaceReg = () => {
                         </div>
                     </>
             }
-            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} 
+            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }}
             // doneProgres={GetDataUserLog} 
             />
         </div>

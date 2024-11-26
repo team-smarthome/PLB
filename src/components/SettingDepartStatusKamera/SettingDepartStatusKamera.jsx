@@ -33,15 +33,15 @@ const SettingDepartStatusKamera = () => {
     console.log(sendDataToWsEdit);
     socket_IO_4010.emit("changeName", sendDataToWsEdit);
     socket_IO_4010.once("renameSuccess", (data) => {
-        Toast.fire({
-            icon: "success",
-            title: "Data berhasil diubah",
-          });
-        console.log(data,"ini data");
-        
+      Toast.fire({
+        icon: "success",
+        title: "Data berhasil diubah",
+      });
+      console.log(data, "ini data");
+
     });
     // return;
-    
+
   };
 
   // Options for React Select
@@ -65,7 +65,7 @@ const SettingDepartStatusKamera = () => {
       )}
       <div className="container-dalam">
         <div className="bagian-atas-server">
-          <p className="">Set Status Depart Camera</p>
+          <p className="">Change Camera Name</p>
         </div>
         <div className="bagian-bawah-server flex gap-6">
           {/* <div className="w-full flex items-center ">

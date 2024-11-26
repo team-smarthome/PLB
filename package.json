@@ -30,6 +30,7 @@
     "node-tlv": "^1.5.14",
     "npm": "^10.2.5",
     "ping": "^0.4.4",
+    "puppeteer": "^23.9.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-datepicker": "^7.3.0",
