@@ -7,6 +7,10 @@ import Modals from '../../components/Modal/Modal'
 import Cookies from 'js-cookie';
 import { addPendingRequest4050, initiateSocket4050 } from '../../utils/socket'
 import { useNavigate } from 'react-router-dom'
+import './LoadingSimpan.css'
+import { url_socket } from '../../services/env'
+
+
 
 const SynchronizeFaceReg = () => {
   const socket_IO_4050 = initiateSocket4050();
@@ -18,9 +22,8 @@ const SynchronizeFaceReg = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCounted, setIsCounted] = useState(true)
   const [modalAlertSynchronize, setModalAlertSynchronize] = useState(false)
-  const [dataNationality, setDataNationality] = useState([])
+  const [progress, setProgress] = useState(false)
   const [isDepart, setIsDepart] = useState("");
-  const [nationality, setNationality] = useState("")
   const [status, setStatus] = useState("not started")
   const [date, setDate] = useState({
     startDate: null,
@@ -104,23 +107,10 @@ const SynchronizeFaceReg = () => {
         title: "Tanggal atau Negara atau status keberangkatan Harus Diisi",
       });
       return
-    } else if (nationality === "") {
-      Toast.fire({
-        icon: "error",
-        title: "Harap Pilih Negara",
-      });
-      return
-    } else if (isDepart === "") {
-      Toast.fire({
-        icon: "error",
-        title: "Harap Pilih Status Keberangkatan",
-      });
-      return
     }
     try {
       const params = {
         ...date,
-        nationality: nationality,
         is_depart: isDepart
       }
       const res = await checkCountDataFaceReg(params)
@@ -143,23 +133,11 @@ const SynchronizeFaceReg = () => {
     }
   }
 
-  // const handlePayload = async () => {
-  //   const getUserdata = await Cookies.get('userdata');
-  //   const getIpServer = await localStorage.getItem("serverIPSocket")
-  //   const userData = JSON.parse(getUserdata)
-
-  //   return {
-  //     ...date,
-  //     ipServer: getIpServer,
-  //     userNip: userData?.nip,
-  //     userFullName: userData?.petugas?.nama_petugas,
-  //     jenis: "PLB-USER",
-  //   }
-  // }
 
   const handleIncrementCount = async () => {
+    setProgress(true)
     const getUserdata = await Cookies.get('userdata');
-    const getIpServer = await localStorage.getItem("serverIPSocket")
+    const getIpServer = url_socket
     const userData = JSON.parse(getUserdata)
     const version = await localStorage.getItem("version")
 
@@ -169,7 +147,6 @@ const SynchronizeFaceReg = () => {
       userNip: userData?.nip,
       userFullName: userData?.petugas?.nama_petugas,
       jenis: "PLB",
-      nationality: nationality,
       totalData: total,
       version: version,
       is_depart: isDepart
@@ -179,16 +156,18 @@ const SynchronizeFaceReg = () => {
     if (socket_IO_4050.connected) {
       socket_IO_4050.emit("simpan-perlintasan-face-reg", dataPayload);
     } else {
-      addPendingRequest4050({ action: 'check-progress', data: dataPayload });
-
-      socket_IO_4050.connect();
+      Toast.fire({
+        icon: "error",
+        title: "Koneksi ke server terputus, silahkan coba lagi",
+      });
+      setProgress(false)
+      return
     }
   };
 
 
   useEffect(() => {
     socket_IO_4050.on("hasil-progress", (data) => {
-      // console.log(data, "datadarisync");
       setStatus(data?.status);
       setCount(data?.completed);
       setSuccessCount(data?.success);
@@ -197,9 +176,28 @@ const SynchronizeFaceReg = () => {
       if (data?.status === "done") {
         localStorage.setItem("totalDataFaceReg", 0)
         localStorage.setItem("dateFaceReg", JSON.stringify({ startDate: null, endDate: null }))
+      } else if (data?.status === "in-progress") {
+        setProgress(true)
+      } else if (data?.status === "not-started") {
+        setProgress(false)
       }
     });
-  }, [socket_IO_4050]);
+
+    socket_IO_4050.emit("check-progress");
+
+    socket_IO_4050.on("disconnect", () => {
+      Toast.fire({
+        icon: "error",
+        title: "Koneksi ke server terputus, silahkan coba lagi",
+      });
+      setProgress(false)
+    });
+
+    return () => {
+      socket_IO_4050.off("check-progress");
+    };
+
+  }, []);
 
 
   const percentage = Math.round((count / total) * 100);
@@ -218,19 +216,8 @@ const SynchronizeFaceReg = () => {
 
   }
 
-  const getDataNationality = async () => {
-    try {
-      const { data } = await getAllNegaraData();
-      if (data.status === 200) {
-        console.log(data.data, "dataNegara")
-        setDataNationality(data.data);
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+
   useEffect(() => {
-    getDataNationality()
     handleGetTotalAndDate()
   }, [])
 
@@ -243,17 +230,15 @@ const SynchronizeFaceReg = () => {
     localStorage.removeItem("dateFacereg")
     localStorage.removeItem("totalDataFaceReg")
   }
-  const handleNationality = (e) => {
-    console.log(e.target.value)
-    setNationality(e?.target?.value)
-  }
+
   return (
     <div
-      className='p-8'
+      className='p-8 '
     >
-      <div className="flex justify-between items-center">
-        <h2>Sinkronisasi Data FaceReg</h2>
-
+      <div className="flex items-center justify-center ">
+        <h2 className='text-center'>Sinkronisasi Data</h2>
+      </div>
+      <div className='text-end pb-10'>
         {(date.startDate && date.endDate) && total > 0 && <button
           className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
           onClick={handleClearDate}
@@ -261,6 +246,7 @@ const SynchronizeFaceReg = () => {
           Ganti Tanggal
         </button>}
       </div>
+
       {(date.startDate && date.endDate) && total > 0 ?
         (
           <>
@@ -302,9 +288,26 @@ const SynchronizeFaceReg = () => {
                 >Kembali</button>
                 :
                 <button
-                  onClick={() => setModalAlertSynchronize(true)}
-                  className='w-[75%] p-2 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded'
-                >Mulai Sinkronisasi</button>}
+                  onClick={handleIncrementCount}
+                  className={`w-[75%] p-4 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded-md `}
+                >
+                  {/* {progress ? "Sinkronisasi Sedang Berlangsung" : "Mulai Sinkronisasi"} */}
+                  {progress ? (
+                    <div className='flex items-center justify-center gap-3'>
+                      Sinkronisasi Sedang Berlangsung
+                      <div className='loader-simpan-pelintas'>
+
+                      </div>
+                    </div>
+                    // <span className="">
+
+                    //   <span className="loader-simpan-pelintas"></span>
+                    // </span>
+                  ) : (
+                    "Mulai Sinkronisasi"
+                  )}
+
+                </button>}
             </div>
           </>
         ) :
@@ -318,7 +321,7 @@ const SynchronizeFaceReg = () => {
                       type="datetime-local"
                       id="startDate"
                       name="startDate"
-                      className="p-2 border rounded w-full"
+                      className="px-3 border rounded w-full py-5"
                       value={date.startDate}
                       onChange={handleDateTimeChange}
                     />
@@ -329,37 +332,25 @@ const SynchronizeFaceReg = () => {
                       type="datetime-local"
                       id="endDate"
                       name="endDate"
-                      className="p-2 border rounded w-full"
+                      className="px-2 py-5 border rounded w-full"
                       value={date.endDate}
                       onChange={handleDateTimeChange}
                     />
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                  <span
-                    className='font-medium'
-                  >Nationality</span>
-                  <select
-                    className='w-full p-4 rounded-sm bg-[#D9D9D9BF]'
-                    onChange={handleNationality}
-                  >
-                    <option value="">Pilih Negara</option>
-                    {dataNationality.map((negara) => {
-                      return (
-                        <option value={negara.nama_negara}>{negara.nama_negara}</option>
-                      )
-                    })}
-                  </select>
                   <span className="font-medium">Status Keberangkatan</span>
                   <select
                     className="w-full p-4 rounded-sm bg-[#D9D9D9BF]"
                     onChange={handleStatusChangeDepart}
                   >
-                    <option value="">Pilih Status</option>
+
+                    <option value="">Semua</option>
                     <option value={false}>Arrival</option>
-                    <option value={true}>Departure</option>
+                    <option value={true} >Departure</option>
                   </select>
                 </div>
+
                 <div className="flex justify-center items-center w-full">
                   <button
                     onClick={handleCheckDataCount}
@@ -372,7 +363,8 @@ const SynchronizeFaceReg = () => {
             </div>
 
           </>
-        )}
+        )
+      }
       <Modals
         showModal={modalAlertSynchronize}
         closeModal={() => setModalAlertSynchronize(false)}
@@ -389,7 +381,7 @@ const SynchronizeFaceReg = () => {
 
 
       </Modals>
-    </div>
+    </div >
   )
 }
 

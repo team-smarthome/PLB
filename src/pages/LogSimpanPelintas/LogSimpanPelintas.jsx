@@ -9,9 +9,11 @@ import ImgsViewer from "react-images-viewer";
 import ModalData from '../../components/Modal/ModalData'
 import Excel from "exceljs";
 import { initiateSocket4010 } from '../../utils/socket';
+import { useNavigate } from 'react-router-dom';
 
 const LogSimpanPelintas = () => {
     const socket = initiateSocket4010();
+    const navigate = useNavigate();
     const [logData, setLogData] = useState([])
     const [optionIp, setOptionIp] = useState([])
     const [status, setStatus] = useState("loading")
@@ -26,8 +28,8 @@ const LogSimpanPelintas = () => {
     const [dataNationality, setDataNationality] = useState([])
     const [params, setParams] = useState({
         page: page,
-        nama_petugas: "",    
-        no_passport: "",    
+        nama_petugas: "",
+        no_passport: "",
         startDate: "",
         endDate: "",
     })
@@ -145,7 +147,7 @@ const LogSimpanPelintas = () => {
                 <td>{row?.pelintas?.nationality || "Unkown"}</td>
                 <td>{row?.user?.petugas?.nama_petugas}</td>
                 <td>{row?.is_success ? "Success" : "Failed"}</td>
-                
+
 
             </>
         );
@@ -158,9 +160,9 @@ const LogSimpanPelintas = () => {
         })
     }
 
-    const generateExcel = async() => {
+    const generateExcel = async () => {
         setExportStatus("loading")
-        const res = await getAllSimpanPelintasApi({paginate: false})
+        const res = await getAllSimpanPelintasApi({ paginate: false })
         const responseData = res?.data?.data
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Payment Report");
@@ -178,7 +180,7 @@ const LogSimpanPelintas = () => {
                 item?.pelintas?.nationality || "Unkown",
                 item?.is_success ? "Success" : "Failed",
                 item?.user?.petugas?.nama_petugas,
-                
+
             ];
             worksheet.addRow(row);
         });
@@ -278,76 +280,83 @@ const LogSimpanPelintas = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className=" flex flex-row items-center gap-4">
-          <label htmlFor="plb" className="text-sm font-bold text-gray-700 w-[10%]">
-            No. PLB
-          </label>
-          <input
-            id="plb"
-            placeholder="Enter PLB number"
-            className="h-10 bg-gray-100 border-gray-200"
-            value={params.no_passport}
-            onChange={(e) => setParams({...params, no_passport: e.target.value.toUpperCase()})}
-          />
-        </div>
-        <div className=" flex flex-row items-center gap-4">
-          <label htmlFor="startDate" className="text-sm font-bold text-gray-700 ">
-            Start Date
-          </label>
-          
-            <input
-              id="startDate"
-              type="date"
-            //   placeholder="dd/mm/yyyy --:--"
-              className="h-10 bg-gray-100 border-gray-200 pr-10 w-full"
-              value={params.startDate}
-              onChange={(e) => setParams({ ...params, startDate: e.target.value })}
-            />
-          
-        </div>
-        <div className=" flex flex-row items-center gap-4">
-          <label htmlFor="fullName" className="text-sm font-bold text-gray-700 w-[10%]">
-            Nama Petugas
-          </label>
-          <input
-            id="namaPetugas"
-            placeholder="Enter Name"
-            className="h-10 bg-gray-100 border-gray-200"
-            value={params.nama_petugas}
-            onChange={(e) => setParams({...params, nama_petugas: e.target.value.toUpperCase()})}
-          />
-        </div>
-        <div className=" flex flex-row items-center gap-4">
-          <label htmlFor="endDate" className="text-sm font-bold text-gray-700">
-            End Date
-          </label>
-        
-            <input
-              id="endDate"
-              type="date"
-            //   placeholder="dd/mm/yyyy --:--"
-              className="h-10 bg-gray-100 border-gray-200 pr-10"
-              value={params.endDate}
-              onChange={(e) => setParams({ ...params, endDate: e.target.value })}
-            />
-            
-        </div>
-      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className=" flex flex-row items-center gap-4">
+                    <label htmlFor="plb" className="text-sm font-bold text-gray-700 w-[10%]">
+                        No. PLB
+                    </label>
+                    <input
+                        id="plb"
+                        placeholder="Enter PLB number"
+                        className="h-10 bg-gray-100 border-gray-200"
+                        value={params.no_passport}
+                        onChange={(e) => setParams({ ...params, no_passport: e.target.value.toUpperCase() })}
+                    />
+                </div>
+                <div className=" flex flex-row items-center gap-4">
+                    <label htmlFor="startDate" className="text-sm font-bold text-gray-700 ">
+                        Start Date
+                    </label>
+
+                    <input
+                        id="startDate"
+                        type="date"
+                        //   placeholder="dd/mm/yyyy --:--"
+                        className="h-10 bg-gray-100 border-gray-200 pr-10 w-full"
+                        value={params.startDate}
+                        onChange={(e) => setParams({ ...params, startDate: e.target.value })}
+                    />
+
+                </div>
+                <div className=" flex flex-row items-center gap-4">
+                    <label htmlFor="fullName" className="text-sm font-bold text-gray-700 w-[10%]">
+                        Nama Petugas
+                    </label>
+                    <input
+                        id="namaPetugas"
+                        placeholder="Enter Name"
+                        className="h-10 bg-gray-100 border-gray-200"
+                        value={params.nama_petugas}
+                        onChange={(e) => setParams({ ...params, nama_petugas: e.target.value.toUpperCase() })}
+                    />
+                </div>
+                <div className=" flex flex-row items-center gap-4">
+                    <label htmlFor="endDate" className="text-sm font-bold text-gray-700">
+                        End Date
+                    </label>
+
+                    <input
+                        id="endDate"
+                        type="date"
+                        //   placeholder="dd/mm/yyyy --:--"
+                        className="h-10 bg-gray-100 border-gray-200 pr-10"
+                        value={params.endDate}
+                        onChange={(e) => setParams({ ...params, endDate: e.target.value })}
+                    />
+
+                </div>
+            </div>
             <div className='submit-buttons-registers ' style={{
                 width: "99.4%",
                 paddingTop: "1%",
                 paddingBottom: "1%",
                 marginTop: "1%",
             }}>
-                 <button
+                <button
+                    style={{
+                        width: 150,
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => navigate("/cpanel/synchronize-facereg")}
+                >Sinkronisasi Data</button>
+                <button
                     onClick={generateExcel}
                     className='add-data'
-                    disabled={exportStatus === "loading"} 
+                    disabled={exportStatus === "loading"}
                 >
-                {exportStatus == "loading" ?
-                "Exporting..."
-                : "Export"}
+                    {exportStatus == "loading" ?
+                        "Exporting..."
+                        : "Export"}
                 </button>
                 <button
                     className='search'

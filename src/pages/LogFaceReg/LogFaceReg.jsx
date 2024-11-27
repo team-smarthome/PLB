@@ -573,13 +573,7 @@ const LogFaceReg = () => {
                 paddingBottom: "1%",
                 marginTop: "1%",
             }}>
-                <button
-                    style={{
-                        width: 150,
-                        cursor: 'pointer'
-                    }}
-                    onClick={() => navigate("/cpanel/synchronize-facereg")}
-                >Sinkronisasi Data</button>
+
                 <button
                     style={{
                         width: 150,
