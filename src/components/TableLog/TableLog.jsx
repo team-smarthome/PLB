@@ -36,7 +36,7 @@ const TableLog = ({
                         tBody.map((row, index) => (
                             <tr key={index} onClick={() => handler(row, index)} style={{ cursor: 'pointer' }}>
                                 {showIndex && <td>{(page - 1) * perPage + index + 1}</td>} {/* Adjusted index */}
-                                {rowRenderer ? rowRenderer(row) : (
+                                {rowRenderer ? rowRenderer(row, index) : (
                                     <>
                                         {Object.keys(row).map((key, cellIndex) => (
                                             key === "profile_image" ? (

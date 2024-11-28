@@ -271,10 +271,36 @@ export const apiInsertLog = async (data) => {
   }
 }
 
+export const apiDeleteLog = async (data) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/face-reg`,
+      data
+    })
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
+
 export const simpanPelintas = async (data) => {
   try {
     const res = await axios({
       method: "post",
+      url: `${url_devel}api/simpan-pelintas`,
+      data
+    })
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getSimpanPelintas = async (data) => {
+  try {
+    const res = await axios({
+      method: "get",
       url: `${url_devel}api/simpan-pelintas`,
       data
     })
