@@ -60,11 +60,12 @@ const CardPayment = ({
   const [failedMessage, setFailedMessage] = useState(
     "Network / Card error / declined dll"
   );
-  const [number, setNumber] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
   const [passportName, setPassportName] = useState("");
-  const [passportUrl, setPassportUrl] = useState("");
-  const [receipt, setReceipt] = useState("");
+  const [birthDatePrint, setBirthDatePrint] = useState("")
+  const [nationalityPrint, setNationalityPrint] = useState("")
+
+
   const [optionCreditTypes, setOptionCreditTypes] = useState([]);
   const [printLokasi, setPrintLokasi] = useState("");
   const [resDataScan, setResDataScan] = useAtom(resultDataScan)
@@ -264,11 +265,13 @@ const CardPayment = ({
       !isCreditCard
     ) {
 
-      setNumber(dataPermohonanUser?.passportData?.noRegister ?? "");
-      setReceipt(dataPermohonanUser?.visa_receipt ?? "");
       setPassportNumber(dataPermohonanUser?.passportData?.docNumber ?? "");
       setPassportName(dataPermohonanUser?.passportData?.fullName ?? "");
-      setPassportUrl(dataPermohonanUser?.url ?? "");
+      setBirthDatePrint(dataPermohonanUser?.passportData?.formattedBirthDate ?? "")
+      setNationalityPrint(dataPermohonanUser?.passportData?.nationality ?? "")
+
+
+
       handlePrint();
       console.log("passportNumber: ", passportNumber);
       const timerPrintOut = setTimeout(() => {
@@ -1146,14 +1149,11 @@ const CardPayment = ({
       </div>
 
       <Printer
-        dataNumberPermohonanPropsVisa={number}
-        dataNumberPermohonanPropsReceipt={receipt}
         printRefProps={printRef}
-        dataPrice={formattedValue}
-        dataLokasi={printLokasi}
         passportumber={passportNumber}
         passportName={passportName}
-        passportUrl={passportUrl}
+        birthDate={birthDatePrint}
+        nationality={nationalityPrint}
       />
     </div>
   );

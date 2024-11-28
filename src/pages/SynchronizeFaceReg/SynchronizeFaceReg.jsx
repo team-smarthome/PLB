@@ -1,14 +1,18 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { sampleData } from '../LogRegister/sampleSynchronize'
-import { checkCountData, getAllNegaraData } from '../../services/api'
+import { checkCountDataFaceReg, getAllNegaraData } from '../../services/api'
 import Swal from 'sweetalert2'
 import { Toast } from '../../components/Toast/Toast'
 import Modals from '../../components/Modal/Modal'
 import Cookies from 'js-cookie';
 import { addPendingRequest4050, initiateSocket4050 } from '../../utils/socket'
 import { useNavigate } from 'react-router-dom'
+import './LoadingSimpan.css'
+import { url_socket } from '../../services/env'
 
-const SynchronizeRegister = () => {
+
+
+const SynchronizeFaceReg = () => {
   const socket_IO_4050 = initiateSocket4050();
   const navigate = useNavigate();
   const [count, setCount] = useState(0)
@@ -18,9 +22,9 @@ const SynchronizeRegister = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCounted, setIsCounted] = useState(true)
   const [modalAlertSynchronize, setModalAlertSynchronize] = useState(false)
+  const [progress, setProgress] = useState(false)
+  const [isDepart, setIsDepart] = useState("");
   const [status, setStatus] = useState("not started")
-  const [dataNationality, setDataNationality] = useState([])
-  const [nationality, setNationality] = useState("")
   const [date, setDate] = useState({
     startDate: null,
     endDate: null
@@ -29,6 +33,11 @@ const SynchronizeRegister = () => {
     startDate: null,
     endDate: null
   })
+
+  const handleStatusChangeDepart = (event) => {
+    const value = event.target.value;
+    setIsDepart(value);
+  };
 
   const handleIncrement = useCallback(() => {
     if (isProcessing) return
@@ -92,12 +101,19 @@ const SynchronizeRegister = () => {
 
 
   const handleCheckDataCount = async () => {
+    if (!date.startDate && !date.endDate) {
+      Toast.fire({
+        icon: "error",
+        title: "Tanggal atau Negara atau status keberangkatan Harus Diisi",
+      });
+      return
+    }
     try {
       const params = {
         ...date,
-        nationality: nationality
+        is_depart: isDepart
       }
-      const res = await checkCountData(params)
+      const res = await checkCountDataFaceReg(params)
       console.log(res?.data)
       if (res?.status == 200) {
         if (res?.data?.total_data_belum == 0) {
@@ -108,8 +124,8 @@ const SynchronizeRegister = () => {
           return
         } else {
           setTotal(res?.data?.total_data_belum)
-          localStorage.setItem("date", JSON.stringify(date))
-          localStorage.setItem("totalData", res?.data?.total_data_belum)
+          localStorage.setItem("dateFaceReg", JSON.stringify(date))
+          localStorage.setItem("totalDataFaceReg", res?.data?.total_data_belum)
         }
       }
     } catch (error) {
@@ -117,23 +133,11 @@ const SynchronizeRegister = () => {
     }
   }
 
-  // const handlePayload = async () => {
-  //   const getUserdata = await Cookies.get('userdata');
-  //   const getIpServer = await localStorage.getItem("serverIPSocket")
-  //   const userData = JSON.parse(getUserdata)
-
-  //   return {
-  //     ...date,
-  //     ipServer: getIpServer,
-  //     userNip: userData?.nip,
-  //     userFullName: userData?.petugas?.nama_petugas,
-  //     jenis: "PLB-USER",
-  //   }
-  // }
 
   const handleIncrementCount = async () => {
+    setProgress(true)
     const getUserdata = await Cookies.get('userdata');
-    const getIpServer = await localStorage.getItem("serverIPSocket")
+    const getIpServer = url_socket
     const userData = JSON.parse(getUserdata)
     const version = await localStorage.getItem("version")
 
@@ -144,67 +148,77 @@ const SynchronizeRegister = () => {
       userFullName: userData?.petugas?.nama_petugas,
       jenis: "PLB",
       totalData: total,
-      version: version
+      version: version,
+      is_depart: isDepart
     }
 
     setModalAlertSynchronize(false)
     if (socket_IO_4050.connected) {
-      socket_IO_4050.emit("simpan-perlintasan", dataPayload);
+      socket_IO_4050.emit("simpan-perlintasan-face-reg", dataPayload);
     } else {
-      addPendingRequest4050({ action: 'check-progress', data: dataPayload });
-
-      socket_IO_4050.connect();
+      Toast.fire({
+        icon: "error",
+        title: "Koneksi ke server terputus, silahkan coba lagi",
+      });
+      setProgress(false)
+      return
     }
   };
 
 
   useEffect(() => {
     socket_IO_4050.on("hasil-progress", (data) => {
-      // console.log(data, "datadarisync");
       setStatus(data?.status);
       setCount(data?.completed);
       setSuccessCount(data?.success);
       setFailedCount(data?.failed);
 
       if (data?.status === "done") {
-        localStorage.setItem("totalData", 0)
-        localStorage.setItem("date", JSON.stringify({ startDate: null, endDate: null }))
+        localStorage.setItem("totalDataFaceReg", 0)
+        localStorage.setItem("dateFaceReg", JSON.stringify({ startDate: null, endDate: null }))
+      } else if (data?.status === "in-progress") {
+        setProgress(true)
+      } else if (data?.status === "not-started") {
+        setProgress(false)
       }
     });
-  }, [socket_IO_4050]);
+
+    socket_IO_4050.emit("check-progress");
+
+    socket_IO_4050.on("disconnect", () => {
+      Toast.fire({
+        icon: "error",
+        title: "Koneksi ke server terputus, silahkan coba lagi",
+      });
+      setProgress(false)
+    });
+
+    return () => {
+      socket_IO_4050.off("check-progress");
+    };
+
+  }, []);
 
 
   const percentage = Math.round((count / total) * 100);
 
   const handleGetTotalAndDate = async () => {
 
-    const getDate = await localStorage.getItem("date")
+    const getDate = await localStorage.getItem("dateFaceReg")
     const convertDate = JSON.parse(getDate)
-    const getTotal = await localStorage.getItem("totalData")
+    const getTotal = await localStorage.getItem("totalDataFaceReg")
     if (convertDate) {
       setDate({ ...date, startDate: convertDate.startDate, endDate: convertDate.endDate })
     }
     if (getTotal) {
       setTotal(getTotal)
     }
-    
+
   }
 
-  const getDataNationality = async () => {
-    try {
-        const { data } = await getAllNegaraData();
-        if (data.status === 200) {
-            console.log(data.data, "dataNegara")
-            setDataNationality(data.data);
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
 
   useEffect(() => {
     handleGetTotalAndDate()
-    getDataNationality()
   }, [])
 
   const handleClearDate = () => {
@@ -213,22 +227,18 @@ const SynchronizeRegister = () => {
       endDate: null
     })
     setTotal(0)
-    localStorage.removeItem("date")
-    localStorage.removeItem("totalData")
+    localStorage.removeItem("dateFacereg")
+    localStorage.removeItem("totalDataFaceReg")
   }
 
-  const handleNationality = (e) => {
-    console.log(e.target.value)
-    setNationality(e?.target?.value)
-  }
-  // console.log(date, total, "sini tan")
   return (
     <div
-      className='p-8'
+      className='p-8 '
     >
-      <div className="flex justify-between items-center">
-        <h2>Sinkronisasi Data Register</h2>
-
+      <div className="flex items-center justify-center ">
+        <h2 className='text-center'>Sinkronisasi Data</h2>
+      </div>
+      <div className='text-end pb-10'>
         {(date.startDate && date.endDate) && total > 0 && <button
           className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
           onClick={handleClearDate}
@@ -236,6 +246,7 @@ const SynchronizeRegister = () => {
           Ganti Tanggal
         </button>}
       </div>
+
       {(date.startDate && date.endDate) && total > 0 ?
         (
           <>
@@ -272,14 +283,31 @@ const SynchronizeRegister = () => {
             <div className="flex justify-center items-center w-full">
               {status == "done" ?
                 <button
-                  onClick={() => navigate("/cpanel/log-register")}
+                  onClick={() => navigate("/cpanel/log-facereg")}
                   className='w-[75%] p-2 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded'
                 >Kembali</button>
                 :
                 <button
-                  onClick={() => setModalAlertSynchronize(true)}
-                  className='w-[75%] p-2 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded'
-                >Mulai Sinkronisasi</button>}
+                  onClick={handleIncrementCount}
+                  className={`w-[75%] p-4 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded-md `}
+                >
+                  {/* {progress ? "Sinkronisasi Sedang Berlangsung" : "Mulai Sinkronisasi"} */}
+                  {progress ? (
+                    <div className='flex items-center justify-center gap-3'>
+                      Sinkronisasi Sedang Berlangsung
+                      <div className='loader-simpan-pelintas'>
+
+                      </div>
+                    </div>
+                    // <span className="">
+
+                    //   <span className="loader-simpan-pelintas"></span>
+                    // </span>
+                  ) : (
+                    "Mulai Sinkronisasi"
+                  )}
+
+                </button>}
             </div>
           </>
         ) :
@@ -293,7 +321,7 @@ const SynchronizeRegister = () => {
                       type="datetime-local"
                       id="startDate"
                       name="startDate"
-                      className="p-2 border rounded w-full"
+                      className="px-3 border rounded w-full py-5"
                       value={date.startDate}
                       onChange={handleDateTimeChange}
                     />
@@ -304,28 +332,25 @@ const SynchronizeRegister = () => {
                       type="datetime-local"
                       id="endDate"
                       name="endDate"
-                      className="p-2 border rounded w-full"
+                      className="px-2 py-5 border rounded w-full"
                       value={date.endDate}
                       onChange={handleDateTimeChange}
                     />
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                <span
-                className='font-medium'
-                >Nationality</span>
-                <select 
-                className='w-full p-4 rounded-sm bg-[#D9D9D9BF]'
-                onChange={handleNationality}
-                >
-                        <option value="">Pilih Negara</option>
-                        {dataNationality.map((negara) => {
-                            return (
-                                <option value={negara.nama_negara}>{negara.nama_negara}</option>
-                            )
-                        })}
-                    </select>
+                  <span className="font-medium">Status Keberangkatan</span>
+                  <select
+                    className="w-full p-4 rounded-sm bg-[#D9D9D9BF]"
+                    onChange={handleStatusChangeDepart}
+                  >
+
+                    <option value="">Semua</option>
+                    <option value={false}>Arrival</option>
+                    <option value={true} >Departure</option>
+                  </select>
                 </div>
+
                 <div className="flex justify-center items-center w-full">
                   <button
                     onClick={handleCheckDataCount}
@@ -338,7 +363,8 @@ const SynchronizeRegister = () => {
             </div>
 
           </>
-        )}
+        )
+      }
       <Modals
         showModal={modalAlertSynchronize}
         closeModal={() => setModalAlertSynchronize(false)}
@@ -355,8 +381,8 @@ const SynchronizeRegister = () => {
 
 
       </Modals>
-    </div>
+    </div >
   )
 }
 
-export default SynchronizeRegister
+export default SynchronizeFaceReg

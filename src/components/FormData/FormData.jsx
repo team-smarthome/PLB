@@ -117,6 +117,10 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
   }, [sharedData]);
 
 
+  useEffect(() => {
+    console.log(sharedData, 'formdata');
+  }, [sharedData]);
+
 
 
   const handleDateTimeChange = (e) => {
@@ -241,7 +245,7 @@ const FormData = ({ sharedData, setSharedData, cardStatus, country }) => {
         <div className="form-group">
           <div className="wrapper-form">
             <div className="wrapper-input">
-              <label htmlFor="passport_number">Nomor PLB / BCP</label>
+              <label htmlFor="passport_number">Nomor PLB / TBC</label>
             </div>
             <input
               type="text"

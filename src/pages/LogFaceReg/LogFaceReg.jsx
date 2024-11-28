@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import './logfacereg.style.css'
-import { apiGetAllIp, getDataLogApi } from '../../services/api'
+import { apiGetAllIp, getAllNegaraData, getDataLogApi } from '../../services/api'
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
@@ -9,19 +9,23 @@ import ImgsViewer from "react-images-viewer";
 import ModalData from '../../components/Modal/ModalData'
 import Excel from "exceljs";
 import { initiateSocket4010 } from '../../utils/socket';
+import { useNavigate } from 'react-router-dom';
 
 const LogFaceReg = () => {
+    const navigate = useNavigate()
     const socket = initiateSocket4010();
     const [logData, setLogData] = useState([])
     const [optionIp, setOptionIp] = useState([])
-    const [status, setStatus] = useState("loading")
+    const [status, setStatus] = useState("idle")
     const [getPagination, setGetPagination] = useState(false)
     const [selectedCondition, setSelectedCondition] = useState('personId');
+    const [exportStatus, setExportStatus] = useState("idle")
     const [totalDataFilter, setTotalDataFilter] = useState(0);
     const [page, setPage] = useState(1);
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
     const [modalOpen, setModalOpen] = useState(false)
+    const [dataNationality, setDataNationality] = useState([])
     const [params, setParams] = useState({
         page: page,
         name: "",
@@ -29,7 +33,9 @@ const LogFaceReg = () => {
         startDate: "",
         endDate: "",
         passStatus: "",
-        ipCamera: ""
+        ipCamera: "",
+        gender: "",
+        nationality: "",
     })
     const [pagination, setPagination] = useState({
         total: 0,
@@ -64,11 +70,27 @@ const LogFaceReg = () => {
         },
     ]
 
+
+    const dataGender = [
+        { value: "", label: "All Gender" },
+        { value: "M", label: "MALE" },
+        { value: "F", label: "FEMALE" },
+    ];
+
+
+    const paramsRef = useRef(params);
+
+    useEffect(() => {
+        paramsRef.current = params;
+    }, [params]);
     //============================================ YANG DIGUNAKAN =============================================================//
 
     const GetDataUserLog = async () => {
+        const currentParams = paramsRef.current;
+        console.log(currentParams, "paramsDariLog");
+
         try {
-            const { data } = await getDataLogApi(params);
+            const { data } = await getDataLogApi(currentParams);
             if (data.status === 200) {
                 setLogData(data?.data)
                 setTotalDataFilter(data?.data?.length);
@@ -91,7 +113,7 @@ const LogFaceReg = () => {
             ipCamera: dataIpKamera
         }
         try {
-            console.log(dataLog, "dataLog")
+            console.log(params, "paramsDariLog")
             const { data } = await getDataLogApi(dataLog);
             if (data.status === 200) {
                 setLogData(data?.data)
@@ -121,6 +143,18 @@ const LogFaceReg = () => {
 
         } catch (error) {
             console.log(error?.message)
+        }
+    }
+
+    const getDataNationality = async () => {
+        try {
+            const { data } = await getAllNegaraData();
+            if (data.status === 200) {
+                console.log(data.data, "dataNegara")
+                setDataNationality(data.data);
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -155,6 +189,8 @@ const LogFaceReg = () => {
                 <td>{row?.personId}</td>
                 <td>{row?.name}</td>
                 <td>{row?.similarity}</td>
+                <td>{row?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
+                <td>{row?.nationality || "Unkown"}</td>
                 <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
                 <td>{handleEpochToDate(row?.time)}</td>
                 <td className={`${row?.is_depart ? 'text-green-400' : 'text-red-400'}`}>{row?.is_depart ? "Departure" : "Arrival"}</td>
@@ -176,23 +212,34 @@ const LogFaceReg = () => {
     const handleChange = (e) => {
         setParams({
             ...params,
-            [selectedCondition]: e.target.value.toUpperCase()
+            [selectedCondition]: e.target.value.toUpperCase(),
+            page: 1
         })
+        handlePageChange(1)
     }
 
-    const generateExcel = () => {
+    const generateExcel = async () => {
+        setExportStatus("loading")
+        const res = await getDataLogApi({
+            startDate: params.startDate,
+            endDate: params.endDate,
+            "not-paginate": true,
+        });
+        const responseData = res?.data?.data
         const workbook = new Excel.Workbook();
         const worksheet = workbook.addWorksheet("Payment Report");
 
-        const headers = ['No', 'no plb', 'name', 'similarity', 'recogniton status', "Recognition Time"]
+        const headers = ['No', 'no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time"]
         worksheet.addRow(headers);
 
-        logData.forEach((item, index) => {
+        responseData.forEach((item, index) => {
             const row = [
                 index + 1,
                 item.personId,
-                item.name,
+                item.name ?? "unkown",
                 item?.similarity,
+                item?.gender ?? "unkown",
+                item?.nationality ?? "unkown",
                 item?.passStatus === 6 ? "Failed" : "Success",
                 handleEpochToDate(item?.time),
             ];
@@ -209,11 +256,16 @@ const LogFaceReg = () => {
                 const time = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
                 return `${baseFilename.replace('.xlsx', '')}_${date}_${time}.xlsx`;
             };
-            const baseFilename = "Log_FaceReg.xlsx";
+
+            const date = new Date();
+            const formattedDate = date.toISOString().slice(0, 19).replace(/[-T:]/g, ""); // e.g., 20241119_123456
+            const baseFilename = `Log_FaceReg_${formattedDate}.xlsx`;
             const filename = getFilenameWithDateTime(baseFilename);
             if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                setExportStatus("success")
                 window.navigator.msSaveOrOpenBlob(blob, filename);
             } else {
+                setExportStatus("success")
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
@@ -226,7 +278,12 @@ const LogFaceReg = () => {
         });
     };
 
-    const resultArray = logData.map(item => ({ src: `data:image/jpeg;base64,${item.image_base64}` }));
+    const resultArray = (logData || []).map(item => ({
+        src: item.image_base64
+            ? `data:image/jpeg;base64,${item.image_base64}`
+            : 'https://via.placeholder.com/150'
+    }));
+
 
     const handleOpenImage = (row, index) => {
         setIsOpenImage(true)
@@ -242,15 +299,17 @@ const LogFaceReg = () => {
     const handleChangeStatus = (selectedOption) => {
         setParams(prevState => ({
             ...prevState,
+            page: 1,
             passStatus: selectedOption ? selectedOption.value : ""
         }));
+        handlePageChange(1)
     };
 
 
     useEffect(() => {
         localStorage.setItem('cameraIp', '')
         const fetchData = async () => {
-            await Promise.all([GetDataUserLog(), GetDataKamera()])
+            await Promise.all([GetDataUserLog(), GetDataKamera(), getDataNationality()])
             setStatus("success")
         }
         fetchData();
@@ -258,7 +317,8 @@ const LogFaceReg = () => {
 
 
         socket.on('logDataUpdate', () => {
-            GetDataUserLogFilter()
+            console.log('123params1234', params)
+            GetDataUserLog()
         });
 
         return () => {
@@ -292,10 +352,11 @@ const LogFaceReg = () => {
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
             <div className="face-reg-header">
                 <div className='face-reg-filter-name'>
-                    <div className='label-filter-name'>
+                    <div className=' label-filter-name'>
                         <p>Filter By</p>
                         <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
                         <p>Recognition Status</p>
+                        <p>Gender</p>
                     </div>
                     <div className='value-filter-name'>
                         <Select
@@ -368,6 +429,38 @@ const LogFaceReg = () => {
                                 }),
                             }}
                         />
+                        <Select
+                            onChange={(selectedOption) => {
+                                setParams({ ...params, page: 1, gender: selectedOption.value })
+                                handlePageChange(1)
+                            }}
+                            options={dataGender}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            defaultValue={dataGender[0]}
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
                     </div>
                 </div>
                 <div className='face-reg-filter-kamera'>
@@ -375,18 +468,25 @@ const LogFaceReg = () => {
                         <p>Start Date</p>
                         <p>End Date</p>
                         <p>Select Camera</p>
+                        <p>Nationality</p>
                     </div>
                     <div className='value-filter-name'>
                         <input type="datetime-local"
                             value={params.startDate}
-                            onChange={(e) => setParams({ ...params, startDate: e.target.value })}
+                            onChange={(e) => {
+                                setParams({ ...params, startDate: e.target.value, page: 1 })
+                                handlePageChange(1)
+                            }}
                             style={{
                                 width: "88%",
                             }}
                         />
                         <input type="datetime-local"
                             value={params.endDate}
-                            onChange={(e) => setParams({ ...params, endDate: e.target.value })}
+                            onChange={(e) => {
+                                setParams({ ...params, endDate: e.target.value, page: 1 })
+                                handlePageChange(1)
+                            }}
                             style={{
                                 width: "88%",
                             }}
@@ -395,12 +495,50 @@ const LogFaceReg = () => {
                             onChange={(selectedOption) => {
                                 localStorage.setItem('cameraIp', selectedOption.value)
                                 setParams({ ...params, page: 1, ipCamera: selectedOption.value })
+                                handlePageChange(1)
                             }}
                             options={[
                                 { value: '', label: 'All Camera' },
                                 ...optionIp.map(item => ({ value: item.ipAddress, label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Departure" : "Arrival"} )` }))
                             ]}
                             defaultValue={{ value: '', label: 'All Camera' }}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            styles={{
+                                container: (provided) => ({
+                                    ...provided,
+                                    position: 'relative',
+                                    flex: 1,
+                                    width: "91.7%",
+                                    borderRadius: "10px",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                    fontFamily: "Roboto, Arial, sans-serif",
+                                }),
+                                valueContainer: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                }),
+                                control: (provided) => ({
+                                    ...provided,
+                                    flex: 1,
+                                    width: "100%",
+                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
+                                }),
+                            }}
+                        />
+                        <Select
+                            onChange={(selectedOption) => {
+                                setParams({ ...params, nationality: selectedOption.value, page: 1 })
+                                handlePageChange(1)
+                            }}
+                            options={[
+                                { value: "", label: "All Nationality" },
+                                ...dataNationality.map(country => ({
+                                    value: country.nama_negara,
+                                    label: country.nama_negara
+                                }))
+                            ]}
                             className="basic-single"
                             classNamePrefix="select"
                             styles={{
@@ -435,17 +573,22 @@ const LogFaceReg = () => {
                 paddingBottom: "1%",
                 marginTop: "1%",
             }}>
+
                 <button
                     style={{
                         width: 150,
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        backgroundColor: "blue"
                     }}
                     onClick={() => setModalOpen(true)}
                 >Input Data Manual</button>
                 <button
                     onClick={generateExcel}
                     className='add-data'
-                >Export
+                    disabled={exportStatus === "loading"}
+                > {exportStatus == "loading" ?
+                    "Exporting..."
+                    : "Export"}
                 </button>
                 <button
                     className='search'
@@ -465,7 +608,7 @@ const LogFaceReg = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['no plb', 'name', 'similarity', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
+                        tHeader={['no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera"]}
                         tBody={logData}
                         handler={handleOpenImage}
                         rowRenderer={customRowRenderer}

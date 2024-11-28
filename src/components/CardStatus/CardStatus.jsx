@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./CardStatusStyle.css";
 import Gambar1 from "../../assets/images/image-1.png";
 import Gambar2 from "../../assets/images/image-2.svg";
@@ -16,17 +16,18 @@ import { apiVoaPayment } from "../../services/api";
 import VideoPlayer from "../VideoPlayer";
 import { useAtom } from "jotai";
 import { imageToSend, resultDataScan, caputedImageAfter, ImageDocumentPLB, DataHasilCekal } from "../../utils/atomStates";
-import { initiateSocket, addPendingRequest, initiateSocket4040 } from "../../utils/socket";
+import { initiateSocket, addPendingRequest } from "../../utils/socket";
 import { FaRegIdCard } from "react-icons/fa";
 import ImgsViewer from "react-images-viewer";
 import Modals from "../Modal/Modal";
 import ModalCekal from "../Modal/ModalCekal";
-// const parse = require("mrz").parse;
-
+import imageCompression from "browser-image-compression";
 const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataScanProps }) => {
 	const [image, setImage] = useAtom(imageToSend);
 	const [dataCekalAtom] = useAtom(DataHasilCekal);
 	const [skorKemiripan, setSkorKemiripan] = useState(0);
+	const [documentResult, setDocumentResult] = useState([])
+	const canvasRef = useRef(null);
 	const [documentPLBImage, setDocumentPLBImage] = useAtom(ImageDocumentPLB)
 	const [capturedImageAfter2, setCapturedImageAfter2] = useAtom(caputedImageAfter);
 	const { data } = useContext(DataContext);
@@ -75,8 +76,6 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	}
 	const socket_IO_4000 = initiateSocket();
 
-	const socket_IO_4040 = initiateSocket4040();
-
 	useEffect(() => {
 		socket_IO_4000.once("photo_taken", (imageBase64) => {
 			setCapturedImageAfter2(imageBase64);
@@ -93,11 +92,11 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 		socket_IO_4000.on("error_photo", (error) => {
 			console.log('error_photo', error)
 			const statusCardBoxMap = {
+				cannot_take_photo: 'errorPhoto',
 				closed_eyes: "closedEyes",
 				glasses: "usingGlasses",
 				hat: "usingHat",
 				mask: "usingMask",
-				cannot_take_photo: 'errorPhoto',
 				glassesMask: 'usingMaskGlasses',
 				occlusion: 'occlusionImage'
 			};
@@ -121,28 +120,14 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			}, 2000);
 		});
 
-		return () => {
-			socket_IO_4000.off("photo_taken");
-			socket_IO_4000.off("error_photo");
-		}
-
-	}, [socket_IO_4000, capturedImage]);
-
-	useEffect(() => {
-		console.log(capturedImageAfter2, "asdasdasdsadsadsa")
-		console.log(capturedImage, "adasdasdsadadsadassad")
-	}, [CardStatus])
-
-
-	useEffect(() => {
-		setSkorKemiripan(dataCekalAtom?.skor_kemiripan || 0)
-	}, [dataCekalAtom]);
-
-
-	useEffect(() => {
-		socket_IO_4040.on("document-data", (data) => {
+		socket_IO_4000.on("document-data", (data) => {
 			if (data.image) {
-				setDocumentPLBImage(data?.image)
+				setDocumentResult(prevResult => {
+					const updatedArray = [...prevResult, `data:image/jpeg;base64, ${data.image}`];
+					console.log('After Update:', updatedArray);
+					return updatedArray;
+				});
+				// setDocumentPLBImage(data?.image)
 				sendDataToInput({
 					statusCardBox: 'getDocumentSucces',
 					capturedImage: null,
@@ -158,30 +143,55 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 					titleHeader: "Registrasi Pas Lintas Batas",
 					titleFooter: "Lanjut",
 				});
-				setTimeout(() => {
-					sendDataToInput({
-						statusCardBox: 'iddle',
-						capturedImage: null,
-						emailUser: null,
-						titleHeader: "Registrasi Pas Lintas Batas",
-						titleFooter: "Lanjut",
-					});
-				}, 3000)
+				if (documentPLBImage) {
+					setTimeout(() => {
+						sendDataToInput({
+							statusCardBox: 'iddle',
+							capturedImage: null,
+							emailUser: null,
+							titleHeader: "Registrasi Pas Lintas Batas",
+							titleFooter: "Lanjut",
+						});
+					}, 3000)
+				} else {
+					setTimeout(() => {
+						sendDataToInput({
+							statusCardBox: 'getDocumentSucces',
+							capturedImage: null,
+							emailUser: null,
+							titleHeader: "Registrasi Pas Lintas Batas",
+							titleFooter: "Lanjut",
+						});
+					}, 3000)
+				}
 			} else {
 				console.error("test12345", data);
 			}
-			// console.log('document-data', imageBase64)
-
-			// setResDataScan(imageBase64);
-			// sendDataToInput({
-			// 	statusCardBox: "success",
-			// 	capturedImage: null,
-			// 	emailUser: null,
-			// 	titleHeader: "Registrasi Pas Lintas Batas",
-			// titleFooter: "Lanjut",
-			// });
 		});
-	}, [socket_IO_4040]);
+
+		return () => {
+			socket_IO_4000.off("photo_taken");
+			socket_IO_4000.off("error_photo");
+		}
+
+	}, [socket_IO_4000, capturedImage]);
+
+	useEffect(() => {
+		console.log(documentResult, "documentResult")
+
+	}, [documentResult])
+
+	useEffect(() => {
+		console.log(capturedImageAfter2, "asdasdasdsadsadsa")
+		console.log(capturedImage, "adasdasdsadadsadassad")
+	}, [CardStatus])
+
+
+	useEffect(() => {
+		setSkorKemiripan(dataCekalAtom?.skor_kemiripan || 0)
+	}, [dataCekalAtom]);
+
+
 
 
 	const handleTakePhoto = async () => {
@@ -207,26 +217,15 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 
 			socket_IO_4000.connect();
-			// socket_IO_4000.once('connect', () => {
-			// 	console.log('testWebsocket clSocket reconnected. Resending take_photo...');
-			// 	socket_IO_4000.emit("take_photo");
-			// 	sendDataToInput({
-			// 		statusCardBox: "waiting2",
-			// 		capturedImage: null,
-			// 		emailUser: null,
-			// 		titleHeader: "Apply PLB",
-			// 	titleFooter: "Lanjut",
-			// 	});
-			// });
 		}
 	};
 
 
 	const handleGetDocumnet = async () => {
 		console.log('testWebsocket Socket connected. Sending get_document...');
-		if (socket_IO_4040.connected) {
+		if (socket_IO_4000.connected) {
 			console.log('testWebsocket Socket connected. Sending get_document...');
-			socket_IO_4040.emit("get-document");
+			socket_IO_4000.emit("get-document");
 			sendDataToInput({
 				statusCardBox: "waiting3",
 				capturedImage: capturedImage,
@@ -244,7 +243,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			});
 			addPendingRequest({ action: 'get-documnent' });
 
-			socket_IO_4040.connect();
+			socket_IO_4000.connect();
 		}
 	};
 
@@ -287,6 +286,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 
 	const doRetakeDocument = () => {
 		// socket_IO_4000.emit("start_stream");
+		setDocumentResult([])
 		setDocumentPLBImage(null);
 		sendDataToInput({
 			statusCardBox: "iddle",
@@ -295,6 +295,18 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			titleHeader: "Registrasi Pas Lintas Batas",
 			titleFooter: "Lanjut",
 		});
+	};
+
+	const doAddDocument = () => {
+		// socket_IO_4000.emit("start_stream");
+		// setDocumentPLBImage(null);
+		// sendDataToInput({
+		// 	statusCardBox: "iddle",
+		// 	capturedImage: null,
+		// 	emailUser: email,
+		// 	titleHeader: "Registrasi Pas Lintas Batas",
+		// 	titleFooter: "Lanjut",
+		// });
 	};
 
 	const handleEmailChange = (event) => {
@@ -525,6 +537,87 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			console.log(error.message);
 		}
 	};
+
+
+	const combineImages = async () => {
+	  try {
+		if (!documentResult || documentResult.length === 0) {
+		  console.error("No documentResults provided.");
+		  return;
+		}
+	
+		// Create Image objects for each Base64 string or URL
+		const imageObjects = documentResult.map((src) => {
+		  const img = new Image();
+		  img.src = src;
+		  return img;
+		});
+	
+		// Wait for all images to load
+		const imageLoadPromises = imageObjects.map(
+		  (img) =>
+			new Promise((resolve, reject) => {
+			  img.onload = resolve;
+			  img.onerror = reject;
+			})
+		);
+	
+		await Promise.all(imageLoadPromises);
+	
+		// Combine images on the canvas
+		const canvas = canvasRef.current;
+		const ctx = canvas.getContext("2d");
+	
+		// Calculate total canvas width and height
+		const totalWidth = imageObjects.reduce((sum, img) => sum + img.width, 0);
+		const maxHeight = Math.max(...imageObjects.map((img) => img.height));
+	
+		canvas.width = totalWidth;
+		canvas.height = maxHeight;
+	
+		// Draw each image sequentially
+		let xOffset = 0;
+		imageObjects.forEach((img) => {
+		  ctx.drawImage(img, xOffset, 0);
+		  xOffset += img.width; // Move to the right for the next image
+		});
+	
+		// Export the combined image as a data URL
+		const dataURL = canvas.toDataURL("image/jpeg");
+	
+		// Convert dataURL to Blob for compression
+		const blob = await (await fetch(dataURL)).blob();
+	
+		// Compress the Blob
+		const compressedBlob = await imageCompression(blob, {
+		  maxSizeMB: 1, // Adjust maximum file size (in MB)
+		  maxWidthOrHeight: 1920, // Optional: Set a max width/height
+		  useWebWorker: true, // Enable compression in a web worker
+		});
+	
+		// Convert the compressed Blob back to a data URL
+		const compressedDataURL = await imageCompression.getDataUrlFromFile(compressedBlob);
+	
+		// // Calculate percentage decrease in file size
+		// const originalSize = blob.size / 1024; // Convert to KB
+		// const compressedSize = compressedBlob.size / 1024; // Convert to KB
+		// const percentageDecrease = ((originalSize - compressedSize) / originalSize) * 100;
+	
+		// console.log(`Original size: ${originalSize.toFixed(2)} KB`);
+		// console.log(`Compressed size: ${compressedSize.toFixed(2)} KB`);
+		// console.log(`Percentage decrease: ${percentageDecrease.toFixed(2)}%`);
+	
+		// Set the compressed image
+		setDocumentPLBImage(compressedDataURL);
+	  } catch (error) {
+		console.error("Error combining or compressing images:", error);
+	  }
+	};
+	
+
+	useEffect(() => {
+		combineImages()
+	}, [documentResult])
 
 	const renderCardContent = () => {
 		switch (statusCardBox) {
@@ -875,24 +968,36 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 								</h1>
 
 								<div className="box-image cursor-pointer"
-									onClick={() => handlePreviewImage(`data:image/jpeg;base64,${documentPLBImage}`)}
+									onClick={() => handlePreviewImage(`${documentPLBImage}`)}
 								>
 									<img
 										style={{
+											minWidth: "500px",
 											width: "100vh",
 											height: "30vh",
 										}}
-										src={`data:image/jpeg;base64,${documentPLBImage ? documentPLBImage : ""}`}
+										src={`${documentPLBImage ? documentPLBImage : ""}`}
 										alt="Captured Image"
 										className="potrait-image"
 									/>
 								</div>
-								<button
-									onClick={doRetakeDocument}
-									className="retake-button"
-								>
-									Ulangi
-								</button>
+								<div className="flex items-center justify-center gap-4">
+									<button
+										onClick={doRetakeDocument}
+										className="retake-button"
+									>
+										Ulangi
+									</button>
+									{documentResult.length < 2 && (
+										<button
+											onClick={handleGetDocumnet}
+											className="retake-button"
+											style={{ backgroundColor: "blue" }}
+										>
+											Tambah Lagi
+										</button>
+									)}
+								</div>
 							</div>
 						)}
 					</>
@@ -1076,7 +1181,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 			case "error_folder":
 				return ["Folder Tidak Ditemukan", "Harap Periksa Pengaturan"];
 			case "closedEyes":
-				return ["Mata Tertutup", "Silahkan Buka Mata"];
+				return ["Gagal Ambil Foto", "Silahkan Coba Lagi"];
 			case "usingMask":
 				return ["Silahkan Lepas Masker", "Sebelum Foto"];
 			case "usingGlasses":
@@ -1131,6 +1236,7 @@ const CardStatus = ({ statusCardBox, sendDataToInput, sendDataToParent2, dataSca
 	return (
 		<div className="card-status">
 			<div className="card-container">
+				<canvas ref={canvasRef} style={{ display: "none" }} />
 				<div className="inner-card">{renderCardContent()}</div>
 			</div>
 			<ImgsViewer

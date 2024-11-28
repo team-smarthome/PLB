@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import "./sidebarstyle.css"; // import the CSS file
 import logo from '../../assets/images/Kemenkumham_Imigrasi.png';
 import { FaSync, FaChevronDown, FaUsers, FaRegAddressCard, FaUserCircle, FaNetworkWired, FaDatabase, FaServer, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCameraRotate } from "react-icons/fa6";
 import { FcSynchronize } from "react-icons/fc";
 import { TbLogs } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoSettingsSharp, IoSpeedometer } from "react-icons/io5";
 import Cookies from 'js-cookie';
 import { FaUserTie } from "react-icons/fa6";
+import { TbUserScan } from "react-icons/tb";
 
 const Sidebar = ({ isOpen }) => {
 
@@ -65,6 +67,12 @@ const Sidebar = ({ isOpen }) => {
                     </Link>
                 </li>
                 <li>
+                    <Link to='/cpanel/realtime-facereg' className={`link ${isActive('/cpanel/realtime-facereg') ? 'active' : ''}`}>
+                        <TbUserScan size={30} style={{ marginRight: '10px' }} />
+                        <span className="link_name">Realtime FaceReg</span>
+                    </Link>
+                </li>
+                <li>
                     <div className="icon-link" onClick={() => handleMenuToggle("category")}>
                         <a>
                             <TbLogs size={30} color="#fff" style={{ marginRight: '10px' }} />
@@ -82,6 +90,10 @@ const Sidebar = ({ isOpen }) => {
                         <Link to='/cpanel/log-facereg' className={`link ${isActive('/cpanel/log-facereg') ? 'active' : ''}`}>
                             <FaUserCircle size={25} style={{ marginRight: '10px' }} />
                             Log Facereg
+                        </Link>
+                        <Link to='/cpanel/log-simpan-pelintas' className={`link ${isActive('/cpanel/log-simpan-pelintas') ? 'active' : ''}`}>
+                            <FaDatabase size={25} style={{ marginRight: '10px' }} />
+                            Log Simpan Pelintas
                         </Link>
                     </ul>
                 )}
@@ -115,6 +127,14 @@ const Sidebar = ({ isOpen }) => {
                                         style={{ marginRight: '10px' }}
                                     />
                                     <span>Camera</span>
+                                </Link>
+
+                                <Link to='/cpanel/setting-status-depart' className={`link ${isActive('/cpanel/setting-status-depart') ? 'active' : ''}`}>
+                                    <FaCameraRotate
+                                        size={25}
+                                        style={{ marginRight: '10px' }}
+                                    />
+                                    <span>Change Camera Name</span>
                                 </Link>
 
                                 <Link to='/cpanel/synchronize' className={`link ${isActive('/cpanel/synchronize') ? 'active' : ''}`}>

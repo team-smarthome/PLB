@@ -138,7 +138,8 @@
 .register-container select {
   appearance: none;
   /* Remove default styling for a modern look */
-  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KPHBhdGggZD0iTTEuNzY4IDExLjc4NCAxLjE5OSAxMC41MTYgMTcuNjA1IiBzdHJva2U9IiM2QzA4MDkiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjY2xhc3M9InJvdW5kIiBzdHJva2UtZGFzaGFycm93PSIxMjAwIi8+Cjwvc3ZnPgo=") no-repeat right center;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij4KPHBhdGggZD0iTTEuNzY4IDExLjc4NCAxLjE5OSAxMC41MTYgMTcuNjA1IiBzdHJva2U9IiM2QzA4MDkiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjY2xhc3M9InJvdW5kIiBzdHJva2UtZGFzaGFycm93PSIxMjAwIi8+Cjwvc3ZnPgo=")
+    no-repeat right center;
   background-size: 16px;
   /* padding-right: 40px; */
   /* Space for the custom arrow */

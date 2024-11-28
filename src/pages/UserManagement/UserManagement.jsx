@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import Modals from '../../components/Modal/Modal'
 import './usermanagement.style.css'
@@ -6,9 +6,11 @@ import { DeletePetugas, getAllJabatanData, getAllPetugas, getAllTpiData, InsertP
 import { FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Toast } from '../../components/Toast/Toast'
 import Cookies from 'js-cookie';
+import Pagination from '../../components/Pagination/Pagination'
+
 
 const UserManagement = () => {
-    const userCookie = Cookies.get('userdata')
+    const userCookie = Cookies.get('userdata');
     const userInfo = userCookie ? JSON.parse(userCookie) : { role: null };
 
     const [isShowModalAdd, setIsShowModalAdd] = useState(false)
@@ -22,31 +24,27 @@ const UserManagement = () => {
     const [dataJabatan, setDataJabatan] = useState([])
     const [search, setSearch] = useState({
         nip: "",
-        role: "",
-        nama_petugas: "",
     })
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    const dummyUser = [
-        {
-            nama: "bagas",
-            nip: "34234242",
-            gender: "M",
-            tanggalLahir: "2024-09-01",
-            jabatan: "kanim",
-            role: "admin"
-        }
-    ]
-    const getAllPetugasData = async (page = 1) => {
+    const [pagination, setPagination] = useState({
+        total: 0,
+        per_page: 10,
+        current_page: 1,
+        last_page: 1,
+    });
+    const [totalDataFilter, setTotalDataFilter] = useState(0);
+    const [page, setPage] = useState(1);
+    const pageRef = useRef(page);
+    const getAllPetugasData = async () => {
         try {
             setIsLoading(true)
-            const response = await getAllPetugas({ nama_petugas: search.nama_petugas }, page)
-            if (response.status === 200) {
-                console.log(response.data.data)
-                setDataPetugas(response?.data?.data)
-                setTotalPages(response.data.pagination.last_page);
-                setCurrentPage(response.data.pagination.current_page);
+            const { data: getPetugas } = await getAllPetugas({ ...search, page: pageRef.current });
+            if (getPetugas.status === 200) {
+                setDataPetugas(getPetugas?.data)
+                setPagination(getPetugas?.pagination)
+                setTotalDataFilter(getPetugas?.data?.length)
                 setIsLoading(false)
             }
         } catch (error) {
@@ -79,6 +77,17 @@ const UserManagement = () => {
             console.log(error)
         }
     }
+
+    const handleSearch = () => {
+        pageRef.current = 1;
+        setPage(1);
+        getAllPetugasData()
+    }
+
+    useEffect(() => {
+        pageRef.current = page;
+        getAllPetugasData()
+    }, [page])
 
 
     useEffect(() => {
@@ -227,9 +236,7 @@ const UserManagement = () => {
 
         const handleTpiChange = (e) => {
             const value = e.target.value;
-            // console.log(object)
             const findTpi = dataTpi.find(tpi => tpi.id_tpi == value);
-            // console.log(findTpi, "sini")
             setFormData({ ...formData, tpi_id: findTpi.id_tpi, nama_tpi: findTpi.nama_tpi });
         }
 
@@ -320,7 +327,6 @@ const UserManagement = () => {
     };
 
     const editModalContent = () => {
-        console.log(formData, "sini")
         const handleChange = (e) => {
             setFormData({
                 ...formData,
@@ -448,7 +454,7 @@ const UserManagement = () => {
     };
 
     const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return; // Out of bounds check
+        if (newPage < 1 || newPage > totalPages) return;
         setCurrentPage(newPage);
         getAllPetugasData(newPage);
     };
@@ -475,48 +481,13 @@ const UserManagement = () => {
 
     return (
         <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            {/* <div className="userManagement-header ">
-                <div className='face-reg-filter-name'>
-                    <div className='label-filter-name' style={{ width: "15%", paddingTop: '2.5%' }} >
-                        <p>Input Name</p>
-                    </div>
-                    <div className='value-filter-name'>
-                        <input type="text"
-                            placeholder='Inser Name'
-                            onChange={(e) => setSearch({ ...search, nama_petugas: e.target.value })}
-                            value={search.nama_petugas}
-
-                        />
-                    </div>
-                </div>
-                <div className='face-reg-filter-kamera'>
-                    <div className='label-filter-name' style={{
-                        alignItems: 'flex-end',
-                        paddingRight: "3%"
-                    }}>
-                        <p>Input Nip</p>
-                    </div>
-                    <div className='value-filter-name'>
-                        <input
-                            type="text"
-                            placeholder='Input nip'
-                            onChange={(e) => setSearch({ ...search, nip: e.target.value })}
-                            value={search.nip}
-                            style={{
-                                width: "88%",
-                                marginTop: '0%',
-                            }}
-                        />
-                    </div>
-                </div>
-            </div> */}
             <div className='submit-buttons'>
                 <div className="input-icon-wrapper">
                     <FaSearch className="input-icon" />
-                    <input type="text" placeholder="Search by Name or NIP" onChange={(e) => setSearch({ ...search, nama_petugas: e.target.value })} />
+                    <input type="text" placeholder="Search by NIP" onChange={(e) => setSearch({ ...search, nip: e.target.value })} />
                 </div>
                 <button
-                    onClick={getAllPetugasData}
+                    onClick={handleSearch}
                     className='search-data'
                     style={{
                         backgroundColor: "#4F70AB"
@@ -548,8 +519,17 @@ const UserManagement = () => {
                                 onDelete={deleteModal}
                                 showIndex={true}
                                 rowRenderer={customRowRenderer}
+                                page={page}
+                                perPage={pagination?.per_page}
                             />
-                            {renderPaginationControls()}
+                            <div className="table-footer">
+                                <>Show {totalDataFilter} of {pagination?.total} entries</>
+                                <Pagination
+                                    pageCount={pagination?.last_page}
+                                    onPageChange={(selectedPage) => setPage(selectedPage)}
+                                    currentPage={page}
+                                />
+                            </div>
                         </>
                     )
             }

@@ -62,7 +62,7 @@ const JobTitle = () => {
             if (res.status == 201) {
                 Toast.fire({
                     icon: "success",
-                    title: "Petugas berhasil ditambahkan.",
+                    title: "Jabatan berhasil ditambahkan.",
                 });
                 setIsLoading(false)
                 getAllNegara();
@@ -73,7 +73,7 @@ const JobTitle = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal menambahkan petugas. Silakan coba lagi.",
+                title: "Gagal menambahkan jabatan. Silakan coba lagi.",
             });
         }
     };
@@ -85,7 +85,7 @@ const JobTitle = () => {
             if (res.status === 200) {
                 Toast.fire({
                     icon: "success",
-                    title: "Petugas berhasil dihapus.",
+                    title: "Jabatan berhasil dihapus.",
                 });
                 setIsLoading(false)
                 getAllNegara();
@@ -96,7 +96,7 @@ const JobTitle = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal menghapus petugas. Silakan coba lagi.",
+                title: "Gagal menghapus jabatan. Silakan coba lagi.",
             });
         }
     };
@@ -108,7 +108,7 @@ const JobTitle = () => {
             if (res.status == 201) {
                 Toast.fire({
                     icon: "success",
-                    title: "Data Jabatan Berhasil Ditambahkan",
+                    title: "Jabatan berhasil diubah",
                 });
                 setIsLoading(false)
                 setIsShowModal(false);
@@ -119,7 +119,7 @@ const JobTitle = () => {
             setIsLoading(false)
             Toast.fire({
                 icon: "error",
-                title: "Gagal Menambahkan Data Jabatan",
+                title: "Gagal mengubah jabatan. Silakan coba lagi.",
             });
         }
     };

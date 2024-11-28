@@ -131,7 +131,7 @@ export const getDataUserAPI = async (filterParams) => {
   }
 }
 
-export const getAllPetugas = async (params, page) => {
+export const getAllPetugas = async (params) => {
   try {
     const res = await axios({
       method: "get",
@@ -139,11 +139,11 @@ export const getAllPetugas = async (params, page) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      params: { ...params, page }
+      params
     })
     return res;
   } catch (error) {
-    console.log(error)
+    throw error
   }
 }
 
@@ -270,6 +270,20 @@ export const apiInsertLog = async (data) => {
     throw error
   }
 }
+
+export const simpanPelintas = async (data) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/simpan-pelintas`,
+      data
+    })
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
+
 
 
 export const apiInsertIP = async (data) => {
@@ -521,6 +535,35 @@ export const DeleteJabatan = async (id) => {
       }
     })
     return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getAllSimpanPelintasApi = async (params) => {
+  try {
+    const res = await axios({
+      url: `${url_devel}api/log-simpan-pelintas`,
+      params,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res
+  } catch (error) {
+    console.error(error)
+  }
+
+}
+
+export const checkCountDataFaceReg = async (date) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${url_devel}api/total-userFacereg`,
+      params: date
+    })
+    return res
   } catch (error) {
     console.log(error)
   }

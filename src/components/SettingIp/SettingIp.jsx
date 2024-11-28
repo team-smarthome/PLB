@@ -32,8 +32,6 @@ const SettingIp = () => {
     const [operationalStatus, setOperationalStatus] = useState();
     const socket_IO_4010 = initiateSocket4010();
 
-
-
     const handleSubmitCrudKameraToServer = (action, params, dataApiKemera) => {
         closeModalAdd()
         closeModalDelete()

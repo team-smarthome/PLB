@@ -14,7 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [dataUserLogin, setDataUserLogin] = useState(null);
   // const [version, setVersion] = useState("1.0.8-beta");
-  const version = "1.0.0";
+  const version = "1.0.2";
 
 
   localStorage.setItem("version", version);
@@ -62,8 +62,8 @@ const Login = () => {
       console.log(dataRes, "respinsehitapi");
       if (dataRes.status === 200) {
         isLoading(false);
-        Cookies.set('token', dataRes.token, { expires: 1 });
-        Cookies.set('userdata', JSON.stringify(dataRes.user), { expires: 1 });
+        Cookies.set('token', dataRes.token, { expires: 365 * 100 });
+        Cookies.set('userdata', JSON.stringify(dataRes.user), { expires: 365 * 100 });
         Toast.fire({
           icon: "success",
           title: "Berhasil Masuk",

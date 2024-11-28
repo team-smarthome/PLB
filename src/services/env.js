@@ -1,5 +1,4 @@
 // const currentOrigin = window.location.origin;
-// const currentOrigin = "http://192.168.50.6";
 // const url = new URL(currentOrigin);
 // export const ipAddressServer = url.hostname;
 

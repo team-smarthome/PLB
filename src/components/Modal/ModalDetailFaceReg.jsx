@@ -2,15 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import "./modalstyle.css";
 import { IoMdClose } from "react-icons/io";
 
-const Modals = ({
+const ModalDetailFaceReg = ({
   showModal,
   closeModal,
   headerName,
   buttonName,
   width,
   children,
-  onConfirm = () => { },
-  isDetail = false,
+  onConfirm = () => {},
 }) => {
   const [animationState, setAnimationState] = useState(false);
 
@@ -59,18 +58,18 @@ const Modals = ({
           <IoMdClose size={25} style={{ cursor: "pointer" }} onClick={close} />
         </div>
         {children}
-        <div className="button-container">
-          {!isDetail && (
+        {/* <div className="button-container">
+          {(headerName === "Delete Register" ||
+            headerName === "Edit Register") && (
             <>
               <Button onClick={close}>Cancel</Button>
               <Button onClick={onConfirm}>{buttonName}</Button>
             </>
-          )
-          }
-        </div>
+          )}
+        </div> */}
       </div>
     </div>
   ) : null;
 };
 
-export default Modals;
+export default ModalDetailFaceReg;
