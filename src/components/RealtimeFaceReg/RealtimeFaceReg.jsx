@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ImageSample from '../../assets/images/register_sample.jpg'
 import Select from 'react-select'
-import { apiGetAllIp, apiInsertLog } from '../../services/api'
+import { apiGetAllIp, apiInsertLog, simpanPelintas } from '../../services/api'
 import Cookies from 'js-cookie'
 import './realtimefacereg.css'
 import { FaImage } from 'react-icons/fa'
@@ -86,26 +86,24 @@ const RealtimeFaceReg = () => {
         }
     }
 
-    const insertDataLog = async () => {
+    const insertDataLog = async (params) => {
         setStatus('loading')
         console.log(resData, "resData")
         const dataRes = [
             {
-                personId: resData?.personId,
-                personCode: resData?.personCode,
-                name: resData?.name,
-                similarity: resData?.images_info[0]?.similarity || 0,
-                passStatus: resData?.passStatus === 6 ? "Failed" : "Success",
-                time: resData?.time,
-                img_path: resData?.base64Image,
-                ipCamera: ipCamera,
-                is_depart: resData?.is_depart,
-
+                "no_passport": resData?.personId,
+                "name": resData?.name,
+                "similarity": resData?.images_info[0]?.similarity || 0,
+                "pass_status": params,
+                "time": resData?.time,
+                "facreg_img": resData?.base64Image,
+                "ip_camera": ipCamera,
+                "is_depart": resData?.is_depart,
             }
         ]
         try {
 
-            const { data: resInsertLog } = await apiInsertLog(dataRes);
+            const { data: resInsertLog } = await simpanPelintas(dataRes);
             if (resInsertLog?.status == 201) {
                 Toast.fire({
                     icon: 'success',
@@ -134,6 +132,7 @@ const RealtimeFaceReg = () => {
 
     useEffect(() => {
         socket.on("realtimeFRResponse", (res) => {
+            console.log(res, "resDataSocket")
             setStatus('loading')
             const { status, data } = res
             if (status == 200) {
@@ -147,10 +146,10 @@ const RealtimeFaceReg = () => {
                 })
             } else if (status == 404) {
                 setStatus('failed')
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Data tidak ditemukan'
-                })
+                // Toast.fire({
+                //     icon: 'error',
+                //     title: 'Data tidak ditemukan'
+                // })
                 setResData(null)
                 setFaceRegData({
                     similiarity: null,
@@ -171,6 +170,7 @@ const RealtimeFaceReg = () => {
     }, [faceRegData])
 
     useEffect(() => {
+        functionCheckRealtime();
         fetchAllIp()
         getIpCamera()
     }, [])
@@ -285,19 +285,19 @@ const RealtimeFaceReg = () => {
                                         <button
                                             // disabled={score < 100}
                                             className={`p-2 text-lg text-white ${score === 100 ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-6e00"} min-w-36 rounded-xl border-none ${score == 100 ? "cursor-pointer" : "cursor-not-allowed"}`}
-                                            onClick={insertDataLog}
+                                            onClick={() => insertDataLog("izinkan")}
                                             disabled={status == "loading"}
                                         >Ijinkan</button>
                                     </div>
                                 </> :
                                 <>
-                                    <div className="flex justify-center mb-8">
+                                    {/* <div className="flex justify-center mb-8">
                                         <button
                                             className={`p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] w-40 rounded-xl border-none cursor-pointer`}
                                             onClick={functionCheckRealtime}
                                             disabled={status == "loading"}
                                         >{status == "loading" ? "Mohon Tunggu... " : "Periksa Data"}</button>
-                                    </div>
+                                    </div> */}
                                 </>
                         }
 

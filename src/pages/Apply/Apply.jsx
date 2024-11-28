@@ -364,6 +364,7 @@ const Apply = () => {
           setCaputedImageAfter2("")
           setObjectApi(null)
           setObjectCamera(null)
+          setResDataScan('')
         }, 3000);
       } else if (titleFooter === "Payment" && cardPaymentProps.isDoRetake) {
         doSaveRequestVoaPayment(sharedData);
