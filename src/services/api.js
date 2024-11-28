@@ -271,6 +271,20 @@ export const apiInsertLog = async (data) => {
   }
 }
 
+export const simpanPelintas = async (data) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/simpan-pelintas`,
+      data
+    })
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
+
+
 
 export const apiInsertIP = async (data) => {
   console.log("Form_submitted", data)
