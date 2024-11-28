@@ -43,8 +43,17 @@ const LogSimpanPelintas = () => {
     //============================================ YANG DIGUNAKAN =============================================================//
 
     const GetDataUserLog = async () => {
+        const userCookie = Cookies.get('userdata');
+
+        if (!userCookie) {
+            console.error("No user cookie found");
+            return;
+        }
+
+        const userInfo = JSON.parse(userCookie);
+        console.log(userInfo, "userInfoSimpanPelintas")
         try {
-            const { data } = await getAllSimpanPelintasApi(params);
+            const { data } = await getAllSimpanPelintasApi({ ...params, tpi_id: userInfo?.tpi_id });
             if (data.status === 200) {
                 setLogData(data?.data)
                 setTotalDataFilter(data?.data?.length);
