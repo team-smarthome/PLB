@@ -325,21 +325,28 @@ const LogSimpanPelintas = () => {
                     <input type="text" name="name" id="" value={detailData.destination_location} onChange={handleChange} disabled />
                 </div>
                 <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
-                    <span>Face</span>
+                    <span>Profile Image</span>
                     <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
                                     : detailData.profile_image}
                                     alt="" height={175} />
-                        {/* {detailData.profile_image ?
-                            (
-                                <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
-                                    : detailData.profile_image}
-                                    alt="" height={175} />
-                            )
-                            :
-                            (<span>Drag and Drop here </span>)} */}
                     </div>
-                    {/* <input type="file" name="profile_image" id="" style={{ display: 'none' }} ref={refInputFace} onChange={(e) => handleImageFace(e)} /> */}
+                </div>
+                <div className="register-input input-file" style={{ paddingTop: '2rem' }}>
+                    <span>Photo Document</span>
+                    <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
+                                    : detailData.photo_passport}
+                                    alt="" height={175} />
+                    </div>
+                </div>
+                <div className="register-input input-file" style={{ paddingTop: '8rem' }}>
+                    <span>Photo FaceReg</span>
+                    <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <img src={detailData.facreg_img ? `data:image/jpeg;base64,${detailData.facreg_img}`
+                                    : detailData.facreg_img}
+                                    alt="" height={175} />
+                    </div>
                 </div>
 
             </div>
