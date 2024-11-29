@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import './logfacereg.style.css'
-import { apiDeleteLog, apiGetAllIp, getAllNegaraData, getDataLogApi } from '../../services/api'
+import { apiDeleteLog, apiGetAllIp, getAllNegaraData, getDataLogApi, simpanPelintas } from '../../services/api'
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
@@ -11,6 +11,7 @@ import Excel from "exceljs";
 import { initiateSocket4010 } from '../../utils/socket';
 import { useNavigate } from 'react-router-dom';
 import Modals from '../../components/Modal/Modal';
+import { Toast } from '../../components/Toast/Toast';
 
 const LogFaceReg = () => {
     const navigate = useNavigate()
@@ -96,7 +97,7 @@ const LogFaceReg = () => {
         try {
             const { data } = await getDataLogApi(currentParams);
             if (data.status === 200) {
-                const addCol = data?.data.map((item) => ({...item, isSelected: false}))
+                const addCol = data?.data.map((item) => ({ ...item, isSelected: false }))
                 setLogData(addCol)
                 setTotalDataFilter(data?.data?.length);
                 setPagination(data?.pagination);
@@ -190,16 +191,16 @@ const LogFaceReg = () => {
     const handleCheckBox = (e, index) => {
         const updateData = [...logData]
 
-        updateData[index] = {...updateData[index], isSelected: e.target.checked}
+        updateData[index] = { ...updateData[index], isSelected: e.target.checked }
 
         setLogData(updateData)
     }
 
-    const handleActionPopup = () =>{
-        const findData = logData.filter((data) =>  data.isSelected == true).length
+    const handleActionPopup = () => {
+        const findData = logData.filter((data) => data.isSelected == true).length
         if (findData > 0) {
-        setActionPopup(true)
-        }else{
+            setActionPopup(true)
+        } else {
             setActionPopup(false)
 
         }
@@ -208,7 +209,7 @@ const LogFaceReg = () => {
     useEffect(() => {
         handleActionPopup()
     }, [logData])
-    
+
     const customRowRenderer = (row, index) => {
         return (
             <>
@@ -233,13 +234,13 @@ const LogFaceReg = () => {
                 </td>
                 <td>{row?.ipCamera}</td>
                 <td class="">
-                <input  
-                onChange={(e) =>{
-                    e.stopPropagation()
-                    handleCheckBox(e, index)
-                }
-                }
-                id="disabled-checked-checkbox" type="checkbox" value={row?.isSelected} class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                    <input
+                        onChange={(e) => {
+                            e.stopPropagation()
+                            handleCheckBox(e, index)
+                        }
+                        }
+                        id="disabled-checked-checkbox" type="checkbox" value={row?.isSelected} class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                 </td>
             </>
         );
@@ -379,64 +380,66 @@ const LogFaceReg = () => {
         setGetPagination(false)
     }, [getPagination])
 
-    const selectedData = logData.filter((data) =>  data.isSelected == true)
+    const selectedData = logData.filter((data) => data.isSelected == true)
 
-    const handleSimpanPelintas = async() => {
+    const handleSimpanPelintas = async () => {
+        console.log('selectedData', selectedData)
         setStatus('loading')
-            const mapSelectedData = selectedData.map((item) => {
-                return({
-                    no_passport: item?.personId,
-                    name: item?.name,
-                    similarity: item?.similarity,
-                    pass_status: "izinkan",
-                    time: item?.time,
-                    facreg_img: item?.image_base64,
-                    ipCamera: item?.ipCamera,
-                    is_depart: item?.is_depart,
-                })
-
+        const mapSelectedData = selectedData.map((item) => {
+            return ({
+                no_passport: item?.personId,
+                name: item?.name,
+                similarity: item?.similarity,
+                pass_status: "izinkan",
+                time: item?.time,
+                facreg_img: item?.image_base64,
+                ip_camera: item?.ipCamera,
+                is_depart: item?.is_depart,
             })
-            // return console.log(mapSelectedData)
-            // const dataRes = [
-            //     {
-            //         "no_passport": resData?.personId,
-            //         "name": resData?.name,
-            //         "similarity": resData?.images_info[0]?.similarity || 0,
-            //         "pass_status": params,
-            //         "time": resData?.time,
-            //         "facreg_img": resData?.base64Image,
-            //         "ip_camera": ipCamera,
-            //         "is_depart": resData?.is_depart,
-            //     }
-            // ]
-            try {
-                const { data: resInsertLog } = await simpanPelintas(mapSelectedData);
-                if (resInsertLog?.status == 201) {
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Data Log berhasil ditambahkan'
-                    })
-                    // setResData(null)
-                    // setFaceRegData({
-                    //     similiarity: null,
-                    //     faceRegImage: null,
-                    //     profile_image: null,
-                    //     documentImage: null
-                    // })
-                    setSimpanModal(false)
-                    setStatus('success')
-                    console.log("Data berhasil diinsert")
-                    GetDataUserLog()
-                }
-            } catch (error) {
-                setSimpanModal(false)
+
+        })
+        console.log(mapSelectedData, 'mapSelectedData')
+        // return console.log(mapSelectedData)
+        // const dataRes = [
+        //     {
+        //         "no_passport": resData?.personId,
+        //         "name": resData?.name,
+        //         "similarity": resData?.images_info[0]?.similarity || 0,
+        //         "pass_status": params,
+        //         "time": resData?.time,
+        //         "facreg_img": resData?.base64Image,
+        //         "ip_camera": ipCamera,
+        //         "is_depart": resData?.is_depart,
+        //     }
+        // ]
+        try {
+            const { data: resInsertLog } = await simpanPelintas(mapSelectedData);
+            if (resInsertLog?.status == 201) {
                 Toast.fire({
-                    icon: 'error',
-                    title: 'Data Log gagal ditambahkan'
+                    icon: 'success',
+                    title: 'Data Log berhasil ditambahkan'
                 })
+                // setResData(null)
+                // setFaceRegData({
+                //     similiarity: null,
+                //     faceRegImage: null,
+                //     profile_image: null,
+                //     documentImage: null
+                // })
+                setSimpanModal(false)
                 setStatus('success')
-                console.error("Error inserting log data:", error);
+                console.log("Data berhasil diinsert")
+                GetDataUserLog()
             }
+        } catch (error) {
+            setSimpanModal(false)
+            Toast.fire({
+                icon: 'error',
+                title: 'Data Log gagal ditambahkan'
+            })
+            setStatus('success')
+            console.error("Error inserting log data:", error);
+        }
     }
 
     const handleDeleteLogs = async () => {
@@ -453,7 +456,7 @@ const LogFaceReg = () => {
                     icon: 'success',
                     title: 'Data Log berhasil dihapus'
                 })
-                
+
                 setDeleteModal(false)
                 setStatus('success')
                 GetDataUserLog()
@@ -741,19 +744,19 @@ const LogFaceReg = () => {
                         page={page}
                         perPage={pagination?.per_page}
                     />
-                      {actionPopup && <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
-                    <button
-                        className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                        onClick={() => setSimpanModal(true)}
-                    >
-                        Sinkronisasi
-                    </button>
-                    <button
-                        className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-                        onClick={() => setDeleteModal(true)}
-                    >
-                        Hapus Data
-                    </button>
+                    {actionPopup && <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
+                        <button
+                            className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                            onClick={() => setSimpanModal(true)}
+                        >
+                            Simpan Pelintas
+                        </button>
+                        <button
+                            className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                            onClick={() => setDeleteModal(true)}
+                        >
+                            Hapus Data
+                        </button>
                     </div>}
                     <div className="table-footer">
                         <>Show {totalDataFilter} of {pagination?.total} entries</>
@@ -775,21 +778,21 @@ const LogFaceReg = () => {
                 currImg={currentImage}
             />
             <Modals
-            showModal={simpanModal}
-            headerName="Sinkronisasi data"
-            closeModal={() => setSimpanModal(false)}
-            buttonName="Confirm"
-            onConfirm={handleSimpanPelintas}
+                showModal={simpanModal}
+                headerName="Sinkronisasi data"
+                closeModal={() => setSimpanModal(false)}
+                buttonName="Confirm"
+                onConfirm={handleSimpanPelintas}
             >
                 <span className='text-lg'>Apakah anda ingin Sinkronisasi <span className='font-bold'>{selectedData.length}</span> data ?</span>
             </Modals>
 
             <Modals
-            showModal={deleteModal}
-            headerName="Hapus data"
-            closeModal={() => setDeleteModal(false)}
-            buttonName="Confirm"
-            onConfirm={handleDeleteLogs}
+                showModal={deleteModal}
+                headerName="Hapus data"
+                closeModal={() => setDeleteModal(false)}
+                buttonName="Confirm"
+                onConfirm={handleDeleteLogs}
             >
                 <span className='text-lg'>Apakah anda ingin Menghapus <span className='font-bold'>{selectedData.length}</span> data ?</span>
             </Modals>
