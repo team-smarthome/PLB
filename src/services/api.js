@@ -302,7 +302,7 @@ export const getSimpanPelintas = async (data) => {
     const res = await axios({
       method: "get",
       url: `${url_devel}api/simpan-pelintas`,
-      data
+      params: data
     })
     return res;
   } catch (error) {
