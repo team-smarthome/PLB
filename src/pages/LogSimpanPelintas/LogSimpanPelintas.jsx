@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import './logsimpanpelintas.style.css'
-import { apiGetAllIp, getAllNegaraData, getDataLogApi, getAllSimpanPelintasApi } from '../../services/api'
+import { apiGetAllIp, getAllNegaraData, getDataLogApi, getAllSimpanPelintasApi, getSimpanPelintas } from '../../services/api'
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
@@ -10,6 +10,7 @@ import ModalData from '../../components/Modal/ModalData'
 import Excel from "exceljs";
 import { initiateSocket4010 } from '../../utils/socket';
 import { useNavigate } from 'react-router-dom';
+import Modals from '../../components/Modal/Modal';
 
 const LogSimpanPelintas = () => {
     const socket = initiateSocket4010();
@@ -25,6 +26,8 @@ const LogSimpanPelintas = () => {
     const [isOpenImage, setIsOpenImage] = useState(false)
     const [currentImage, setCurrentImage] = useState(null)
     const [modalOpen, setModalOpen] = useState(false)
+    const [modalDetail, setModalDetail] = useState(false)
+    const [detailData, setDetailData] = useState({})
     const [dataNationality, setDataNationality] = useState([])
     const [params, setParams] = useState({
         page: page,
@@ -150,12 +153,12 @@ const LogSimpanPelintas = () => {
             <>
 
                 <td>{row?.no_passport}</td>
-                <td>{row?.pelintas?.name || "Unkown"}</td>
-                <td>{row?.pelintas?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
-                <td>{row?.pelintas?.tpi_id || "Unkown"}</td>
-                <td>{row?.pelintas?.nationality || "Unkown"}</td>
+                <td>{row?.name || "Unkown"}</td>
+                <td>{row?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
+                <td>{row?.tpi_id || "Unkown"}</td>
+                <td>{row?.nationality || "Unkown"}</td>
                 <td>{row?.user?.petugas?.nama_petugas}</td>
-                <td>{row?.is_success ? "Success" : "Failed"}</td>
+                <td>{row?.pass_status == "izinkan" ? "Success" : "Failed"}</td>
 
 
             </>
@@ -281,6 +284,76 @@ const LogSimpanPelintas = () => {
         setGetPagination(false)
     }, [getPagination])
 
+    const handleCloseModalDetail = () => {
+        setModalDetail(false)
+        setDetailData({})
+    }
+    const handleOpenDetail = (row) => {
+        setDetailData(row)
+        setModalDetail(true)
+        console.log(row)
+    }
+    const modalDetailRow = () => {
+        return (
+            <div className="register-container">
+                <div className="register-input">
+                    <span>PLB / BCP Number</span>
+                    <input type="text" name="no_passport" id="" value={detailData.no_passport} onChange={handleChange} disabled />
+                </div>
+                {/* <div className="register-input">
+                    <span>Registration Number</span>
+                    <input type="text" name="no_register" id="" value={detailData.no_register} onChange={handleChange} />
+                </div> */}
+                <div className="register-input">
+                    <span>Full Name</span>
+                    <input type="text" name="name" id="" value={detailData.name} onChange={handleChange} disabled />
+                </div>
+                <div className="register-input">
+                    <span>Date of Birth</span>
+                    <input type="date" name="date_of_birth" id="" value={detailData.date_of_birth} onChange={handleChange} disabled />
+                </div>
+                <div className="register-input">
+                    <span>Gender</span>
+                    <select value={detailData.gender} name='gender' onChange={handleChange} disabled>
+                        <option value="">Pilih Gender</option>
+                        <option value="M">Laki-Laki</option>
+                        <option value="F">Perempuan</option>
+                    </select>
+                </div>
+                <div className="register-input">
+                    <span>Nationality</span>
+                    <input type="text" name="name" id="" value={detailData.nationality} onChange={handleChange} disabled />
+                </div>
+                <div className="register-input">
+                    <span>Expired Date</span>
+                    <input type="date" name="expired_date" id="" value={detailData.expired_date} onChange={handleChange} disabled />
+                </div>
+                <div className="register-input" style={{ marginBottom: '5rem' }}>
+                    <span>Destination Location</span>
+                    <input type="text" name="name" id="" value={detailData.destination_location} onChange={handleChange} disabled />
+                </div>
+                <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
+                    <span>Face</span>
+                    <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
+                            : detailData.profile_image}
+                            alt="" height={175} />
+                        {/* {detailData.profile_image ?
+                            (
+                                <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
+                                    : detailData.profile_image}
+                                    alt="" height={175} />
+                            )
+                            :
+                            (<span>Drag and Drop here </span>)} */}
+                    </div>
+                    {/* <input type="file" name="profile_image" id="" style={{ display: 'none' }} ref={refInputFace} onChange={(e) => handleImageFace(e)} /> */}
+                </div>
+
+            </div>
+        )
+    }
+
 
 
     //============================================ YANG DIGUNAKAN =============================================================//
@@ -387,7 +460,7 @@ const LogSimpanPelintas = () => {
                     <TableLog
                         tHeader={['no plb', 'name', 'gender', 'tpi id', 'nationality', "nama petugas", "status"]}
                         tBody={logData}
-                        // handler={handleOpenImage}
+                        handler={handleOpenDetail}
                         rowRenderer={customRowRenderer}
                         showIndex={true}
                         page={page}
@@ -412,6 +485,15 @@ const LogSimpanPelintas = () => {
                 onClose={() => { setIsOpenImage(false) }}
                 currImg={currentImage}
             />
+            <Modals
+                showModal={modalDetail}
+                closeModal={handleCloseModalDetail}
+                headerName="Detail Log"
+                width={800}
+                isDetail
+            >
+                {modalDetailRow()}
+            </Modals>
             <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} doneProgres={GetDataUserLog} />
         </div >
     )
