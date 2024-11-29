@@ -158,7 +158,7 @@ const LogSimpanPelintas = () => {
                 <td>{row?.tpi_id || "Unkown"}</td>
                 <td>{row?.nationality || "Unkown"}</td>
                 <td>{row?.user?.petugas?.nama_petugas}</td>
-                <td>{row?.pass_status == "izinkan" ? "Success" : "Failed"}</td>
+                <td>{row?.pass_status == "izinkan" ? "Izinkan" : "Tolak"}</td>
 
 
             </>

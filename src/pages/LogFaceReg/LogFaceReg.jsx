@@ -474,7 +474,20 @@ const LogFaceReg = () => {
 
     console.log(logData, "logData")
     //============================================ YANG DIGUNAKAN =============================================================//
-
+    const handleSelectAll = () => {
+        setLogData((prevItems) =>
+            prevItems.map((item) => ({
+                ...item,
+                isSelected: true,
+            })))
+    }
+    const handleClearAll = () => {
+        setLogData((prevItems) =>
+            prevItems.map((item) => ({
+                ...item,
+                isSelected: false,
+            })))
+    }
 
 
     return (
@@ -746,6 +759,19 @@ const LogFaceReg = () => {
                         perPage={pagination?.per_page}
                     />
                     {actionPopup && <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
+                        {logData.length == selectedData.length ?
+                            <button
+                                className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                                onClick={handleClearAll}
+                            >
+                                Kosongkan Semua
+                            </button>
+                            : <button
+                                className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                                onClick={handleSelectAll}
+                            >
+                                Pilih Semua
+                            </button>}
                         <button
                             className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
                             onClick={() => setSimpanModal(true)}

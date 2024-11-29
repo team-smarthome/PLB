@@ -6,6 +6,7 @@ import { FaImage } from 'react-icons/fa'
 import { Toast } from '../Toast/Toast'
 import ModalData from '../Modal/ModalData'
 import { io } from 'socket.io-client'
+import { url_socket } from '../../services/env'
 
 
 const RealtimeFaceReg = () => {
@@ -95,6 +96,7 @@ const RealtimeFaceReg = () => {
             const { data: resInsertLog } = await simpanPelintas(dataRes);
             if (resInsertLog?.status == 201) {
                 if (params !== "tolak") {
+                    localStorage.removeItem("personId")
                     Toast.fire({
                         icon: 'success',
                         title: 'Data Log berhasil ditambahkan'
@@ -124,12 +126,19 @@ const RealtimeFaceReg = () => {
         if (!params) {
             return
         }
-        const newSocket = io('http://localhost:4030')
+        const newSocket = io(`${url_socket}:4030`)
         setSocket(newSocket)
 
         return () => {
             newSocket.disconnect()
         }
+    }
+
+
+    const Ulangi = () => {
+        socket.emit("realtimeFR", { ipCamera })
+        localStorage.removeItem("personId")
+        setLanjutRealtime(false)
     }
 
     useEffect(() => {
@@ -140,8 +149,8 @@ const RealtimeFaceReg = () => {
 
         socket.on("realtimeFRResponse", (res) => {
             const { status, data } = res
-            const personId = localStorage.getItem("personId")
             if (status === 200) {
+                const personId = localStorage.getItem("personId")
                 if (data?.personId !== personId) {
                     setResData(data)
                     setFaceRegData({
@@ -159,6 +168,7 @@ const RealtimeFaceReg = () => {
                         profile_image: null,
                         documentImage: null
                     })
+                    localStorage.removeItem("personId")
                     socket.emit("realtimeFR", { ipCamera })
                 }
             } else {
@@ -297,7 +307,7 @@ const RealtimeFaceReg = () => {
                                         >Tolak</button>
                                         <button
                                             className='p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] min-w-36 rounded-xl border-1 border-black cursor-pointer'
-                                            onClick={connectToSocket}
+                                            onClick={Ulangi}
                                             disabled={status == "loading"}
                                         >{status == "loading" ? "Mohon Tunggu..." : "Ulangi"}</button>
                                         <button

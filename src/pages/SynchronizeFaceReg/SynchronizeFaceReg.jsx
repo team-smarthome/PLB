@@ -283,7 +283,7 @@ const SynchronizeFaceReg = () => {
             <div className="flex justify-center items-center w-full">
               {status == "done" ?
                 <button
-                  onClick={() => navigate("/cpanel/log-facereg")}
+                  onClick={() => navigate("/cpanel/log-simpan-pelintas")}
                   className='w-[75%] p-2 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded'
                 >Kembali</button>
                 :
