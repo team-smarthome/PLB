@@ -284,6 +284,19 @@ export const apiDeleteLog = async (data) => {
   }
 }
 
+export const apiDeleteLogSimpanPelintas = async (data) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/simpan-pelintas`,
+      data
+    })
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
+
 export const simpanPelintas = async (data) => {
   try {
     const res = await axios({
