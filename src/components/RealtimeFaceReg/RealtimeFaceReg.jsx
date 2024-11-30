@@ -168,7 +168,7 @@ const RealtimeFaceReg = () => {
                         profile_image: null,
                         documentImage: null
                     })
-                    localStorage.removeItem("personId")
+                    // localStorage.removeItem("personId")
                     socket.emit("realtimeFR", { ipCamera })
                 }
             } else {
