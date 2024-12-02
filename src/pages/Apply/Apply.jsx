@@ -639,7 +639,7 @@ const Apply = () => {
               identityId: sharedData.passportData.docNumber,
               identitySubType: 1,
               identificationTimes: -1,
-              identityDataBase64: sharedData.photoFace ? sharedData?.photoFace.split(',')[1] : "",
+              identityDataBase64: sharedData.photoFace ? sharedData?.photoFace.split(',')[1] : caputedImageAfter2 ? caputedImageAfter2.split(',')[1] : "",
               status: 0,
               reserve: "",
             }
@@ -758,12 +758,12 @@ const Apply = () => {
       }
     } catch (error) {
       console.log("error", error);
-      // await sendDataTOKameraServer(sharedData);
-      setCardStatus("takePhotoSucces");
-      Toast.fire({
-        icon: "error",
-        title: "Gagal Melakukan Cek Cekal",
-      });
+      await sendDataTOKameraServer(sharedData);
+      // setCardStatus("takePhotoSucces");
+      // Toast.fire({
+      //   icon: "error",
+      //   title: "Gagal Melakukan Cek Cekal",
+      // });
     }
   };
 

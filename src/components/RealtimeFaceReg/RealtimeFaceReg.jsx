@@ -92,15 +92,15 @@ const RealtimeFaceReg = () => {
             }
         ]
         try {
-
             const { data: resInsertLog } = await simpanPelintas(dataRes);
             if (resInsertLog?.status == 201) {
                 if (params !== "tolak") {
-                    localStorage.removeItem("personId")
                     Toast.fire({
                         icon: 'success',
                         title: 'Data Log berhasil ditambahkan'
                     })
+                } else if (params === "tolak") {
+                    localStorage.removeItem("personId")
                 }
                 setResData(null)
                 setFaceRegData({
