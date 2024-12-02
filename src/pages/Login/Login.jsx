@@ -14,7 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [dataUserLogin, setDataUserLogin] = useState(null);
   // const [version, setVersion] = useState("1.0.8-beta");
-  const version = "1.0.3";
+  const version = "1.0.4";
 
 
   localStorage.setItem("version", version);

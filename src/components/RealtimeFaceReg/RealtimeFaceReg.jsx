@@ -61,6 +61,7 @@ const RealtimeFaceReg = () => {
     }
 
     const handleSelectCamera = (e) => {
+        localStorage.removeItem("personId")
         setSelectedCamera(e.target.value)
     }
 

@@ -37,6 +37,11 @@ const handleSendDataToApi = async (dataUser, data) => {
     if (ipCameraCheckSend.length === 0) {
         return { status: 500, message: "IP Kamera tidak ditemukan" };
     }
+    console.log("HASILDATAIMAGE", dataUser?.bodyParamsSendKamera?.params?.data[0]?.identityDataBase64)
+    if (!dataUser?.bodyParamsSendKamera?.params?.data[0]?.identityDataBase64) {
+        return { status: 500, message: "Mohon Ulangi Lagi" };
+    }
+
     const ipCamera = ipCameraCheckSend.filter((ip) => ip.ipAddress !== "");
     try {
         console.log("MENGIRIM DATA KE KAMERA");
@@ -44,7 +49,7 @@ const handleSendDataToApi = async (dataUser, data) => {
             const url = `http://${ip.ipAddress}/facial_api/aiot_call`
             try {
                 const response = await axios.post(url, dataUser?.bodyParamsSendKamera);
-                console.log(response.data)
+                console.log(response.data, "HASILRESPONSEKAMERA")
                 console.log(response.data.params)
                 console.log("BERHASIL MENGIRIM DATA KE KAMERA", ip)
                 return { status: response.data.status, message: `Berhasil mengirim data ke kamera dengan IP ${ip?.ipAddress}` };
