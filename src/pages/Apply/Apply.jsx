@@ -589,6 +589,35 @@ const Apply = () => {
         isPhoto: false,
       });
 
+      const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
+      console.log("checkDataUser", checkDataUser.data.data);
+
+      if (checkDataUser.data.data.length > 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Data sudah ada",
+          text: "Silahkan periksa kembali data anda",
+          confirmButtonColor: "#3d5889",
+        });
+        setCardPaymentProps({
+          isWaiting: false,
+          isCreditCard: false,
+          isPaymentCredit: false,
+          isPaymentCash: false,
+          isPrinted: false,
+          isSuccess: false,
+          isFailed: false,
+          isPyamentUrl: false,
+          isPhoto: false,
+          isDoRetake: false,
+        });
+        setDisabled(false);
+        setIsEnableStep(true);
+        setCardStatus("takePhotoSucces");
+        return;
+      }
+
+
       setCaputedImageAfter2(sharedData.photoFace);
 
       const bodyParamsSendKamera = {
