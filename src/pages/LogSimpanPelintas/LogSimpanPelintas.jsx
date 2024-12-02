@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TableLog from '../../components/TableLog/TableLog'
 import './logsimpanpelintas.style.css'
-import { apiGetAllIp, getAllNegaraData, getDataLogApi, getAllSimpanPelintasApi, getSimpanPelintas } from '../../services/api'
+import { apiGetAllIp, getAllNegaraData, getDataLogApi, getAllSimpanPelintasApi, getSimpanPelintas, apiDeleteSimpanPelintas } from '../../services/api'
 import Cookies from 'js-cookie';
 import Select from "react-select";
 import Pagination from '../../components/Pagination/Pagination'
@@ -11,6 +11,7 @@ import Excel from "exceljs";
 import { initiateSocket4010 } from '../../utils/socket';
 import { useNavigate } from 'react-router-dom';
 import Modals from '../../components/Modal/Modal';
+import { Toast } from '../../components/Toast/Toast';
 
 const LogSimpanPelintas = () => {
     const socket = initiateSocket4010();
@@ -29,6 +30,9 @@ const LogSimpanPelintas = () => {
     const [modalDetail, setModalDetail] = useState(false)
     const [detailData, setDetailData] = useState({})
     const [dataNationality, setDataNationality] = useState([])
+    const [actionPopup, setActionPopup] = useState(false)
+    const [simpanModal, setSimpanModal] = useState(false)
+    const [deleteModal, setDeleteModal] = useState(false)
     const [params, setParams] = useState({
         page: page,
         nama_petugas: "",
@@ -42,7 +46,7 @@ const LogSimpanPelintas = () => {
         current_page: 1,
         last_page: 1,
     });
-
+    console.log(actionPopup, "actionPopup")
     //============================================ YANG DIGUNAKAN =============================================================//
 
     const GetDataUserLog = async () => {
@@ -58,7 +62,8 @@ const LogSimpanPelintas = () => {
         try {
             const { data } = await getAllSimpanPelintasApi({ ...params, tpi_id: userInfo?.tpi_id });
             if (data.status === 200) {
-                setLogData(data?.data)
+                const addCol = data?.data.map((item) => ({ ...item, isSelected: false }))
+                setLogData(addCol)
                 setTotalDataFilter(data?.data?.length);
                 setPagination(data?.pagination);
             }
@@ -148,17 +153,49 @@ const LogSimpanPelintas = () => {
         GetDataUserLog();
     }
 
-    const customRowRenderer = (row) => {
+    const handleCheckBox = (e, index) => {
+        const updateData = [...logData]
+
+        updateData[index] = { ...updateData[index], isSelected: e.target.checked }
+
+        setLogData(updateData)
+    }
+    const handleActionPopup = () => {
+        console.log("running")
+        const findData = logData.filter((data) => data.isSelected == true).length
+        if (findData > 0) {
+            setActionPopup(true)
+        } else {
+            setActionPopup(false)
+
+        }
+    }
+
+    useEffect(() => {
+        handleActionPopup()
+    }, [logData])
+    const customRowRenderer = (row, index) => {
         return (
             <>
 
-                <td>{row?.no_passport}</td>
-                <td>{row?.name || "Unkown"}</td>
-                <td>{row?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
-                <td>{row?.tpi_id || "Unkown"}</td>
-                <td>{row?.nationality || "Unkown"}</td>
-                <td>{row?.user?.petugas?.nama_petugas}</td>
-                <td>{row?.pass_status == "izinkan" ? "Izinkan" : "Tolak"}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.no_passport}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.name || "Unkown"}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.tpi_id || "Unkown"}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.nationality || "Unkown"}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.user?.petugas?.nama_petugas}</td>
+                <td onClick={() => handleOpenDetail(row)}>{row?.pass_status == "izinkan" ? "Izinkan" : "Tolak"}</td>
+                <td class="">
+                    <input
+                        onChange={(e) => {
+                            e.stopPropagation()
+                            handleCheckBox(e, index)
+                        }
+                        }
+                        id="disabled-checked-checkbox" type="checkbox" 
+                        checked={row?.isSelected} 
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                </td>
 
 
             </>
@@ -277,6 +314,7 @@ const LogSimpanPelintas = () => {
         setGetPagination(true)
     }, [page]);
 
+    const selectedData = logData.filter((data) => data.isSelected == true)
     useEffect(() => {
         if (getPagination) {
             GetDataUserLog()
@@ -356,6 +394,7 @@ const LogSimpanPelintas = () => {
                             alt="" height={175} />
                     </div>
                 </div>
+                
 
             </div>
         )
@@ -365,6 +404,53 @@ const LogSimpanPelintas = () => {
 
     //============================================ YANG DIGUNAKAN =============================================================//
 
+    const handleDeleteLogs = async () => {
+        const deletedData = selectedData.map((item) => {
+            return item.id
+        })
+        const data = {
+            ids: deletedData
+        }
+        try {
+            const res = await apiDeleteSimpanPelintas(data)
+            console.log('res?.status', res?.status)
+            if (res?.status == 200 || res?.status == 201
+            ) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Data Log berhasil dihapus'
+                })
+
+                setDeleteModal(false)
+                setStatus('success')
+                GetDataUserLog()
+            }
+        } catch (error) {
+            setSimpanModal(false)
+            Toast.fire({
+                icon: 'error',
+                title: 'Data Log gagal dihapus'
+            })
+            setStatus('success')
+            console.error("Error inserting log data:", error);
+        }
+    }
+
+    const handleSelectAll = () => {
+        setLogData((prevItems) =>
+            prevItems.map((item) => ({
+              ...item, 
+              isSelected: true, 
+            })))
+    }
+    
+    const handleClearAll = () => {
+        setLogData((prevItems) =>
+            prevItems.map((item) => ({
+                ...item,
+                isSelected: false,
+            })))
+    }
 
 
     return (
@@ -465,14 +551,35 @@ const LogSimpanPelintas = () => {
             {status === "success" && logData &&
                 <>
                     <TableLog
-                        tHeader={['no plb', 'name', 'gender', 'tpi id', 'nationality', "nama petugas", "status"]}
+                        tHeader={['no plb', 'name', 'gender', 'tpi id', 'nationality', "nama petugas", "status", "action"]}
                         tBody={logData}
-                        handler={handleOpenDetail}
+                        // handler={handleOpenDetail}
                         rowRenderer={customRowRenderer}
                         showIndex={true}
                         page={page}
                         perPage={pagination?.per_page}
                     />
+                     {actionPopup && <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
+                        {logData.length == selectedData.length ?
+                            <button
+                                className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                                onClick={handleClearAll}
+                            >
+                                Kosongkan Semua
+                            </button>
+                            : <button
+                                className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                                onClick={handleSelectAll}
+                            >
+                                Pilih Semua
+                            </button>}
+                        <button
+                            className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                            onClick={() => setDeleteModal(true)}
+                        >
+                            Hapus Data
+                        </button>
+                    </div>}
                     <div className="table-footer">
                         <>Show {totalDataFilter} of {pagination?.total} entries</>
                         <Pagination
@@ -500,6 +607,16 @@ const LogSimpanPelintas = () => {
                 isDetail
             >
                 {modalDetailRow()}
+            </Modals>
+            <Modals
+                showModal={deleteModal}
+                headerName="Hapus data"
+                closeModal={() => setDeleteModal(false)}
+                buttonName="Confirm"
+                onConfirm={handleDeleteLogs}
+                // onConfirm={() => {}}
+            >
+                <span className='text-lg'>Apakah anda ingin Menghapus <span className='font-bold'>{selectedData.length}</span> data ?</span>
             </Modals>
             <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} doneProgres={GetDataUserLog} />
         </div >
