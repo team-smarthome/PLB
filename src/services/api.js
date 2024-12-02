@@ -594,3 +594,16 @@ export const checkCountDataFaceReg = async (date) => {
     console.log(error)
   }
 }
+
+export const apiDeleteSimpanPelintas = async (data) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/simpan-pelintas`,
+      data
+    })
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
