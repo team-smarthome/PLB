@@ -46,9 +46,17 @@ const LogSimpanPelintas = () => {
     //============================================ YANG DIGUNAKAN =============================================================//
 
     const GetDataUserLog = async () => {
+        const userCookie = Cookies.get('userdata');
+
+        if (!userCookie) {
+            console.error("No user cookie found");
+            return;
+        }
+
+        const userInfo = JSON.parse(userCookie);
+        console.log(userInfo, "userInfoSimpanPelintas")
         try {
-            const { data } = await getSimpanPelintas(params);
-            console.log(data, "ada tan")
+            const { data } = await getAllSimpanPelintasApi({ ...params, tpi_id: userInfo?.tpi_id });
             if (data.status === 200) {
                 setLogData(data?.data)
                 setTotalDataFilter(data?.data?.length);
@@ -150,7 +158,7 @@ const LogSimpanPelintas = () => {
                 <td>{row?.tpi_id || "Unkown"}</td>
                 <td>{row?.nationality || "Unkown"}</td>
                 <td>{row?.user?.petugas?.nama_petugas}</td>
-                <td>{row?.pass_status == "izinkan" ? "Success" : "Failed"}</td>
+                <td>{row?.pass_status == "izinkan" ? "Izinkan" : "Tolak"}</td>
 
 
             </>
@@ -281,9 +289,9 @@ const LogSimpanPelintas = () => {
         setDetailData({})
     }
     const handleOpenDetail = (row) => {
-    setDetailData(row)
-    setModalDetail(true)
-    console.log(row) 
+        setDetailData(row)
+        setModalDetail(true)
+        console.log(row)
     }
     const modalDetailRow = () => {
         return (
@@ -327,25 +335,25 @@ const LogSimpanPelintas = () => {
                 <div className="register-input input-file" style={{ marginBottom: '7rem' }}>
                     <span>Profile Image</span>
                     <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
-                                    : detailData.profile_image}
-                                    alt="" height={175} />
+                        <img src={detailData.profile_image ? `data:image/jpeg;base64,${detailData.profile_image}`
+                            : detailData.profile_image}
+                            alt="" height={175} />
                     </div>
                 </div>
                 <div className="register-input input-file" style={{ paddingTop: '2rem' }}>
                     <span>Photo Document</span>
                     <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
-                                    : detailData.photo_passport}
-                                    alt="" height={175} />
+                        <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
+                            : detailData.photo_passport}
+                            alt="" height={175} />
                     </div>
                 </div>
                 <div className="register-input input-file" style={{ paddingTop: '8rem' }}>
                     <span>Photo FaceReg</span>
                     <div className="input-file-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <img src={detailData.facreg_img ? `data:image/jpeg;base64,${detailData.facreg_img}`
-                                    : detailData.facreg_img}
-                                    alt="" height={175} />
+                        <img src={detailData.facreg_img ? `data:image/jpeg;base64,${detailData.facreg_img}`
+                            : detailData.facreg_img}
+                            alt="" height={175} />
                     </div>
                 </div>
 
@@ -484,14 +492,14 @@ const LogSimpanPelintas = () => {
                 onClose={() => { setIsOpenImage(false) }}
                 currImg={currentImage}
             />
-            <Modals 
-            showModal={modalDetail}
-            closeModal={handleCloseModalDetail}
-            headerName="Detail Log"
-            width={800}
-            isDetail
+            <Modals
+                showModal={modalDetail}
+                closeModal={handleCloseModalDetail}
+                headerName="Detail Log"
+                width={800}
+                isDetail
             >
-            {modalDetailRow()}
+                {modalDetailRow()}
             </Modals>
             <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} doneProgres={GetDataUserLog} />
         </div >

@@ -580,14 +580,19 @@ const LogRegister = () => {
                     </div>
                     <input type="file" name="profile_image" id="" style={{ display: 'none' }} ref={refInputFace} onChange={(e) => handleImageFace(e)} />
                 </div>
-                <div className="register-input input-file" style={{ paddingTop: '2rem' }}>
-                    <span>Document PLB</span>
-                    <div className="input-file-container" onClick={() => refInputPassport.current?.click()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div className=" flex" >
+                    <span className=' w-[50%]'>Document PLB</span>
+                    <div className=" h-52 rounded-md text-center bg-gray-100 shadow-inner flex justify-center items-center flex-col gap-2 py-4"
+                        style={{ display: 'flex', width: '68%', justifyContent: 'center', alignItems: 'center' }}>
                         {detailData.photo_passport ?
                             (
-                                <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
-                                    : detailData.photo_passport}
-                                    alt="" height={175} />
+                                <>
+                                    <img src={detailData.photo_passport ? `data:image/jpeg;base64,${detailData.photo_passport}`
+                                        : detailData.photo_passport}
+                                        alt="" height={175} />
+                                    <button onClick={() => setDetailData({ ...detailData, photo_passport: "" })} className="bg-blue-500 text-white rounded-md px-2 py-2 hover:cursor-pointer">Ganti Dokumen</button>
+                                </>
+
                             )
                             :
                             (<span>Drag and Drop here </span>)}
@@ -595,7 +600,7 @@ const LogRegister = () => {
                     <input type="file" name="photo_passport" id="" style={{ display: 'none' }} ref={refInputPassport} onChange={(e) => handleImageFace(e)} />
                 </div>
 
-            </div>
+            </div >
         )
     }
 

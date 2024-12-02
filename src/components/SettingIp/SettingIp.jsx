@@ -108,6 +108,7 @@ const SettingIp = () => {
                     editIpKamera.then((res) => {
                         if (res.status == 200) {
                             fetchAllIpAction()
+                            fetchAllIp()
                             setStatus("success")
                             Toast.fire({
                                 icon: "success",

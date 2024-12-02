@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import ImageSample from '../../assets/images/register_sample.jpg'
-import Select from 'react-select'
-import { apiGetAllIp, apiInsertLog } from '../../services/api'
+import React, { useEffect, useRef, useState } from 'react'
+import { apiGetAllIp, simpanPelintas } from '../../services/api'
 import Cookies from 'js-cookie'
 import './realtimefacereg.css'
 import { FaImage } from 'react-icons/fa'
-import { initiateSocket4020 } from '../../utils/socket'
 import { Toast } from '../Toast/Toast'
 import ModalData from '../Modal/ModalData'
+import { io } from 'socket.io-client'
+import { url_socket } from '../../services/env'
+
 
 const RealtimeFaceReg = () => {
-    const socket = initiateSocket4020()
     const [score, setScore] = useState(100)
     const [ipCamera, setIpCamera] = useState("")
     const [listCamera, setListCamera] = useState([])
@@ -20,13 +19,15 @@ const RealtimeFaceReg = () => {
     const [status, setStatus] = useState('idle')
     const [faceRegData, setFaceRegData] = useState({
         similiarity: null,
-        // faceRegImage: "https://ftnews.co.id/storage/2024/09/Sumanto.jpg",
         faceRegImage: null,
-        // profile_image: ImageSample,
         profile_image: null,
-        // documentImage: "https://upload.wikimedia.org/wikipedia/commons/6/6d/Indonesian_passport_data_page.jpg",
         documentImage: null
     })
+    const [socket, setSocket] = useState(null);
+    // const personIdRef = useRef(null)
+    const [lanjutRealtime, setLanjutRealtime] = useState(false)
+
+    // const [personId, setPersonId] = useState(null)
 
     const fetchAllIp = async () => {
         const userCookie = Cookies.get('userdata');
@@ -55,6 +56,7 @@ const RealtimeFaceReg = () => {
         const getKey = localStorage.getItem('ipCameraFaceReg')
         if (getKey) {
             setIpCamera(getKey)
+            connectToSocket(getKey)
         }
     }
 
@@ -65,6 +67,7 @@ const RealtimeFaceReg = () => {
     const handleConfirmCamera = () => {
         setIpCamera(selectedCamera)
         localStorage.setItem("ipCameraFaceReg", selectedCamera)
+        connectToSocket(selectedCamera)
     }
 
     const handleClearCamera = () => {
@@ -72,45 +75,33 @@ const RealtimeFaceReg = () => {
         localStorage.removeItem("ipCameraFaceReg", selectedCamera)
     }
 
-    const functionCheckRealtime = async () => {
-        if (socket.connected) {
-            setStatus('loading')
-            socket.emit("realtimeFR", { ipCamera });
-        } else {
-            Toast.fire({
-                icon: 'error',
-                title: 'Socket not connected'
-            })
-            console.log("Socket not connected")
-            socket.connect()
-        }
-    }
 
-    const insertDataLog = async () => {
+    const insertDataLog = async (params) => {
         setStatus('loading')
         console.log(resData, "resData")
         const dataRes = [
             {
-                personId: resData?.personId,
-                personCode: resData?.personCode,
-                name: resData?.name,
-                similarity: resData?.images_info[0]?.similarity || 0,
-                passStatus: resData?.passStatus === 6 ? "Failed" : "Success",
-                time: resData?.time,
-                img_path: resData?.base64Image,
-                ipCamera: ipCamera,
-                is_depart: resData?.is_depart,
-
+                "no_passport": resData?.personId,
+                "name": resData?.name,
+                "similarity": resData?.images_info[0]?.similarity || 0,
+                "pass_status": params,
+                "time": resData?.time,
+                "facreg_img": resData?.base64Image,
+                "ip_camera": ipCamera,
+                "is_depart": resData?.is_depart,
             }
         ]
         try {
 
-            const { data: resInsertLog } = await apiInsertLog(dataRes);
+            const { data: resInsertLog } = await simpanPelintas(dataRes);
             if (resInsertLog?.status == 201) {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Data Log berhasil ditambahkan'
-                })
+                if (params !== "tolak") {
+                    localStorage.removeItem("personId")
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Data Log berhasil ditambahkan'
+                    })
+                }
                 setResData(null)
                 setFaceRegData({
                     similiarity: null,
@@ -119,7 +110,7 @@ const RealtimeFaceReg = () => {
                     documentImage: null
                 })
                 setStatus('success')
-                console.log("Data berhasil diinsert")
+                setLanjutRealtime(!lanjutRealtime)
             }
         } catch (error) {
             Toast.fire({
@@ -131,60 +122,97 @@ const RealtimeFaceReg = () => {
         }
     }
 
+    const connectToSocket = (params) => {
+        if (!params) {
+            return
+        }
+        const newSocket = io(`${url_socket}:4030`)
+        setSocket(newSocket)
+
+        return () => {
+            newSocket.disconnect()
+        }
+    }
+
+
+    const Ulangi = () => {
+        socket.emit("realtimeFR", { ipCamera })
+        localStorage.removeItem("personId")
+        setLanjutRealtime(false)
+    }
 
     useEffect(() => {
+        if (!socket) {
+            return
+        }
+        socket.emit("realtimeFR", { ipCamera })
+
         socket.on("realtimeFRResponse", (res) => {
-            setStatus('loading')
             const { status, data } = res
-            if (status == 200) {
-                setStatus('success')
-                setResData(data)
-                setFaceRegData({
-                    similiarity: data?.images_info[0]?.similarity,
-                    faceRegImage: data.base64Image,
-                    profile_image: data.profile_image,
-                    documentImage: data.photo_passport
-                })
-            } else if (status == 404) {
-                setStatus('failed')
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Data tidak ditemukan'
-                })
+            if (status === 200) {
+                const personId = localStorage.getItem("personId")
+                if (data?.personId !== personId) {
+                    setResData(data)
+                    setFaceRegData({
+                        similiarity: data?.images_info[0]?.similarity,
+                        faceRegImage: data.base64Image,
+                        profile_image: data.profile_image,
+                        documentImage: data.photo_passport
+                    })
+                    localStorage.setItem("personId", data?.personId)
+                } else {
+                    setResData(null)
+                    setFaceRegData({
+                        similiarity: null,
+                        faceRegImage: null,
+                        profile_image: null,
+                        documentImage: null
+                    })
+                    // localStorage.removeItem("personId")
+                    socket.emit("realtimeFR", { ipCamera })
+                }
+            } else {
                 setResData(null)
                 setFaceRegData({
                     similiarity: null,
-                    faceRegImage: data.base64Image,
+                    faceRegImage: null,
                     profile_image: null,
                     documentImage: null
                 })
-
-            } else {
-                setStatus('failed')
+                socket.emit("realtimeFR", { ipCamera })
             }
-            setStatus('failed')
         })
+        socket.on("disconnect", () => {
+            // Toast.fire({
+            //     icon: 'error',
+            //     title: 'Socket disconnected'
+            // })
+        })
+
+        return () => {
+            socket.disconnect()
+        }
     }, [socket])
 
     useEffect(() => {
-        console.log(faceRegData, "dasdasdasasdad")
-    }, [faceRegData])
+        if (lanjutRealtime) {
+            socket.emit("realtimeFR", { ipCamera })
+            setLanjutRealtime(false)
+        }
+    }, [lanjutRealtime])
+
+    // useEffect(() => {
+    //     if (personId) {
+    //         personIdRef.current = personId
+    //     }
+    // }, [personId])
+
 
     useEffect(() => {
         fetchAllIp()
         getIpCamera()
     }, [])
     const IsFaceRegDataNull = Object.values(faceRegData).every(value => value === null);
-
-    const handleTolak = () => {
-        setResData(null)
-        setFaceRegData({
-            similiarity: null,
-            faceRegImage: null,
-            profile_image: null,
-            documentImage: null
-        })
-    }
 
     return (
         <div
@@ -275,32 +303,24 @@ const RealtimeFaceReg = () => {
                                         <button
                                             className='p-2 text-lg text-white bg-red-800 hover:bg-red-900 min-w-36 rounded-xl border-none cursor-pointer'
                                             disabled={status == "loading"}
-                                            onClick={handleTolak}
+                                            onClick={() => insertDataLog("tolak")}
                                         >Tolak</button>
                                         <button
                                             className='p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] min-w-36 rounded-xl border-1 border-black cursor-pointer'
-                                            onClick={functionCheckRealtime}
+                                            onClick={Ulangi}
                                             disabled={status == "loading"}
                                         >{status == "loading" ? "Mohon Tunggu..." : "Ulangi"}</button>
                                         <button
-                                            // disabled={score < 100}
                                             className={`p-2 text-lg text-white ${score === 100 ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-6e00"} min-w-36 rounded-xl border-none ${score == 100 ? "cursor-pointer" : "cursor-not-allowed"}`}
-                                            onClick={insertDataLog}
+                                            onClick={() => insertDataLog("izinkan")}
                                             disabled={status == "loading"}
                                         >Ijinkan</button>
                                     </div>
                                 </> :
                                 <>
-                                    <div className="flex justify-center mb-8">
-                                        <button
-                                            className={`p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] w-40 rounded-xl border-none cursor-pointer`}
-                                            onClick={functionCheckRealtime}
-                                            disabled={status == "loading"}
-                                        >{status == "loading" ? "Mohon Tunggu... " : "Periksa Data"}</button>
-                                    </div>
+
                                 </>
                         }
-
                     </> :
                     <>
                         <div className="w-full h-full flex justify-center items-center">
@@ -310,13 +330,9 @@ const RealtimeFaceReg = () => {
                                 </div>
                                 <div className="bagian-bawah-server flex gap-6">
                                     <div className="w-full flex items-center">
-                                        {/* <label htmlFor="isDepart" className="w-[30%]">
-                    Depart Status
-                    </label> */}
                                         <select
                                             value={selectedCamera}
                                             onChange={handleSelectCamera}
-                                        // name='nationality' 
                                         >
                                             <option value="">Pilih Kamera</option>
                                             {listCamera.map((data) => {
@@ -338,7 +354,6 @@ const RealtimeFaceReg = () => {
                     </>
             }
             <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }}
-            // doneProgres={GetDataUserLog} 
             />
         </div>
     )

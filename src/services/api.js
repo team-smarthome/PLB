@@ -569,7 +569,7 @@ export const DeleteJabatan = async (id) => {
 export const getAllSimpanPelintasApi = async (params) => {
   try {
     const res = await axios({
-      url: `${url_devel}api/log-simpan-pelintas`,
+      url: `${url_devel}api/simpan-pelintas`,
       params,
       headers: {
         'Content-Type': 'application/json'
@@ -586,7 +586,7 @@ export const checkCountDataFaceReg = async (date) => {
   try {
     const res = await axios({
       method: "GET",
-      url: `${url_devel}api/total-userFacereg`,
+      url: `${url_devel}api/total-simpan-pelintas`,
       params: date
     })
     return res
