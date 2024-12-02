@@ -10,7 +10,7 @@ import { Toast } from "../../components/Toast/Toast";
 import { formData, resultDataScan, caputedImageAfter, ImageDocumentPLB, DataHasilCekal, LanjutSendData } from "../../utils/atomStates";
 import { useNavigate } from "react-router-dom";
 import { imageToSend } from "../../utils/atomStates";
-import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData } from "../../services/api";
+import { apiInsertDataUser, GetDataCheckCekal, getAllNegaraData, getUserbyPassport } from "../../services/api";
 import { initiateSocket4010, addPendingRequest4010 } from "../../utils/socket";
 import Cookies from 'js-cookie';
 import { ipAddressServer } from "../../services/env";
@@ -588,6 +588,7 @@ const Apply = () => {
         isPyamentUrl: false,
         isPhoto: false,
       });
+
 
       const checkDataUser = await getUserbyPassport(sharedData?.passportData?.docNumber);
       console.log("checkDataUser", checkDataUser.data.data);
