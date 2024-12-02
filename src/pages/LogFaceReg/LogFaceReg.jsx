@@ -472,15 +472,14 @@ const LogFaceReg = () => {
         }
     }
 
-    console.log(logData, "logData")
-    //============================================ YANG DIGUNAKAN =============================================================//
     const handleSelectAll = () => {
         setLogData((prevItems) =>
             prevItems.map((item) => ({
-                ...item,
-                isSelected: true,
+              ...item, 
+              isSelected: true, 
             })))
     }
+    
     const handleClearAll = () => {
         setLogData((prevItems) =>
             prevItems.map((item) => ({
@@ -772,7 +771,20 @@ const LogFaceReg = () => {
                             >
                                 Pilih Semua
                             </button>}
-                        <button
+                       {logData.length == selectedData.length ?
+                   <button
+                   className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                   onClick={handleClearAll}
+               >
+                   Kosongkan Semua
+               </button>
+                   : <button
+                        className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                        onClick={handleSelectAll}
+                    >
+                        Pilih Semua
+                    </button>}
+                    <button
                             className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
                             onClick={() => setSimpanModal(true)}
                         >
