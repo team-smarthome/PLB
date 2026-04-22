@@ -202,8 +202,6 @@
   /* Change the cursor when disabled */
 }
 
-
-
 .table-footer {
   display: flex;
   justify-content: space-between;
@@ -254,18 +252,17 @@
   height: 100%;
 }
 
-
 .button-filter-first button {
   font-size: 13px;
   border-radius: 8px;
-  background-color: #3D5889;
+  background-color: #3d5889;
   color: white;
   width: 15vh;
   text-align: center;
 }
 
 .button-filter-first button:nth-child(2) {
-  background-color: #E6AF3C;
+  background-color: #e6af3c;
 }
 
 .button-filter-first button:nth-child(2):disabled {
@@ -275,7 +272,7 @@
 }
 
 .button-filter-first button:nth-child(3) {
-  background-color: #3DBB6F;
+  background-color: #3dbb6f;
 }
 
 .button-filter-first button:nth-child(3):disabled {
@@ -283,7 +280,6 @@
   color: #999;
   cursor: not-allowed;
 }
-
 
 .button-filter-second {
   display: flex;
@@ -294,7 +290,7 @@
 
 .button-filter-second button {
   border-radius: 8px;
-  background-color: #007BFE;
+  background-color: #007bfe;
   color: white;
   padding-right: 10%;
   padding-left: 10%;
@@ -304,7 +300,7 @@
   padding-right: 20%;
   padding-left: 20%;
   color: black;
-  background-color: #FEC108;
+  background-color: #fec108;
 }
 
 .filter-rigth {
@@ -332,7 +328,6 @@
   padding: 0 5%;
 }
 
-
 .input-filter-top p,
 .input-filter-bottom p {
   font-weight: bold;
@@ -349,7 +344,6 @@
   box-sizing: border-box;
 }
 
-
 .filter-left {
   /* background-color: green; */
   display: flex;
@@ -357,7 +351,6 @@
   flex-direction: column;
   align-items: end;
   height: 70%;
-
 }
 
 .input-filter-bottom2 {
@@ -395,7 +388,6 @@
   gap: 0%;
   padding: 0 5%;
 }
-
 
 .input-filter-top2 p {
   font-weight: bold;

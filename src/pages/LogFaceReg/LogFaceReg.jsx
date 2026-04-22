@@ -1,843 +1,952 @@
-import React, { useEffect, useRef, useState } from 'react'
-import TableLog from '../../components/TableLog/TableLog'
-import './logfacereg.style.css'
-import { apiDeleteLog, apiGetAllIp, getAllNegaraData, getDataLogApi, simpanPelintas } from '../../services/api'
-import Cookies from 'js-cookie';
+import React, { useEffect, useRef, useState } from "react";
+import TableLog from "../../components/TableLog/TableLog";
+import "./logfacereg.style.css";
+import {
+  apiDeleteLog,
+  apiGetAllIp,
+  getAllNegaraData,
+  getDataLogApi,
+  simpanPelintas,
+} from "../../services/api";
+import Cookies from "js-cookie";
 import Select from "react-select";
-import Pagination from '../../components/Pagination/Pagination'
+import Pagination from "../../components/Pagination/Pagination";
 import ImgsViewer from "react-images-viewer";
-import ModalData from '../../components/Modal/ModalData'
+import ModalData from "../../components/Modal/ModalData";
 import Excel from "exceljs";
-import { initiateSocket4010 } from '../../utils/socket';
-import { useNavigate } from 'react-router-dom';
-import Modals from '../../components/Modal/Modal';
-import { Toast } from '../../components/Toast/Toast';
+import { initiateSocket4010 } from "../../utils/socket";
+import { useNavigate } from "react-router-dom";
+import Modals from "../../components/Modal/Modal";
+import { Toast } from "../../components/Toast/Toast";
 
 const LogFaceReg = () => {
-    const navigate = useNavigate()
-    const socket = initiateSocket4010();
-    const [logData, setLogData] = useState([])
-    const [optionIp, setOptionIp] = useState([])
-    const [status, setStatus] = useState("idle")
-    const [getPagination, setGetPagination] = useState(false)
-    const [selectedCondition, setSelectedCondition] = useState('personId');
-    const [exportStatus, setExportStatus] = useState("idle")
-    const [totalDataFilter, setTotalDataFilter] = useState(0);
-    const [page, setPage] = useState(1);
-    const [isOpenImage, setIsOpenImage] = useState(false)
-    const [currentImage, setCurrentImage] = useState(null)
-    const [modalOpen, setModalOpen] = useState(false)
-    const [dataNationality, setDataNationality] = useState([])
-    const [actionPopup, setActionPopup] = useState(false)
-    const [simpanModal, setSimpanModal] = useState(false)
-    const [deleteModal, setDeleteModal] = useState(false)
-    const [params, setParams] = useState({
-        page: page,
-        name: "",
-        personId: "",
-        startDate: "",
-        endDate: "",
-        passStatus: "",
-        ipCamera: "",
-        gender: "",
-        nationality: "",
-    })
-    const [pagination, setPagination] = useState({
-        total: 0,
-        per_page: 10,
-        current_page: 1,
-        last_page: 1,
+  const navigate = useNavigate();
+  const socket = initiateSocket4010();
+  const [logData, setLogData] = useState([]);
+  const [optionIp, setOptionIp] = useState([]);
+  const [status, setStatus] = useState("idle");
+  const [getPagination, setGetPagination] = useState(false);
+  const [selectedCondition, setSelectedCondition] = useState("personId");
+  const [exportStatus, setExportStatus] = useState("idle");
+  const [totalDataFilter, setTotalDataFilter] = useState(0);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [isOpenImage, setIsOpenImage] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [dataNationality, setDataNationality] = useState([]);
+  const [actionPopup, setActionPopup] = useState(false);
+  const [simpanModal, setSimpanModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [params, setParams] = useState({
+    page: page,
+    per_page: perPage,
+    name: "",
+    personId: "",
+    startDate: "",
+    endDate: "",
+    passStatus: "",
+    ipCamera: "",
+    gender: "",
+    nationality: "",
+  });
+  const [pagination, setPagination] = useState({
+    total: 0,
+    per_page: 10,
+    current_page: 1,
+    last_page: 1,
+  });
+
+  const optionFilter = [
+    {
+      value: "personId",
+      label: "Nomor Passport",
+    },
+    {
+      value: "name",
+      label: "Nama",
+    },
+  ];
+
+  const optionFilterStatus = [
+    {
+      value: "",
+      label: "All",
+    },
+    {
+      value: "Success",
+      label: "Success",
+    },
+    {
+      value: "Failed",
+      label: "Failed",
+    },
+  ];
+
+  const dataGender = [
+    { value: "", label: "All Gender" },
+    { value: "M", label: "MALE" },
+    { value: "F", label: "FEMALE" },
+  ];
+
+  const paramsRef = useRef(params);
+
+  useEffect(() => {
+    paramsRef.current = params;
+  }, [params]);
+  //============================================ YANG DIGUNAKAN =============================================================//
+
+  const GetDataUserLog = async () => {
+    const currentParams = paramsRef.current;
+    console.log(currentParams, "paramsDariLog");
+    setStatus("loading");
+    try {
+      const { data } = await getDataLogApi(currentParams);
+      if (data.status === 200) {
+        setStatus("success");
+        const addCol = data?.data.map((item) => ({
+          ...item,
+          isSelected: false,
+        }));
+        setLogData(addCol);
+        setTotalDataFilter(data?.data?.length);
+        setPagination(data?.pagination);
+      }
+    } catch (error) {
+      setStatus("failed");
+      console.log(error?.message);
+    }
+  };
+
+  const GetDataUserLogFilter = async () => {
+    const dataIpKamera = localStorage.getItem("cameraIp");
+    const dataLog = {
+      page: 1,
+      name: "",
+      personId: "",
+      startDate: "",
+      endDate: "",
+      passStatus: "",
+      ipCamera: dataIpKamera,
+    };
+    try {
+      console.log(params, "paramsDariLog");
+      const { data } = await getDataLogApi(dataLog);
+      if (data.status === 200) {
+        setLogData(data?.data);
+        setTotalDataFilter(data?.data?.length);
+        setPagination(data?.pagination);
+      }
+    } catch (error) {
+      console.log(error?.message);
+    }
+  };
+
+  const GetDataKamera = async () => {
+    const userCookie = Cookies.get("userdata");
+
+    if (!userCookie) {
+      console.error("No user cookie found");
+      return;
+    }
+
+    const userInfo = JSON.parse(userCookie);
+    try {
+      const { data } = await apiGetAllIp(userInfo?.tpi_id);
+      if (data.status === 200) {
+        setOptionIp(data?.data);
+      }
+    } catch (error) {
+      console.log(error?.message);
+    }
+  };
+
+  const getDataNationality = async () => {
+    try {
+      const { data } = await getAllNegaraData();
+      if (data.status === 200) {
+        console.log(data.data, "dataNegara");
+        setDataNationality(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEpochToDate = (epoch) => {
+    const date = new Date(epoch * 1000);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    console.log(formattedDate, "dataConvert");
+    return formattedDate;
+  };
+
+  const handlePageChange = (selectedPage) => {
+    setPage(selectedPage);
+  };
+
+  const handleSearch = async () => {
+    handlePageChange(1);
+    GetDataUserLog();
+  };
+
+  const handleCheckBox = (e, index) => {
+    const updateData = [...logData];
+
+    updateData[index] = { ...updateData[index], isSelected: e.target.checked };
+
+    setLogData(updateData);
+  };
+
+  const handleActionPopup = () => {
+    const findData = logData.filter((data) => data.isSelected == true).length;
+    if (findData > 0) {
+      setActionPopup(true);
+    } else {
+      setActionPopup(false);
+    }
+  };
+
+  useEffect(() => {
+    handleActionPopup();
+  }, [logData]);
+
+  const customRowRenderer = (row, index) => {
+    return (
+      <>
+        <td>{row?.personId}</td>
+        <td>{row?.name}</td>
+        <td>{row?.similarity}</td>
+        <td>
+          {row?.gender === "M"
+            ? "Laki-Laki"
+            : row?.gender === "F"
+              ? "Perempuan"
+              : "Unkown"}
+        </td>
+        <td>{row?.nationality || "Unkown"}</td>
+        <td>
+          {row?.passStatus === 6 || row?.passStatus === "Failed"
+            ? "Failed"
+            : "Success"}
+        </td>
+        <td>{handleEpochToDate(row?.time)}</td>
+        <td className={`${row?.is_depart ? "text-green-400" : "text-red-400"}`}>
+          {row?.is_depart ? "Departure" : "Arrival"}
+        </td>
+        <td>
+          <img
+            src={`data:image/jpeg;base64,${row?.image_base64}`}
+            alt="result"
+            width={100}
+            height={100}
+            style={{ borderRadius: "50%" }}
+            onClick={() => handleOpenImage(row, index)}
+          />
+        </td>
+        <td>{row?.ipCamera}</td>
+        <td class="">
+          <input
+            onChange={(e) => {
+              e.stopPropagation();
+              handleCheckBox(e, index);
+            }}
+            id="disabled-checked-checkbox"
+            type="checkbox"
+            checked={row?.isSelected}
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+        </td>
+      </>
+    );
+  };
+
+  const handleChange = (e) => {
+    setParams({
+      ...params,
+      [selectedCondition]: e.target.value.toUpperCase(),
+      page: 1,
+    });
+    handlePageChange(1);
+  };
+
+  const generateExcel = async () => {
+    setExportStatus("loading");
+    const res = await getDataLogApi({
+      startDate: params.startDate,
+      endDate: params.endDate,
+      "not-paginate": true,
+    });
+    const responseData = res?.data?.data;
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet("Payment Report");
+
+    const headers = [
+      "No",
+      "no plb",
+      "name",
+      "similarity",
+      "gender",
+      "nationality",
+      "recogniton status",
+      "Recognition Time",
+    ];
+    worksheet.addRow(headers);
+
+    responseData.forEach((item, index) => {
+      const row = [
+        index + 1,
+        item.personId,
+        item.name ?? "unkown",
+        item?.similarity,
+        item?.gender ?? "unkown",
+        item?.nationality ?? "unkown",
+        item?.passStatus === 6 ? "Failed" : "Success",
+        handleEpochToDate(item?.time),
+      ];
+      worksheet.addRow(row);
     });
 
-    const optionFilter = [
-        {
-            value: 'personId',
-            label: 'Nomor Passport'
-        },
-        {
-            value: 'name',
-            label: 'Nama'
-        },
-    ]
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const getFilenameWithDateTime = (baseFilename) => {
+        const now = new Date();
+        const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
+        const time = now.toTimeString().split(" ")[0].replace(/:/g, "-"); // HH-MM-SS
+        return `${baseFilename.replace(".xlsx", "")}_${date}_${time}.xlsx`;
+      };
 
-    const optionFilterStatus = [
-        {
-            value: '',
-            label: 'All'
-        },
-        {
-            value: 'Success',
-            label: 'Success'
-        },
-        {
-            value: 'Failed',
-            label: 'Failed'
-        },
-    ]
+      const date = new Date();
+      const formattedDate = date
+        .toISOString()
+        .slice(0, 19)
+        .replace(/[-T:]/g, ""); // e.g., 20241119_123456
+      const baseFilename = `Log_FaceReg_${formattedDate}.xlsx`;
+      const filename = getFilenameWithDateTime(baseFilename);
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        setExportStatus("success");
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+      } else {
+        setExportStatus("success");
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    });
+  };
 
+  const resultArray = (logData || []).map((item) => ({
+    src: item.image_base64
+      ? `data:image/jpeg;base64,${item.image_base64}`
+      : "https://via.placeholder.com/150",
+  }));
 
-    const dataGender = [
-        { value: "", label: "All Gender" },
-        { value: "M", label: "MALE" },
-        { value: "F", label: "FEMALE" },
-    ];
+  const handleOpenImage = (row, index) => {
+    console.log(index, row);
+    setIsOpenImage(true);
+    setCurrentImage(index);
+  };
+  const nextImage = () => {
+    setCurrentImage(currentImage + 1);
+  };
+  const prevImage = () => {
+    setCurrentImage(currentImage - 1);
+  };
 
-
-    const paramsRef = useRef(params);
-
-    useEffect(() => {
-        paramsRef.current = params;
-    }, [params]);
-    //============================================ YANG DIGUNAKAN =============================================================//
-
-    const GetDataUserLog = async () => {
-        const currentParams = paramsRef.current;
-        console.log(currentParams, "paramsDariLog");
-
-        try {
-            const { data } = await getDataLogApi(currentParams);
-            if (data.status === 200) {
-                const addCol = data?.data.map((item) => ({ ...item, isSelected: false }))
-                setLogData(addCol)
-                setTotalDataFilter(data?.data?.length);
-                setPagination(data?.pagination);
-            }
-        } catch (error) {
-            console.log(error?.message)
-        }
-    }
-
-    const GetDataUserLogFilter = async () => {
-        const dataIpKamera = localStorage.getItem('cameraIp')
-        const dataLog = {
-            page: 1,
-            name: "",
-            personId: "",
-            startDate: "",
-            endDate: "",
-            passStatus: "",
-            ipCamera: dataIpKamera
-        }
-        try {
-            console.log(params, "paramsDariLog")
-            const { data } = await getDataLogApi(dataLog);
-            if (data.status === 200) {
-                setLogData(data?.data)
-                setTotalDataFilter(data?.data?.length);
-                setPagination(data?.pagination);
-            }
-        } catch (error) {
-            console.log(error?.message)
-        }
-    }
-
-
-    const GetDataKamera = async () => {
-        const userCookie = Cookies.get('userdata');
-
-        if (!userCookie) {
-            console.error("No user cookie found");
-            return;
-        }
-
-        const userInfo = JSON.parse(userCookie);
-        try {
-            const { data } = await apiGetAllIp(userInfo?.tpi_id,);
-            if (data.status === 200) {
-                setOptionIp(data?.data)
-            }
-
-        } catch (error) {
-            console.log(error?.message)
-        }
-    }
-
-    const getDataNationality = async () => {
-        try {
-            const { data } = await getAllNegaraData();
-            if (data.status === 200) {
-                console.log(data.data, "dataNegara")
-                setDataNationality(data.data);
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handleEpochToDate = (epoch) => {
-        const date = new Date(epoch * 1000);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-
-        const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-        console.log(formattedDate, "dataConvert");
-        return formattedDate;
-    };
-
-    const handlePageChange = (selectedPage) => {
-        setPage(selectedPage);
-    };
-
-
-    const handleSearch = async () => {
-        handlePageChange(1);
-        GetDataUserLog();
-    }
-
-    const handleCheckBox = (e, index) => {
-        const updateData = [...logData]
-
-        updateData[index] = { ...updateData[index], isSelected: e.target.checked }
-
-        setLogData(updateData)
-    }
-
-    const handleActionPopup = () => {
-        const findData = logData.filter((data) => data.isSelected == true).length
-        if (findData > 0) {
-            setActionPopup(true)
-        } else {
-            setActionPopup(false)
-
-        }
-    }
-
-    useEffect(() => {
-        handleActionPopup()
-    }, [logData])
-
-    const customRowRenderer = (row, index) => {
-        return (
-            <>
-
-                <td>{row?.personId}</td>
-                <td>{row?.name}</td>
-                <td>{row?.similarity}</td>
-                <td>{row?.gender === "M" ? "Laki-Laki" : row?.gender === "F" ? "Perempuan" : "Unkown"}</td>
-                <td>{row?.nationality || "Unkown"}</td>
-                <td>{row?.passStatus === 6 || row?.passStatus === "Failed" ? "Failed" : "Success"}</td>
-                <td>{handleEpochToDate(row?.time)}</td>
-                <td className={`${row?.is_depart ? 'text-green-400' : 'text-red-400'}`}>{row?.is_depart ? "Departure" : "Arrival"}</td>
-                <td>
-                    <img
-                        src={`data:image/jpeg;base64,${row?.image_base64}`}
-                        alt="result"
-                        width={100}
-                        height={100}
-                        style={{ borderRadius: "50%" }}
-                        onClick={() => handleOpenImage(row, index)}
-                    />
-                </td>
-                <td>{row?.ipCamera}</td>
-                <td class="">
-                    <input
-                        onChange={(e) => {
-                            e.stopPropagation()
-                            handleCheckBox(e, index)
-                        }
-                        }
-                        id="disabled-checked-checkbox" type="checkbox" checked={row?.isSelected} class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                </td>
-            </>
-        );
-    };
-
-    const handleChange = (e) => {
-        setParams({
-            ...params,
-            [selectedCondition]: e.target.value.toUpperCase(),
-            page: 1
-        })
-        handlePageChange(1)
-    }
-
-    const generateExcel = async () => {
-        setExportStatus("loading")
-        const res = await getDataLogApi({
-            startDate: params.startDate,
-            endDate: params.endDate,
-            "not-paginate": true,
-        });
-        const responseData = res?.data?.data
-        const workbook = new Excel.Workbook();
-        const worksheet = workbook.addWorksheet("Payment Report");
-
-        const headers = ['No', 'no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time"]
-        worksheet.addRow(headers);
-
-        responseData.forEach((item, index) => {
-            const row = [
-                index + 1,
-                item.personId,
-                item.name ?? "unkown",
-                item?.similarity,
-                item?.gender ?? "unkown",
-                item?.nationality ?? "unkown",
-                item?.passStatus === 6 ? "Failed" : "Success",
-                handleEpochToDate(item?.time),
-            ];
-            worksheet.addRow(row);
-        });
-
-        workbook.xlsx.writeBuffer().then((buffer) => {
-            const blob = new Blob([buffer], {
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            });
-            const getFilenameWithDateTime = (baseFilename) => {
-                const now = new Date();
-                const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
-                const time = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
-                return `${baseFilename.replace('.xlsx', '')}_${date}_${time}.xlsx`;
-            };
-
-            const date = new Date();
-            const formattedDate = date.toISOString().slice(0, 19).replace(/[-T:]/g, ""); // e.g., 20241119_123456
-            const baseFilename = `Log_FaceReg_${formattedDate}.xlsx`;
-            const filename = getFilenameWithDateTime(baseFilename);
-            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                setExportStatus("success")
-                window.navigator.msSaveOrOpenBlob(blob, filename);
-            } else {
-                setExportStatus("success")
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            }
-        });
-    };
-
-    const resultArray = (logData || []).map(item => ({
-        src: item.image_base64
-            ? `data:image/jpeg;base64,${item.image_base64}`
-            : 'https://via.placeholder.com/150'
+  const handleChangeStatus = (selectedOption) => {
+    setParams((prevState) => ({
+      ...prevState,
+      page: 1,
+      passStatus: selectedOption ? selectedOption.value : "",
     }));
+    handlePageChange(1);
+  };
 
-
-    const handleOpenImage = (row, index) => {
-        console.log(index, row)
-        setIsOpenImage(true)
-        setCurrentImage(index)
-    }
-    const nextImage = () => {
-        setCurrentImage(currentImage + 1)
-    }
-    const prevImage = () => {
-        setCurrentImage(currentImage - 1)
-    }
-
-    const handleChangeStatus = (selectedOption) => {
-        setParams(prevState => ({
-            ...prevState,
-            page: 1,
-            passStatus: selectedOption ? selectedOption.value : ""
-        }));
-        handlePageChange(1)
+  useEffect(() => {
+    localStorage.setItem("cameraIp", "");
+    const fetchData = async () => {
+      await Promise.all([
+        GetDataUserLog(),
+        GetDataKamera(),
+        getDataNationality(),
+      ]);
+      setStatus("success");
     };
+    fetchData();
 
+    socket.on("logDataUpdate", () => {
+      console.log("123params1234", params);
+      GetDataUserLog();
+    });
 
-    useEffect(() => {
-        localStorage.setItem('cameraIp', '')
-        const fetchData = async () => {
-            await Promise.all([GetDataUserLog(), GetDataKamera(), getDataNationality()])
-            setStatus("success")
-        }
-        fetchData();
+    return () => {
+      socket.off("logDataUpdate");
+    };
+  }, []);
 
+  useEffect(() => {
+    setParams((prevState) => ({
+      ...prevState,
+      page: page,
+      per_page: perPage,
+    }));
+    setGetPagination(true);
+  }, [page, perPage]);
 
+  useEffect(() => {
+    if (getPagination) {
+      GetDataUserLog();
+    }
+    setGetPagination(false);
+  }, [getPagination]);
 
-        socket.on('logDataUpdate', () => {
-            console.log('123params1234', params)
-            GetDataUserLog()
+  const selectedData = logData.filter((data) => data.isSelected == true);
+
+  const handleSimpanPelintas = async () => {
+    console.log("selectedData", selectedData);
+    setStatus("loading");
+    const mapSelectedData = selectedData.map((item) => {
+      return {
+        no_passport: item?.personId,
+        name: item?.name,
+        similarity: item?.similarity,
+        pass_status: "izinkan",
+        time: item?.time,
+        facreg_img: item?.image_base64,
+        ip_camera: item?.ipCamera,
+        is_depart: item?.is_depart,
+      };
+    });
+    console.log(mapSelectedData, "mapSelectedData");
+    try {
+      const { data: resInsertLog } = await simpanPelintas(mapSelectedData);
+      if (resInsertLog?.status == 201) {
+        Toast.fire({
+          icon: "success",
+          title: "Data Log berhasil ditambahkan",
+        });
+        setSimpanModal(false);
+        setStatus("success");
+        console.log("Data berhasil diinsert");
+        GetDataUserLog();
+      }
+    } catch (error) {
+      setSimpanModal(false);
+      Toast.fire({
+        icon: "error",
+        title: "Data Log gagal ditambahkan",
+      });
+      setStatus("success");
+      console.error("Error inserting log data:", error);
+    }
+  };
+
+  const handleDeleteLogs = async () => {
+    const deletedData = selectedData.map((item) => {
+      return item.id;
+    });
+    const data = {
+      ids: deletedData,
+    };
+    try {
+      const res = await apiDeleteLog(data);
+      if (res?.status == 200 || res?.status == 201) {
+        Toast.fire({
+          icon: "success",
+          title: "Data Log berhasil dihapus",
         });
 
-        return () => {
-            socket.off('logDataUpdate');
-        }
-    }, [])
-
-    useEffect(() => {
-        setParams((prevState) => ({
-            ...prevState,
-            page: page
-        })
-        )
-        setGetPagination(true)
-    }, [page]);
-
-    useEffect(() => {
-        if (getPagination) {
-            GetDataUserLog()
-        }
-        setGetPagination(false)
-    }, [getPagination])
-
-    const selectedData = logData.filter((data) => data.isSelected == true)
-
-    const handleSimpanPelintas = async () => {
-        console.log('selectedData', selectedData)
-        setStatus('loading')
-        const mapSelectedData = selectedData.map((item) => {
-            return ({
-                no_passport: item?.personId,
-                name: item?.name,
-                similarity: item?.similarity,
-                pass_status: "izinkan",
-                time: item?.time,
-                facreg_img: item?.image_base64,
-                ip_camera: item?.ipCamera,
-                is_depart: item?.is_depart,
-            })
-
-        })
-        console.log(mapSelectedData, 'mapSelectedData')
-        // return console.log(mapSelectedData)
-        // const dataRes = [
-        //     {
-        //         "no_passport": resData?.personId,
-        //         "name": resData?.name,
-        //         "similarity": resData?.images_info[0]?.similarity || 0,
-        //         "pass_status": params,
-        //         "time": resData?.time,
-        //         "facreg_img": resData?.base64Image,
-        //         "ip_camera": ipCamera,
-        //         "is_depart": resData?.is_depart,
-        //     }
-        // ]
-        try {
-            const { data: resInsertLog } = await simpanPelintas(mapSelectedData);
-            if (resInsertLog?.status == 201) {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Data Log berhasil ditambahkan'
-                })
-                // setResData(null)
-                // setFaceRegData({
-                //     similiarity: null,
-                //     faceRegImage: null,
-                //     profile_image: null,
-                //     documentImage: null
-                // })
-                setSimpanModal(false)
-                setStatus('success')
-                console.log("Data berhasil diinsert")
-                GetDataUserLog()
-            }
-        } catch (error) {
-            setSimpanModal(false)
-            Toast.fire({
-                icon: 'error',
-                title: 'Data Log gagal ditambahkan'
-            })
-            setStatus('success')
-            console.error("Error inserting log data:", error);
-        }
+        setDeleteModal(false);
+        setStatus("success");
+        GetDataUserLog();
+      }
+    } catch (error) {
+      setSimpanModal(false);
+      Toast.fire({
+        icon: "error",
+        title: "Data Log gagal dihapus",
+      });
+      setStatus("success");
+      console.error("Error inserting log data:", error);
     }
+  };
 
-    const handleDeleteLogs = async () => {
-        const deletedData = selectedData.map((item) => {
-            return item.id
-        })
-        const data = {
-            ids: deletedData
-        }
-        try {
-            const res = await apiDeleteLog(data)
-            if (res?.status == 200 || res?.status == 201) {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Data Log berhasil dihapus'
-                })
+  const handleSelectAll = () => {
+    setLogData((prevItems) =>
+      prevItems.map((item) => ({
+        ...item,
+        isSelected: true,
+      })),
+    );
+  };
 
-                setDeleteModal(false)
-                setStatus('success')
-                GetDataUserLog()
-            }
-        } catch (error) {
-            setSimpanModal(false)
-            Toast.fire({
-                icon: 'error',
-                title: 'Data Log gagal dihapus'
-            })
-            setStatus('success')
-            console.error("Error inserting log data:", error);
-        }
-    }
+  const handleClearAll = () => {
+    setLogData((prevItems) =>
+      prevItems.map((item) => ({
+        ...item,
+        isSelected: false,
+      })),
+    );
+  };
 
-    const handleSelectAll = () => {
-        setLogData((prevItems) =>
-            prevItems.map((item) => ({
-              ...item, 
-              isSelected: true, 
-            })))
-    }
-    
-    const handleClearAll = () => {
-        setLogData((prevItems) =>
-            prevItems.map((item) => ({
-                ...item,
-                isSelected: false,
-            })))
-    }
-
-
-    return (
-        <div style={{ padding: 20, backgroundColor: '#eeeeee', height: '100%' }}>
-            <div className="face-reg-header">
-                <div className='face-reg-filter-name'>
-                    <div className=' label-filter-name'>
-                        <p>Filter By</p>
-                        <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
-                        <p>Recognition Status</p>
-                        <p>Gender</p>
-                    </div>
-                    <div className='value-filter-name'>
-                        <Select
-                            value={optionFilter.find(option => option.value === selectedCondition)}
-                            onChange={(selectedOption) => {
-                                setParams({
-                                    ...params,
-                                    [selectedOption.value]: ""
-                                })
-                                setSelectedCondition(selectedOption.value)
-                            }}
-                            options={optionFilter}
-                            className="basic-single"
-                            classNamePrefix="select"
-                            styles={{
-                                container: (provided) => ({
-                                    ...provided,
-                                    position: 'relative',
-                                    flex: 1,
-                                    width: "91.7%",
-                                    borderRadius: "10px",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                    fontFamily: "Roboto, Arial, sans-serif",
-                                }),
-                                valueContainer: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                }),
-                                control: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                }),
-                            }}
-                        />
-                        <input type="text"
-                            value={selectedCondition === "name" ? params.name.toUpperCase() : params.personId.toUpperCase()}
-                            onChange={handleChange}
-                            placeholder={`Enter ${selectedCondition == "name" ? "name" : "passport number"}`}
-                            className='input-filter-name-1'
-                        />
-                        <Select
-                            onChange={handleChangeStatus}
-                            options={optionFilterStatus}
-                            className="basic-single"
-                            classNamePrefix="select"
-                            defaultValue={optionFilterStatus[0]}
-                            styles={{
-                                container: (provided) => ({
-                                    ...provided,
-                                    position: 'relative',
-                                    flex: 1,
-                                    width: "91.7%",
-                                    borderRadius: "10px",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                    fontFamily: "Roboto, Arial, sans-serif",
-                                }),
-                                valueContainer: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                }),
-                                control: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                }),
-                            }}
-                        />
-                        <Select
-                            onChange={(selectedOption) => {
-                                setParams({ ...params, page: 1, gender: selectedOption.value })
-                                handlePageChange(1)
-                            }}
-                            options={dataGender}
-                            className="basic-single"
-                            classNamePrefix="select"
-                            defaultValue={dataGender[0]}
-                            styles={{
-                                container: (provided) => ({
-                                    ...provided,
-                                    position: 'relative',
-                                    flex: 1,
-                                    width: "91.7%",
-                                    borderRadius: "10px",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                    fontFamily: "Roboto, Arial, sans-serif",
-                                }),
-                                valueContainer: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                }),
-                                control: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                }),
-                            }}
-                        />
-                    </div>
-                </div>
-                <div className='face-reg-filter-kamera'>
-                    <div className='label-filter-name'>
-                        <p>Start Date</p>
-                        <p>End Date</p>
-                        <p>Select Camera</p>
-                        <p>Nationality</p>
-                    </div>
-                    <div className='value-filter-name'>
-                        <input type="datetime-local"
-                            value={params.startDate}
-                            onChange={(e) => {
-                                setParams({ ...params, startDate: e.target.value, page: 1 })
-                                handlePageChange(1)
-                            }}
-                            style={{
-                                width: "88%",
-                            }}
-                        />
-                        <input type="datetime-local"
-                            value={params.endDate}
-                            onChange={(e) => {
-                                setParams({ ...params, endDate: e.target.value, page: 1 })
-                                handlePageChange(1)
-                            }}
-                            style={{
-                                width: "88%",
-                            }}
-                        />
-                        <Select
-                            onChange={(selectedOption) => {
-                                localStorage.setItem('cameraIp', selectedOption.value)
-                                setParams({ ...params, page: 1, ipCamera: selectedOption.value })
-                                handlePageChange(1)
-                            }}
-                            options={[
-                                { value: '', label: 'All Camera' },
-                                ...optionIp.map(item => ({ value: item.ipAddress, label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Departure" : "Arrival"} )` }))
-                            ]}
-                            defaultValue={{ value: '', label: 'All Camera' }}
-                            className="basic-single"
-                            classNamePrefix="select"
-                            styles={{
-                                container: (provided) => ({
-                                    ...provided,
-                                    position: 'relative',
-                                    flex: 1,
-                                    width: "91.7%",
-                                    borderRadius: "10px",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                    fontFamily: "Roboto, Arial, sans-serif",
-                                }),
-                                valueContainer: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                }),
-                                control: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                }),
-                            }}
-                        />
-                        <Select
-                            onChange={(selectedOption) => {
-                                setParams({ ...params, nationality: selectedOption.value, page: 1 })
-                                handlePageChange(1)
-                            }}
-                            options={[
-                                { value: "", label: "All Nationality" },
-                                ...dataNationality.map(country => ({
-                                    value: country.nama_negara,
-                                    label: country.nama_negara
-                                }))
-                            ]}
-                            className="basic-single"
-                            classNamePrefix="select"
-                            styles={{
-                                container: (provided) => ({
-                                    ...provided,
-                                    position: 'relative',
-                                    flex: 1,
-                                    width: "91.7%",
-                                    borderRadius: "10px",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                    fontFamily: "Roboto, Arial, sans-serif",
-                                }),
-                                valueContainer: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                }),
-                                control: (provided) => ({
-                                    ...provided,
-                                    flex: 1,
-                                    width: "100%",
-                                    backgroundColor: "rgba(217, 217, 217, 0.75)",
-                                }),
-                            }}
-                        />
-                    </div>
-                </div>
-            </div>
-            <div className='submit-buttons-registers ' style={{
-                width: "99.4%",
-                paddingTop: "1%",
-                paddingBottom: "1%",
-                marginTop: "1%",
-            }}>
-
-                <button
-                    style={{
-                        width: 150,
-                        cursor: 'pointer',
-                        backgroundColor: "blue"
-                    }}
-                    onClick={() => setModalOpen(true)}
-                >Input Data Manual</button>
-                <button
-                    onClick={generateExcel}
-                    className='add-data'
-                    disabled={exportStatus === "loading"}
-                > {exportStatus == "loading" ?
-                    "Exporting..."
-                    : "Export"}
-                </button>
-                <button
-                    className='search'
-                    onClick={handleSearch}
-                    style={{
-                        backgroundColor: '#4F70AB',
-                    }}
-                >Search
-                </button>
-
-            </div>
-            {status === "loading" && (
-                <div className="loading">
-                    <span className="loader-loading-table"></span>
-                </div>
-            )}
-            {status === "success" && logData &&
-                <>
-                    <TableLog
-                        tHeader={['no plb', 'name', 'similarity', 'gender', 'nationality', 'recogniton status', "Recognition Time", "Depart Status", "Image Result", "IP Camera", "Action"]}
-                        tBody={logData}
-                        // handler={handleOpenImage}
-                        rowRenderer={customRowRenderer}
-                        showIndex={true}
-                        page={page}
-                        perPage={pagination?.per_page}
-                    />
-                    {actionPopup && <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
-                        {logData.length == selectedData.length ?
-                            <button
-                                className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                                onClick={handleClearAll}
-                            >
-                                Kosongkan Semua
-                            </button>
-                            : <button
-                                className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                                onClick={handleSelectAll}
-                            >
-                                Pilih Semua
-                            </button>}
-                       {logData.length == selectedData.length ?
-                   <button
-                   className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                   onClick={handleClearAll}
-               >
-                   Kosongkan Semua
-               </button>
-                   : <button
-                        className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                        onClick={handleSelectAll}
-                    >
-                        Pilih Semua
-                    </button>}
-                    <button
-                            className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                            onClick={() => setSimpanModal(true)}
-                        >
-                            Simpan Pelintas
-                        </button>
-                        <button
-                            className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-                            onClick={() => setDeleteModal(true)}
-                        >
-                            Hapus Data
-                        </button>
-                    </div>}
-                    <div className="table-footer">
-                        <>Show {totalDataFilter} of {pagination?.total} entries</>
-                        <Pagination
-                            pageCount={pagination?.last_page}
-                            onPageChange={handlePageChange}
-                            currentPage={page}
-                        />
-                    </div>
-
-                </>
-            }
-            <ImgsViewer
-                imgs={resultArray}
-                isOpen={isOpenImage}
-                onClickPrev={prevImage}
-                onClickNext={nextImage}
-                onClose={() => { setIsOpenImage(false) }}
-                currImg={currentImage}
+  return (
+    <div style={{ padding: 20, backgroundColor: "#eeeeee", height: "100%" }}>
+      <div className="face-reg-header">
+        <div className="face-reg-filter-name">
+          <div className=" label-filter-name">
+            <p>Filter By</p>
+            <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
+            <p>Recognition Status</p>
+            <p>Gender</p>
+          </div>
+          <div className="value-filter-name">
+            <Select
+              value={optionFilter.find(
+                (option) => option.value === selectedCondition,
+              )}
+              onChange={(selectedOption) => {
+                setParams({
+                  ...params,
+                  [selectedOption.value]: "",
+                });
+                setSelectedCondition(selectedOption.value);
+              }}
+              options={optionFilter}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  position: "relative",
+                  flex: 1,
+                  width: "91.7%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
             />
-            <Modals
-                showModal={simpanModal}
-                headerName="Sinkronisasi data"
-                closeModal={() => setSimpanModal(false)}
-                buttonName="Confirm"
-                onConfirm={handleSimpanPelintas}
-            >
-                <span className='text-lg'>Apakah anda ingin Sinkronisasi <span className='font-bold'>{selectedData.length}</span> data ?</span>
-            </Modals>
+            <input
+              type="text"
+              value={
+                selectedCondition === "name"
+                  ? params.name.toUpperCase().replace(/[^A-Za-z\s.-]/g, "")
+                  : params.personId.toUpperCase()
+              }
+              onChange={handleChange}
+              placeholder={`Enter ${selectedCondition == "name" ? "name" : "passport number"}`}
+              className="input-filter-name-1"
+            />
+            <Select
+              onChange={handleChangeStatus}
+              options={optionFilterStatus}
+              className="basic-single"
+              classNamePrefix="select"
+              defaultValue={optionFilterStatus[0]}
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  position: "relative",
+                  flex: 1,
+                  width: "91.7%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+            <Select
+              onChange={(selectedOption) => {
+                setParams({ ...params, page: 1, gender: selectedOption.value });
+                handlePageChange(1);
+              }}
+              options={dataGender}
+              className="basic-single"
+              classNamePrefix="select"
+              defaultValue={dataGender[0]}
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  position: "relative",
+                  flex: 1,
+                  width: "91.7%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+          </div>
+        </div>
+        <div className="face-reg-filter-kamera">
+          <div className="label-filter-name">
+            <p>Start Date</p>
+            <p>End Date</p>
+            <p>Select Camera</p>
+            <p>Nationality</p>
+          </div>
+          <div className="value-filter-name">
+            <input
+              type="datetime-local"
+              value={params.startDate}
+              onChange={(e) => {
+                setParams({ ...params, startDate: e.target.value, page: 1 });
+                handlePageChange(1);
+              }}
+              style={{
+                width: "88%",
+              }}
+            />
+            <input
+              type="datetime-local"
+              value={params.endDate}
+              onChange={(e) => {
+                setParams({ ...params, endDate: e.target.value, page: 1 });
+                handlePageChange(1);
+              }}
+              style={{
+                width: "88%",
+              }}
+            />
+            <Select
+              onChange={(selectedOption) => {
+                localStorage.setItem("cameraIp", selectedOption.value);
+                setParams({
+                  ...params,
+                  page: 1,
+                  ipCamera: selectedOption.value,
+                });
+                handlePageChange(1);
+              }}
+              options={[
+                { value: "", label: "All Camera" },
+                ...optionIp.map((item) => ({
+                  value: item.ipAddress,
+                  label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Departure" : "Arrival"} )`,
+                })),
+              ]}
+              defaultValue={{ value: "", label: "All Camera" }}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  position: "relative",
+                  flex: 1,
+                  width: "91.7%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+            <Select
+              onChange={(selectedOption) => {
+                setParams({
+                  ...params,
+                  nationality: selectedOption.value,
+                  page: 1,
+                });
+                handlePageChange(1);
+              }}
+              options={[
+                { value: "", label: "All Nationality" },
+                ...dataNationality.map((country) => ({
+                  value: country.nama_negara,
+                  label: country.nama_negara,
+                })),
+              ]}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={{
+                container: (provided) => ({
+                  ...provided,
+                  position: "relative",
+                  flex: 1,
+                  width: "91.7%",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  fontFamily: "Roboto, Arial, sans-serif",
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  flex: 1,
+                  width: "100%",
+                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                }),
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="submit-buttons-registers "
+        style={{
+          width: "99.4%",
+          paddingTop: "1%",
+          paddingBottom: "1%",
+          marginTop: "1%",
+        }}
+      >
+        <button
+          style={{
+            width: 150,
+            cursor: "pointer",
+            backgroundColor: "blue",
+          }}
+          onClick={() => setModalOpen(true)}
+        >
+          Input Data Manual
+        </button>
+        <button
+          onClick={generateExcel}
+          className="add-data"
+          disabled={exportStatus === "loading"}
+        >
+          {" "}
+          {exportStatus == "loading" ? "Exporting..." : "Export"}
+        </button>
+        <button
+          className="search"
+          onClick={handleSearch}
+          style={{
+            backgroundColor: "#4F70AB",
+          }}
+        >
+          Search
+        </button>
+      </div>
+      {status === "loading" && (
+        <div className="loading">
+          <span className="loader-loading-table"></span>
+        </div>
+      )}
+      {status === "success" && logData && (
+        <>
+          <TableLog
+            tHeader={[
+              "no plb",
+              "name",
+              "similarity",
+              "gender",
+              "nationality",
+              "recogniton status",
+              "Recognition Time",
+              "Depart Status",
+              "Image Result",
+              "IP Camera",
+              "Action",
+            ]}
+            tBody={logData}
+            // handler={handleOpenImage}
+            rowRenderer={customRowRenderer}
+            showIndex={true}
+            page={page}
+            perPage={pagination?.per_page}
+          />
+          {actionPopup && (
+            <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
+              {logData.length == selectedData.length ? (
+                <button
+                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                  onClick={handleClearAll}
+                >
+                  Kosongkan Semua
+                </button>
+              ) : (
+                <button
+                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                  onClick={handleSelectAll}
+                >
+                  Pilih Semua
+                </button>
+              )}
+              {logData.length == selectedData.length ? (
+                <button
+                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                  onClick={handleClearAll}
+                >
+                  Kosongkan Semua
+                </button>
+              ) : (
+                <button
+                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                  onClick={handleSelectAll}
+                >
+                  Pilih Semua
+                </button>
+              )}
+              <button
+                className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
+                onClick={() => setSimpanModal(true)}
+              >
+                Simpan Pelintas
+              </button>
+              <button
+                className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
+                onClick={() => setDeleteModal(true)}
+              >
+                Hapus Data
+              </button>
+            </div>
+          )}
+          <div className="table-footer">
+            <>
+              Show {totalDataFilter} of {pagination?.total} entries
+            </>
+            <div className="table-footer-controls">
+              <select
+                value={perPage || 10}
+                onChange={(e) => {
+                  setPerPage(Number(e.target.value));
+                }}
+                className="table-footer-controls-select"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <Pagination
+                pageCount={pagination?.last_page}
+                onPageChange={handlePageChange}
+                currentPage={page}
+              />
+            </div>
+          </div>
+        </>
+      )}
+      {status === "failed" && (
+        <>
+          <TableLog
+            tHeader={[
+              "no plb",
+              "name",
+              "similarity",
+              "gender",
+              "nationality",
+              "recogniton status",
+              "Recognition Time",
+              "Depart Status",
+              "Image Result",
+              "IP Camera",
+              "Action",
+            ]}
+            tBody={[]}
+            // handler={handleOpenImage}
+            rowRenderer={customRowRenderer}
+            showIndex={true}
+            page={page}
+            perPage={pagination?.per_page}
+          />
+        </>
+      )}
+      <ImgsViewer
+        imgs={resultArray}
+        isOpen={isOpenImage}
+        onClickPrev={prevImage}
+        onClickNext={nextImage}
+        onClose={() => {
+          setIsOpenImage(false);
+        }}
+        currImg={currentImage}
+      />
+      <Modals
+        showModal={simpanModal}
+        headerName="Sinkronisasi data"
+        closeModal={() => setSimpanModal(false)}
+        buttonName="Confirm"
+        onConfirm={handleSimpanPelintas}
+      >
+        <span className="text-lg">
+          Apakah anda ingin Sinkronisasi{" "}
+          <span className="font-bold">{selectedData.length}</span> data ?
+        </span>
+      </Modals>
 
-            <Modals
-                showModal={deleteModal}
-                headerName="Hapus data"
-                closeModal={() => setDeleteModal(false)}
-                buttonName="Confirm"
-                onConfirm={handleDeleteLogs}
-            >
-                <span className='text-lg'>Apakah anda ingin Menghapus <span className='font-bold'>{selectedData.length}</span> data ?</span>
-            </Modals>
-            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} doneProgres={GetDataUserLog} />
-        </div >
-    )
-}
+      <Modals
+        showModal={deleteModal}
+        headerName="Hapus data"
+        closeModal={() => setDeleteModal(false)}
+        buttonName="Confirm"
+        onConfirm={handleDeleteLogs}
+      >
+        <span className="text-lg">
+          Apakah anda ingin Menghapus{" "}
+          <span className="font-bold">{selectedData.length}</span> data ?
+        </span>
+      </Modals>
+      <ModalData
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+        }}
+        doneProgres={GetDataUserLog}
+      />
+    </div>
+  );
+};
 
-export default LogFaceReg
+export default LogFaceReg;
