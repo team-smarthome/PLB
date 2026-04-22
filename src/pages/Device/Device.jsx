@@ -1,22 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import TableLog from "../../components/TableLog/TableLog";
-import Modals from "../../components/Modal/Modal";
-import "./country.style.css";
-import {
-  DeleteNegara,
-  DeletePetugas,
-  getAllNegaraData,
-  getAllPetugas,
-  InsertNegara,
-  InsertPetugas,
-  UpdateNegara,
-  UpdatePetugas,
-} from "../../services/api";
-import { FaEye, FaEyeSlash, FaSearch } from "react-icons/fa";
-import { Toast } from "../../components/Toast/Toast";
+import { FaSearch } from "react-icons/fa";
 import Cookies from "js-cookie";
 
-const Country = () => {
+const Device = () => {
   const userCookie = Cookies.get("userdata");
   const userInfo = JSON.parse(userCookie);
   const [isShowModalAdd, setIsShowModalAdd] = useState(false);
@@ -32,133 +19,30 @@ const Country = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const dummyUser = [
+  console.log("userInfo: ");
+  const tHeader = [
+    "nama device",
+    "ip address",
+    "lokasi tpi",
+    "status",
+    "tanggal dipasang",
+  ];
+  const tBody = [
     {
-      nama: "bagas",
-      nip: "34234242",
-      gender: "M",
-      tanggalLahir: "2024-09-01",
-      jabatan: "kanim",
-      role: "admin",
+      nama_device: "device 1",
+      ip_address: "[IP_ADDRESS]",
+      lokasi_tpi: "tpi1",
+      status: "aktif",
+      tanggal_dipasang: "2022-01-01",
+    },
+    {
+      nama_device: "device 2",
+      ip_address: "[IP_ADDRESS]",
+      lokasi_tpi: "tpi2",
+      status: "aktif",
+      tanggal_dipasang: "2022-01-01",
     },
   ];
-  const getAllNegara = async (page = 1) => {
-    try {
-      setIsLoading(true);
-      const response = await getAllNegaraData(search, page);
-      if (response.status === 200) {
-        console.log(response.data.data);
-        setDataPetugas(response?.data?.data);
-        setTotalPages(response.data.pagination.last_page);
-        setCurrentPage(response.data.pagination.current_page);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getAllNegara();
-  }, []);
-
-  const handleAddNegara = async () => {
-    try {
-      setIsLoading(true);
-      const res = await InsertNegara(formData);
-      if (res.status == 201) {
-        Toast.fire({
-          icon: "success",
-          title: "Destinasi lokasi berhasil ditambahkan.",
-        });
-        setIsLoading(false);
-        getAllNegara();
-        setIsShowModalAdd(false);
-        setFormData({});
-      }
-    } catch (error) {
-      setIsLoading(false);
-      Toast.fire({
-        icon: "error",
-        title: "Gagal menambahkan destinasi lokasi. Silakan coba lagi.",
-      });
-    }
-  };
-
-  const handleDeletePetugas = async () => {
-    try {
-      setIsLoading(true);
-      const res = await DeleteNegara(formData.id);
-      if (res.status === 200) {
-        Toast.fire({
-          icon: "success",
-          title: "Destinasi lokasi berhasil dihapus.",
-        });
-        setIsLoading(false);
-        getAllNegara();
-        setIsShowModalDelete(false);
-        setFormData({});
-      }
-    } catch (error) {
-      setIsLoading(false);
-      Toast.fire({
-        icon: "error",
-        title: "Gagal menghapus destinasi lokasi. Silakan coba lagi.",
-      });
-    }
-  };
-
-  const handleEditPetugas = async () => {
-    try {
-      setIsLoading(true);
-      const res = await UpdateNegara(formData.id, {
-        nama_negara: formData.nama_negara,
-      });
-      if (res.status == 201) {
-        Toast.fire({
-          icon: "success",
-          title: "Destinasi lokasi berhasil diperbarui.",
-        });
-        setIsLoading(false);
-        setIsShowModal(false);
-        getAllNegara();
-        setFormData({});
-      }
-    } catch (error) {
-      setIsLoading(false);
-      Toast.fire({
-        icon: "error",
-        title: "Gagal memperbarui destinasi lokasi. Silakan coba lagi.",
-      });
-    }
-  };
-
-  const openModalAdd = () => {
-    setFormData({});
-    setIsShowModalAdd(true);
-  };
-  const closeModal = () => {
-    setIsShowModal(false);
-  };
-  const closeModalAdd = () => {
-    setIsShowModalAdd(false);
-  };
-  const closeModalDelete = () => {
-    setIsShowModalDelete(false);
-  };
-  const editModal = (data) => {
-    const editData = {
-      id: data?.id,
-      nama_negara: data?.nama_negara,
-    };
-    setFormData(editData);
-    setIsShowModal(true);
-  };
-  const deleteModal = (data) => {
-    setFormData(data);
-    setIsShowModalDelete(true);
-  };
 
   const addModalContent = () => {
     return (
@@ -225,7 +109,7 @@ const Country = () => {
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return; // Out of bounds check
     setCurrentPage(newPage);
-    getAllNegara(newPage);
+    // getAllNegara(newPage);
   };
 
   const renderPaginationControls = () => {
@@ -264,14 +148,20 @@ const Country = () => {
               <input
                 type="text"
                 placeholder="Search"
-                onChange={(e) =>
-                  setSearch({ ...search, nama_negara: e.target.value })
-                }
+                // onChange={(e) =>
+                //   setSearch({ ...search, nama_negara: e.target.value })
+                // }
               />
             </div>
+            {/* <input
+                            type="text"
+                            placeholder="Masukkan nama negara"
+                            onChange={(e) => setSearch({ ...search, nama_negara: e.target.value })}
+                            value={search.nama_petugas}
+                        /> */}
           </div>
           <button
-            onClick={getAllNegara}
+            // onClick={getAllNegara}
             style={{
               backgroundColor: "#4F70AB",
             }}
@@ -285,7 +175,7 @@ const Country = () => {
               marginRight: 10,
               marginLeft: 10,
             }}
-            onClick={openModalAdd}
+            // onClick={openModalAdd}
           >
             Add
           </button>
@@ -298,16 +188,16 @@ const Country = () => {
       ) : (
         <>
           <TableLog
-            tHeader={userInfo.role == 0 ? ["nama", "action"] : ["nama"]}
-            tBody={dataPetugas}
-            onEdit={editModal}
-            onDelete={deleteModal}
-            rowRenderer={customRowRenderer}
+            tHeader={tHeader}
+            tBody={tBody}
+            // onEdit={editModal}
+            // onDelete={deleteModal}
+            // rowRenderer={customRowRenderer}
           />
           {renderPaginationControls()}
         </>
       )}
-      <Modals
+      {/* <Modals
         showModal={isShowModalAdd}
         closeModal={closeModalAdd}
         headerName="Tambah Negara"
@@ -333,9 +223,9 @@ const Country = () => {
         onConfirm={handleDeletePetugas}
       >
         {deleteModalContent()}
-      </Modals>
+      </Modals> */}
     </div>
   );
 };
 
-export default Country;
+export default Device;

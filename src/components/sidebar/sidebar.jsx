@@ -11,6 +11,7 @@ import {
   FaDatabase,
   FaServer,
   FaMapMarkerAlt,
+  FaDesktop,
 } from "react-icons/fa";
 import { FaCameraRotate } from "react-icons/fa6";
 import { FcSynchronize } from "react-icons/fc";
@@ -150,7 +151,7 @@ const Sidebar = ({ isOpen }) => {
             </div>
           </li>
         )} */}
-        {(userInfo.role === 0 || userInfo.role === 1) &&
+        {/* {(userInfo.role === 0 || userInfo.role === 1) &&
           menuSetting.setting && (
             <ul className="sub-menu-link">
               <Link
@@ -161,7 +162,6 @@ const Sidebar = ({ isOpen }) => {
                 <span>Server</span>
               </Link>
 
-              {/* Hanya tampilkan menu Camera dan Synchronize jika role === 0 */}
               {userInfo.role !== 2 && (
                 <>
                   <Link
@@ -190,7 +190,7 @@ const Sidebar = ({ isOpen }) => {
                 </>
               )}
             </ul>
-          )}
+          )} */}
 
         {userInfo.role !== 2 && (
           <li>
@@ -233,6 +233,17 @@ const Sidebar = ({ isOpen }) => {
             >
               <FaUserTie size={25} style={{ marginRight: "10px" }} />
               <a>Jabatan</a>
+            </Link>
+          </ul>
+        )}
+        {userInfo.role !== 2 && menuSetting.master && (
+          <ul className="sub-menu-link">
+            <Link
+              to="/cpanel/device"
+              className={`link ${isActive("/cpanel/device") ? "active" : ""}`}
+            >
+              <FaDesktop size={25} style={{ marginRight: "10px" }} />
+              <a>Device</a>
             </Link>
           </ul>
         )}
