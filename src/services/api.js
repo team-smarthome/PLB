@@ -607,3 +607,125 @@ export const apiDeleteSimpanPelintas = async (data) => {
     throw error
   }
 }
+
+export const getAllDeviceaData = async (params, page) => {
+  try {
+    const res = await axios({
+      method: "get",
+      url: `${url_devel}api/device`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: { ...params, page }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const InsertDevice = async (payload) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/device`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const UpdateDevice = async (id, payload) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${url_devel}api/device/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const DeleteDevice = async (id) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/device/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getAllDeviceTypeData = async (params, page) => {
+  try {
+    const res = await axios({
+      method: "get",
+      url: `${url_devel}api/device-type`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      params: { ...params, page }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const InsertDeviceType = async (payload) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${url_devel}api/device-type`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const UpdateDeviceType = async (id, payload) => {
+  try {
+    const res = await axios({
+      method: "PUT",
+      url: `${url_devel}api/device-type/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const DeleteDeviceType = async (id) => {
+  try {
+    const res = await axios({
+      method: "delete",
+      url: `${url_devel}api/device-type/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    return res;
+  } catch (error) {
+    console.log(error)
+  }
+}

@@ -25,6 +25,7 @@ import SynchronizeFaceReg from "../SynchronizeFaceReg/SynchronizeFaceReg";
 import SettingDepartStatusKamera from "../../components/SettingDepartStatusKamera/SettingDepartStatusKamera";
 import RealtimeFaceReg from "../../components/RealtimeFaceReg/RealtimeFaceReg";
 import Device from "../Device/Device";
+import DeviceType from "../DeviceType/DeviceType";
 const Cpanel = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -119,6 +120,7 @@ const Cpanel = () => {
           <Route path="/setting-server" element={<SettingServer />} />
           <Route path="/setting-camera" element={<SettingIp />} />
           <Route path="/device" element={<Device />} />
+          <Route path="/device-type" element={<DeviceType />} />
           <Route path="/destination-location" element={<Country />} />
           <Route path="/jabatan" element={<JobTitle />} />
           <Route path="/synchronize" element={<Synchronize />} />

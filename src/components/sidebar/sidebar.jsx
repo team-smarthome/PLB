@@ -247,6 +247,17 @@ const Sidebar = ({ isOpen }) => {
             </Link>
           </ul>
         )}
+        {userInfo.role !== 2 && menuSetting.master && (
+          <ul className="sub-menu-link">
+            <Link
+              to="/cpanel/device-type"
+              className={`link ${isActive("/cpanel/device-type") ? "active" : ""}`}
+            >
+              <FaDesktop size={25} style={{ marginRight: "10px" }} />
+              <a>Device Type</a>
+            </Link>
+          </ul>
+        )}
 
         {/* <li>
                     <Link to='/cpanel/camera-settings' className={`link ${isActive('/cpanel/camera-settings') ? 'active' : ''}`}>

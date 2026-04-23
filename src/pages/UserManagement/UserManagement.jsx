@@ -318,7 +318,7 @@ const UserManagement = () => {
           <span>Jabatan :</span>
           <select value={formData.nama_jabatan} onChange={handleChangeJabatan}>
             <option value="">Pilih Jabatan</option>
-            {dataJabatan.map((item, index) => {
+            {dataJabatan?.map((item, index) => {
               return (
                 <option key={index} value={item.nama_jabatan}>
                   {item.nama_jabatan}
@@ -439,7 +439,7 @@ const UserManagement = () => {
             onChange={handleChangeJabatan}
           >
             <option value="">Pilih Jabatan</option>
-            {dataJabatan.map((item, index) => {
+            {dataJabatan?.map((item, index) => {
               return (
                 <option key={index} value={item.nama_jabatan}>
                   {item.nama_jabatan}
