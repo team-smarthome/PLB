@@ -327,6 +327,7 @@ const SynchronizeFaceReg = () => {
                     name="startDate"
                     className="px-3 border rounded w-full py-5"
                     value={date.startDate}
+                    style={{ backgroundColor: "white" }}
                     onChange={handleDateTimeChange}
                   />
                 </div>
@@ -338,6 +339,7 @@ const SynchronizeFaceReg = () => {
                     name="endDate"
                     className="px-2 py-5 border rounded w-full"
                     value={date.endDate}
+                    style={{ backgroundColor: "white" }}
                     onChange={handleDateTimeChange}
                   />
                 </div>
@@ -347,6 +349,7 @@ const SynchronizeFaceReg = () => {
                 <select
                   className="w-full p-4 rounded-sm bg-[#D9D9D9BF]"
                   onChange={handleStatusChangeDepart}
+                  style={{ backgroundColor: "white" }}
                 >
                   <option value="">Semua</option>
                   <option value={false}>Arrival</option>

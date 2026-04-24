@@ -586,6 +586,7 @@ const LogSimpanPelintas = () => {
             placeholder="Enter PLB number"
             className="h-10 bg-gray-100 border-gray-200"
             value={params.no_passport}
+            style={{ backgroundColor: "white" }}
             onChange={(e) =>
               setParams({
                 ...params,
@@ -608,6 +609,7 @@ const LogSimpanPelintas = () => {
             //   placeholder="dd/mm/yyyy --:--"
             className="h-10 bg-gray-100 border-gray-200 pr-10 w-full"
             value={params.startDate}
+            style={{ backgroundColor: "white" }}
             onChange={(e) =>
               setParams({ ...params, startDate: e.target.value })
             }
@@ -625,6 +627,7 @@ const LogSimpanPelintas = () => {
             placeholder="Enter Name"
             className="h-10 bg-gray-100 border-gray-200"
             value={params.nama_petugas}
+            style={{ backgroundColor: "white" }}
             onChange={(e) =>
               setParams({
                 ...params,
@@ -646,6 +649,7 @@ const LogSimpanPelintas = () => {
             //   placeholder="dd/mm/yyyy --:--"
             className="h-10 bg-gray-100 border-gray-200 pr-10"
             value={params.endDate}
+            style={{ backgroundColor: "white" }}
             onChange={(e) => setParams({ ...params, endDate: e.target.value })}
           />
         </div>

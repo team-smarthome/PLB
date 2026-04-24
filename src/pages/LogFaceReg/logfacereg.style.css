@@ -178,6 +178,7 @@
 }
 
 .value-filter-name {
+  color: white;
   width: 75%;
   display: flex;
   flex-direction: column;

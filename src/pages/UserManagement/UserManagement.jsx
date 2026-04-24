@@ -549,6 +549,7 @@ const UserManagement = () => {
             type="text"
             placeholder="Search by NIP"
             onChange={(e) => setSearch({ ...search, nip: e.target.value })}
+            style={{ backgroundColor: "white" }}
           />
         </div>
         <button

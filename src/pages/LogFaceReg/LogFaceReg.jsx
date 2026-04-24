@@ -534,7 +534,7 @@ const LogFaceReg = () => {
                   flex: 1,
                   width: "91.7%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -546,12 +546,13 @@ const LogFaceReg = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
             <input
               type="text"
+              style={{ backgroundColor: "white" }}
               value={
                 selectedCondition === "name"
                   ? params.name.toUpperCase().replace(/[^A-Za-z\s.-]/g, "")
@@ -574,7 +575,7 @@ const LogFaceReg = () => {
                   flex: 1,
                   width: "91.7%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -586,7 +587,7 @@ const LogFaceReg = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
@@ -606,7 +607,7 @@ const LogFaceReg = () => {
                   flex: 1,
                   width: "91.7%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -618,7 +619,7 @@ const LogFaceReg = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
@@ -641,6 +642,7 @@ const LogFaceReg = () => {
               }}
               style={{
                 width: "88%",
+                backgroundColor: "white",
               }}
             />
             <input
@@ -652,6 +654,7 @@ const LogFaceReg = () => {
               }}
               style={{
                 width: "88%",
+                backgroundColor: "white",
               }}
             />
             <Select
@@ -681,7 +684,7 @@ const LogFaceReg = () => {
                   flex: 1,
                   width: "91.7%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -693,7 +696,7 @@ const LogFaceReg = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
@@ -722,7 +725,7 @@ const LogFaceReg = () => {
                   flex: 1,
                   width: "91.7%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -734,7 +737,7 @@ const LogFaceReg = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />

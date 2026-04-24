@@ -1023,6 +1023,7 @@ const LogRegister = () => {
           >
             <input
               type="text"
+              style={{ backgroundColor: "white" }}
               value={search.no_passport.toUpperCase()}
               onChange={(e) =>
                 setSearch({
@@ -1034,6 +1035,7 @@ const LogRegister = () => {
 
             <input
               type="text"
+              style={{ backgroundColor: "white" }}
               value={search.name.toUpperCase()}
               onChange={(e) => {
                 const cleanedValue = e.target.value.replace(
@@ -1062,7 +1064,7 @@ const LogRegister = () => {
                   flex: 1,
                   width: "100%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -1074,7 +1076,7 @@ const LogRegister = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
@@ -1093,7 +1095,7 @@ const LogRegister = () => {
                   flex: 1,
                   width: "100%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -1105,7 +1107,7 @@ const LogRegister = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
@@ -1132,6 +1134,7 @@ const LogRegister = () => {
               }
               style={{
                 width: "88%",
+                backgroundColor: "white",
               }}
             />
             <input
@@ -1142,6 +1145,7 @@ const LogRegister = () => {
               }
               style={{
                 width: "88%",
+                backgroundColor: "white",
               }}
             />
             <Select
@@ -1164,7 +1168,7 @@ const LogRegister = () => {
                   flex: 1,
                   width: "91.7%",
                   borderRadius: "10px",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                   fontFamily: "Roboto, Arial, sans-serif",
                 }),
                 valueContainer: (provided) => ({
@@ -1176,7 +1180,7 @@ const LogRegister = () => {
                   ...provided,
                   flex: 1,
                   width: "100%",
-                  backgroundColor: "rgba(217, 217, 217, 0.75)",
+                  backgroundColor: "white",
                 }),
               }}
             />
