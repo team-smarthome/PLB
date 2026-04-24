@@ -3,12 +3,16 @@ import TableLog from "../../components/TableLog/TableLog";
 import { FaSearch } from "react-icons/fa";
 import Cookies from "js-cookie";
 import Modals from "../../components/Modal/Modal";
+import Select from "react-select";
+import "./device.style.css";
 import {
   DeleteDevice,
   getAllDeviceaData,
+  getAllDeviceTypeData,
   InsertDevice,
   UpdateDevice,
 } from "../../services/api";
+import { Toast } from "../../components/Toast/Toast";
 
 const Device = () => {
   const userCookie = Cookies.get("userdata");
@@ -18,7 +22,8 @@ const Device = () => {
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({});
-  const [dataPetugas, setDataPetugas] = useState([]);
+  const [dataDevice, setDataDevice] = useState([]);
+  const [deviceType, setDeviceType] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState({
     name: "",
@@ -26,13 +31,17 @@ const Device = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  console.log("userInfo: ");
+  console.log("userInfo: ", search);
   const tHeader = [
     "nama device",
     "ip address",
+    "mac address",
+    "tipe device",
+    "status device",
+    "device number",
+    "product key",
+    "tanggal instalasi",
     "lokasi tpi",
-    "status",
-    "tanggal dipasang",
     "action",
   ];
   const tBody = [
@@ -61,7 +70,14 @@ const Device = () => {
             type="text"
             placeholder="Masukkan nama device"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                name: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9- ]/g, ""),
+              })
+            }
           />
         </div>
         <div>
@@ -71,7 +87,10 @@ const Device = () => {
             placeholder="Masukkan ip address device"
             value={formData.ip_address}
             onChange={(e) =>
-              setFormData({ ...formData, ip_address: e.target.value })
+              setFormData({
+                ...formData,
+                ip_address: e.target.value.replace(/[^0-9.]/g, ""),
+              })
             }
           />
         </div>
@@ -82,31 +101,49 @@ const Device = () => {
             placeholder="Masukkan mac address"
             value={formData.mac_address}
             onChange={(e) =>
-              setFormData({ ...formData, mac_address: e.target.value })
+              setFormData({
+                ...formData,
+                mac_address: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9-]/g, ""),
+              })
             }
           />
         </div>
         <div>
           <span>Tipe Device :</span>
-          <input
-            type="text"
-            placeholder="Masukkan tipe device"
-            value={formData.device_tyoe}
+          <select
+            className="custom-select"
+            value={formData.device_type_id}
             onChange={(e) =>
-              setFormData({ ...formData, device_tyoe: e.target.value })
+              setFormData({ ...formData, device_type_id: e.target.value })
             }
-          />
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            {deviceType.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <span>Status Device :</span>
-          <input
-            type="text"
-            placeholder="Masukkan status device"
+          <select
+            className="custom-select"
             value={formData.device_status}
             onChange={(e) =>
               setFormData({ ...formData, device_status: e.target.value })
             }
-          />
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            <option value="aktif">Aktif</option>
+            <option value="non aktif">Non Aktif</option>
+          </select>
         </div>
         <div>
           <span>Device Number :</span>
@@ -115,7 +152,12 @@ const Device = () => {
             placeholder="Masukkan device number"
             value={formData.device_number}
             onChange={(e) =>
-              setFormData({ ...formData, device_number: e.target.value })
+              setFormData({
+                ...formData,
+                device_number: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9-]/g, ""),
+              })
             }
           />
         </div>
@@ -126,14 +168,19 @@ const Device = () => {
             placeholder="Masukkan product key"
             value={formData.product_key}
             onChange={(e) =>
-              setFormData({ ...formData, product_key: e.target.value })
+              setFormData({
+                ...formData,
+                product_key: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9-]/g, ""),
+              })
             }
           />
         </div>
         <div>
           <span>Tgl. Instalasi :</span>
           <input
-            type="text"
+            type="datetime-local"
             placeholder="Masukkan tgl instalasi"
             value={formData.tgl_dipasang}
             onChange={(e) =>
@@ -148,7 +195,10 @@ const Device = () => {
             placeholder="Masukkan lokasi tpi"
             value={formData.tpi_id}
             onChange={(e) =>
-              setFormData({ ...formData, tpi_id: e.target.value })
+              setFormData({
+                ...formData,
+                tpi_id: e.target.value.toUpperCase().replace(/[^A-Za-z ]/g, ""),
+              })
             }
           />
         </div>
@@ -165,7 +215,14 @@ const Device = () => {
             type="text"
             placeholder="Masukkan nama device"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                name: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9- ]/g, ""),
+              })
+            }
           />
         </div>
         <div>
@@ -175,7 +232,12 @@ const Device = () => {
             placeholder="Masukkan ip address device"
             value={formData.ip_address}
             onChange={(e) =>
-              setFormData({ ...formData, ip_address: e.target.value })
+              setFormData({
+                ...formData,
+                ip_address: e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(.*\..*\..*)\./g, "$1"),
+              })
             }
           />
         </div>
@@ -186,31 +248,49 @@ const Device = () => {
             placeholder="Masukkan mac address"
             value={formData.mac_address}
             onChange={(e) =>
-              setFormData({ ...formData, mac_address: e.target.value })
+              setFormData({
+                ...formData,
+                mac_address: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9-]/g, ""),
+              })
             }
           />
         </div>
         <div>
           <span>Tipe Device :</span>
-          <input
-            type="text"
-            placeholder="Masukkan tipe device"
-            value={formData.device_tyoe}
+          <select
+            className="custom-select"
+            value={formData.device_type_id}
             onChange={(e) =>
-              setFormData({ ...formData, device_tyoe: e.target.value })
+              setFormData({ ...formData, device_type_id: e.target.value })
             }
-          />
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            {deviceType.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <span>Status Device :</span>
-          <input
-            type="text"
-            placeholder="Masukkan status device"
+          <select
+            className="custom-select"
             value={formData.device_status}
             onChange={(e) =>
               setFormData({ ...formData, device_status: e.target.value })
             }
-          />
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            <option value="aktif">Aktif</option>
+            <option value="non aktif">Non Aktif</option>
+          </select>
         </div>
         <div>
           <span>Device Number :</span>
@@ -219,7 +299,12 @@ const Device = () => {
             placeholder="Masukkan device number"
             value={formData.device_number}
             onChange={(e) =>
-              setFormData({ ...formData, device_number: e.target.value })
+              setFormData({
+                ...formData,
+                device_number: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9-]/g, ""),
+              })
             }
           />
         </div>
@@ -230,7 +315,12 @@ const Device = () => {
             placeholder="Masukkan product key"
             value={formData.product_key}
             onChange={(e) =>
-              setFormData({ ...formData, product_key: e.target.value })
+              setFormData({
+                ...formData,
+                product_key: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z0-9-]/g, ""),
+              })
             }
           />
         </div>
@@ -252,7 +342,10 @@ const Device = () => {
             placeholder="Masukkan lokasi tpi"
             value={formData.tpi_id}
             onChange={(e) =>
-              setFormData({ ...formData, tpi_id: e.target.value })
+              setFormData({
+                ...formData,
+                tpi_id: e.target.value.toUpperCase().replace(/[^A-Za-z ]/g, ""),
+              })
             }
           />
         </div>
@@ -265,7 +358,7 @@ const Device = () => {
       <div className="delete-container">
         <h3>
           Are You Sure Want Delete{" "}
-          <span style={{ fontWeight: "bold" }}>{formData?.id}</span> ?
+          <span style={{ fontWeight: "bold" }}>{formData?.name}</span> ?
         </h3>
       </div>
     );
@@ -313,10 +406,10 @@ const Device = () => {
   const getAllDevice = async (page = 1) => {
     try {
       setIsLoading(true);
-      const response = await getAllDeviceaData(page);
+      const response = await getAllDeviceaData(search, page);
       if (response.status === 200) {
         console.log("response getAllDevice: ", response.data.data);
-        setDataPetugas(response?.data?.data);
+        setDataDevice(response?.data?.data);
         setTotalPages(response.data.pagination.last_page);
         setCurrentPage(response.data.pagination.current_page);
         setIsLoading(false);
@@ -327,14 +420,33 @@ const Device = () => {
     }
   };
 
-  const handleAddDevice = async () => {
+  const getDeviceType = async () => {
     try {
       setIsLoading(true);
+      const response = await getAllDeviceTypeData();
+      if (response.status === 200) {
+        const dataDeviceType = response?.data?.data?.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }));
+        setDeviceType(dataDeviceType);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const handleAddDevice = async () => {
+    try {
+      console.log("formData: ", formData);
+      setIsLoading(true);
       const res = await InsertDevice(formData);
-      if (res.status == 201) {
+      if (res?.status == 201) {
         Toast.fire({
           icon: "success",
-          title: "Destinasi lokasi berhasil ditambahkan.",
+          title: "Device berhasil ditambahkan.",
         });
         setIsLoading(false);
         getAllDevice();
@@ -354,10 +466,10 @@ const Device = () => {
     try {
       setIsLoading(true);
       const res = await UpdateDevice(formData.id, formData);
-      if (res.status == 201) {
+      if (res.status == 200) {
         Toast.fire({
           icon: "success",
-          title: "Destinasi lokasi berhasil diperbarui.",
+          title: "Device berhasil diperbarui.",
         });
         setIsLoading(false);
         setIsShowModal(false);
@@ -368,7 +480,7 @@ const Device = () => {
       setIsLoading(false);
       Toast.fire({
         icon: "error",
-        title: "Gagal memperbarui destinasi lokasi. Silakan coba lagi.",
+        title: "Gagal memperbarui device. Silakan coba lagi.",
       });
     }
   };
@@ -380,7 +492,7 @@ const Device = () => {
       if (res.status === 200) {
         Toast.fire({
           icon: "success",
-          title: "Destinasi lokasi berhasil dihapus.",
+          title: "Device berhasil dihapus.",
         });
         setIsLoading(false);
         getAllDevice();
@@ -391,7 +503,7 @@ const Device = () => {
       setIsLoading(false);
       Toast.fire({
         icon: "error",
-        title: "Gagal menghapus destinasi lokasi. Silakan coba lagi.",
+        title: "Gagal menghapus device. Silakan coba lagi.",
       });
     }
   };
@@ -399,11 +511,15 @@ const Device = () => {
   const customRowRenderer = (row) => {
     return (
       <>
-        <td>{row?.nama_device}</td>
+        <td>{row?.name}</td>
         <td>{row?.ip_address}</td>
-        <td>{row?.lokasi_tpi}</td>
-        <td>{row?.status}</td>
-        <td>{row?.tanggal_dipasang}</td>
+        <td>{row?.mac_address}</td>
+        <td>{row?.device_type?.name}</td>
+        <td>{row?.device_status}</td>
+        <td>{row?.device_number}</td>
+        <td>{row?.product_key}</td>
+        <td>{row?.tgl_dipasang}</td>
+        <td>{row?.tpi_id}</td>
 
         {userInfo.role == 0 && (
           <td className="button-action">
@@ -423,7 +539,12 @@ const Device = () => {
 
   useEffect(() => {
     getAllDevice();
+    getDeviceType();
   }, []);
+
+  useEffect(() => {
+    getAllDevice();
+  }, [currentPage, search]);
 
   const renderPaginationControls = () => {
     return (
@@ -500,7 +621,7 @@ const Device = () => {
         <>
           <TableLog
             tHeader={tHeader}
-            tBody={tBody}
+            tBody={dataDevice}
             onEdit={editModal}
             onDelete={deleteModal}
             rowRenderer={customRowRenderer}

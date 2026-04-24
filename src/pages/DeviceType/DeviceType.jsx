@@ -221,7 +221,7 @@ const DeviceType = () => {
 
   useEffect(() => {
     getAllDeviceType();
-  }, []);
+  }, [search, currentPage]);
 
   const renderPaginationControls = () => {
     return (
