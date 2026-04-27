@@ -608,7 +608,7 @@ export const apiDeleteSimpanPelintas = async (data) => {
   }
 }
 
-export const getAllDeviceaData = async (params, page) => {
+export const getAllDeviceaData = async (params) => {
   try {
     const res = await axios({
       method: "get",
@@ -616,7 +616,7 @@ export const getAllDeviceaData = async (params, page) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      params: { ...params, page }
+      params,
     })
     return res;
   } catch (error) {
@@ -669,7 +669,7 @@ export const DeleteDevice = async (id) => {
   }
 }
 
-export const getAllDeviceTypeData = async (params, page) => {
+export const getAllDeviceTypeData = async (params) => {
   try {
     const res = await axios({
       method: "get",
@@ -677,7 +677,7 @@ export const getAllDeviceTypeData = async (params, page) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      params: { ...params, page }
+      params: params
     })
     return res;
   } catch (error) {

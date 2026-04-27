@@ -10,6 +10,7 @@ import {
   UpdateDeviceType,
 } from "../../services/api";
 import { Toast } from "../../components/Toast/Toast";
+import Pagination from "../../components/Pagination/Pagination";
 
 const DeviceType = () => {
   const userCookie = Cookies.get("userdata");
@@ -24,10 +25,17 @@ const DeviceType = () => {
   const [search, setSearch] = useState({
     name: "",
   });
+  const [totalDataFilter, setTotalDataFilter] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    per_page: 10,
+    current_page: 1,
+    last_page: 1,
+  });
 
-  console.log("userInfo: ");
   const tHeader = ["nama jenis device", "action"];
   const tBody = [
     {
@@ -115,12 +123,17 @@ const DeviceType = () => {
   const getAllDeviceType = async (page = 1) => {
     try {
       setIsLoading(true);
-      const response = await getAllDeviceTypeData(search, page);
+      const response = await getAllDeviceTypeData({
+        ...search,
+        page,
+        per_page: perPage,
+      });
       if (response.status === 200) {
-        console.log("response getAllDeviceType: ", response.data.data);
         setdataDeviceType(response?.data?.data);
         setTotalPages(response.data.pagination.last_page);
+        setPagination(response?.data?.pagination);
         setCurrentPage(response.data.pagination.current_page);
+        setTotalDataFilter(response?.data?.data?.length);
         setIsLoading(false);
       }
     } catch (error) {
@@ -128,7 +141,6 @@ const DeviceType = () => {
       console.log(error);
     }
   };
-
   const handleAddDeviceType = async () => {
     try {
       setIsLoading(true);
@@ -221,26 +233,33 @@ const DeviceType = () => {
 
   useEffect(() => {
     getAllDeviceType();
-  }, [search, currentPage]);
+  }, [search, currentPage, perPage]);
 
   const renderPaginationControls = () => {
     return (
-      <div className="pagination-controls">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+      <div className="table-footer">
+        <>
+          Show {totalDataFilter} of {pagination?.total} entries
+        </>
+        <div className="table-footer-controls">
+          <select
+            value={perPage}
+            onChange={(e) => {
+              setPerPage(Number(e.target.value));
+            }}
+            className="table-footer-controls-select"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+          <Pagination
+            pageCount={pagination?.last_page}
+            onPageChange={(selectedPage) => setPage(selectedPage)}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
     );
   };

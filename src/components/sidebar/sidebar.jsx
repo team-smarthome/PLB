@@ -38,7 +38,6 @@ const Sidebar = ({ isOpen }) => {
   };
 
   const handleSettingToggle = (menuKey) => {
-    console.log(menuKey, "jalan gk tan");
     setMenuSetting((prevState) => ({
       ...prevState,
       [menuKey]: !prevState[menuKey],

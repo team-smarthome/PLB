@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import TableLog from "../../components/TableLog/TableLog";
-import { FaSearch } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
 import Cookies from "js-cookie";
 import Modals from "../../components/Modal/Modal";
 import Select from "react-select";
@@ -13,6 +13,7 @@ import {
   UpdateDevice,
 } from "../../services/api";
 import { Toast } from "../../components/Toast/Toast";
+import Pagination from "../../components/Pagination/Pagination";
 
 const Device = () => {
   const userCookie = Cookies.get("userdata");
@@ -30,6 +31,14 @@ const Device = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    per_page: 10,
+    current_page: 1,
+    last_page: 1,
+  });
+  const [totalDataFilter, setTotalDataFilter] = useState(0);
 
   console.log("userInfo: ", search);
   const tHeader = [
@@ -406,12 +415,17 @@ const Device = () => {
   const getAllDevice = async (page = 1) => {
     try {
       setIsLoading(true);
-      const response = await getAllDeviceaData(search, page);
+      const response = await getAllDeviceaData({
+        ...search,
+        page,
+        per_page: perPage,
+      });
       if (response.status === 200) {
         console.log("response getAllDevice: ", response.data.data);
         setDataDevice(response?.data?.data);
-        setTotalPages(response.data.pagination.last_page);
+        setPagination(response?.data?.pagination);
         setCurrentPage(response.data.pagination.current_page);
+        setTotalDataFilter(response?.data?.data?.length);
         setIsLoading(false);
       }
     } catch (error) {
@@ -544,26 +558,33 @@ const Device = () => {
 
   useEffect(() => {
     getAllDevice();
-  }, [currentPage, search]);
+  }, [currentPage, search, perPage]);
 
   const renderPaginationControls = () => {
     return (
-      <div className="pagination-controls">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+      <div className="table-footer">
+        <>
+          Show {totalDataFilter} of {pagination?.total} entries
+        </>
+        <div className="table-footer-controls">
+          <select
+            value={perPage}
+            onChange={(e) => {
+              setPerPage(Number(e.target.value));
+            }}
+            className="table-footer-controls-select"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+          <Pagination
+            pageCount={pagination?.last_page}
+            onPageChange={(selectedPage) => setPage(selectedPage)}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
     );
   };
@@ -585,12 +606,6 @@ const Device = () => {
                 onChange={(e) => setSearch({ ...search, name: e.target.value })}
               />
             </div>
-            {/* <input
-                            type="text"
-                            placeholder="Masukkan nama negara"
-                            onChange={(e) => setSearch({ ...search, nama_negara: e.target.value })}
-                            value={search.nama_petugas}
-                        /> */}
           </div>
           <button
             // onClick={getAllDevice}

@@ -1,0 +1,28 @@
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2%;
+  color: black;
+}
+
+.table-footer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-footer-controls-select {
+  width: auto;
+  min-width: unset;
+  min-height: unset;
+  max-height: unset;
+  padding: 4px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  color: #3d5889;
+  background: transparent;
+  box-shadow: none;
+}
