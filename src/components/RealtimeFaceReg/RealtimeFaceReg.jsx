@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { apiGetAllIp, simpanPelintas } from '../../services/api'
 import Cookies from 'js-cookie'
-import './realtimefacereg.css'
 import { FaImage } from 'react-icons/fa'
 import { Toast } from '../Toast/Toast'
 import ModalData from '../Modal/ModalData'
@@ -216,148 +215,152 @@ const RealtimeFaceReg = () => {
     const IsFaceRegDataNull = Object.values(faceRegData).every(value => value === null);
 
     return (
-        <div
-            className='p-8  '
-        >
-            <div className="flex justify-between items-center">
-                <h2>Realtime FaceReg</h2>
+        <div className="flex flex-col h-full gap-6">
+            <div className="flex items-start justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-navy-900">Realtime FaceReg</h1>
+                    <p className="text-gray-500 text-sm mt-1">Monitor realtime face recognition from cameras</p>
+                </div>
                 <div className="flex flex-row gap-4">
-                    {ipCamera &&
+                    {ipCamera && (
                         <button
-                            className='
-                p-4 text-sm font-bold cursor-pointer border-0 text-white rounded bg-transparent bg-blue-500'
+                            className="px-4 py-2 text-sm font-medium cursor-pointer border-none text-white rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors duration-300 shadow-sm"
                             onClick={() => setModalOpen(true)}
-                        >Input Data Manual</button>
-                    }
-                    {ipCamera && <button
-                        className='p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300'
-                        onClick={handleClearCamera}
-                        disabled={status == "loading"}
-                    >
-                        Ganti Kamera
-                    </button>}
+                        >
+                            Input Data Manual
+                        </button>
+                    )}
+                    {ipCamera && (
+                        <button
+                            className="px-4 py-2 text-sm font-medium cursor-pointer border border-gray-200 text-gray-700 rounded-lg bg-white hover:bg-gray-50 transition-colors duration-300 shadow-sm"
+                            onClick={handleClearCamera}
+                            disabled={status == "loading"}
+                        >
+                            Ganti Kamera
+                        </button>
+                    )}
                 </div>
             </div>
-            {
-                ipCamera ?
-                    <>
-                        <div className="flex flex-row-reverse justify-evenly items-center gap-4 ">
-                            <div className="">
-                                <h3>Foto Document</h3>
-                                {
-                                    faceRegData.documentImage ? (
-                                        <img
-                                            src={`data:image/jpeg;base64,${faceRegData.documentImage}`}
-                                            alt="Document Image"
-                                            className='object-cover'
-                                            height={300}
-                                        />
-                                    ) : (
-                                        <div className="w-[400px] h-[300px] flex justify-center items-center bg-gray-200">
-                                            <FaImage size={150} color="#aaa" />
-                                        </div>
-                                    )
-                                }
-                            </div>
-                            <div className="">
-                                <h3>Foto Register</h3>
-                                {
-                                    faceRegData.profile_image ? (
-                                        <img
-                                            src={`data:image/jpeg;base64,${faceRegData.profile_image}`}
-                                            alt="Document Image"
-                                            className='object-cover'
-                                            height={300}
-                                        />
-                                    ) : (
-                                        <div className="w-[400px] h-[300px] flex justify-center items-center bg-gray-200">
-                                            <FaImage size={150} color="#aaa" />
-                                        </div>
-                                    )
-                                }
-                            </div>
-                            <div className="">
-                                <h3>Foto FaceReg</h3>
-                                {
-                                    faceRegData.faceRegImage ? (
-                                        <img
-                                            src={`data:image/jpeg;base64,${faceRegData.faceRegImage}`}
-                                            alt="Document Image"
-                                            className='object-cover'
-                                            height={300}
-                                        />
-                                    ) : (
-                                        <div className="w-[400px] h-[300px] flex justify-center items-center bg-gray-200">
-                                            <FaImage size={150} color="#aaa" />
-                                        </div>
-                                    )
-                                }
-                            </div>
-                        </div>
-                        <div className="pt-4 flex justify-center">
-                            <h2>Skor Kemiripan : {faceRegData?.similiarity ?? "-"}</h2>
-                        </div>
-                        {
-                            !IsFaceRegDataNull ?
-                                <>
-                                    <div className="flex justify-center gap-4">
-                                        <button
-                                            className='p-2 text-lg text-white bg-red-800 hover:bg-red-900 min-w-36 rounded-xl border-none cursor-pointer'
-                                            disabled={status == "loading"}
-                                            onClick={() => insertDataLog("tolak")}
-                                        >Tolak</button>
-                                        <button
-                                            className='p-2 text-lg text-white bg-btnPrimary hover:bg-[#0F2D4B] min-w-36 rounded-xl border-1 border-black cursor-pointer'
-                                            onClick={Ulangi}
-                                            disabled={status == "loading"}
-                                        >{status == "loading" ? "Mohon Tunggu..." : "Ulangi"}</button>
-                                        <button
-                                            className={`p-2 text-lg text-white ${score === 100 ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-6e00"} min-w-36 rounded-xl border-none ${score == 100 ? "cursor-pointer" : "cursor-not-allowed"}`}
-                                            onClick={() => insertDataLog("izinkan")}
-                                            disabled={status == "loading"}
-                                        >Ijinkan</button>
-                                    </div>
-                                </> :
-                                <>
 
-                                </>
-                        }
-                    </> :
-                    <>
-                        <div className="w-full h-full flex justify-center items-center">
-                            <div className="container-dalam">
-                                <div className="bagian-atas-server">
-                                    <p className="">Pilih Kamera</p>
-                                </div>
-                                <div className="bagian-bawah-server flex gap-6">
-                                    <div className="w-full flex items-center">
-                                        <select
-                                            value={selectedCamera}
-                                            onChange={handleSelectCamera}
-                                        >
-                                            <option value="">Pilih Kamera</option>
-                                            {listCamera.map((data) => {
-                                                return (
-                                                    <option value={data.ipAddress}>{`${data.namaKamera} - ${data.ipAddress}`}</option>
-                                                )
-                                            })}
-                                        </select>
-
-                                    </div>
-                                    <button className="ok-button"
-                                        onClick={handleConfirmCamera}
-                                    >
-                                        Konfirmasi
-                                    </button>
-                                </div>
+            {ipCamera ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden p-6 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="flex flex-col gap-3">
+                            <h3 className="text-center font-semibold text-gray-700">Foto Document</h3>
+                            <div className="border border-gray-200 rounded-lg overflow-hidden flex justify-center items-center bg-gray-50 h-[300px]">
+                                {faceRegData.documentImage ? (
+                                    <img
+                                        src={`data:image/jpeg;base64,${faceRegData.documentImage}`}
+                                        alt="Document"
+                                        className="object-contain w-full h-full"
+                                    />
+                                ) : (
+                                    <FaImage size={80} className="text-gray-300" />
+                                )}
                             </div>
                         </div>
-                    </>
-            }
-            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }}
-            />
+                        
+                        <div className="flex flex-col gap-3">
+                            <h3 className="text-center font-semibold text-gray-700">Foto Register</h3>
+                            <div className="border border-gray-200 rounded-lg overflow-hidden flex justify-center items-center bg-gray-50 h-[300px]">
+                                {faceRegData.profile_image ? (
+                                    <img
+                                        src={`data:image/jpeg;base64,${faceRegData.profile_image}`}
+                                        alt="Register"
+                                        className="object-contain w-full h-full"
+                                    />
+                                ) : (
+                                    <FaImage size={80} className="text-gray-300" />
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="flex flex-col gap-3">
+                            <h3 className="text-center font-semibold text-gray-700">Foto FaceReg</h3>
+                            <div className="border border-gray-200 rounded-lg overflow-hidden flex justify-center items-center bg-gray-50 h-[300px]">
+                                {faceRegData.faceRegImage ? (
+                                    <img
+                                        src={`data:image/jpeg;base64,${faceRegData.faceRegImage}`}
+                                        alt="FaceReg"
+                                        className="object-contain w-full h-full"
+                                    />
+                                ) : (
+                                    <FaImage size={80} className="text-gray-300" />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-6 mt-4">
+                        <div className="bg-gray-50 px-8 py-4 rounded-xl border border-gray-100">
+                            <h2 className="text-2xl font-bold text-gray-800 m-0">Skor Kemiripan : <span className={faceRegData?.similiarity >= 80 ? "text-green-600" : faceRegData?.similiarity ? "text-red-600" : ""}>{faceRegData?.similiarity ?? "-"}</span></h2>
+                        </div>
+
+                        {!IsFaceRegDataNull && (
+                            <div className="flex justify-center gap-4">
+                                <button
+                                    className="py-3 px-8 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 min-w-[140px] rounded-lg border-none cursor-pointer transition-colors shadow-sm disabled:opacity-50"
+                                    disabled={status == "loading"}
+                                    onClick={() => insertDataLog("tolak")}
+                                >
+                                    Tolak
+                                </button>
+                                <button
+                                    className="py-3 px-8 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 min-w-[140px] rounded-lg cursor-pointer transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                                    onClick={Ulangi}
+                                    disabled={status == "loading"}
+                                >
+                                    {status == "loading" ? (
+                                        <><span className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></span> Mohon Tunggu...</>
+                                    ) : (
+                                        "Ulangi"
+                                    )}
+                                </button>
+                                <button
+                                    className={`py-3 px-8 text-sm font-semibold text-white min-w-[140px] rounded-lg border-none shadow-sm transition-colors ${score === 100 ? "bg-green-600 hover:bg-green-700 cursor-pointer" : "bg-gray-400 cursor-not-allowed"}`}
+                                    onClick={() => insertDataLog("izinkan")}
+                                    disabled={status == "loading"}
+                                >
+                                    Izinkan
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden max-w-2xl mx-auto w-full mt-10">
+                    <div className="p-6 border-b border-gray-100">
+                        <h2 className="text-lg font-semibold text-navy-900">Pilih Kamera</h2>
+                        <p className="text-gray-500 text-sm mt-1">Pilih kamera untuk memulai monitoring Face Recognition</p>
+                    </div>
+                    <div className="p-6 flex gap-4 items-end">
+                        <div className="flex-1 flex flex-col gap-1.5 w-full">
+                            <label className="text-sm font-semibold text-gray-700">Kamera</label>
+                            <select
+                                value={selectedCamera}
+                                onChange={handleSelectCamera}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+                            >
+                                <option value="">Pilih Kamera</option>
+                                {listCamera.map((data, index) => (
+                                    <option key={index} value={data.ipAddress}>{`${data.namaKamera} - ${data.ipAddress}`}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <button 
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm h-[38px] disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={handleConfirmCamera}
+                            disabled={!selectedCamera}
+                        >
+                            Konfirmasi
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            <ModalData open={modalOpen} onClose={() => { setModalOpen(false) }} />
         </div>
-    )
+    );
 }
 
 export default RealtimeFaceReg

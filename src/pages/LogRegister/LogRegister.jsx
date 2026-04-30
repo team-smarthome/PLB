@@ -10,18 +10,19 @@ import {
 import Modals from "../../components/Modal/Modal";
 import dataNegara from "../../utils/dataNegara";
 import { initiateSocket4010 } from "../../utils/socket";
-import "./logregister.style.css";
 import Pagination from "../../components/Pagination/Pagination";
 import Select from "react-select";
 import Excel from "exceljs";
 import { formatDateToIndonesian } from "../../utils/formatDate";
 import { Toast } from "../../components/Toast/Toast";
+import { IoFilter } from "react-icons/io5";
 
 const LogRegister = () => {
   const socket_IO_4010 = initiateSocket4010();
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showModalDetail, setShowModalDetail] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [showModalFilter, setShowModalFilter] = useState(false);
   const [status, setStatus] = useState("loading");
   const [totalDataFilter, setTotalDataFilter] = useState(0);
   const [isErrorImage, setIsErrorImage] = useState(false);
@@ -308,14 +309,14 @@ const LogRegister = () => {
 
   const customRowRenderer = (row) => (
     <>
-      <td className="max-w-32">{row.no_passport}</td>
-      <td className="max-w-32">{row.name}</td>
-      <td>{row.gender === "M" ? "Male" : "Female"}</td>
-      <td className="w-auto">{row.nationality}</td>
-      <td>
+      <td className="max-w-32 text-center">{row.no_passport}</td>
+      <td className="max-w-32 text-center">{row.name}</td>
+      <td className="text-center">{row.gender === "M" ? "Male" : "Female"}</td>
+      <td className="w-auto text-center">{row.nationality}</td>
+      <td className="text-center">
         {row?.is_cekal ? `Cekal - ${row?.skor_kemiripan || ""}` : "No Cekal"}
       </td>
-      <td>
+      <td className="text-center">
         <>
           <img
             src={`data:image/jpeg;base64,${row.profile_image}`}
@@ -327,7 +328,7 @@ const LogRegister = () => {
           />
         </>
       </td>
-      <td>{formatDateToIndonesian(row.created_at)}</td>
+      <td className="text-center">{formatDateToIndonesian(row.created_at)}</td>
 
       <td
         className="flex items-center justify-center gap-2"
@@ -905,6 +906,223 @@ const LogRegister = () => {
     );
   };
 
+  const filterModalContent = () => {
+    return (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pb-6">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              No. PLB
+            </label>
+            <input
+              type="text"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+              value={search.no_passport.toUpperCase()}
+              onChange={(e) =>
+                setSearch({
+                  ...search,
+                  no_passport: e.target.value.toUpperCase(),
+                })
+              }
+              placeholder="Enter No. PLB"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Full Name
+            </label>
+            <input
+              type="text"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+              value={search.name.toUpperCase()}
+              onChange={(e) => {
+                const cleanedValue = e.target.value.replace(
+                  /[^A-Za-z\s.-]/g,
+                  "",
+                );
+                setSearch({ ...search, name: cleanedValue.toUpperCase() });
+              }}
+              placeholder="Enter Name"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Gender
+            </label>
+            <Select
+              onChange={(selectedOption) =>
+                setSearch({ ...search, gender: selectedOption.value })
+              }
+              options={dataGender}
+              placeholder="Select Gender"
+              className="text-sm z-50"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Status Cekal
+            </label>
+            <Select
+              onChange={(selectedOption) =>
+                setSearch({ ...search, is_cekal: selectedOption.value })
+              }
+              options={dataCekal}
+              placeholder="Select Status Cekal"
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Start Date
+            </label>
+            <input
+              type="datetime-local"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+              value={search.startDate}
+              onChange={(e) =>
+                setSearch({ ...search, startDate: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              End Date
+            </label>
+            <input
+              type="datetime-local"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+              value={search.endDate}
+              onChange={(e) =>
+                setSearch({ ...search, endDate: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1.5 md:col-span-2">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Nationality
+            </label>
+            <Select
+              onChange={(selectedOption) =>
+                setSearch({ ...search, nationality: selectedOption.value })
+              }
+              options={[
+                { value: "", label: "All Nationality" },
+                ...countryData.map((country) => ({
+                  value: country.nama_negara,
+                  label: country.nama_negara,
+                })),
+              ]}
+              placeholder="Select Nationality"
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const closeModalFilter = () => {
+    setShowModalFilter(false);
+  };
+
+  const handleFilter = () => {
+    getLogRegister();
+    setShowModalFilter(false);
+  };
+
   const handleEdit = async () => {
     setStatus("loading");
 
@@ -1000,275 +1218,136 @@ const LogRegister = () => {
   };
 
   return (
-    <div style={{ padding: 20, backgroundColor: "#eeeeee", height: "100%" }}>
-      <div className="flex w-full h-[30vh] ">
-        <div className="face-reg-filter-name ">
-          <div
-            className="label-filter-name"
-            style={{
-              gap: "13%",
-              paddingTop: "3%",
-            }}
-          >
-            <p>No. PLB</p>
-            <p>Full Name</p>
-            <p>Gender</p>
-            <p>Status Cekal</p>
-          </div>
-          <div
-            className="value-filter-name"
-            style={{
-              width: "65%",
-            }}
-          >
-            <input
-              type="text"
-              style={{ backgroundColor: "white" }}
-              value={search.no_passport.toUpperCase()}
-              onChange={(e) =>
-                setSearch({
-                  ...search,
-                  no_passport: e.target.value.toUpperCase(),
-                })
-              }
-            />
+    <div className="flex flex-col flex-1 min-h-0 h-full gap-2">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-navy-900">Log Register</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Kelola dan lihat daftar riwayat pendaftaran pelintas batas.
+          </p>
+        </div>
+      </div>
 
-            <input
-              type="text"
-              style={{ backgroundColor: "white" }}
-              value={search.name.toUpperCase()}
-              onChange={(e) => {
-                const cleanedValue = e.target.value.replace(
-                  /[^A-Za-z\s.-]/g,
-                  "",
-                );
-                setSearch({
-                  ...search,
-                  name: cleanedValue.toUpperCase(),
-                });
-              }}
-              placeholder={`Enter Name`}
-            />
-            <Select
-              onChange={(selectedOption) =>
-                setSearch({ ...search, gender: selectedOption.value })
-              }
-              options={dataGender}
-              className="basic-single"
-              classNamePrefix="select"
-              placeholder="Select Gender"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "100%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-            <Select
-              onChange={(selectedOption) =>
-                setSearch({ ...search, is_cekal: selectedOption.value })
-              }
-              options={dataCekal}
-              className="basic-single"
-              classNamePrefix="select"
-              placeholder="Select Status Cekal"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "100%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-          </div>
-        </div>
-        <div className="face-reg-filter-kamera h-[75%]">
-          <div
-            className="label-filter-name"
-            style={{
-              gap: "18%",
-              paddingTop: "3%",
-            }}
-          >
-            <p>Start Date</p>
-            <p>End Date</p>
-            <p>Nationality</p>
-          </div>
-          <div className="value-filter-name">
-            <input
-              type="datetime-local"
-              value={search.startDate}
-              onChange={(e) =>
-                setSearch({ ...search, startDate: e.target.value })
-              }
-              style={{
-                width: "88%",
-                backgroundColor: "white",
-              }}
-            />
-            <input
-              type="datetime-local"
-              value={search.endDate}
-              onChange={(e) =>
-                setSearch({ ...search, endDate: e.target.value })
-              }
-              style={{
-                width: "88%",
-                backgroundColor: "white",
-              }}
-            />
-            <Select
-              onChange={(selectedOption) =>
-                setSearch({ ...search, nationality: selectedOption.value })
-              }
-              options={[
-                { value: "", label: "All Nationality" },
-                ...countryData.map((country) => ({
-                  value: country.nama_negara,
-                  label: country.nama_negara,
-                })),
-              ]}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "91.7%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      <div
-        className="submit-buttons-registers"
-        style={{
-          width: "99.4%",
-          paddingTop: "1%",
-          paddingBottom: "1%",
-        }}
-      >
-        {/* <button
-                    style={{
-                        width: 150,
-                        cursor: 'pointer'
-                    }}
-                    onClick={() => navigate("/cpanel/synchronize-register")}
-                >Sinkronisasi Data</button> */}
-        <button
-          onClick={generateExcel}
-          className="add-data"
-          disabled={exportStatus === "loading"}
-        >
-          {exportStatus == "loading" ? "Exporting..." : "Export"}
-        </button>
-        <button
-          className="search"
-          onClick={getLogRegister}
-          style={{
-            backgroundColor: "#4F70AB",
-          }}
-        >
-          Search
-        </button>
-      </div>
-      {status === "loading" && (
-        <div className="loading">
-          <span className="loader-loading-table"></span>
-        </div>
-      )}
-      {status === "success" && logData && (
-        <>
-          <TableLog
-            tHeader={[
-              "no plb",
-              "name",
-              "gender",
-              "nationality",
-              "status cekal",
-              "profile image",
-              "registration date",
-              "action",
-            ]}
-            tBody={logData}
-            page={page}
-            showIndex={true}
-            rowRenderer={customRowRenderer}
-            handler={openModalDetail}
-          />
-          <div className="table-footer">
-            <>
-              Show {totalDataFilter} of {pagination?.total} entries
-            </>
-            <div className="table-footer-controls">
-              <select
-                value={perPage}
-                className="table-footer-controls-select"
-                onChange={(e) => {
-                  setPerPage(Number(e.target.value));
-                  setPage(1);
-                }}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 flex flex-col gap-4">
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              onClick={generateExcel}
+              disabled={exportStatus === "loading"}
+              className="px-6 py-2 border border-gray-300 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors flex items-center gap-2"
+            >
+              {exportStatus === "loading" ? "Exporting..." : "Export"}
+            </button>
+            <button
+              onClick={() => setShowModalFilter(true)}
+              className="px-6 py-2 bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <IoFilter />
+              Filter
+            </button>
+            {/* <button
+              onClick={getLogRegister}
+              className="px-6 py-2 bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <Pagination
-                pageCount={pagination?.last_page}
-                onPageChange={(selectedPage) => setPage(selectedPage)}
-                currentPage={page}
-              />
-            </div>
+                <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path>
+              </svg>
+              Search
+            </button> */}
           </div>
-        </>
-      )}
+        </div>
+        <div className="flex-1 overflow-auto bg-white p-6 pt-0">
+          {status === "loading" && (
+            <div className="flex justify-center items-center h-40">
+              <span
+                className="w-10 h-10 rounded-full animate-spin"
+                style={{
+                  border: "4px solid #172951",
+                  borderTopColor: "transparent",
+                }}
+              ></span>
+            </div>
+          )}
+          {status === "success" && logData && (
+            <div className="flex flex-col h-full">
+              <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
+                <TableLog
+                  tHeader={[
+                    "no plb",
+                    "name",
+                    "gender",
+                    "nationality",
+                    "status cekal",
+                    "profile image",
+                    "registration date",
+                    "action",
+                  ]}
+                  tBody={logData}
+                  rowRenderer={customRowRenderer}
+                  showIndex={true}
+                  page={page}
+                  handler={openModalDetail}
+                  perPage={pagination.per_page}
+                />
+              </div>
+
+              <div className="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
+                <div className="text-sm text-gray-500">
+                  Menampilkan{" "}
+                  <span className="font-medium text-gray-900">
+                    {logData.length}
+                  </span>{" "}
+                  dari{" "}
+                  <span className="font-medium text-gray-900">
+                    {pagination?.total}
+                  </span>{" "}
+                  data
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Per halaman:</span>
+                    <select
+                      value={perPage}
+                      className="border border-gray-300 rounded-md text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onChange={(e) => {
+                        setPerPage(Number(e.target.value));
+                        setPage(1);
+                      }}
+                    >
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                  <Pagination
+                    pageCount={pagination?.last_page}
+                    onPageChange={(selectedPage) => setPage(selectedPage)}
+                    currentPage={page}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      <Modals
+        showModal={showModalFilter}
+        buttonName="Search"
+        width={800}
+        headerName="Filter Register"
+        closeModal={closeModalFilter}
+        onConfirm={handleFilter}
+      >
+        {filterModalContent()}
+      </Modals>
       <Modals
         showModal={showModalEdit}
         buttonName="Submit"

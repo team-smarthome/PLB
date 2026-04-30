@@ -4,7 +4,6 @@ import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
 import Cookies from "js-cookie";
 import Modals from "../../components/Modal/Modal";
 import Select from "react-select";
-import "./device.style.css";
 import {
   DeleteDevice,
   getAllDeviceaData,
@@ -72,13 +71,16 @@ const Device = () => {
 
   const addModalContent = () => {
     return (
-      <div className="edit-container">
-        <div>
-          <span>Nama Device :</span>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Nama Device
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan nama device"
-            value={formData.name}
+            value={formData.name || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -89,12 +91,15 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Ip Address :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Ip Address
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan ip address device"
-            value={formData.ip_address}
+            value={formData.ip_address || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -103,12 +108,15 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Mac Address :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Mac Address
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan mac address"
-            value={formData.mac_address}
+            value={formData.mac_address || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -119,11 +127,13 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Tipe Device :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Tipe Device
+          </span>
           <select
-            className="custom-select"
-            value={formData.device_type_id}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            value={formData.device_type_id || ""}
             onChange={(e) =>
               setFormData({ ...formData, device_type_id: e.target.value })
             }
@@ -138,11 +148,13 @@ const Device = () => {
             ))}
           </select>
         </div>
-        <div>
-          <span>Status Device :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Status Device
+          </span>
           <select
-            className="custom-select"
-            value={formData.device_status}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            value={formData.device_status || ""}
             onChange={(e) =>
               setFormData({ ...formData, device_status: e.target.value })
             }
@@ -154,12 +166,15 @@ const Device = () => {
             <option value="non aktif">Non Aktif</option>
           </select>
         </div>
-        <div>
-          <span>Device Number :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Device Number
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan device number"
-            value={formData.device_number}
+            value={formData.device_number || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -170,12 +185,15 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Product Key :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Product Key
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan product key"
-            value={formData.product_key}
+            value={formData.product_key || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -186,23 +204,28 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Tgl. Instalasi :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Tgl. Instalasi
+          </span>
           <input
             type="datetime-local"
-            placeholder="Masukkan tgl instalasi"
-            value={formData.tgl_dipasang}
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+            value={formData.tgl_dipasang || ""}
             onChange={(e) =>
               setFormData({ ...formData, tgl_dipasang: e.target.value })
             }
           />
         </div>
-        <div>
-          <span>Lokasi TPI :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Lokasi TPI
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan lokasi tpi"
-            value={formData.tpi_id}
+            value={formData.tpi_id || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -217,13 +240,16 @@ const Device = () => {
 
   const editModalContent = () => {
     return (
-      <div className="edit-container">
-        <div>
-          <span>Nama Device :</span>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Nama Device
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan nama device"
-            value={formData.name}
+            value={formData.name || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -234,12 +260,15 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Ip Address :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Ip Address
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan ip address device"
-            value={formData.ip_address}
+            value={formData.ip_address || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -250,12 +279,15 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Mac Address :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Mac Address
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan mac address"
-            value={formData.mac_address}
+            value={formData.mac_address || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -266,11 +298,13 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Tipe Device :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Tipe Device
+          </span>
           <select
-            className="custom-select"
-            value={formData.device_type_id}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            value={formData.device_type_id || ""}
             onChange={(e) =>
               setFormData({ ...formData, device_type_id: e.target.value })
             }
@@ -285,11 +319,13 @@ const Device = () => {
             ))}
           </select>
         </div>
-        <div>
-          <span>Status Device :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Status Device
+          </span>
           <select
-            className="custom-select"
-            value={formData.device_status}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            value={formData.device_status || ""}
             onChange={(e) =>
               setFormData({ ...formData, device_status: e.target.value })
             }
@@ -301,12 +337,15 @@ const Device = () => {
             <option value="non aktif">Non Aktif</option>
           </select>
         </div>
-        <div>
-          <span>Device Number :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Device Number
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan device number"
-            value={formData.device_number}
+            value={formData.device_number || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -317,12 +356,15 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Product Key :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Product Key
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan product key"
-            value={formData.product_key}
+            value={formData.product_key || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -333,23 +375,28 @@ const Device = () => {
             }
           />
         </div>
-        <div>
-          <span>Tgl. Instalasi :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Tgl. Instalasi
+          </span>
           <input
-            type="text"
-            placeholder="Masukkan tgl instalasi"
-            value={formData.tgl_dipasang}
+            type="datetime-local"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+            value={formData.tgl_dipasang || ""}
             onChange={(e) =>
               setFormData({ ...formData, tgl_dipasang: e.target.value })
             }
           />
         </div>
-        <div>
-          <span>Lokasi TPI :</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold text-gray-700">
+            Lokasi TPI
+          </span>
           <input
             type="text"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             placeholder="Masukkan lokasi tpi"
-            value={formData.tpi_id}
+            value={formData.tpi_id || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
@@ -364,11 +411,11 @@ const Device = () => {
 
   const deleteModalContent = () => {
     return (
-      <div className="delete-container">
-        <h3>
+      <div className="py-4 text-center">
+        <span className="text-lg text-gray-700">
           Are You Sure Want Delete{" "}
-          <span style={{ fontWeight: "bold" }}>{formData?.name}</span> ?
-        </h3>
+          <span className="font-bold text-navy-900">{formData?.name}</span>?
+        </span>
       </div>
     );
   };
@@ -410,6 +457,12 @@ const Device = () => {
   const deleteModal = (data) => {
     setFormData(data);
     setIsShowModalDelete(true);
+  };
+
+  const handleSearch = () => {
+    console.warn("search init...");
+    setCurrentPage(1);
+    getAllDevice();
   };
 
   const getAllDevice = async (page = 1) => {
@@ -525,20 +578,38 @@ const Device = () => {
   const customRowRenderer = (row) => {
     return (
       <>
-        <td>{row?.name}</td>
-        <td>{row?.ip_address}</td>
-        <td>{row?.mac_address}</td>
-        <td>{row?.device_type?.name}</td>
-        <td>{row?.device_status}</td>
-        <td>{row?.device_number}</td>
-        <td>{row?.product_key}</td>
-        <td>{row?.tgl_dipasang}</td>
-        <td>{row?.tpi_id}</td>
+        <td className="text-center">{row?.name}</td>
+        <td className="text-center">{row?.ip_address}</td>
+        <td className="text-center">{row?.mac_address}</td>
+        <td className="text-center">{row?.device_type?.name}</td>
+        <td className="text-center">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${row?.device_status === "aktif" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+          >
+            {row?.device_status}
+          </span>
+        </td>
+        <td className="text-center">{row?.device_number}</td>
+        <td className="text-center">{row?.product_key}</td>
+        <td className="text-center">{row?.tgl_dipasang}</td>
+        <td className="text-center">{row?.tpi_id}</td>
 
         {userInfo.role == 0 && (
-          <td className="button-action">
-            <button onClick={() => editModal(row)}>Edit</button>
-            <button onClick={() => deleteModal(row)}>Delete</button>
+          <td className="flex justify-center items-center">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => editModal(row)}
+                className="w-16 py-2 bg-[#fbaf17] text-base border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => deleteModal(row)}
+                className="w-16 py-2 text-base bg-red-500 border-none text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 hover:cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
           </td>
         )}
       </>
@@ -546,7 +617,7 @@ const Device = () => {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage < 1 || newPage > totalPages) return; // Out of bounds check
+    if (newPage < 1 || newPage > totalPages) return;
     setCurrentPage(newPage);
     getAllDevice(newPage);
   };
@@ -558,92 +629,125 @@ const Device = () => {
 
   useEffect(() => {
     getAllDevice();
-  }, [currentPage, search, perPage]);
-
-  const renderPaginationControls = () => {
-    return (
-      <div className="table-footer">
-        <>
-          Show {totalDataFilter} of {pagination?.total} entries
-        </>
-        <div className="table-footer-controls">
-          <select
-            value={perPage}
-            onChange={(e) => {
-              setPerPage(Number(e.target.value));
-            }}
-            className="table-footer-controls-select"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-          <Pagination
-            pageCount={pagination?.last_page}
-            onPageChange={(selectedPage) => setPage(selectedPage)}
-            currentPage={currentPage}
-          />
-        </div>
-      </div>
-    );
-  };
+  }, [currentPage, perPage]);
 
   return (
-    <div style={{ padding: 20, backgroundColor: "#eeeeee", height: "100%" }}>
-      <div
-        className="input-search-container search-country"
-        style={{ display: "flex", justifyContent: "flex-end" }}
-      >
-        <div className="search-table-list" style={{ alignItems: "center" }}>
-          <div className="search-table">
-            {/* <span>Negara : </span> */}
-            <div className="input-icon-wrapper-country">
-              <FaSearch className="input-icon" />
-              <input
-                type="text"
-                placeholder="Search"
-                onChange={(e) => setSearch({ ...search, name: e.target.value })}
-              />
-            </div>
-          </div>
-          <button
-            // onClick={getAllDevice}
-            style={{
-              backgroundColor: "#4F70AB",
-            }}
-          >
-            Search
-          </button>
+    <div className="flex flex-col h-full gap-2">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-navy-900">
+            Device Management
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Kelola data dan status device yang terdaftar dalam sistem.
+          </p>
         </div>
+
         {userInfo.role == 0 && (
           <button
-            style={{
-              marginRight: 10,
-              marginLeft: 10,
-            }}
             onClick={openModalAdd}
+            className="px-6 py-2 bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors flex items-center gap-2 shadow-sm"
           >
-            Add
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              strokeWidth="0"
+              viewBox="0 0 448 512"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path>
+            </svg>
+            Add Device
           </button>
         )}
       </div>
-      {isLoading ? (
-        <div className="loading">
-          <span className="loader-loading-table"></span>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 flex flex-col gap-4">
+          <div className="flex items-center gap-4 w-full mt-2">
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search Device"
+                className="pl-10 pr-4 py-3 text-sm rounded-lg bg-gray-100 border border-gray-200 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-200"
+                onChange={(e) => setSearch({ ...search, name: e.target.value })}
+              />
+            </div>
+            <button
+              onClick={handleSearch}
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors shadow-sm whitespace-nowrap"
+            >
+              Search
+            </button>
+          </div>
         </div>
-      ) : (
-        <>
-          <TableLog
-            tHeader={tHeader}
-            tBody={dataDevice}
-            onEdit={editModal}
-            onDelete={deleteModal}
-            rowRenderer={customRowRenderer}
-          />
-          {renderPaginationControls()}
-        </>
-      )}
+
+        <div className="flex-1 overflow-auto bg-white p-6 pt-0">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+              <span
+                className="w-10 h-10 rounded-full animate-spin"
+                style={{
+                  border: "4px solid #172951",
+                  borderTopColor: "transparent",
+                }}
+              ></span>
+            </div>
+          ) : (
+            <div className="flex flex-col h-full">
+              <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
+                <TableLog
+                  tHeader={tHeader}
+                  tBody={dataDevice}
+                  onEdit={editModal}
+                  onDelete={deleteModal}
+                  rowRenderer={customRowRenderer}
+                />
+              </div>
+
+              <div className="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
+                <div className="text-sm text-gray-500">
+                  Menampilkan{" "}
+                  <span className="font-medium text-gray-900">
+                    {totalDataFilter}
+                  </span>{" "}
+                  dari{" "}
+                  <span className="font-medium text-gray-900">
+                    {pagination?.total || 0}
+                  </span>{" "}
+                  data
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Per halaman:</span>
+                    <select
+                      value={perPage}
+                      className="border border-gray-300 rounded-md text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onChange={(e) => setPerPage(Number(e.target.value))}
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                  <Pagination
+                    pageCount={pagination?.last_page}
+                    onPageChange={(selectedPage) => setPage(selectedPage)}
+                    currentPage={currentPage}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <Modals
         showModal={isShowModalAdd}
         closeModal={closeModalAdd}

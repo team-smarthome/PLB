@@ -10,8 +10,7 @@ import LogRegister from "../LogRegister/LogRegister";
 import LogFaceReg from "../LogFaceReg/LogFaceReg";
 import { RiMenu3Fill } from "react-icons/ri";
 import Cookies from "js-cookie";
-import "./cpanel.style.css";
-import ario from "../../assets/images/ario.jpeg";
+
 import UserManagement from "../UserManagement/UserManagement";
 import SettingIp from "../../components/SettingIp/SettingIp";
 import Country from "../Country/Country";
@@ -61,78 +60,78 @@ const Cpanel = () => {
     navigate("/");
   };
   return (
-    <div
-      style={{
-        display: isSidebarOpen ? "flex" : "",
-        height: "100vh",
-      }}
-    >
-      {/* Sidebar with fixed width */}
-      <div style={{ width: "280px" }}>
-        <Sidebar isOpen={isSidebarOpen} />
+    <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
+      {/* Sidebar */}
+      <div
+        className={`transition-all duration-300 flex-shrink-0 ${isSidebarOpen ? "w-[280px]" : "w-0 overflow-hidden"}`}
+      >
+        <Sidebar
+          isOpen={isSidebarOpen}
+          userData={userData}
+          handleLogout={handleLogout}
+        />
       </div>
-      {/* Content taking the remaining space */}
-      <div style={{ flexGrow: 1 }} className="cpanel-content">
-        <div className="header-body">
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden min-h-0">
+        {/* Header */}
+        <header className="flex items-center gap-4 px-6 py-4 bg-white border-b border-gray-200 shadow-sm z-10">
           <RiMenu3Fill
-            size={30}
-            style={{ cursor: "pointer" }}
+            size={24}
+            className="cursor-pointer text-gray-600 hover:text-gray-900"
             onClick={handleSidebarToggle}
           />
-          <div className="user-profile">
-            {/* {userData.role !== 2 && (
-              <>
-                <button
-                  className="p-4 rounded-md bg-btnPrimary text-white font-semibold cursor-pointer hover:bg-[#0f2a43]"
-                  onClick={() => navigate("/home")}
-                >
-                  Home
-                </button>
-              </>
-            )} */}
-            {/* <img src={ario} alt="" width={55} height={55} /> */}
-            <div
-              className="flex flex-row gap-4"
-              onClick={() => setShowUserButton(!showUserButton)}
-            >
-              <div className="circle-container ml-4">
-                <span className="circle">
-                  {handleSplitName(userData?.petugas?.nama_petugas)}
-                </span>
-              </div>
-
-              <h4>{userData?.petugas?.nama_petugas ?? ""}</h4>
+          <div className="flex items-center gap-3 text-gray-800 font-semibold text-lg">
+            <div className="flex align-center justify-center border border-gray-300 p-1 rounded text-gray-500">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                height="1.2em"
+                width="1.2em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M416 112H96a64.07 64.07 0 00-64 64v208a64.07 64.07 0 0064 64h320a64.07 64.07 0 0064-64V176a64.07 64.07 0 00-64-64zm-16 272H112a16 16 0 01-16-16V224h320v144a16 16 0 01-16 16zM384 144H128v16h256zm-32-32H160v16h192z"></path>
+              </svg>
             </div>
+            Sistem Registrasi Pas Lintas Batas
           </div>
-          {showUserButton && (
-            <div className="user-button-list">
-              <button onClick={handleLogout}>Logout</button>
-            </div>
-          )}
-        </div>
-        <ReactRoutes>
-          <Route path="*" element={<NotFound />} />
-          <Route path="/" element={<Navigate to="/cpanel/user-management" />} />
-          <Route path="/log-register" element={<LogRegister />} />
-          <Route path="/log-facereg" element={<LogFaceReg />} />
-          <Route path="/log-simpan-pelintas" element={<LogSimpanPelintas />} />
-          <Route path="/user-management" element={<UserManagement />} />
-          <Route path="/setting-server" element={<SettingServer />} />
-          <Route path="/setting-camera" element={<SettingIp />} />
-          <Route path="/device" element={<Device />} />
-          <Route path="/device-type" element={<DeviceType />} />
-          <Route path="/destination-location" element={<Country />} />
-          <Route path="/jabatan" element={<JobTitle />} />
-          <Route path="/synchronize" element={<Synchronize />} />
-          {/* <Route path="/synchronize-register" element={<SynchronizeRegister />} /> */}
-          <Route path="/synchronize-facereg" element={<SynchronizeFaceReg />} />
-          <Route
-            path="/setting-status-depart"
-            element={<SettingDepartStatusKamera />}
-          />
-          <Route path="/realtime-facereg" element={<RealtimeFaceReg />} />
-          {/* <Route path="/camera-settings" element={<CameraSetting />} /> */}
-        </ReactRoutes>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex flex-col flex-1 overflow-y-auto bg-slate-50 p-6">
+          <ReactRoutes>
+            <Route path="*" element={<NotFound />} />
+            <Route
+              path="/"
+              element={<Navigate to="/cpanel/user-management" />}
+            />
+            <Route path="/log-register" element={<LogRegister />} />
+            <Route path="/log-facereg" element={<LogFaceReg />} />
+            <Route
+              path="/log-simpan-pelintas"
+              element={<LogSimpanPelintas />}
+            />
+            <Route path="/user-management" element={<UserManagement />} />
+            {/* <Route path="/setting-server" element={<SettingServer />} /> */}
+            {/* <Route path="/setting-camera" element={<SettingIp />} /> */}
+            <Route path="/device" element={<Device />} />
+            <Route path="/device-type" element={<DeviceType />} />
+            <Route path="/destination-location" element={<Country />} />
+            <Route path="/jabatan" element={<JobTitle />} />
+            <Route path="/synchronize" element={<Synchronize />} />
+            <Route
+              path="/synchronize-facereg"
+              element={<SynchronizeFaceReg />}
+            />
+            {/* <Route
+              path="/setting-status-depart"
+              element={<SettingDepartStatusKamera />}
+            /> */}
+            <Route path="/realtime-facereg" element={<RealtimeFaceReg />} />
+          </ReactRoutes>
+        </main>
       </div>
     </div>
   );

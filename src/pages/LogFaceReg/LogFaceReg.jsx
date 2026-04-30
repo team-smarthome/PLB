@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import TableLog from "../../components/TableLog/TableLog";
-import "./logfacereg.style.css";
 import {
   apiDeleteLog,
   apiGetAllIp,
@@ -18,6 +17,7 @@ import { initiateSocket4010 } from "../../utils/socket";
 import { useNavigate } from "react-router-dom";
 import Modals from "../../components/Modal/Modal";
 import { Toast } from "../../components/Toast/Toast";
+import { IoFilter } from "react-icons/io5";
 
 const LogFaceReg = () => {
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ const LogFaceReg = () => {
   const [actionPopup, setActionPopup] = useState(false);
   const [simpanModal, setSimpanModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [showModalFilter, setShowModalFilter] = useState(false);
   const [params, setParams] = useState({
     page: page,
     per_page: perPage,
@@ -220,27 +221,29 @@ const LogFaceReg = () => {
   const customRowRenderer = (row, index) => {
     return (
       <>
-        <td>{row?.personId}</td>
-        <td>{row?.name}</td>
-        <td>{row?.similarity}</td>
-        <td>
+        <td className="text-center">{row?.personId}</td>
+        <td className="text-center">{row?.name}</td>
+        <td className="text-center">{row?.similarity}</td>
+        <td className="text-center">
           {row?.gender === "M"
             ? "Laki-Laki"
             : row?.gender === "F"
               ? "Perempuan"
               : "Unkown"}
         </td>
-        <td>{row?.nationality || "Unkown"}</td>
-        <td>
+        <td className="text-center">{row?.nationality || "Unkown"}</td>
+        <td className="text-center">
           {row?.passStatus === 6 || row?.passStatus === "Failed"
             ? "Failed"
             : "Success"}
         </td>
-        <td>{handleEpochToDate(row?.time)}</td>
-        <td className={`${row?.is_depart ? "text-green-400" : "text-red-400"}`}>
+        <td className="text-center">{handleEpochToDate(row?.time)}</td>
+        <td
+          className={`${row?.is_depart ? "text-green-700" : "text-red-700"} text-center`}
+        >
           {row?.is_depart ? "Departure" : "Arrival"}
         </td>
-        <td>
+        <td className="text-center">
           <img
             src={`data:image/jpeg;base64,${row?.image_base64}`}
             alt="result"
@@ -415,6 +418,315 @@ const LogFaceReg = () => {
 
   const selectedData = logData.filter((data) => data.isSelected == true);
 
+  const handleSearchFilter = () => {
+    handlePageChange(1);
+    GetDataUserLogFilter();
+    setShowModalFilter(false);
+  };
+
+  const handleCloseModalFilter = () => {
+    setShowModalFilter(false);
+  };
+
+  const filterModalContent = () => {
+    return (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pb-6">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Filter By
+            </label>
+            <Select
+              value={optionFilter.find(
+                (option) => option.value === selectedCondition,
+              )}
+              onChange={(selectedOption) => {
+                setParams({ ...params, [selectedOption.value]: "" });
+                setSelectedCondition(selectedOption.value);
+              }}
+              options={optionFilter}
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              {selectedCondition === "name" ? "Nama" : "Nomor Passport"}
+            </label>
+            <input
+              type="text"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+              value={
+                selectedCondition === "name"
+                  ? params.name.toUpperCase().replace(/[^A-Za-z\s.-]/g, "")
+                  : params.personId.toUpperCase()
+              }
+              onChange={handleChange}
+              placeholder={`Enter ${selectedCondition === "name" ? "name" : "passport number"}`}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Recognition Status
+            </label>
+            <Select
+              onChange={handleChangeStatus}
+              options={optionFilterStatus}
+              defaultValue={optionFilterStatus[0]}
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Gender
+            </label>
+            <Select
+              onChange={(selectedOption) => {
+                setParams({
+                  ...params,
+                  page: 1,
+                  gender: selectedOption.value,
+                });
+                handlePageChange(1);
+              }}
+              options={dataGender}
+              defaultValue={dataGender[0]}
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Start Date
+            </label>
+            <input
+              type="datetime-local"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+              value={params.startDate}
+              onChange={(e) => {
+                setParams({ ...params, startDate: e.target.value, page: 1 });
+                handlePageChange(1);
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              End Date
+            </label>
+            <input
+              type="datetime-local"
+              className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+              value={params.endDate}
+              onChange={(e) => {
+                setParams({ ...params, endDate: e.target.value, page: 1 });
+                handlePageChange(1);
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Select Camera
+            </label>
+            <Select
+              onChange={(selectedOption) => {
+                localStorage.setItem("cameraIp", selectedOption.value);
+                setParams({
+                  ...params,
+                  page: 1,
+                  ipCamera: selectedOption.value,
+                });
+                handlePageChange(1);
+              }}
+              options={[
+                { value: "", label: "All Camera" },
+                ...optionIp.map((item) => ({
+                  value: item.ipAddress,
+                  label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Departure" : "Arrival"} )`,
+                })),
+              ]}
+              defaultValue={{ value: "", label: "All Camera" }}
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Nationality
+            </label>
+            <Select
+              onChange={(selectedOption) => {
+                setParams({
+                  ...params,
+                  nationality: selectedOption.value,
+                  page: 1,
+                });
+                handlePageChange(1);
+              }}
+              options={[
+                { value: "", label: "All Nationality" },
+                ...dataNationality.map((country) => ({
+                  value: country.nama_negara,
+                  label: country.nama_negara,
+                })),
+              ]}
+              className="text-sm"
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  minHeight: "44px",
+                  height: "44px",
+                  backgroundColor: "#f9fafb", // match input (bg-gray-50)
+                  borderColor: state.isFocused ? "#3b82f6" : "#e5e7eb",
+                  borderRadius: "0.5rem",
+                  boxShadow: state.isFocused
+                    ? "0 0 0 2px rgba(59,130,246,0.3)"
+                    : "none",
+                  "&:hover": {
+                    borderColor: "#3b82f6",
+                  },
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                  padding: "0 12px",
+                }),
+                input: (base) => ({
+                  ...base,
+                  margin: 0,
+                  padding: 0,
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: "44px",
+                }),
+              }}
+            />
+          </div>
+        </div>
+      </>
+    );
+  };
+
   const handleSimpanPelintas = async () => {
     console.log("selectedData", selectedData);
     setStatus("loading");
@@ -501,411 +813,177 @@ const LogFaceReg = () => {
       })),
     );
   };
+  console.log("loading: ", status);
 
   return (
-    <div style={{ padding: 20, backgroundColor: "#eeeeee", height: "100%" }}>
-      <div className="face-reg-header">
-        <div className="face-reg-filter-name">
-          <div className=" label-filter-name">
-            <p>Filter By</p>
-            <p>{selectedCondition === "name" ? "Nama" : "Nomor Passport"}</p>
-            <p>Recognition Status</p>
-            <p>Gender</p>
-          </div>
-          <div className="value-filter-name">
-            <Select
-              value={optionFilter.find(
-                (option) => option.value === selectedCondition,
-              )}
-              onChange={(selectedOption) => {
-                setParams({
-                  ...params,
-                  [selectedOption.value]: "",
-                });
-                setSelectedCondition(selectedOption.value);
-              }}
-              options={optionFilter}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "91.7%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-            <input
-              type="text"
-              style={{ backgroundColor: "white" }}
-              value={
-                selectedCondition === "name"
-                  ? params.name.toUpperCase().replace(/[^A-Za-z\s.-]/g, "")
-                  : params.personId.toUpperCase()
-              }
-              onChange={handleChange}
-              placeholder={`Enter ${selectedCondition == "name" ? "name" : "passport number"}`}
-              className="input-filter-name-1"
-            />
-            <Select
-              onChange={handleChangeStatus}
-              options={optionFilterStatus}
-              className="basic-single"
-              classNamePrefix="select"
-              defaultValue={optionFilterStatus[0]}
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "91.7%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-            <Select
-              onChange={(selectedOption) => {
-                setParams({ ...params, page: 1, gender: selectedOption.value });
-                handlePageChange(1);
-              }}
-              options={dataGender}
-              className="basic-single"
-              classNamePrefix="select"
-              defaultValue={dataGender[0]}
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "91.7%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-          </div>
-        </div>
-        <div className="face-reg-filter-kamera">
-          <div className="label-filter-name">
-            <p>Start Date</p>
-            <p>End Date</p>
-            <p>Select Camera</p>
-            <p>Nationality</p>
-          </div>
-          <div className="value-filter-name">
-            <input
-              type="datetime-local"
-              value={params.startDate}
-              onChange={(e) => {
-                setParams({ ...params, startDate: e.target.value, page: 1 });
-                handlePageChange(1);
-              }}
-              style={{
-                width: "88%",
-                backgroundColor: "white",
-              }}
-            />
-            <input
-              type="datetime-local"
-              value={params.endDate}
-              onChange={(e) => {
-                setParams({ ...params, endDate: e.target.value, page: 1 });
-                handlePageChange(1);
-              }}
-              style={{
-                width: "88%",
-                backgroundColor: "white",
-              }}
-            />
-            <Select
-              onChange={(selectedOption) => {
-                localStorage.setItem("cameraIp", selectedOption.value);
-                setParams({
-                  ...params,
-                  page: 1,
-                  ipCamera: selectedOption.value,
-                });
-                handlePageChange(1);
-              }}
-              options={[
-                { value: "", label: "All Camera" },
-                ...optionIp.map((item) => ({
-                  value: item.ipAddress,
-                  label: `${item.namaKamera} - ${item.ipAddress} ( ${item.is_depart ? "Departure" : "Arrival"} )`,
-                })),
-              ]}
-              defaultValue={{ value: "", label: "All Camera" }}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "91.7%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-            <Select
-              onChange={(selectedOption) => {
-                setParams({
-                  ...params,
-                  nationality: selectedOption.value,
-                  page: 1,
-                });
-                handlePageChange(1);
-              }}
-              options={[
-                { value: "", label: "All Nationality" },
-                ...dataNationality.map((country) => ({
-                  value: country.nama_negara,
-                  label: country.nama_negara,
-                })),
-              ]}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={{
-                container: (provided) => ({
-                  ...provided,
-                  position: "relative",
-                  flex: 1,
-                  width: "91.7%",
-                  borderRadius: "10px",
-                  backgroundColor: "white",
-                  fontFamily: "Roboto, Arial, sans-serif",
-                }),
-                valueContainer: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                }),
-                control: (provided) => ({
-                  ...provided,
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "white",
-                }),
-              }}
-            />
-          </div>
+    <div className="flex flex-col h-full gap-2">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-navy-900">Log FaceReg</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Kelola dan lihat daftar riwayat pengenalan wajah pelintas batas.
+          </p>
         </div>
       </div>
-      <div
-        className="submit-buttons-registers "
-        style={{
-          width: "99.4%",
-          paddingTop: "1%",
-          paddingBottom: "1%",
-          marginTop: "1%",
-        }}
-      >
-        <button
-          style={{
-            width: 150,
-            cursor: "pointer",
-            backgroundColor: "blue",
-          }}
-          onClick={() => setModalOpen(true)}
-        >
-          Input Data Manual
-        </button>
-        <button
-          onClick={generateExcel}
-          className="add-data"
-          disabled={exportStatus === "loading"}
-        >
-          {" "}
-          {exportStatus == "loading" ? "Exporting..." : "Export"}
-        </button>
-        <button
-          className="search"
-          onClick={handleSearch}
-          style={{
-            backgroundColor: "#4F70AB",
-          }}
-        >
-          Search
-        </button>
-      </div>
-      {status === "loading" && (
-        <div className="loading">
-          <span className="loader-loading-table"></span>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden relative">
+        <div className="p-6 border-b border-gray-100 flex flex-col gap-4">
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="px-6 py-2 border border-navy-900 text-navy-900 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors"
+            >
+              Input Data Manual
+            </button>
+            <button
+              onClick={generateExcel}
+              disabled={exportStatus === "loading"}
+              className="px-6 py-2 border border-gray-300 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors flex items-center gap-2"
+            >
+              {exportStatus === "loading" ? "Exporting..." : "Export"}
+            </button>
+            <button
+              onClick={() => setShowModalFilter(true)}
+              className="px-6 py-2 border bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <IoFilter />
+              Filter
+            </button>
+          </div>
         </div>
-      )}
-      {status === "success" && logData && (
-        <>
-          <TableLog
-            tHeader={[
-              "no plb",
-              "name",
-              "similarity",
-              "gender",
-              "nationality",
-              "recogniton status",
-              "Recognition Time",
-              "Depart Status",
-              "Image Result",
-              "IP Camera",
-              "Action",
-            ]}
-            tBody={logData}
-            // handler={handleOpenImage}
-            rowRenderer={customRowRenderer}
-            showIndex={true}
-            page={page}
-            perPage={pagination?.per_page}
-          />
-          {actionPopup && (
-            <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
-              {logData.length == selectedData.length ? (
-                <button
-                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                  onClick={handleClearAll}
-                >
-                  Kosongkan Semua
-                </button>
-              ) : (
-                <button
-                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                  onClick={handleSelectAll}
-                >
-                  Pilih Semua
-                </button>
-              )}
-              {logData.length == selectedData.length ? (
-                <button
-                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                  onClick={handleClearAll}
-                >
-                  Kosongkan Semua
-                </button>
-              ) : (
-                <button
-                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                  onClick={handleSelectAll}
-                >
-                  Pilih Semua
-                </button>
-              )}
-              <button
-                className="bg-btnPrimary text-white py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                onClick={() => setSimpanModal(true)}
-              >
-                Simpan Pelintas
-              </button>
-              <button
-                className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-                onClick={() => setDeleteModal(true)}
-              >
-                Hapus Data
-              </button>
+
+        <div className="flex-1 overflow-auto bg-white p-6 pt-0">
+          {status === "loading" && (
+            <div className="flex justify-center items-center h-40">
+              <span
+                className="w-10 h-10 rounded-full animate-spin"
+                style={{
+                  border: "4px solid #172951",
+                  borderTopColor: "transparent",
+                }}
+              ></span>
             </div>
           )}
-          <div className="table-footer">
-            <>
-              Show {totalDataFilter} of {pagination?.total} entries
-            </>
-            <div className="table-footer-controls">
-              <select
-                value={perPage || 10}
-                onChange={(e) => {
-                  setPerPage(Number(e.target.value));
-                }}
-                className="table-footer-controls-select"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <Pagination
-                pageCount={pagination?.last_page}
-                onPageChange={handlePageChange}
-                currentPage={page}
-              />
+
+          {status === "success" && logData && (
+            <div className="flex flex-col h-full">
+              <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
+                <TableLog
+                  tHeader={[
+                    "no plb",
+                    "name",
+                    "similarity",
+                    "gender",
+                    "nationality",
+                    "recogniton status",
+                    "Recognition Time",
+                    "Depart Status",
+                    "Image Result",
+                    "IP Camera",
+                    "Action",
+                  ]}
+                  tBody={logData}
+                  rowRenderer={customRowRenderer}
+                  showIndex={true}
+                  page={page}
+                  perPage={pagination?.per_page}
+                />
+              </div>
+
+              {actionPopup && (
+                <div className="fixed bottom-12 right-8 bg-white/90 backdrop-blur-md flex items-center justify-center gap-4 rounded-xl shadow-2xl border border-gray-200 p-4 z-50">
+                  {logData.length == selectedData.length ? (
+                    <button
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                      onClick={handleClearAll}
+                    >
+                      Kosongkan Semua
+                    </button>
+                  ) : (
+                    <button
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                      onClick={handleSelectAll}
+                    >
+                      Pilih Semua
+                    </button>
+                  )}
+                  <button
+                    className="px-4 py-2 border bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-800"
+                    onClick={() => setSimpanModal(true)}
+                  >
+                    Simpan Pelintas
+                  </button>
+                  <button
+                    className="px-4 py-2 border bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                    onClick={() => setDeleteModal(true)}
+                  >
+                    Hapus Data
+                  </button>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
+                <div className="text-sm text-gray-500">
+                  Menampilkan{" "}
+                  <span className="font-medium text-gray-900">
+                    {logData.length}
+                  </span>{" "}
+                  dari{" "}
+                  <span className="font-medium text-gray-900">
+                    {pagination?.total}
+                  </span>{" "}
+                  data
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Per halaman:</span>
+                    <select
+                      value={perPage || 10}
+                      className="border border-gray-300 rounded-md text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onChange={(e) => setPerPage(Number(e.target.value))}
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                  <Pagination
+                    pageCount={pagination?.last_page}
+                    onPageChange={handlePageChange}
+                    currentPage={page}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </>
-      )}
-      {status === "failed" && (
-        <>
-          <TableLog
-            tHeader={[
-              "no plb",
-              "name",
-              "similarity",
-              "gender",
-              "nationality",
-              "recogniton status",
-              "Recognition Time",
-              "Depart Status",
-              "Image Result",
-              "IP Camera",
-              "Action",
-            ]}
-            tBody={[]}
-            // handler={handleOpenImage}
-            rowRenderer={customRowRenderer}
-            showIndex={true}
-            page={page}
-            perPage={pagination?.per_page}
-          />
-        </>
-      )}
+          )}
+          {status === "failed" && (
+            <>
+              <TableLog
+                tHeader={[
+                  "no plb",
+                  "name",
+                  "similarity",
+                  "gender",
+                  "nationality",
+                  "recogniton status",
+                  "Recognition Time",
+                  "Depart Status",
+                  "Image Result",
+                  "IP Camera",
+                  "Action",
+                ]}
+                tBody={[]}
+                // handler={handleOpenImage}
+                rowRenderer={customRowRenderer}
+                showIndex={true}
+                page={page}
+                perPage={pagination?.per_page}
+              />
+            </>
+          )}
+        </div>
+      </div>
       <ImgsViewer
         imgs={resultArray}
         isOpen={isOpenImage}
@@ -916,6 +994,17 @@ const LogFaceReg = () => {
         }}
         currImg={currentImage}
       />
+      <Modals
+        showModal={showModalFilter}
+        headerName="Filter Data"
+        width={800}
+        height={500}
+        closeModal={handleCloseModalFilter}
+        buttonName="Apply"
+        onConfirm={handleSearchFilter}
+      >
+        {filterModalContent()}
+      </Modals>
       <Modals
         showModal={simpanModal}
         headerName="Sinkronisasi data"

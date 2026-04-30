@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Select from "react-select";
 import Cookies from 'js-cookie';
 import { apiDeleteIp, apiEditIp, apiGetAllIp, apiGetIp, apiInsertIP, apiGetAllIpFilter } from '../../services/api';
-import './settingip.style.css'
 import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import TableLog from '../TableLog/TableLog';
 import Modals from '../Modal/Modal';
@@ -389,132 +388,125 @@ const SettingIp = () => {
             <>
                 <td>{row.namaKamera}</td>
                 <td>{row.ipAddress}</td>
-                <td>{row.is_depart ? "Departure" : "Arrival"}</td>
+                <td>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.is_depart ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                        {row.is_depart ? "Departure" : "Arrival"}
+                    </span>
+                </td>
                 <td>
                     {kameraStatus ? (
-                        <div style={{ color: kameraStatus.status === 'error' ? 'red' : 'green' }}>
-                            {kameraStatus.status === 'error' ? 'Inactive' : 'Active'}
+                        <div className={`flex items-center gap-2 ${kameraStatus.status === 'error' ? 'text-red-600' : 'text-green-600'}`}>
+                            <span className={`w-2 h-2 rounded-full ${kameraStatus.status === 'error' ? 'bg-red-600' : 'bg-green-600'}`}></span>
+                            <span className="font-medium text-sm">{kameraStatus.status === 'error' ? 'Inactive' : 'Active'}</span>
                         </div>
                     ) : (
-                        <div style={{ color: 'gray' }}>Unknown</div>
+                        <div className="flex items-center gap-2 text-gray-400">
+                            <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                            <span className="font-medium text-sm">Unknown</span>
+                        </div>
                     )}
                 </td>
 
-                <td className='button-action' style={{ height: '100px', display: 'flex', alignItems: "center" }}>
-                    <button
-                        onClick={() => openModalEdit(row)}
-                        disabled={!canAddIpKamerea}
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={() => openModalDelete(row)}
-                        style={{ background: 'red' }}
-                        disabled={!canAddIpKamerea}
-                    >
-                        Delete
-                    </button>
+                <td>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => openModalEdit(row)}
+                            disabled={!canAddIpKamerea}
+                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!canAddIpKamerea ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                        >
+                            Edit
+                        </button>
+                        <button
+                            onClick={() => openModalDelete(row)}
+                            disabled={!canAddIpKamerea}
+                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${!canAddIpKamerea ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
+                        >
+                            Delete
+                        </button>
+                    </div>
                 </td>
-
             </>
         );
     };
 
     const modalAddLayout = () => (
-        <div className="modal-edit-container">
-            <div className="input-config">
-                <span>Camera Name</span>
+        <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-gray-700">Camera Name</span>
                 <input type="text"
-                    value={detailData?.namaKamera}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    value={detailData?.namaKamera || ''}
                     onChange={(e) => setDetailData({ ...detailData, namaKamera: e.target.value })}
                 />
             </div>
-            <div className="input-config">
-                <span>Camera IP</span>
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-gray-700">Camera IP</span>
                 <input type="text"
-                    value={detailData?.ipAddress}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    value={detailData?.ipAddress || ''}
                     onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                 />
             </div>
-            <div className="input-config">
-                <span>Depart Status</span>
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-gray-700">Depart Status</span>
                 <Select
                     value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
                     onChange={handleChangeStatus}
                     options={optionFilterStatus}
-                    className="basic-single"
-                    classNamePrefix="select"
+                    className="text-sm"
                     styles={{
-                        container: (provided) => ({
-                            ...provided,
-                            position: 'relative',
-                            flex: 1,
-                            width: "91.7%",
-                            borderRadius: "10px",
-                            backgroundColor: "rgba(217, 217, 217, 0.75)",
-                            fontFamily: "Roboto, Arial, sans-serif",
-                        }),
-                        valueContainer: (provided) => ({
-                            ...provided,
-                            flex: 1,
-                            width: "100%",
-                        }),
-                        control: (provided) => ({
-                            ...provided,
-                            flex: 1,
-                            width: "100%",
-                            backgroundColor: "rgba(217, 217, 217, 0.75)",
-                        }),
+                        control: (base) => ({
+                            ...base,
+                            borderColor: '#e5e7eb',
+                            borderRadius: '0.5rem',
+                            minHeight: '42px',
+                            boxShadow: 'none',
+                            '&:hover': {
+                                borderColor: '#3b82f6'
+                            }
+                        })
                     }}
                 />
             </div>
         </div>
     )
+
     const modalEditLayout = () => (
-        <div className="modal-edit-container">
-            <div className="input-config">
-                <span>Nama Kamera</span>
+        <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-gray-700">Nama Kamera</span>
                 <input type="text"
-                    value={detailData?.namaKamera}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    value={detailData?.namaKamera || ''}
                     onChange={(e) => setDetailData({ ...detailData, namaKamera: e.target.value })}
                 />
             </div>
-            <div className="input-config">
-                <span>IP Kamera</span>
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-gray-700">IP Kamera</span>
                 <input type="text"
-                    value={detailData?.ipAddress}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    value={detailData?.ipAddress || ''}
                     onChange={(e) => setDetailData({ ...detailData, ipAddress: e.target.value })}
                 />
             </div>
-            <div className="input-config">
-                <span>Operasional</span>
+            <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-gray-700">Operasional</span>
                 <Select
                     value={optionFilterStatus.find((option) => option.value === operationalStatus) || optionFilterStatus[0]}
                     onChange={handleChangeStatus}
                     options={optionFilterStatus}
-                    className="basic-single"
-                    classNamePrefix="select"
+                    className="text-sm"
                     styles={{
-                        container: (provided) => ({
-                            ...provided,
-                            position: 'relative',
-                            flex: 1,
-                            width: "91.7%",
-                            borderRadius: "10px",
-                            backgroundColor: "rgba(217, 217, 217, 0.75)",
-                            fontFamily: "Roboto, Arial, sans-serif",
-                        }),
-                        valueContainer: (provided) => ({
-                            ...provided,
-                            flex: 1,
-                            width: "100%",
-                        }),
-                        control: (provided) => ({
-                            ...provided,
-                            flex: 1,
-                            width: "100%",
-                            backgroundColor: "rgba(217, 217, 217, 0.75)",
-                        }),
+                        control: (base) => ({
+                            ...base,
+                            borderColor: '#e5e7eb',
+                            borderRadius: '0.5rem',
+                            minHeight: '42px',
+                            boxShadow: 'none',
+                            '&:hover': {
+                                borderColor: '#3b82f6'
+                            }
+                        })
                     }}
                 />
             </div>
@@ -523,280 +515,152 @@ const SettingIp = () => {
 
     const modalDeleteLayout = () => {
         return (
-            <div className="" >
-                <span
-                    style={{ fontSize: 20, fontWeight: '400' }}
-                >Are You Sure Want Delete <span style={{ fontWeight: "bold" }}>{detailData.namaKamera}</span> with ip address <span style={{ fontWeight: "bold" }}>{detailData.ipAddress}</span> ?</span>
+            <div className="py-4 text-center">
+                <span className="text-lg text-gray-700">
+                    Are You Sure Want Delete <span className="font-bold text-navy-900">{detailData.namaKamera}</span> with ip address <span className="font-bold text-navy-900">{detailData.ipAddress}</span>?
+                </span>
             </div>
         )
     }
+
     return (
-        <>
-            <div className='config-container'>
-                <div className='flex'>
-                    <div className='flex flex-1'>
-                        <div className='flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5 justify-center w-[25%]'>
-                            <p>Camera Name</p>
-                            <p>Camera IP</p>
-                        </div>
-                        <div className='w-[70%] flex flex-col gap-2'>
-                            <Select
-                                options={[
-                                    { value: "", label: "All Camera Name" },
-                                    ...Array.from(new Set(listCamera.map(item => item.namaKamera))).map(namaKamera => ({
-                                        value: namaKamera,
-                                        label: namaKamera,
-                                    })),
-                                ]}
-                                placeholder="Select Camera Name"
-                                className="basic-single"
-                                classNamePrefix="select"
-                                defaultValue={{ value: "", label: "All Camera Name" }}
-                                onChange={(selected) => handleSelectChange("namaKamera", selected)}
-                                styles={{
-                                    container: (provided) => ({
-                                        ...provided,
-                                        height: '42px',
-                                        borderRadius: '10px',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                        fontFamily: 'Roboto, Arial, sans-serif',
-                                    }),
-                                    valueContainer: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                    }),
-                                    control: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    }),
-                                }}
-                            />
-                            <Select
-                                options={[
-                                    { value: "", label: "All Camera IP" },
-                                    ...Array.from(
-                                        new Set(listCamera.map((item) => item.ipAddress))
-                                    ).map((uniqueIp) => ({
-                                        value: uniqueIp,
-                                        label: uniqueIp,
-                                    })),
-                                ]}
-                                placeholder="Select Camera IP"
-                                className="basic-single"
-                                classNamePrefix="select"
-                                defaultValue={{ value: "", label: "All Camera IP" }}
-                                onChange={(selected) => handleSelectChange("ipAddress", selected)}
-                                styles={{
-                                    container: (provided) => ({
-                                        ...provided,
-                                        height: '42px',
-                                        borderRadius: '10px',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                        fontFamily: 'Roboto, Arial, sans-serif',
-                                    }),
-                                    valueContainer: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                    }),
-                                    control: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    }),
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className='flex flex-1'>
-                        <div className='flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5 w-[25%]'>
-                            <p>Status Camera</p>
-                        </div>
-                        <div className='w-[70%] flex flex-col pt-1'>
-                            <Select
-                                options={[
-                                    { value: "", label: "All Status Camera" },
-                                    ...optionFilterStatus2,
-                                ]}
-                                placeholder="Select Status Camera"
-                                className="basic-single"
-                                classNamePrefix="select"
-                                defaultValue={{ value: "", label: "All Status Camera" }}
-                                onChange={(selected) => handleSelectChange("statusCamera", selected)}
-                                styles={{
-                                    container: (provided) => ({
-                                        ...provided,
-                                        height: '42px',
-                                        borderRadius: '10px',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                        fontFamily: 'Roboto, Arial, sans-serif',
-                                    }),
-                                    valueContainer: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                    }),
-                                    control: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    }),
-                                }}
-                            />
-                        </div>
-                    </div>
+        <div className="flex flex-col h-full gap-6">
+            <div className="flex items-start justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-navy-900">Setting IP Kamera</h1>
+                    <p className="text-gray-500 text-sm mt-1">Kelola dan monitor alamat IP kamera untuk sistem.</p>
                 </div>
+            </div>
 
-                {/* <div className=' flex'>
-                    <div className='flex flex-1 '>
-                        <div className=' flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5 justify-center w-[25%] '>
-                            <p>Camera Name</p>
-                            <p>Camera IP</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden relative">
+                <div className="p-6 border-b border-gray-100 flex flex-col gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Camera Filters */}
+                        <div className="flex gap-4">
+                            <div className="flex flex-col gap-3 justify-center text-sm font-semibold text-gray-700 w-1/4">
+                                <p>Camera Name</p>
+                                <p className="mt-2">Camera IP</p>
+                            </div>
+                            <div className="flex flex-col gap-2 flex-1">
+                                <Select
+                                    options={[
+                                        { value: "", label: "All Camera Name" },
+                                        ...Array.from(new Set(listCamera.map(item => item.namaKamera))).map(namaKamera => ({
+                                            value: namaKamera,
+                                            label: namaKamera,
+                                        })),
+                                    ]}
+                                    placeholder="Select Camera Name"
+                                    defaultValue={{ value: "", label: "All Camera Name" }}
+                                    onChange={(selected) => handleSelectChange("namaKamera", selected)}
+                                    className="text-sm"
+                                    styles={{
+                                        control: (base) => ({
+                                            ...base,
+                                            borderColor: '#e5e7eb',
+                                            borderRadius: '0.5rem',
+                                            minHeight: '40px'
+                                        })
+                                    }}
+                                />
+                                <Select
+                                    options={[
+                                        { value: "", label: "All Camera IP" },
+                                        ...Array.from(
+                                            new Set(listCamera.map((item) => item.ipAddress))
+                                        ).map((uniqueIp) => ({
+                                            value: uniqueIp,
+                                            label: uniqueIp,
+                                        })),
+                                    ]}
+                                    placeholder="Select Camera IP"
+                                    defaultValue={{ value: "", label: "All Camera IP" }}
+                                    onChange={(selected) => handleSelectChange("ipAddress", selected)}
+                                    className="text-sm"
+                                    styles={{
+                                        control: (base) => ({
+                                            ...base,
+                                            borderColor: '#e5e7eb',
+                                            borderRadius: '0.5rem',
+                                            minHeight: '40px'
+                                        })
+                                    }}
+                                />
+                            </div>
                         </div>
-                        <div className='w-[70%] flex  flex-col  gap-2'>
-                            <Select
-                                options={listCamera.map((item) => ({
-                                    value: item.ipAddress,
-                                    label: item.namaKamera,
-                                }))}
-                                placeholder="Select Camera Name"
-                                className="basic-single  "
-                                classNamePrefix="select"
-                                styles={{
-                                    container: (provided) => ({
-                                        ...provided,
-                                        height: '45px',
-                                        borderRadius: '10px',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                        fontFamily: 'Roboto, Arial, sans-serif',
-                                    }),
-                                    valueContainer: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                    }),
-                                    control: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    }),
-                                }}
-                            />
-                            <Select
-                                options={listCamera.map((item) => ({
-                                    value: item.ipAddress,
-                                    label: item.ipAddress,
-                                }))}
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="Select Camera IP"
-                                styles={{
-                                    container: (provided) => ({
-                                        ...provided,
-                                        height: '45px',
-                                        width: '100%',
-                                        borderRadius: '10px',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                        fontFamily: 'Roboto, Arial, sans-serif',
-                                    }),
-                                    valueContainer: (provided) => ({
-                                        ...provided,
 
-                                        width: '100%',
-                                    }),
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '100%',
-                                        width: '100%',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    }),
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className='flex flex-1 '>
-                        <div className=' flex flex-col gap-4 text-lg text-[#3D5889] items-start pt-5  w-[25%] '>
-                            <p>Status Camera</p>
-                        </div>
-                        <div className='w-[70%] flex  flex-col pt-1'>
-                            <Select
-                                options={optionFilterStatus2}
-                                placeholder="Select Status Camera"
-                                className="basic-single  "
-                                classNamePrefix="select"
-                                styles={{
-                                    container: (provided) => ({
-                                        ...provided,
-                                        height: '45px',
-                                        borderRadius: '10px',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                        fontFamily: 'Roboto, Arial, sans-serif',
-                                    }),
-                                    valueContainer: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                    }),
-                                    control: (provided) => ({
-                                        ...provided,
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: 'rgba(217, 217, 217, 0.75)',
-                                    }),
-                                }}
-                            />
-
+                        {/* Status Filter */}
+                        <div className="flex gap-4">
+                            <div className="flex flex-col gap-3 justify-start pt-2 text-sm font-semibold text-gray-700 w-1/4">
+                                <p>Status Camera</p>
+                            </div>
+                            <div className="flex flex-col flex-1">
+                                <Select
+                                    options={[
+                                        { value: "", label: "All Status Camera" },
+                                        ...optionFilterStatus2,
+                                    ]}
+                                    placeholder="Select Status Camera"
+                                    defaultValue={{ value: "", label: "All Status Camera" }}
+                                    onChange={(selected) => handleSelectChange("statusCamera", selected)}
+                                    className="text-sm"
+                                    styles={{
+                                        control: (base) => ({
+                                            ...base,
+                                            borderColor: '#e5e7eb',
+                                            borderRadius: '0.5rem',
+                                            minHeight: '40px'
+                                        })
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div > */}
-                <div className='submit-face-reg'>
-                    <button
-                        style={{
-                            backgroundColor: '#3DBB6F',
-                            width: '10%',
 
-                        }}
-                        onClick={fetchAllIp}
-                    >Check Status
-                    </button>
-                    <button
-                        style={{
-                            backgroundColor: '#4F70AB',
-                        }}
-                        onClick={handleSubmitFilter}
-                    >Search
-                    </button>
-                    {canAddIpKamerea && (
-                        <>
+                    <div className="flex items-center gap-3 justify-end pt-2 border-t border-gray-100 mt-2">
+                        <button
+                            onClick={fetchAllIp}
+                            className="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors shadow-sm"
+                        >
+                            Check Status
+                        </button>
+                        <button
+                            onClick={handleSubmitFilter}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                        >
+                            Search
+                        </button>
+                        {canAddIpKamerea && (
                             <button
                                 onClick={openModalAdd}
-                            >Add
+                                className="px-6 py-2 bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors shadow-sm flex items-center gap-2"
+                            >
+                                <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path></svg>
+                                Add Camera
                             </button>
-                        </>
-                    )}
-
-
-
+                        )}
+                    </div>
                 </div>
-                {
-                    status === "loading" && (
-                        <div className="loading">
-                            <span className="loader-loading-table"></span>
+
+                <div className="flex-1 overflow-auto bg-white p-6 pt-0">
+                    {status === "loading" && (
+                        <div className="flex justify-center items-center h-40">
+                            <span className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></span>
                         </div>
-                    )
-                }
-                {
-                    status === "success" &&
-                    <>
-                        <TableLog
-                            tHeader={['Nama Kamera', "Ip Address", "Depart Status", "Status", "Action"]}
-                            tBody={listCamera}
-                            showIndex={true}
-                            rowRenderer={customRowRenderer}
-                        />
-                    </>
-                }
+                    )}
+                    
+                    {status === "success" && (
+                        <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
+                            <TableLog
+                                tHeader={['Nama Kamera', "Ip Address", "Depart Status", "Status", "Action"]}
+                                tBody={listCamera}
+                                showIndex={true}
+                                rowRenderer={customRowRenderer}
+                            />
+                        </div>
+                    )}
+                </div>
+
                 <Modals
                     buttonName="Submit"
                     headerName="Add Kamera"
@@ -824,8 +688,8 @@ const SettingIp = () => {
                 >
                     {modalDeleteLayout()}
                 </Modals>
-            </div >
-        </>
+            </div>
+        </div>
     );
 };
 

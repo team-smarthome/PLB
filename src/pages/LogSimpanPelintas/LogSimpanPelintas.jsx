@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import TableLog from "../../components/TableLog/TableLog";
-import "./logsimpanpelintas.style.css";
 import {
   apiGetAllIp,
   getAllNegaraData,
@@ -19,6 +18,7 @@ import { initiateSocket4010 } from "../../utils/socket";
 import { useNavigate } from "react-router-dom";
 import Modals from "../../components/Modal/Modal";
 import { Toast } from "../../components/Toast/Toast";
+import { IoFilter } from "react-icons/io5";
 
 const LogSimpanPelintas = () => {
   const socket = initiateSocket4010();
@@ -37,6 +37,7 @@ const LogSimpanPelintas = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalDetail, setModalDetail] = useState(false);
   const [detailData, setDetailData] = useState({});
+  const [showModalFilter, setShowModalFilter] = useState(false);
   const [dataNationality, setDataNationality] = useState([]);
   const [actionPopup, setActionPopup] = useState(false);
   const [simpanModal, setSimpanModal] = useState(false);
@@ -55,8 +56,6 @@ const LogSimpanPelintas = () => {
     current_page: 1,
     last_page: 1,
   });
-  console.log(actionPopup, "actionPopup");
-  //============================================ YANG DIGUNAKAN =============================================================//
 
   const GetDataUserLog = async () => {
     setStatus("loading");
@@ -165,6 +164,7 @@ const LogSimpanPelintas = () => {
 
     setLogData(updateData);
   };
+
   const handleActionPopup = () => {
     console.log("running");
     const findData = logData.filter((data) => data.isSelected == true).length;
@@ -175,33 +175,35 @@ const LogSimpanPelintas = () => {
     }
   };
 
-  useEffect(() => {
-    handleActionPopup();
-  }, [logData]);
-
   const customRowRenderer = (row, index) => {
     return (
       <>
-        <td onClick={() => handleOpenDetail(row)}>{row?.no_passport}</td>
-        <td onClick={() => handleOpenDetail(row)}>{row?.name || "Unkown"}</td>
-        <td onClick={() => handleOpenDetail(row)}>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
+          {row?.no_passport}
+        </td>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
+          {row?.name || "Unkown"}
+        </td>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
           {row?.gender === "M"
             ? "Laki-Laki"
             : row?.gender === "F"
               ? "Perempuan"
               : "Unkown"}
         </td>
-        <td onClick={() => handleOpenDetail(row)}>{row?.tpi_id || "Unkown"}</td>
-        <td onClick={() => handleOpenDetail(row)}>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
+          {row?.tpi_id || "Unkown"}
+        </td>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
           {row?.nationality || "Unkown"}
         </td>
-        <td onClick={() => handleOpenDetail(row)}>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
           {row?.user?.petugas?.nama_petugas}
         </td>
-        <td onClick={() => handleOpenDetail(row)}>
+        <td className="text-center" onClick={() => handleOpenDetail(row)}>
           {row?.pass_status == "izinkan" ? "Izinkan" : "Tolak"}
         </td>
-        <td class="">
+        <td className="text-center">
           <input
             onChange={(e) => {
               e.stopPropagation();
@@ -310,44 +312,6 @@ const LogSimpanPelintas = () => {
     setCurrentImage(currentImage - 1);
   };
 
-  useEffect(() => {
-    localStorage.setItem("cameraIp", "");
-    const fetchData = async () => {
-      await Promise.all([
-        GetDataUserLog(),
-        GetDataKamera(),
-        getDataNationality(),
-      ]);
-      setStatus("success");
-    };
-    fetchData();
-
-    socket.on("logDataUpdate", () => {
-      GetDataUserLogFilter();
-    });
-
-    return () => {
-      socket.off("logDataUpdate");
-    };
-  }, []);
-
-  useEffect(() => {
-    setParams((prevState) => ({
-      ...prevState,
-      page: page,
-      per_page: perPage,
-    }));
-    setGetPagination(true);
-  }, [page, perPage]);
-
-  const selectedData = logData.filter((data) => data.isSelected == true);
-  useEffect(() => {
-    if (getPagination) {
-      GetDataUserLog();
-    }
-    setGetPagination(false);
-  }, [getPagination]);
-
   const handleCloseModalDetail = () => {
     setModalDetail(false);
     setDetailData({});
@@ -358,169 +322,166 @@ const LogSimpanPelintas = () => {
     console.log(row);
   };
 
-  const modalDetailRow = () => {
+  const filterModalContent = () => {
     return (
-      <div className="register-container">
-        <div className="register-input">
-          <span>PLB / BCP Number</span>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-gray-500 uppercase">
+            No. PLB
+          </label>
           <input
             type="text"
-            name="no_passport"
-            id=""
-            value={detailData.no_passport}
-            onChange={handleChange}
-            disabled
+            placeholder="Enter PLB number"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+            value={params.no_passport}
+            onChange={(e) =>
+              setParams({
+                ...params,
+                no_passport: e.target.value.toUpperCase(),
+              })
+            }
           />
         </div>
-        {/* <div className="register-input">
-                    <span>Registration Number</span>
-                    <input type="text" name="no_register" id="" value={detailData.no_register} onChange={handleChange} />
-                </div> */}
-        <div className="register-input">
-          <span>Full Name</span>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-gray-500 uppercase">
+            Nama Petugas
+          </label>
           <input
             type="text"
-            name="name"
-            id=""
-            value={detailData.name}
-            onChange={handleChange}
-            disabled
+            placeholder="Enter Name"
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+            value={params.nama_petugas}
+            onChange={(e) =>
+              setParams({
+                ...params,
+                nama_petugas: e.target.value
+                  .toUpperCase()
+                  .replace(/[^A-Za-z\s.-]/g, ""),
+              })
+            }
           />
         </div>
-        <div className="register-input">
-          <span>Date of Birth</span>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-gray-500 uppercase">
+            Start Date
+          </label>
           <input
             type="date"
-            name="date_of_birth"
-            id=""
-            value={detailData.date_of_birth}
-            onChange={handleChange}
-            disabled
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+            value={params.startDate}
+            onChange={(e) =>
+              setParams({ ...params, startDate: e.target.value })
+            }
           />
         </div>
-        <div className="register-input">
-          <span>Gender</span>
-          <select
-            value={detailData.gender}
-            name="gender"
-            onChange={handleChange}
-            disabled
-          >
-            <option value="">Pilih Gender</option>
-            <option value="M">Laki-Laki</option>
-            <option value="F">Perempuan</option>
-          </select>
-        </div>
-        <div className="register-input">
-          <span>Nationality</span>
-          <input
-            type="text"
-            name="name"
-            id=""
-            value={detailData.nationality}
-            onChange={handleChange}
-            disabled
-          />
-        </div>
-        <div className="register-input">
-          <span>Expired Date</span>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-gray-500 uppercase">
+            End Date
+          </label>
           <input
             type="date"
-            name="expired_date"
-            id=""
-            value={detailData.expired_date}
-            onChange={handleChange}
-            disabled
+            className="w-90 px-4 h-11 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-700"
+            value={params.endDate}
+            onChange={(e) => setParams({ ...params, endDate: e.target.value })}
           />
-        </div>
-        <div className="register-input" style={{ marginBottom: "5rem" }}>
-          <span>Destination Location</span>
-          <input
-            type="text"
-            name="name"
-            id=""
-            value={detailData.destination_location}
-            onChange={handleChange}
-            disabled
-          />
-        </div>
-        <div
-          className="register-input input-file"
-          style={{ marginBottom: "7rem" }}
-        >
-          <span>Profile Image</span>
-          <div
-            className="input-file-container"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <img
-              src={
-                detailData.profile_image
-                  ? `data:image/jpeg;base64,${detailData.profile_image}`
-                  : detailData.profile_image
-              }
-              alt=""
-              height={175}
-            />
-          </div>
-        </div>
-        <div
-          className="register-input input-file"
-          style={{ paddingTop: "2rem" }}
-        >
-          <span>Photo Document</span>
-          <div
-            className="input-file-container"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <img
-              src={
-                detailData.photo_passport
-                  ? `data:image/jpeg;base64,${detailData.photo_passport}`
-                  : detailData.photo_passport
-              }
-              alt=""
-              height={175}
-            />
-          </div>
-        </div>
-        <div
-          className="register-input input-file"
-          style={{ paddingTop: "8rem" }}
-        >
-          <span>Photo FaceReg</span>
-          <div
-            className="input-file-container"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <img
-              src={
-                detailData.facreg_img
-                  ? `data:image/jpeg;base64,${detailData.facreg_img}`
-                  : detailData.facreg_img
-              }
-              alt=""
-              height={175}
-            />
-          </div>
         </div>
       </div>
     );
   };
 
-  //============================================ YANG DIGUNAKAN =============================================================//
+  const handleCloseModalFilter = () => {
+    setShowModalFilter(false);
+  };
+
+  const handleSearchFilter = () => {
+    handlePageChange(1);
+    GetDataUserLog();
+    setShowModalFilter(false);
+  };
+
+  const modalDetailRow = () => {
+    const fields = [
+      { label: "PLB / BCP Number", name: "no_passport", type: "text" },
+      { label: "Full Name", name: "name", type: "text" },
+      { label: "Date of Birth", name: "date_of_birth", type: "date" },
+      { label: "Nationality", name: "nationality", type: "text" },
+      { label: "Expired Date", name: "expired_date", type: "date" },
+      {
+        label: "Destination Location",
+        name: "destination_location",
+        type: "text",
+      },
+    ];
+
+    const images = [
+      { label: "Profile Image", key: "profile_image" },
+      { label: "Photo Document", key: "photo_passport" },
+      { label: "Photo FaceReg", key: "facreg_img" },
+    ];
+
+    return (
+      <div className="flex flex-col gap-4 p-6">
+        {/* Text Fields */}
+        <div className="grid grid-cols-1 gap-3">
+          {fields.map(({ label, name, type }) => (
+            <div key={name} className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-600">
+                {label}
+              </label>
+              {name === "gender" ? (
+                <select
+                  value={detailData.gender}
+                  name="gender"
+                  onChange={handleChange}
+                  disabled
+                  className="w-90 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
+                >
+                  <option value="">Pilih Gender</option>
+                  <option value="M">Laki-Laki</option>
+                  <option value="F">Perempuan</option>
+                </select>
+              ) : (
+                <input
+                  type={type}
+                  name={name}
+                  value={detailData[name] || ""}
+                  onChange={handleChange}
+                  disabled
+                  className="w-90 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
+                />
+              )}
+            </div>
+          ))}
+
+          {/* Gender — inserted after Date of Birth */}
+          {/* (already handled above via fields array — add gender there if needed) */}
+        </div>
+
+        {/* Divider */}
+        <hr className="border-gray-100 my-2" />
+
+        {/* Image Fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {images.map(({ label, key }) => (
+            <div key={key} className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-gray-600">{label}</span>
+              <div className="flex items-center justify-center w-full h-44 border border-gray-200 rounded-lg bg-gray-50 overflow-hidden">
+                {detailData[key] ? (
+                  <img
+                    src={`data:image/jpeg;base64,${detailData[key]}`}
+                    alt={label}
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400">No image</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const handleDeleteLogs = async () => {
     const deletedData = selectedData.map((item) => {
@@ -571,200 +532,185 @@ const LogSimpanPelintas = () => {
     );
   };
 
+  useEffect(() => {
+    localStorage.setItem("cameraIp", "");
+    const fetchData = async () => {
+      await Promise.all([
+        GetDataUserLog(),
+        GetDataKamera(),
+        getDataNationality(),
+      ]);
+      setStatus("success");
+    };
+    fetchData();
+
+    socket.on("logDataUpdate", () => {
+      GetDataUserLogFilter();
+    });
+
+    return () => {
+      socket.off("logDataUpdate");
+    };
+  }, []);
+
+  useEffect(() => {
+    handleActionPopup();
+  }, [logData]);
+
+  useEffect(() => {
+    setParams((prevState) => ({
+      ...prevState,
+      page: page,
+      per_page: perPage,
+    }));
+    setGetPagination(true);
+  }, [page, perPage]);
+
+  const selectedData = logData.filter((data) => data.isSelected == true);
+  useEffect(() => {
+    if (getPagination) {
+      GetDataUserLog();
+    }
+    setGetPagination(false);
+  }, [getPagination]);
+
   return (
-    <div style={{ padding: 20, backgroundColor: "#eeeeee", height: "100%" }}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className=" flex flex-row items-center gap-4">
-          <label
-            htmlFor="plb"
-            className="text-sm font-bold text-gray-700 w-[10%]"
-          >
-            No. PLB
-          </label>
-          <input
-            id="plb"
-            placeholder="Enter PLB number"
-            className="h-10 bg-gray-100 border-gray-200"
-            value={params.no_passport}
-            style={{ backgroundColor: "white" }}
-            onChange={(e) =>
-              setParams({
-                ...params,
-                no_passport: e.target.value.toUpperCase(),
-              })
-            }
-          />
-        </div>
-        <div className=" flex flex-row items-center gap-4">
-          <label
-            htmlFor="startDate"
-            className="text-sm font-bold text-gray-700 "
-          >
-            Start Date
-          </label>
-
-          <input
-            id="startDate"
-            type="date"
-            //   placeholder="dd/mm/yyyy --:--"
-            className="h-10 bg-gray-100 border-gray-200 pr-10 w-full"
-            value={params.startDate}
-            style={{ backgroundColor: "white" }}
-            onChange={(e) =>
-              setParams({ ...params, startDate: e.target.value })
-            }
-          />
-        </div>
-        <div className=" flex flex-row items-center gap-4">
-          <label
-            htmlFor="fullName"
-            className="text-sm font-bold text-gray-700 w-[10%]"
-          >
-            Nama Petugas
-          </label>
-          <input
-            id="namaPetugas"
-            placeholder="Enter Name"
-            className="h-10 bg-gray-100 border-gray-200"
-            value={params.nama_petugas}
-            style={{ backgroundColor: "white" }}
-            onChange={(e) =>
-              setParams({
-                ...params,
-                nama_petugas: e.target.value
-                  .toUpperCase()
-                  .replace(/[^A-Za-z\s.-]/g, ""),
-              })
-            }
-          />
-        </div>
-        <div className=" flex flex-row items-center gap-4">
-          <label htmlFor="endDate" className="text-sm font-bold text-gray-700">
-            End Date
-          </label>
-
-          <input
-            id="endDate"
-            type="date"
-            //   placeholder="dd/mm/yyyy --:--"
-            className="h-10 bg-gray-100 border-gray-200 pr-10"
-            value={params.endDate}
-            style={{ backgroundColor: "white" }}
-            onChange={(e) => setParams({ ...params, endDate: e.target.value })}
-          />
+    <div className="flex flex-col h-full gap-2">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-navy-900">
+            Log Simpan Pelintas
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Kelola dan lihat daftar log pelintas batas yang telah disimpan.
+          </p>
         </div>
       </div>
-      <div
-        className="submit-buttons-registers "
-        style={{
-          width: "99.4%",
-          paddingTop: "1%",
-          paddingBottom: "1%",
-          marginTop: "1%",
-        }}
-      >
-        <button
-          style={{
-            width: 150,
-            cursor: "pointer",
-          }}
-          onClick={() => navigate("/cpanel/synchronize-facereg")}
-        >
-          Sinkronisasi Data
-        </button>
-        <button
-          onClick={generateExcel}
-          className="add-data"
-          disabled={exportStatus === "loading"}
-        >
-          {exportStatus == "loading" ? "Exporting..." : "Export"}
-        </button>
-        <button
-          className="search"
-          onClick={handleSearch}
-          style={{
-            backgroundColor: "#4F70AB",
-          }}
-        >
-          Search
-        </button>
-      </div>
-      {status === "loading" && (
-        <div className="loading">
-          <span className="loader-loading-table"></span>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden relative">
+        <div className="p-6 border-b border-gray-100 flex flex-col gap-4">
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              onClick={() => navigate("/cpanel/synchronize-facereg")}
+              className="px-6 py-2 border border-navy-900 text-navy-900 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors"
+            >
+              Sinkronisasi Data
+            </button>
+            <button
+              onClick={generateExcel}
+              disabled={exportStatus === "loading"}
+              className="px-6 py-2 border bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 transition-colors flex items-center gap-2"
+            >
+              {exportStatus === "loading" ? "Exporting..." : "Export"}
+            </button>
+            <button
+              onClick={() => setShowModalFilter(true)}
+              className="px-6 py-2 border bg-navy-900 text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors flex items-center gap-2"
+            >
+              <IoFilter />
+              Filter
+            </button>
+          </div>
         </div>
-      )}
-      {status === "success" && logData && (
-        <>
-          <TableLog
-            tHeader={[
-              "no plb",
-              "name",
-              "gender",
-              "tpi id",
-              "nationality",
-              "nama petugas",
-              "status",
-              "action",
-            ]}
-            tBody={logData}
-            // handler={handleOpenDetail}
-            rowRenderer={customRowRenderer}
-            showIndex={true}
-            page={page}
-            perPage={pagination?.per_page}
-          />
-          {actionPopup && (
-            <div className="fixed bottom-12 right-8 min-w-[15%] p-4 bg-opacity-30 bg-gray-800 backdrop-blur-md flex items-center justify-center gap-4 rounded-lg shadow-lg border border-gray-700">
-              {logData.length == selectedData.length ? (
-                <button
-                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                  onClick={handleClearAll}
-                >
-                  Kosongkan Semua
-                </button>
-              ) : (
-                <button
-                  className="bg-white text-black py-2 px-6 rounded-lg shadow-md cursor-pointer transition-colors duration-200"
-                  onClick={handleSelectAll}
-                >
-                  Pilih Semua
-                </button>
-              )}
-              <button
-                className="bg-red-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-200 cursor-pointer"
-                onClick={() => setDeleteModal(true)}
-              >
-                Hapus Data
-              </button>
+
+        <div className="flex-1 overflow-auto bg-white p-6 pt-0">
+          {status === "loading" && (
+            <div className="flex justify-center items-center h-40">
+              <span
+                className="w-10 h-10 rounded-full animate-spin"
+                style={{
+                  border: "4px solid #172951",
+                  borderTopColor: "transparent",
+                }}
+              ></span>
             </div>
           )}
-          <div className="table-footer">
-            <>
-              Show {totalDataFilter} of {pagination?.total} entries
-            </>
-            <div className="table-footer-controls">
-              <select
-                value={perPage}
-                onChange={(e) => {
-                  setPerPage(Number(e.target.value));
-                }}
-                className="table-footer-controls-select"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <Pagination
-                pageCount={pagination?.last_page}
-                onPageChange={handlePageChange}
-                currentPage={page}
-              />
+
+          {status === "success" && logData && (
+            <div className="flex flex-col h-full">
+              <div className="mt-4 border border-gray-100 rounded-lg overflow-hidden">
+                <TableLog
+                  tHeader={[
+                    "no plb",
+                    "name",
+                    "gender",
+                    "tpi id",
+                    "nationality",
+                    "nama petugas",
+                    "status",
+                    "action",
+                  ]}
+                  tBody={logData}
+                  rowRenderer={customRowRenderer}
+                  showIndex={true}
+                  page={page}
+                  perPage={pagination?.per_page}
+                />
+              </div>
+
+              {actionPopup && (
+                <div className="fixed bottom-12 right-8 bg-white/90 backdrop-blur-md flex items-center justify-center gap-4 rounded-xl shadow-2xl border border-gray-200 p-4 z-50">
+                  {logData.length == selectedData.length ? (
+                    <button
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                      onClick={handleClearAll}
+                    >
+                      Kosongkan Semua
+                    </button>
+                  ) : (
+                    <button
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                      onClick={handleSelectAll}
+                    >
+                      Pilih Semua
+                    </button>
+                  )}
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                    onClick={() => setDeleteModal(true)}
+                  >
+                    Hapus Data
+                  </button>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mt-4 py-3 border-t border-gray-100">
+                <div className="text-sm text-gray-500">
+                  Menampilkan{" "}
+                  <span className="font-medium text-gray-900">
+                    {logData.length}
+                  </span>{" "}
+                  dari{" "}
+                  <span className="font-medium text-gray-900">
+                    {pagination?.total}
+                  </span>{" "}
+                  data
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Per halaman:</span>
+                    <select
+                      value={perPage}
+                      className="border border-gray-300 rounded-md text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onChange={(e) => setPerPage(Number(e.target.value))}
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                  <Pagination
+                    pageCount={pagination?.last_page}
+                    onPageChange={handlePageChange}
+                    currentPage={page}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          )}
+        </div>
+      </div>
       <ImgsViewer
         imgs={resultArray}
         isOpen={isOpenImage}
@@ -775,6 +721,15 @@ const LogSimpanPelintas = () => {
         }}
         currImg={currentImage}
       />
+      <Modals
+        showModal={showModalFilter}
+        closeModal={handleCloseModalFilter}
+        headerName="Filter Log"
+        buttonName="Apply"
+        width={800}
+      >
+        {filterModalContent()}
+      </Modals>
       <Modals
         showModal={modalDetail}
         closeModal={handleCloseModalDetail}

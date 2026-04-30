@@ -7,7 +7,6 @@ import Modals from "../../components/Modal/Modal";
 import Cookies from "js-cookie";
 import { addPendingRequest4050, initiateSocket4050 } from "../../utils/socket";
 import { useNavigate } from "react-router-dom";
-import "./LoadingSimpan.css";
 import { url_socket } from "../../services/env";
 
 const SynchronizeFaceReg = () => {
@@ -229,20 +228,20 @@ const SynchronizeFaceReg = () => {
   };
 
   return (
-    <div className="p-8 ">
-      <div className="flex items-center justify-center relative">
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute left-0 p-2 px-4 text-sm font-bold cursor-pointer border-none text-white rounded bg-btnPrimary hover:bg-[#0f2a43] transition-colors duration-300"
-        >
-          Kembali
-        </button>
-        <h2 className="text-center">Sinkronisasi Data</h2>
-      </div>
-      <div className="text-end pb-10">
+    <div className="flex flex-col h-full gap-2">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-navy-900 flex items-center gap-4">
+            Sinkronisasi Data
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Sinkronisasi data face recognition dengan server.
+          </p>
+        </div>
+
         {date.startDate && date.endDate && total > 0 && (
           <button
-            className="p-4 text-sm font-bold cursor-pointer border-1 text-black rounded bg-transparent hover:bg-gray-200 transition-colors duration-300"
+            className="px-4 py-2 text-sm font-medium cursor-pointer border border-gray-200 text-gray-700 rounded-lg bg-white hover:bg-gray-50 transition-colors duration-300 shadow-sm"
             onClick={handleClearDate}
           >
             Ganti Tanggal
@@ -250,140 +249,204 @@ const SynchronizeFaceReg = () => {
         )}
       </div>
 
-      {date.startDate && date.endDate && total > 0 ? (
-        <>
-          <div className="mb-8">
-            <div className="flex flex-row justify-between -my-4">
-              <h3>Total Data : </h3>
-              <h3>{total}</h3>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col flex-1 overflow-hidden p-6">
+        {date.startDate && date.endDate && total > 0 ? (
+          <div className="flex flex-col gap-8 max-w-3xl mx-auto w-full mt-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <p className="text-sm text-gray-500 mb-1">Total Data</p>
+                <p className="text-2xl font-bold text-gray-800">{total}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                <p className="text-sm text-green-600 mb-1">Sukses</p>
+                <p className="text-2xl font-bold text-green-700">
+                  {successCount}
+                </p>
+              </div>
+              <div className="bg-red-50 p-4 rounded-lg border border-red-100">
+                <p className="text-sm text-red-600 mb-1">Gagal</p>
+                <p className="text-2xl font-bold text-red-700">{failedCount}</p>
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <p className="text-sm text-blue-600 mb-1">Diproses</p>
+                <p className="text-2xl font-bold text-blue-700">{count}</p>
+              </div>
             </div>
-            <div className="flex flex-row justify-between -my-4">
-              <h3>Total Sukses : </h3>
-              <h3>{successCount}</h3>
-            </div>
-            <div className="flex flex-row justify-between -my-4">
-              <h3>Total Gagal : </h3>
-              <h3>{failedCount}</h3>
-            </div>
-            <div className="flex flex-row justify-between -my-4">
-              <h3>Data yang sudah diproses : </h3>
-              <h3>{count}</h3>
-            </div>
-          </div>
-          <div className="mb-8">
-            <div class="flex justify-between mb-1">
-              <span class="text-base font-medium text-black ">Progress</span>
-              <span class="text-base font-medium text-black ">
-                {`${percentage}`} %
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-8 ">
-              <div
-                className="bg-btnPrimary h-8 rounded-full"
-                style={{ width: `${percentage}%` }}
-              ></div>
-            </div>
-          </div>
 
-          <div className="flex justify-center items-center w-full">
-            {status == "done" ? (
-              <button
-                onClick={() => navigate("/cpanel/log-simpan-pelintas")}
-                className="w-[75%] p-2 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded"
-              >
-                Kembali
-              </button>
-            ) : (
-              <button
-                onClick={handleIncrementCount}
-                className={`w-[75%] p-4 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded-md `}
-              >
-                {/* {progress ? "Sinkronisasi Sedang Berlangsung" : "Mulai Sinkronisasi"} */}
-                {progress ? (
-                  <div className="flex items-center justify-center gap-3">
-                    Sinkronisasi Sedang Berlangsung
-                    <div className="loader-simpan-pelintas"></div>
-                  </div>
-                ) : (
-                  // <span className="">
+            <div className="flex flex-col gap-2">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-semibold text-gray-700">
+                  Progress Sinkronisasi
+                </span>
+                <span class="text-sm font-bold text-navy-900">
+                  {`${percentage}`}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden border border-gray-200">
+                <div
+                  className="bg-blue-600 h-full rounded-full transition-all duration-300 ease-out relative"
+                  style={{ width: `${percentage}%` }}
+                >
+                  <div
+                    className="absolute top-0 bottom-0 left-0 right-0 bg-white/20"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent)",
+                      backgroundSize: "1rem 1rem",
+                      animation: "progress-stripes 1s linear infinite",
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
 
-                  //   <span className="loader-simpan-pelintas"></span>
-                  // </span>
-                  "Mulai Sinkronisasi"
-                )}
-              </button>
-            )}
+            <div className="flex justify-center mt-6">
+              {status == "done" ? (
+                <button
+                  onClick={() => navigate("/cpanel/log-simpan-pelintas")}
+                  className="w-full md:w-[75%] py-3 px-6 text-sm font-semibold border-0 cursor-pointer bg-navy-900 hover:bg-blue-900 transition-colors text-white rounded-lg shadow-sm"
+                >
+                  Kembali ke Log
+                </button>
+              ) : (
+                <button
+                  onClick={handleIncrementCount}
+                  disabled={progress}
+                  className={`w-full md:w-[75%] py-3 px-6 text-sm font-semibold border-0 cursor-pointer text-white rounded-lg shadow-sm transition-all ${progress ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                >
+                  {progress ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                      Sinkronisasi Sedang Berlangsung...
+                    </div>
+                  ) : (
+                    "Mulai Sinkronisasi"
+                  )}
+                </button>
+              )}
+            </div>
           </div>
-        </>
-      ) : (
-        <>
-          <div className="flex flex-col items-center w-full">
-            <div className="flex flex-col gap-6 w-full max-w-3xl">
-              <div className="flex flex-row gap-4 justify-center items-center w-full">
-                <div className="flex items-center gap-1 w-full">
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full min-h-[400px]">
+            <div className="w-full max-w-2xl bg-gray-50 border border-gray-100 rounded-xl p-8 flex flex-col gap-6 shadow-sm">
+              <div className="text-center mb-2">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="p-2 text-sm font-semibold cursor-pointer border border-gray-200 text-gray-700 rounded-lg bg-white hover:bg-gray-50 transition-colors duration-300 flex items-center shadow-sm"
+                >
+                  <svg
+                    stroke="currentColor"
+                    fill="currentColor"
+                    strokeWidth="0"
+                    viewBox="0 0 448 512"
+                    height="1em"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mr-1"
+                  >
+                    <path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"></path>
+                  </svg>
+                  Kembali
+                </button>
+                <h3 className="text-lg font-bold text-gray-800">
+                  Filter Data Sinkronisasi
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Pilih rentang tanggal dan status keberangkatan data yang akan
+                  disinkronkan.
+                </p>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4 justify-center items-center w-full">
+                <div className="flex flex-col gap-1.5 w-full">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Tanggal Mulai
+                  </label>
                   <input
                     type="datetime-local"
                     id="startDate"
                     name="startDate"
-                    className="px-3 border rounded w-full py-5"
-                    value={date.startDate}
-                    style={{ backgroundColor: "white" }}
+                    className="px-4 py-2.5 border border-gray-200 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+                    value={date.startDate || ""}
                     onChange={handleDateTimeChange}
                   />
                 </div>
-                <span className="text-lg font-semibold">-</span>
-                <div className="flex items-center gap-1 w-full">
+                <span className="hidden md:block text-gray-400 font-bold mt-6">
+                  -
+                </span>
+                <div className="flex flex-col gap-1.5 w-full">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Tanggal Akhir
+                  </label>
                   <input
                     type="datetime-local"
                     id="endDate"
                     name="endDate"
-                    className="px-2 py-5 border rounded w-full"
-                    value={date.endDate}
-                    style={{ backgroundColor: "white" }}
+                    className="px-4 py-2.5 border border-gray-200 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+                    value={date.endDate || ""}
                     onChange={handleDateTimeChange}
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-4">
-                <span className="font-medium">Status Keberangkatan</span>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-gray-700">
+                  Status Keberangkatan
+                </label>
                 <select
-                  className="w-full p-4 rounded-sm bg-[#D9D9D9BF]"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
                   onChange={handleStatusChangeDepart}
-                  style={{ backgroundColor: "white" }}
+                  value={isDepart}
                 >
-                  <option value="">Semua</option>
-                  <option value={false}>Arrival</option>
-                  <option value={true}>Departure</option>
+                  <option value="">Semua Status</option>
+                  <option value={false}>Kedatangan (Arrival)</option>
+                  <option value={true}>Keberangkatan (Departure)</option>
                 </select>
               </div>
 
-              <div className="flex justify-center items-center w-full">
+              <div className="mt-4 pt-6 border-t border-gray-200">
                 <button
                   onClick={handleCheckDataCount}
-                  className="w-full p-3 text-base font-bold border-0 cursor-pointer bg-btnPrimary text-white rounded"
+                  className="w-full py-3 px-4 text-sm font-semibold cursor-pointer bg-navy-900 hover:bg-blue-800 transition-colors text-white rounded-lg shadow-sm"
                 >
-                  Periksa Data
+                  Periksa Ketersediaan Data
                 </button>
               </div>
             </div>
           </div>
-        </>
-      )}
+        )}
+      </div>
+
       <Modals
         showModal={modalAlertSynchronize}
         closeModal={() => setModalAlertSynchronize(false)}
         buttonName="Lanjutkan"
         cancelButtonName="Batalkan"
-        headerName="Peringatan"
+        headerName="Peringatan Penting"
         onConfirm={handleIncrementCount}
       >
-        <div className="py-5">
-          <p className="text-justify text-lg text-red-900">
-            Pastikan Anda tetap berada di halaman sinkronisasi selama proses
-            sinkronisasi berlangsung dan jangan menutup jendela atau berpindah
-            ke halaman lain. Keluar dari halaman ini dapat mengganggu proses
-            sinkronisasi dan menyebabkan data tidak tersimpan dengan benar.
-          </p>
+        <div className="py-4">
+          <div className="bg-red-50 p-4 rounded-lg border border-red-100 flex gap-4">
+            <div className="mt-0.5 text-red-600">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                height="1.5em"
+                width="1.5em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path>
+              </svg>
+            </div>
+            <p className="text-sm text-red-800 font-medium leading-relaxed">
+              Pastikan Anda tetap berada di halaman sinkronisasi selama proses
+              berlangsung. Jangan menutup browser atau berpindah ke halaman
+              lain. Keluar dari halaman ini dapat menghentikan proses secara
+              paksa dan menyebabkan data gagal tersimpan dengan benar.
+            </p>
+          </div>
         </div>
       </Modals>
     </div>

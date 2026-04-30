@@ -10,7 +10,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'btnPrimary': "#11375c"
+        'btnPrimary': "#11375c",
+        'navy-900': '#172951ff'
       }
     },
   },
